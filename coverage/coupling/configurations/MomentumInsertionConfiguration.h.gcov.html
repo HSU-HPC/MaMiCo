@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -108,10 +108,10 @@
 <a name="46"><span class="lineNum">      46 </span>            :   };</a>
 <a name="47"><span class="lineNum">      47 </span>            : </a>
 <a name="48"><span class="lineNum">      48 </span>            :   /** Constructor, initializes the class  */</a>
-<a name="49"><span class="lineNum">      49 </span><span class="lineCov">        240 :   MomentumInsertionConfiguration() : _insertionType(ADDITIVE_MOMENTUM_INSERTION), _isValid(true) {}</span></a>
+<a name="49"><span class="lineNum">      49 </span><span class="lineCov">        328 :   MomentumInsertionConfiguration() : _insertionType(ADDITIVE_MOMENTUM_INSERTION), _isValid(true) {}</span></a>
 <a name="50"><span class="lineNum">      50 </span>            : </a>
 <a name="51"><span class="lineNum">      51 </span>            :   /** Destructor */</a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineCov">        244 :   virtual ~MomentumInsertionConfiguration() {}</span></a>
+<a name="52"><span class="lineNum">      52 </span><span class="lineCov">        332 :   virtual ~MomentumInsertionConfiguration() {}</span></a>
 <a name="53"><span class="lineNum">      53 </span>            : </a>
 <a name="54"><span class="lineNum">      54 </span>            :   /** parseSubtag</a>
 <a name="55"><span class="lineNum">      55 </span>            :    *    @param node</a>
@@ -211,47 +211,44 @@
 <a name="149"><span class="lineNum">     149 </span>            :    *    @tparam LinkedCell type of the cell</a>
 <a name="150"><span class="lineNum">     150 </span>            :    *    @tparam dim Number of dimensions; it can be 1, 2 or 3</a>
 <a name="151"><span class="lineNum">     151 </span>            :    *    @param mdSolverInterface</a>
-<a name="152"><span class="lineNum">     152 </span>            :    *    @param indexConversion</a>
-<a name="153"><span class="lineNum">     153 </span>            :    *    @param macroscopicCells</a>
-<a name="154"><span class="lineNum">     154 </span>            :    *    @param numberMDTimestepsPerCouplingCycle</a>
-<a name="155"><span class="lineNum">     155 </span>            :    *    @return momentum insertion config</a>
-<a name="156"><span class="lineNum">     156 </span>            :    */</a>
-<a name="157"><span class="lineNum">     157 </span>            :   template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="158"><span class="lineNum">     158 </span>            :   MomentumInsertion&lt;LinkedCell, dim&gt;*</a>
-<a name="159"><span class="lineNum">     159 </span><span class="lineCov">          4 :   interpreteConfiguration(coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const mdSolverInterface,</span></a>
-<a name="160"><span class="lineNum">     160 </span>            :                           const coupling::IndexConversion&lt;dim&gt;&amp; indexConversion,</a>
-<a name="161"><span class="lineNum">     161 </span>            :                           const coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;* const macroscopicCells,</a>
-<a name="162"><span class="lineNum">     162 </span>            :                           unsigned int numberMDTimestepsPerCouplingCycle) const {</a>
-<a name="163"><span class="lineNum">     163 </span><span class="lineCov">          4 :     if (_insertionType == ADDITIVE_MOMENTUM_INSERTION) {</span></a>
-<a name="164"><span class="lineNum">     164 </span><span class="lineNoCov">          0 :       return new coupling::AdditiveMomentumInsertion&lt;LinkedCell, dim&gt;(mdSolverInterface, numberMDTimestepsPerCouplingCycle);</span></a>
-<a name="165"><span class="lineNum">     165 </span>            :     } else if (_insertionType == DIRECT_VELOCITY_INSERTION) {</a>
-<a name="166"><span class="lineNum">     166 </span><span class="lineNoCov">          0 :       return new coupling::SetGivenVelocity4MomentumInsertion&lt;LinkedCell, dim&gt;(mdSolverInterface);</span></a>
-<a name="167"><span class="lineNum">     167 </span>            :     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION) {</a>
-<a name="168"><span class="lineNum">     168 </span><span class="lineNoCov">          0 :       return new coupling::VelocityGradientRelaxation&lt;LinkedCell, dim&gt;(_velocityRelaxationFactor, mdSolverInterface, indexConversion, macroscopicCells);</span></a>
-<a name="169"><span class="lineNum">     169 </span>            :     } else if (_insertionType == NO_INSERTION) {</a>
-<a name="170"><span class="lineNum">     170 </span><span class="lineCov">          4 :       return new coupling::NoMomentumInsertion&lt;LinkedCell, dim&gt;(mdSolverInterface);</span></a>
-<a name="171"><span class="lineNum">     171 </span>            :     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION_TOPONLY) {</a>
-<a name="172"><span class="lineNum">     172 </span><span class="lineNoCov">          0 :       return new coupling::VelocityGradientRelaxationTopOnly&lt;LinkedCell, dim&gt;(_velocityRelaxationFactor, mdSolverInterface, indexConversion, macroscopicCells);</span></a>
-<a name="173"><span class="lineNum">     173 </span>            :     } else if (_insertionType == NIE_VELOCITY_IMPOSITION) {</a>
-<a name="174"><span class="lineNum">     174 </span><span class="lineNoCov">          0 :       return new coupling::NieVelocityImposition&lt;LinkedCell, dim&gt;(mdSolverInterface, indexConversion, _outerOverlap, _innerOverlap);</span></a>
-<a name="175"><span class="lineNum">     175 </span>            :     }</a>
-<a name="176"><span class="lineNum">     176 </span>            :     return NULL;</a>
-<a name="177"><span class="lineNum">     177 </span>            :   }</a>
+<a name="152"><span class="lineNum">     152 </span>            :    *    @param couplingCells</a>
+<a name="153"><span class="lineNum">     153 </span>            :    *    @param numberMDTimestepsPerCouplingCycle</a>
+<a name="154"><span class="lineNum">     154 </span>            :    *    @return momentum insertion config</a>
+<a name="155"><span class="lineNum">     155 </span>            :    */</a>
+<a name="156"><span class="lineNum">     156 </span>            :   template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="157"><span class="lineNum">     157 </span><span class="lineCov">          4 :   MomentumInsertion&lt;LinkedCell, dim&gt;* interpreteConfiguration(coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const mdSolverInterface,</span></a>
+<a name="158"><span class="lineNum">     158 </span>            :                                                               const coupling::datastructures::CouplingCellWithLinkedCells&lt;LinkedCell, dim&gt;* const couplingCells,</a>
+<a name="159"><span class="lineNum">     159 </span>            :                                                               unsigned int numberMDTimestepsPerCouplingCycle) const {</a>
+<a name="160"><span class="lineNum">     160 </span><span class="lineCov">          4 :     if (_insertionType == ADDITIVE_MOMENTUM_INSERTION) {</span></a>
+<a name="161"><span class="lineNum">     161 </span><span class="lineNoCov">          0 :       return new coupling::AdditiveMomentumInsertion&lt;LinkedCell, dim&gt;(mdSolverInterface, numberMDTimestepsPerCouplingCycle);</span></a>
+<a name="162"><span class="lineNum">     162 </span>            :     } else if (_insertionType == DIRECT_VELOCITY_INSERTION) {</a>
+<a name="163"><span class="lineNum">     163 </span><span class="lineNoCov">          0 :       return new coupling::SetGivenVelocity4MomentumInsertion&lt;LinkedCell, dim&gt;(mdSolverInterface);</span></a>
+<a name="164"><span class="lineNum">     164 </span>            :     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION) {</a>
+<a name="165"><span class="lineNum">     165 </span><span class="lineNoCov">          0 :       return new coupling::VelocityGradientRelaxation&lt;LinkedCell, dim&gt;(_velocityRelaxationFactor, mdSolverInterface, couplingCells);</span></a>
+<a name="166"><span class="lineNum">     166 </span>            :     } else if (_insertionType == NO_INSERTION) {</a>
+<a name="167"><span class="lineNum">     167 </span><span class="lineCov">          4 :       return new coupling::NoMomentumInsertion&lt;LinkedCell, dim&gt;(mdSolverInterface);</span></a>
+<a name="168"><span class="lineNum">     168 </span>            :     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION_TOPONLY) {</a>
+<a name="169"><span class="lineNum">     169 </span><span class="lineNoCov">          0 :       return new coupling::VelocityGradientRelaxationTopOnly&lt;LinkedCell, dim&gt;(_velocityRelaxationFactor, mdSolverInterface, couplingCells);</span></a>
+<a name="170"><span class="lineNum">     170 </span>            :     } else if (_insertionType == NIE_VELOCITY_IMPOSITION) {</a>
+<a name="171"><span class="lineNum">     171 </span><span class="lineNoCov">          0 :       return new coupling::NieVelocityImposition&lt;LinkedCell, dim&gt;(mdSolverInterface, _outerOverlap, _innerOverlap);</span></a>
+<a name="172"><span class="lineNum">     172 </span>            :     }</a>
+<a name="173"><span class="lineNum">     173 </span>            :     return NULL;</a>
+<a name="174"><span class="lineNum">     174 </span>            :   }</a>
+<a name="175"><span class="lineNum">     175 </span>            : </a>
+<a name="176"><span class="lineNum">     176 </span>            : protected:</a>
+<a name="177"><span class="lineNum">     177 </span><span class="lineCov">          4 :   MomentumInsertionConfiguration(MomentumInsertionType insertionType) : _insertionType(insertionType), _isValid(true) {}</span></a>
 <a name="178"><span class="lineNum">     178 </span>            : </a>
-<a name="179"><span class="lineNum">     179 </span>            : protected:</a>
-<a name="180"><span class="lineNum">     180 </span><span class="lineCov">          4 :   MomentumInsertionConfiguration(MomentumInsertionType insertionType) : _insertionType(insertionType), _isValid(true) {}</span></a>
-<a name="181"><span class="lineNum">     181 </span>            : </a>
-<a name="182"><span class="lineNum">     182 </span>            : private:</a>
-<a name="183"><span class="lineNum">     183 </span>            :   MomentumInsertionType _insertionType;</a>
-<a name="184"><span class="lineNum">     184 </span>            :   double _velocityRelaxationFactor; // required by velocity relaxation schemes</a>
-<a name="185"><span class="lineNum">     185 </span>            :   unsigned int _innerOverlap;       // innermost layer of overlap cells (required by</a>
-<a name="186"><span class="lineNum">     186 </span>            :                                     // nie velocity imposition)</a>
-<a name="187"><span class="lineNum">     187 </span>            :   unsigned int _outerOverlap;       // outermost layer of overlap cells (required by</a>
-<a name="188"><span class="lineNum">     188 </span>            :                                     // nie velocity imposition)</a>
-<a name="189"><span class="lineNum">     189 </span>            :   bool _isValid;</a>
-<a name="190"><span class="lineNum">     190 </span>            : };</a>
-<a name="191"><span class="lineNum">     191 </span>            : </a>
-<a name="192"><span class="lineNum">     192 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MOMENTUMINSERTIONCONFIGURATION_H_</a>
+<a name="179"><span class="lineNum">     179 </span>            : private:</a>
+<a name="180"><span class="lineNum">     180 </span>            :   MomentumInsertionType _insertionType;</a>
+<a name="181"><span class="lineNum">     181 </span>            :   double _velocityRelaxationFactor; // required by velocity relaxation schemes</a>
+<a name="182"><span class="lineNum">     182 </span>            :   unsigned int _innerOverlap;       // innermost layer of overlap cells (required by</a>
+<a name="183"><span class="lineNum">     183 </span>            :                                     // nie velocity imposition)</a>
+<a name="184"><span class="lineNum">     184 </span>            :   unsigned int _outerOverlap;       // outermost layer of overlap cells (required by</a>
+<a name="185"><span class="lineNum">     185 </span>            :                                     // nie velocity imposition)</a>
+<a name="186"><span class="lineNum">     186 </span>            :   bool _isValid;</a>
+<a name="187"><span class="lineNum">     187 </span>            : };</a>
+<a name="188"><span class="lineNum">     188 </span>            : </a>
+<a name="189"><span class="lineNum">     189 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MOMENTUMINSERTIONCONFIGURATION_H_</a>
 </pre>
       </td>
     </tr>

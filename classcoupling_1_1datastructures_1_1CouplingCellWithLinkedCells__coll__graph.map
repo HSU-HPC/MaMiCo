@@ -1,0 +1,7 @@
+<map id="coupling::datastructures::CouplingCellWithLinkedCells&lt; LinkedCell, dim &gt;" name="coupling::datastructures::CouplingCellWithLinkedCells&lt; LinkedCell, dim &gt;">
+<area shape="rect" id="Node000001" title="defines the cell type with cell&#45;averaged quantities. Derived from the class coupling::datastructures:..." alt="" coords="5,229,199,285"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1datastructures_1_1CouplingCell.html" title="defines the cell type with cell&#45;averaged quantities only (no linked cells)." alt="" coords="23,139,181,180"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,195,105,229,99,229,99,195"/>
+<area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="43,5,161,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="105,62,105,139,99,139,99,62"/>
+</map>

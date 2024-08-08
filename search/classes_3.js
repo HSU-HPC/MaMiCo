@@ -1,7 +1,7 @@
 var searchData=
 [
   ['dataexchange_0',['DataExchange',['../classcoupling_1_1sendrecv_1_1DataExchange.html',1,'coupling::sendrecv']]],
-  ['dataexchange_3c_20coupling_3a_3adatastructures_3a_3amacroscopiccell_3c_20dim_20_3e_2c_20dim_20_3e_1',['DataExchange&lt; coupling::datastructures::MacroscopicCell&lt; dim &gt;, dim &gt;',['../classcoupling_1_1sendrecv_1_1DataExchange.html',1,'coupling::sendrecv']]],
+  ['dataexchange_3c_20coupling_3a_3adatastructures_3a_3acouplingcell_3c_20dim_20_3e_2c_20dim_20_3e_1',['DataExchange&lt; coupling::datastructures::CouplingCell&lt; dim &gt;, dim &gt;',['../classcoupling_1_1sendrecv_1_1DataExchange.html',1,'coupling::sendrecv']]],
   ['dataexchangefrommacro2md_2',['DataExchangeFromMacro2MD',['../classcoupling_1_1sendrecv_1_1DataExchangeFromMacro2MD.html',1,'coupling::sendrecv']]],
   ['dataexchangefrommd2macro_3',['DataExchangeFromMD2Macro',['../classcoupling_1_1sendrecv_1_1DataExchangeFromMD2Macro.html',1,'coupling::sendrecv']]],
   ['deleteparticlemapping_4',['DeleteParticleMapping',['../classcoupling_1_1cellmappings_1_1DeleteParticleMapping.html',1,'coupling::cellmappings']]],

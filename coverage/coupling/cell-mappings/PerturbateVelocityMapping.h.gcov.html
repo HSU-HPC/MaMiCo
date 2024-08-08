@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -109,51 +109,50 @@
 <a name="47"><span class="lineNum">      47 </span>            : </a>
 <a name="48"><span class="lineNum">      48 </span>            :   /** superimposes a random perturbation to the mean velocity in all directions</a>
 <a name="49"><span class="lineNum">      49 </span>            :    *    @param cell</a>
-<a name="50"><span class="lineNum">      50 </span>            :    *    @param cellIndex</a>
-<a name="51"><span class="lineNum">      51 </span>            :    */</a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineNoCov">          0 :   void handleCell(LinkedCell&amp; cell, const unsigned int&amp; cellIndex) {</span></a>
-<a name="53"><span class="lineNum">      53 </span>            : </a>
-<a name="54"><span class="lineNum">      54 </span><span class="lineNoCov">          0 :     double stdDeviation = std::sqrt(dim * _kB * _temperature / _molecularMass);</span></a>
-<a name="55"><span class="lineNum">      55 </span>            : </a>
-<a name="56"><span class="lineNum">      56 </span><span class="lineNoCov">          0 :     tarch::la::Vector&lt;dim, double&gt; randomNumbers(0.0);</span></a>
-<a name="57"><span class="lineNum">      57 </span>            : </a>
-<a name="58"><span class="lineNum">      58 </span><span class="lineNoCov">          0 :     coupling::interface::MoleculeIterator&lt;LinkedCell, dim&gt;* molecule = _mdSolverInterface-&gt;getMoleculeIterator(cell);</span></a>
-<a name="59"><span class="lineNum">      59 </span><span class="lineNoCov">          0 :     molecule-&gt;begin();</span></a>
-<a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 :     while (molecule-&gt;continueIteration()) {</span></a>
-<a name="61"><span class="lineNum">      61 </span><span class="lineNoCov">          0 :       coupling::interface::Molecule&lt;dim&gt;&amp; wrapper(molecule-&gt;get());</span></a>
-<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :       randomNumbers[0] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();</span></a>
-<a name="63"><span class="lineNum">      63 </span><span class="lineNoCov">          0 :       for (unsigned int d = 1; d &lt; dim; ++d) {</span></a>
-<a name="64"><span class="lineNum">      64 </span><span class="lineNoCov">          0 :         randomNumbers[d] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();</span></a>
-<a name="65"><span class="lineNum">      65 </span>            :       }</a>
-<a name="66"><span class="lineNum">      66 </span>            : </a>
-<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :       tarch::la::Vector&lt;dim, double&gt; mVelocity = wrapper.getVelocity();</span></a>
-<a name="68"><span class="lineNum">      68 </span>            :       if (dim == 3) {</a>
-<a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :         mVelocity[0] = _velocity[0] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::cos(randomNumbers[2]));</span></a>
-<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :         mVelocity[1] = _velocity[1] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::sin(randomNumbers[2]));</span></a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :         mVelocity[2] = _velocity[2] + stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));</span></a>
-<a name="72"><span class="lineNum">      72 </span>            :       } else if (dim == 1) {</a>
-<a name="73"><span class="lineNum">      73 </span>            :         mVelocity = _velocity + stdDeviation * randomNumbers;</a>
-<a name="74"><span class="lineNum">      74 </span>            :       } else if (dim == 2) {</a>
-<a name="75"><span class="lineNum">      75 </span>            :         mVelocity[0] = _velocity[0] + stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));</a>
-<a name="76"><span class="lineNum">      76 </span>            :         mVelocity[1] = _velocity[1] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]));</a>
-<a name="77"><span class="lineNum">      77 </span>            :       }</a>
-<a name="78"><span class="lineNum">      78 </span><span class="lineNoCov">          0 :       wrapper.setVelocity(mVelocity);</span></a>
-<a name="79"><span class="lineNum">      79 </span>            : </a>
-<a name="80"><span class="lineNum">      80 </span><span class="lineNoCov">          0 :       molecule-&gt;next();</span></a>
-<a name="81"><span class="lineNum">      81 </span>            :     }</a>
-<a name="82"><span class="lineNum">      82 </span><span class="lineNoCov">          0 :     delete molecule;</span></a>
-<a name="83"><span class="lineNum">      83 </span><span class="lineNoCov">          0 :   }</span></a>
-<a name="84"><span class="lineNum">      84 </span>            : </a>
-<a name="85"><span class="lineNum">      85 </span>            : private:</a>
-<a name="86"><span class="lineNum">      86 </span>            :   coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const _mdSolverInterface;</a>
-<a name="87"><span class="lineNum">      87 </span>            :   const double _molecularMass;</a>
-<a name="88"><span class="lineNum">      88 </span>            :   const double _kB;</a>
-<a name="89"><span class="lineNum">      89 </span>            :   const double _temperature;</a>
-<a name="90"><span class="lineNum">      90 </span>            :   const tarch::la::Vector&lt;dim, double&gt; _velocity;</a>
-<a name="91"><span class="lineNum">      91 </span>            :   const double _sigma;</a>
-<a name="92"><span class="lineNum">      92 </span>            : };</a>
-<a name="93"><span class="lineNum">      93 </span>            : </a>
-<a name="94"><span class="lineNum">      94 </span>            : #endif //_COUPLING_CELLMAPPINGS_VARYCHECKPOINTMAPPING_H_</a>
+<a name="50"><span class="lineNum">      50 </span>            :    */</a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineNoCov">          0 :   void handleCell(LinkedCell&amp; cell) {</span></a>
+<a name="52"><span class="lineNum">      52 </span>            : </a>
+<a name="53"><span class="lineNum">      53 </span><span class="lineNoCov">          0 :     double stdDeviation = std::sqrt(dim * _kB * _temperature / _molecularMass);</span></a>
+<a name="54"><span class="lineNum">      54 </span>            : </a>
+<a name="55"><span class="lineNum">      55 </span><span class="lineNoCov">          0 :     tarch::la::Vector&lt;dim, double&gt; randomNumbers(0.0);</span></a>
+<a name="56"><span class="lineNum">      56 </span>            : </a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :     coupling::interface::MoleculeIterator&lt;LinkedCell, dim&gt;* molecule = _mdSolverInterface-&gt;getMoleculeIterator(cell);</span></a>
+<a name="58"><span class="lineNum">      58 </span><span class="lineNoCov">          0 :     molecule-&gt;begin();</span></a>
+<a name="59"><span class="lineNum">      59 </span><span class="lineNoCov">          0 :     while (molecule-&gt;continueIteration()) {</span></a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 :       coupling::interface::Molecule&lt;dim&gt;&amp; wrapper(molecule-&gt;get());</span></a>
+<a name="61"><span class="lineNum">      61 </span><span class="lineNoCov">          0 :       randomNumbers[0] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();</span></a>
+<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :       for (unsigned int d = 1; d &lt; dim; ++d) {</span></a>
+<a name="63"><span class="lineNum">      63 </span><span class="lineNoCov">          0 :         randomNumbers[d] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();</span></a>
+<a name="64"><span class="lineNum">      64 </span>            :       }</a>
+<a name="65"><span class="lineNum">      65 </span>            : </a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :       tarch::la::Vector&lt;dim, double&gt; mVelocity = wrapper.getVelocity();</span></a>
+<a name="67"><span class="lineNum">      67 </span>            :       if (dim == 3) {</a>
+<a name="68"><span class="lineNum">      68 </span><span class="lineNoCov">          0 :         mVelocity[0] = _velocity[0] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::cos(randomNumbers[2]));</span></a>
+<a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :         mVelocity[1] = _velocity[1] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::sin(randomNumbers[2]));</span></a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :         mVelocity[2] = _velocity[2] + stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));</span></a>
+<a name="71"><span class="lineNum">      71 </span>            :       } else if (dim == 1) {</a>
+<a name="72"><span class="lineNum">      72 </span>            :         mVelocity = _velocity + stdDeviation * randomNumbers;</a>
+<a name="73"><span class="lineNum">      73 </span>            :       } else if (dim == 2) {</a>
+<a name="74"><span class="lineNum">      74 </span>            :         mVelocity[0] = _velocity[0] + stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));</a>
+<a name="75"><span class="lineNum">      75 </span>            :         mVelocity[1] = _velocity[1] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]));</a>
+<a name="76"><span class="lineNum">      76 </span>            :       }</a>
+<a name="77"><span class="lineNum">      77 </span><span class="lineNoCov">          0 :       wrapper.setVelocity(mVelocity);</span></a>
+<a name="78"><span class="lineNum">      78 </span>            : </a>
+<a name="79"><span class="lineNum">      79 </span><span class="lineNoCov">          0 :       molecule-&gt;next();</span></a>
+<a name="80"><span class="lineNum">      80 </span>            :     }</a>
+<a name="81"><span class="lineNum">      81 </span><span class="lineNoCov">          0 :     delete molecule;</span></a>
+<a name="82"><span class="lineNum">      82 </span><span class="lineNoCov">          0 :   }</span></a>
+<a name="83"><span class="lineNum">      83 </span>            : </a>
+<a name="84"><span class="lineNum">      84 </span>            : private:</a>
+<a name="85"><span class="lineNum">      85 </span>            :   coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const _mdSolverInterface;</a>
+<a name="86"><span class="lineNum">      86 </span>            :   const double _molecularMass;</a>
+<a name="87"><span class="lineNum">      87 </span>            :   const double _kB;</a>
+<a name="88"><span class="lineNum">      88 </span>            :   const double _temperature;</a>
+<a name="89"><span class="lineNum">      89 </span>            :   const tarch::la::Vector&lt;dim, double&gt; _velocity;</a>
+<a name="90"><span class="lineNum">      90 </span>            :   const double _sigma;</a>
+<a name="91"><span class="lineNum">      91 </span>            : };</a>
+<a name="92"><span class="lineNum">      92 </span>            : </a>
+<a name="93"><span class="lineNum">      93 </span>            : #endif //_COUPLING_CELLMAPPINGS_VARYCHECKPOINTMAPPING_H_</a>
 </pre>
       </td>
     </tr>

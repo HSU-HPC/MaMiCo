@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -80,7 +80,7 @@
 <a name="18"><span class="lineNum">      18 </span>            : </a>
 <a name="19"><span class="lineNum">      19 </span>            : /**</a>
 <a name="20"><span class="lineNum">      20 </span>            :  *      @brief This class computes the mean potential energy over this</a>
-<a name="21"><span class="lineNum">      21 </span>            :  *macroscopic cell.</a>
+<a name="21"><span class="lineNum">      21 </span>            :  *coupling cell.</a>
 <a name="22"><span class="lineNum">      22 </span>            :  *      @tparam LinkedCell cell type</a>
 <a name="23"><span class="lineNum">      23 </span>            :  *      @tparam dim Number of dimensions; it can be 1, 2 or 3</a>
 <a name="24"><span class="lineNum">      24 </span>            :  *  @author Philipp Neumann</a>
@@ -119,34 +119,33 @@
 <a name="57"><span class="lineNum">      57 </span>            :   /** counts the molecules inside a linked cell and sums up the of the mean</a>
 <a name="58"><span class="lineNum">      58 </span>            :    *potential energy of all particles inside the cell.</a>
 <a name="59"><span class="lineNum">      59 </span>            :    *    @param cell</a>
-<a name="60"><span class="lineNum">      60 </span>            :    *    @param cellIndex</a>
-<a name="61"><span class="lineNum">      61 </span>            :    */</a>
-<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :   void handleCell(LinkedCell&amp; cell, const unsigned int&amp; cellIndex) {</span></a>
-<a name="63"><span class="lineNum">      63 </span><span class="lineNoCov">          0 :     coupling::interface::MoleculeIterator&lt;LinkedCell, dim&gt;* it = _mdSolverInterface-&gt;getMoleculeIterator(cell);</span></a>
-<a name="64"><span class="lineNum">      64 </span><span class="lineNoCov">          0 :     it-&gt;begin();</span></a>
-<a name="65"><span class="lineNum">      65 </span><span class="lineNoCov">          0 :     while (it-&gt;continueIteration()) {</span></a>
-<a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :       const coupling::interface::Molecule&lt;dim&gt;&amp; wrapper(it-&gt;getConst());</span></a>
-<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :       _meanPotentialEnergy += wrapper.getPotentialEnergy();</span></a>
-<a name="68"><span class="lineNum">      68 </span><span class="lineNoCov">          0 :       _meanPotentialEnergy += _boundaryForceController.getPotentialEnergy(wrapper.getPosition());</span></a>
-<a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :       _particleCounter++;</span></a>
-<a name="70"><span class="lineNum">      70 </span>            : </a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :       it-&gt;next();</span></a>
-<a name="72"><span class="lineNum">      72 </span>            :     }</a>
-<a name="73"><span class="lineNum">      73 </span><span class="lineNoCov">          0 :     delete it;</span></a>
-<a name="74"><span class="lineNum">      74 </span><span class="lineNoCov">          0 :   }</span></a>
-<a name="75"><span class="lineNum">      75 </span>            : </a>
-<a name="76"><span class="lineNum">      76 </span>            :   /** returns the mean potential energy inside a linked cell</a>
-<a name="77"><span class="lineNum">      77 </span>            :    *    @return _meanPotentialEnergy</a>
-<a name="78"><span class="lineNum">      78 </span>            :    */</a>
-<a name="79"><span class="lineNum">      79 </span><span class="lineNoCov">          0 :   double getPotentialEnergy() const { return _meanPotentialEnergy; }</span></a>
-<a name="80"><span class="lineNum">      80 </span>            : </a>
-<a name="81"><span class="lineNum">      81 </span>            : private:</a>
-<a name="82"><span class="lineNum">      82 </span>            :   coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const _mdSolverInterface;</a>
-<a name="83"><span class="lineNum">      83 </span>            :   double _meanPotentialEnergy;</a>
-<a name="84"><span class="lineNum">      84 </span>            :   unsigned int _particleCounter;</a>
-<a name="85"><span class="lineNum">      85 </span>            :   const coupling::BoundaryForceController&lt;LinkedCell, dim&gt;&amp; _boundaryForceController;</a>
-<a name="86"><span class="lineNum">      86 </span>            : };</a>
-<a name="87"><span class="lineNum">      87 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_COMPUTEMEANPOTENTIALENERGYMAPPING_H_</a>
+<a name="60"><span class="lineNum">      60 </span>            :    */</a>
+<a name="61"><span class="lineNum">      61 </span><span class="lineNoCov">          0 :   void handleCell(LinkedCell&amp; cell) {</span></a>
+<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :     coupling::interface::MoleculeIterator&lt;LinkedCell, dim&gt;* it = _mdSolverInterface-&gt;getMoleculeIterator(cell);</span></a>
+<a name="63"><span class="lineNum">      63 </span><span class="lineNoCov">          0 :     it-&gt;begin();</span></a>
+<a name="64"><span class="lineNum">      64 </span><span class="lineNoCov">          0 :     while (it-&gt;continueIteration()) {</span></a>
+<a name="65"><span class="lineNum">      65 </span><span class="lineNoCov">          0 :       const coupling::interface::Molecule&lt;dim&gt;&amp; wrapper(it-&gt;getConst());</span></a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :       _meanPotentialEnergy += wrapper.getPotentialEnergy();</span></a>
+<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :       _meanPotentialEnergy += _boundaryForceController.getPotentialEnergy(wrapper.getPosition());</span></a>
+<a name="68"><span class="lineNum">      68 </span><span class="lineNoCov">          0 :       _particleCounter++;</span></a>
+<a name="69"><span class="lineNum">      69 </span>            : </a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :       it-&gt;next();</span></a>
+<a name="71"><span class="lineNum">      71 </span>            :     }</a>
+<a name="72"><span class="lineNum">      72 </span><span class="lineNoCov">          0 :     delete it;</span></a>
+<a name="73"><span class="lineNum">      73 </span><span class="lineNoCov">          0 :   }</span></a>
+<a name="74"><span class="lineNum">      74 </span>            : </a>
+<a name="75"><span class="lineNum">      75 </span>            :   /** returns the mean potential energy inside a linked cell</a>
+<a name="76"><span class="lineNum">      76 </span>            :    *    @return _meanPotentialEnergy</a>
+<a name="77"><span class="lineNum">      77 </span>            :    */</a>
+<a name="78"><span class="lineNum">      78 </span><span class="lineNoCov">          0 :   double getPotentialEnergy() const { return _meanPotentialEnergy; }</span></a>
+<a name="79"><span class="lineNum">      79 </span>            : </a>
+<a name="80"><span class="lineNum">      80 </span>            : private:</a>
+<a name="81"><span class="lineNum">      81 </span>            :   coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const _mdSolverInterface;</a>
+<a name="82"><span class="lineNum">      82 </span>            :   double _meanPotentialEnergy;</a>
+<a name="83"><span class="lineNum">      83 </span>            :   unsigned int _particleCounter;</a>
+<a name="84"><span class="lineNum">      84 </span>            :   const coupling::BoundaryForceController&lt;LinkedCell, dim&gt;&amp; _boundaryForceController;</a>
+<a name="85"><span class="lineNum">      85 </span>            : };</a>
+<a name="86"><span class="lineNum">      86 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_COMPUTEMEANPOTENTIALENERGYMAPPING_H_</a>
 </pre>
       </td>
     </tr>

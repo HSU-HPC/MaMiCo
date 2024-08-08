@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -87,8 +87,8 @@
 <a name="25"><span class="lineNum">      25 </span>            : template &lt;unsigned int dim&gt; class coupling::filtering::FilterFromFunction : public coupling::filtering::FilterInterface&lt;dim&gt; {</a>
 <a name="26"><span class="lineNum">      26 </span>            : public:</a>
 <a name="27"><span class="lineNum">      27 </span><span class="lineNoCov">          0 :   FilterFromFunction(</span></a>
-<a name="28"><span class="lineNum">      28 </span>            :       const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; inputCellVector,</a>
-<a name="29"><span class="lineNum">      29 </span>            :       const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; outputCellVector, std::array&lt;bool, 7&gt; filteredValues,</a>
+<a name="28"><span class="lineNum">      28 </span>            :       const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt;&amp; inputCellVector,</a>
+<a name="29"><span class="lineNum">      29 </span>            :       const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt;&amp; outputCellVector, std::array&lt;bool, 7&gt; filteredValues,</a>
 <a name="30"><span class="lineNum">      30 </span>            :       const std::function&lt;std::vector&lt;double&gt;(std::vector&lt;double&gt;, std::vector&lt;std::array&lt;unsigned int, dim&gt;&gt;)&gt;* applyScalar,</a>
 <a name="31"><span class="lineNum">      31 </span>            :       const std::function&lt;std::vector&lt;std::array&lt;double, dim&gt;&gt;(std::vector&lt;std::array&lt;double, dim&gt;&gt;, std::vector&lt;std::array&lt;unsigned int, dim&gt;&gt;)&gt;* applyVector)</a>
 <a name="32"><span class="lineNum">      32 </span><span class="lineNoCov">          0 :       : coupling::filtering::FilterInterface&lt;dim&gt;(inputCellVector, outputCellVector, filteredValues, &quot;FFF&quot;), _applyScalar(applyScalar),</span></a>
@@ -104,7 +104,7 @@
 <a name="42"><span class="lineNum">      42 </span>            :       // interpret position of cell in inputCellVector as linear local</a>
 <a name="43"><span class="lineNum">      43 </span>            :       // md-to-macro index, then convert it to vector</a>
 <a name="44"><span class="lineNum">      44 </span>            :       using coupling::indexing::IndexTrait;</a>
-<a name="45"><span class="lineNum">      45 </span><span class="lineNoCov">          0 :       mamicoIndex = coupling::indexing::convertToVector&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;({i});</span></a>
+<a name="45"><span class="lineNum">      45 </span><span class="lineNoCov">          0 :       mamicoIndex = coupling::indexing::convertToVector&lt;dim&gt;(I14{i});</span></a>
 <a name="46"><span class="lineNum">      46 </span>            : </a>
 <a name="47"><span class="lineNum">      47 </span><span class="lineNoCov">          0 :       for (unsigned int d = 0; d &lt; dim; d++)</span></a>
 <a name="48"><span class="lineNum">      48 </span><span class="lineNoCov">          0 :         stlIndex[d] = mamicoIndex[d];</span></a>

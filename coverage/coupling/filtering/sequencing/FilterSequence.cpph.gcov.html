@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -73,8 +73,8 @@
 <a name="11"><span class="lineNum">      11 </span>            :     return EXIT_FAILURE;</a>
 <a name="12"><span class="lineNum">      12 </span><span class="lineNoCov">          0 :   tinyxml2::XMLElement* currFilterNode = sequenceNode-&gt;FirstChildElement();</span></a>
 <a name="13"><span class="lineNum">      13 </span>            : </a>
-<a name="14"><span class="lineNum">      14 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; inputCellVector = _inputCellVector;</span></a>
-<a name="15"><span class="lineNum">      15 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; outputCellVector = _cellVector2;</span></a>
+<a name="14"><span class="lineNum">      14 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; inputCellVector = _inputCellVector;</span></a>
+<a name="15"><span class="lineNum">      15 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; outputCellVector = _cellVector2;</span></a>
 <a name="16"><span class="lineNum">      16 </span>            : </a>
 <a name="17"><span class="lineNum">      17 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
 <a name="18"><span class="lineNum">      18 </span>            :   std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Initializing filter objects.&quot; &lt;&lt; std::endl;</a>
@@ -375,8 +375,8 @@
 <a name="313"><span class="lineNum">     313 </span>            : // TODO: inline in constructor</a>
 <a name="314"><span class="lineNum">     314 </span><span class="lineNoCov">          0 : template &lt;unsigned int dim&gt; void coupling::filtering::FilterSequence&lt;dim&gt;::initCellVectors() {</span></a>
 <a name="315"><span class="lineNum">     315 </span><span class="lineNoCov">          0 :   for (auto cell : _inputCellVector) {</span></a>
-<a name="316"><span class="lineNum">     316 </span><span class="lineNoCov">          0 :     _cellVector1.push_back(new coupling::datastructures::MacroscopicCell&lt;dim&gt;(*cell));</span></a>
-<a name="317"><span class="lineNum">     317 </span><span class="lineNoCov">          0 :     _cellVector2.push_back(new coupling::datastructures::MacroscopicCell&lt;dim&gt;(*cell));</span></a>
+<a name="316"><span class="lineNum">     316 </span><span class="lineNoCov">          0 :     _cellVector1.push_back(new coupling::datastructures::CouplingCell&lt;dim&gt;(*cell));</span></a>
+<a name="317"><span class="lineNum">     317 </span><span class="lineNoCov">          0 :     _cellVector2.push_back(new coupling::datastructures::CouplingCell&lt;dim&gt;(*cell));</span></a>
 <a name="318"><span class="lineNum">     318 </span>            :   }</a>
 <a name="319"><span class="lineNum">     319 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
 <a name="320"><span class="lineNum">     320 </span>            :   std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Initialized cell vectors.&quot; &lt;&lt; std::endl;</a>

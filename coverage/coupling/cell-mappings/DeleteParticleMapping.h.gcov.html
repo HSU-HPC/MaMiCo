@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -79,7 +79,7 @@
 <a name="17"><span class="lineNum">      17 </span>            : } // namespace coupling</a>
 <a name="18"><span class="lineNum">      18 </span>            : </a>
 <a name="19"><span class="lineNum">      19 </span>            : /**</a>
-<a name="20"><span class="lineNum">      20 </span>            :  *      @brief This class deletes a certain particle from a macroscopic cell.</a>
+<a name="20"><span class="lineNum">      20 </span>            :  *      @brief This class deletes a certain particle from a coupling cell.</a>
 <a name="21"><span class="lineNum">      21 </span>            :  *      @tparam LinkedCell cell type</a>
 <a name="22"><span class="lineNum">      22 </span>            :  *      @tparam dim Number of dimensions; it can be 1, 2 or 3</a>
 <a name="23"><span class="lineNum">      23 </span>            :  *  @author Philipp Neumann</a>
@@ -109,53 +109,52 @@
 <a name="47"><span class="lineNum">      47 </span>            :    *deletes the molecule from MD simulation. It does nothiung, if the particle</a>
 <a name="48"><span class="lineNum">      48 </span>            :    *is already deleted.</a>
 <a name="49"><span class="lineNum">      49 </span>            :    *    @param cell</a>
-<a name="50"><span class="lineNum">      50 </span>            :    *    @param cellIndex</a>
-<a name="51"><span class="lineNum">      51 </span>            :    */</a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineNoCov">          0 :   void handleCell(LinkedCell&amp; cell, const unsigned int&amp; cellIndex) {</span></a>
-<a name="53"><span class="lineNum">      53 </span>            :     // return, if we already deleted the respective particle</a>
-<a name="54"><span class="lineNum">      54 </span><span class="lineNoCov">          0 :     if (_particleCounter &gt; _particle) {</span></a>
-<a name="55"><span class="lineNum">      55 </span>            :       return;</a>
-<a name="56"><span class="lineNum">      56 </span>            :     }</a>
-<a name="57"><span class="lineNum">      57 </span>            : </a>
-<a name="58"><span class="lineNum">      58 </span>            :     // otherwise: loop over particles</a>
-<a name="59"><span class="lineNum">      59 </span><span class="lineNoCov">          0 :     coupling::interface::MoleculeIterator&lt;LinkedCell, dim&gt;* it = _mdSolverInterface-&gt;getMoleculeIterator(cell);</span></a>
-<a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 :     it-&gt;begin();</span></a>
-<a name="61"><span class="lineNum">      61 </span><span class="lineNoCov">          0 :     while (it-&gt;continueIteration()) {</span></a>
-<a name="62"><span class="lineNum">      62 </span>            :       // if we reached the respective particle, delete it</a>
-<a name="63"><span class="lineNum">      63 </span><span class="lineNoCov">          0 :       if (_particleCounter == _particle) {</span></a>
-<a name="64"><span class="lineNum">      64 </span><span class="lineNoCov">          0 :         const coupling::interface::Molecule&lt;dim&gt;&amp; myMolecule(it-&gt;getConst());</span></a>
-<a name="65"><span class="lineNum">      65 </span>            : </a>
-<a name="66"><span class="lineNum">      66 </span>            :         // save copy of particle</a>
-<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :         const tarch::la::Vector&lt;dim, double&gt; position = myMolecule.getPosition();</span></a>
-<a name="68"><span class="lineNum">      68 </span><span class="lineNoCov">          0 :         const tarch::la::Vector&lt;dim, double&gt; velocity = myMolecule.getVelocity();</span></a>
-<a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :         const tarch::la::Vector&lt;dim, double&gt; force = myMolecule.getForce();</span></a>
-<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :         const double potentialEnergy = myMolecule.getPotentialEnergy();</span></a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :         _deletedMoleculeCopy = coupling::datastructures::Molecule&lt;dim&gt;(position, velocity, force, potentialEnergy);</span></a>
-<a name="72"><span class="lineNum">      72 </span>            : </a>
-<a name="73"><span class="lineNum">      73 </span>            :         // delete molecule from MD simulation</a>
-<a name="74"><span class="lineNum">      74 </span><span class="lineNoCov">          0 :         _mdSolverInterface-&gt;deleteMoleculeFromMDSimulation(myMolecule, cell);</span></a>
-<a name="75"><span class="lineNum">      75 </span><span class="lineNoCov">          0 :         _particleCounter++;</span></a>
-<a name="76"><span class="lineNum">      76 </span>            :         break;</a>
-<a name="77"><span class="lineNum">      77 </span>            :       }</a>
-<a name="78"><span class="lineNum">      78 </span><span class="lineNoCov">          0 :       _particleCounter++;</span></a>
-<a name="79"><span class="lineNum">      79 </span>            : </a>
-<a name="80"><span class="lineNum">      80 </span><span class="lineNoCov">          0 :       it-&gt;next();</span></a>
-<a name="81"><span class="lineNum">      81 </span>            :     }</a>
-<a name="82"><span class="lineNum">      82 </span><span class="lineNoCov">          0 :     delete it;</span></a>
-<a name="83"><span class="lineNum">      83 </span>            :   }</a>
-<a name="84"><span class="lineNum">      84 </span>            : </a>
-<a name="85"><span class="lineNum">      85 </span>            :   /** returns a copy of the deleted molecule.</a>
-<a name="86"><span class="lineNum">      86 </span>            :    *    @return _deletedMoleculeCopy</a>
-<a name="87"><span class="lineNum">      87 </span>            :    */</a>
-<a name="88"><span class="lineNum">      88 </span>            :   coupling::datastructures::Molecule&lt;dim&gt; getDeletedMolecule() const { return _deletedMoleculeCopy; }</a>
-<a name="89"><span class="lineNum">      89 </span>            : </a>
-<a name="90"><span class="lineNum">      90 </span>            : private:</a>
-<a name="91"><span class="lineNum">      91 </span>            :   coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const _mdSolverInterface;</a>
-<a name="92"><span class="lineNum">      92 </span>            :   const unsigned int _particle;</a>
-<a name="93"><span class="lineNum">      93 </span>            :   unsigned int _particleCounter;</a>
-<a name="94"><span class="lineNum">      94 </span>            :   coupling::datastructures::Molecule&lt;dim&gt; _deletedMoleculeCopy;</a>
-<a name="95"><span class="lineNum">      95 </span>            : };</a>
-<a name="96"><span class="lineNum">      96 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_DELETEPARTICLEMAPPING_H_</a>
+<a name="50"><span class="lineNum">      50 </span>            :    */</a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineNoCov">          0 :   void handleCell(LinkedCell&amp; cell) {</span></a>
+<a name="52"><span class="lineNum">      52 </span>            :     // return, if we already deleted the respective particle</a>
+<a name="53"><span class="lineNum">      53 </span><span class="lineNoCov">          0 :     if (_particleCounter &gt; _particle) {</span></a>
+<a name="54"><span class="lineNum">      54 </span>            :       return;</a>
+<a name="55"><span class="lineNum">      55 </span>            :     }</a>
+<a name="56"><span class="lineNum">      56 </span>            : </a>
+<a name="57"><span class="lineNum">      57 </span>            :     // otherwise: loop over particles</a>
+<a name="58"><span class="lineNum">      58 </span><span class="lineNoCov">          0 :     coupling::interface::MoleculeIterator&lt;LinkedCell, dim&gt;* it = _mdSolverInterface-&gt;getMoleculeIterator(cell);</span></a>
+<a name="59"><span class="lineNum">      59 </span><span class="lineNoCov">          0 :     it-&gt;begin();</span></a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 :     while (it-&gt;continueIteration()) {</span></a>
+<a name="61"><span class="lineNum">      61 </span>            :       // if we reached the respective particle, delete it</a>
+<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :       if (_particleCounter == _particle) {</span></a>
+<a name="63"><span class="lineNum">      63 </span><span class="lineNoCov">          0 :         const coupling::interface::Molecule&lt;dim&gt;&amp; myMolecule(it-&gt;getConst());</span></a>
+<a name="64"><span class="lineNum">      64 </span>            : </a>
+<a name="65"><span class="lineNum">      65 </span>            :         // save copy of particle</a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :         const tarch::la::Vector&lt;dim, double&gt; position = myMolecule.getPosition();</span></a>
+<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :         const tarch::la::Vector&lt;dim, double&gt; velocity = myMolecule.getVelocity();</span></a>
+<a name="68"><span class="lineNum">      68 </span><span class="lineNoCov">          0 :         const tarch::la::Vector&lt;dim, double&gt; force = myMolecule.getForce();</span></a>
+<a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :         const double potentialEnergy = myMolecule.getPotentialEnergy();</span></a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :         _deletedMoleculeCopy = coupling::datastructures::Molecule&lt;dim&gt;(position, velocity, force, potentialEnergy);</span></a>
+<a name="71"><span class="lineNum">      71 </span>            : </a>
+<a name="72"><span class="lineNum">      72 </span>            :         // delete molecule from MD simulation</a>
+<a name="73"><span class="lineNum">      73 </span><span class="lineNoCov">          0 :         _mdSolverInterface-&gt;deleteMoleculeFromMDSimulation(myMolecule, cell);</span></a>
+<a name="74"><span class="lineNum">      74 </span><span class="lineNoCov">          0 :         _particleCounter++;</span></a>
+<a name="75"><span class="lineNum">      75 </span>            :         break;</a>
+<a name="76"><span class="lineNum">      76 </span>            :       }</a>
+<a name="77"><span class="lineNum">      77 </span><span class="lineNoCov">          0 :       _particleCounter++;</span></a>
+<a name="78"><span class="lineNum">      78 </span>            : </a>
+<a name="79"><span class="lineNum">      79 </span><span class="lineNoCov">          0 :       it-&gt;next();</span></a>
+<a name="80"><span class="lineNum">      80 </span>            :     }</a>
+<a name="81"><span class="lineNum">      81 </span><span class="lineNoCov">          0 :     delete it;</span></a>
+<a name="82"><span class="lineNum">      82 </span>            :   }</a>
+<a name="83"><span class="lineNum">      83 </span>            : </a>
+<a name="84"><span class="lineNum">      84 </span>            :   /** returns a copy of the deleted molecule.</a>
+<a name="85"><span class="lineNum">      85 </span>            :    *    @return _deletedMoleculeCopy</a>
+<a name="86"><span class="lineNum">      86 </span>            :    */</a>
+<a name="87"><span class="lineNum">      87 </span>            :   coupling::datastructures::Molecule&lt;dim&gt; getDeletedMolecule() const { return _deletedMoleculeCopy; }</a>
+<a name="88"><span class="lineNum">      88 </span>            : </a>
+<a name="89"><span class="lineNum">      89 </span>            : private:</a>
+<a name="90"><span class="lineNum">      90 </span>            :   coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const _mdSolverInterface;</a>
+<a name="91"><span class="lineNum">      91 </span>            :   const unsigned int _particle;</a>
+<a name="92"><span class="lineNum">      92 </span>            :   unsigned int _particleCounter;</a>
+<a name="93"><span class="lineNum">      93 </span>            :   coupling::datastructures::Molecule&lt;dim&gt; _deletedMoleculeCopy;</a>
+<a name="94"><span class="lineNum">      94 </span>            : };</a>
+<a name="95"><span class="lineNum">      95 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_DELETEPARTICLEMAPPING_H_</a>
 </pre>
       </td>
     </tr>

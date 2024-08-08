@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -85,7 +85,7 @@
 <a name="23"><span class="lineNum">      23 </span><span class="lineNoCov">          0 :   for (unsigned int raw_index = 0; raw_index &lt; _inputCells.size(); raw_index++) {</span></a>
 <a name="24"><span class="lineNum">      24 </span>            : </a>
 <a name="25"><span class="lineNum">      25 </span>            :     // construct CellIndex using raw index</a>
-<a name="26"><span class="lineNum">      26 </span><span class="lineNoCov">          0 :     index = {raw_index};</span></a>
+<a name="26"><span class="lineNum">      26 </span><span class="lineNoCov">          0 :     index = ScalarIndex{raw_index};</span></a>
 <a name="27"><span class="lineNum">      27 </span>            : </a>
 <a name="28"><span class="lineNum">      28 </span>            :     // make use of implicit conversion between linear &lt;-&gt; vector indices</a>
 <a name="29"><span class="lineNum">      29 </span><span class="lineNoCov">          0 :     indexAbove = getIndexAbove(index, _dim);</span></a>
@@ -221,11 +221,11 @@
 <a name="159"><span class="lineNum">     159 </span>            :   }</a>
 <a name="160"><span class="lineNum">     160 </span>            : </a>
 <a name="161"><span class="lineNum">     161 </span>            :   // get raw vector index</a>
-<a name="162"><span class="lineNum">     162 </span><span class="lineNoCov">          0 :   auto ans = index.get();</span></a>
+<a name="162"><span class="lineNum">     162 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, int&gt; ans = index.get();</span></a>
 <a name="163"><span class="lineNum">     163 </span>            :   // get upper index in dimension d</a>
 <a name="164"><span class="lineNum">     164 </span><span class="lineNoCov">          0 :   ans[d] += 1;</span></a>
 <a name="165"><span class="lineNum">     165 </span>            : </a>
-<a name="166"><span class="lineNum">     166 </span><span class="lineNoCov">          0 :   return {ans};</span></a>
+<a name="166"><span class="lineNum">     166 </span><span class="lineNoCov">          0 :   return VectorIndex{ans};</span></a>
 <a name="167"><span class="lineNum">     167 </span>            : }</a>
 <a name="168"><span class="lineNum">     168 </span>            : </a>
 <a name="169"><span class="lineNum">     169 </span>            : template &lt;unsigned int dim, coupling::indexing::IndexTrait... scope&gt;</a>
@@ -242,11 +242,11 @@
 <a name="180"><span class="lineNum">     180 </span>            :   }</a>
 <a name="181"><span class="lineNum">     181 </span>            : </a>
 <a name="182"><span class="lineNum">     182 </span>            :   // copy input index</a>
-<a name="183"><span class="lineNum">     183 </span><span class="lineNoCov">          0 :   auto ans = index.get();</span></a>
+<a name="183"><span class="lineNum">     183 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, int&gt; ans = index.get();</span></a>
 <a name="184"><span class="lineNum">     184 </span>            :   // get lower index in dimension d</a>
 <a name="185"><span class="lineNum">     185 </span><span class="lineNoCov">          0 :   ans[d] -= 1;</span></a>
 <a name="186"><span class="lineNum">     186 </span>            : </a>
-<a name="187"><span class="lineNum">     187 </span><span class="lineNoCov">          0 :   return {ans};</span></a>
+<a name="187"><span class="lineNum">     187 </span><span class="lineNoCov">          0 :   return VectorIndex{ans};</span></a>
 <a name="188"><span class="lineNum">     188 </span>            : }</a>
 </pre>
       </td>

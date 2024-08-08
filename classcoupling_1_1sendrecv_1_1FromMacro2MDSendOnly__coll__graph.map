@@ -1,5 +1,5 @@
-<map id="coupling::sendrecv::FromMacro2MDSendOnly&lt; MacroscopicCell, dim &gt;" name="coupling::sendrecv::FromMacro2MDSendOnly&lt; MacroscopicCell, dim &gt;">
-<area shape="rect" id="Node000001" title="SendReceiveBuffer for transfer of quantities from a macroscopic solver to the macroscopic cells...." alt="" coords="5,109,182,165"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title="generic class for send&#45;/ receive methodology." alt="" coords="10,5,177,61"/>
+<map id="coupling::sendrecv::FromMacro2MDSendOnly&lt; Cell_T, dim &gt;" name="coupling::sendrecv::FromMacro2MDSendOnly&lt; Cell_T, dim &gt;">
+<area shape="rect" id="Node000001" title="SendReceiveBuffer for transfer of quantities from a macroscopic solver to the coupling cells...." alt="" coords="5,109,182,165"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title="generic class for send&#45;/ receive methodology." alt="" coords="24,5,163,61"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,77,96,108,91,108,91,77"/>
 </map>

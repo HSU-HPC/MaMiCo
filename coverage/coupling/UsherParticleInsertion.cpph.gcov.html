@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -81,15 +81,15 @@
 <a name="19"><span class="lineNum">      19 </span>            : </a>
 <a name="20"><span class="lineNum">      20 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
 <a name="21"><span class="lineNum">      21 </span><span class="lineNoCov">          0 : typename coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Action coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;::insertDeleteMass(</span></a>
-<a name="22"><span class="lineNum">      22 </span>            :     coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell, const tarch::la::Vector&lt;dim, double&gt;&amp; macroscopicCellPosition,</a>
-<a name="23"><span class="lineNum">      23 </span>            :     const tarch::la::Vector&lt;dim, double&gt;&amp; macroscopicCellSize, const tarch::la::Vector&lt;dim, double&gt;&amp; meanVelocity, const double&amp; temperature,</a>
+<a name="22"><span class="lineNum">      22 </span>            :     coupling::datastructures::CouplingCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell, const tarch::la::Vector&lt;dim, double&gt;&amp; couplingCellPosition,</a>
+<a name="23"><span class="lineNum">      23 </span>            :     const tarch::la::Vector&lt;dim, double&gt;&amp; couplingCellSize, const tarch::la::Vector&lt;dim, double&gt;&amp; meanVelocity, const double&amp; temperature,</a>
 <a name="24"><span class="lineNum">      24 </span>            :     const coupling::BoundaryForceController&lt;LinkedCell, dim&gt;&amp; boundaryForceController) {</a>
 <a name="25"><span class="lineNum">      25 </span><span class="lineNoCov">          0 :   typename coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Action action = coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::NoAction;</span></a>
 <a name="26"><span class="lineNum">      26 </span><span class="lineNoCov">          0 :   const double moleculeMass(_mdSolverInterface-&gt;getMoleculeMass());</span></a>
 <a name="27"><span class="lineNum">      27 </span>            :   // if we have enough mass left in the cell, try to insert a particle and</a>
 <a name="28"><span class="lineNum">      28 </span>            :   // remove one particle mass</a>
 <a name="29"><span class="lineNum">      29 </span><span class="lineNoCov">          0 :   if (cell.getMicroscopicMass() &gt;= moleculeMass) {</span></a>
-<a name="30"><span class="lineNum">      30 </span><span class="lineNoCov">          0 :     action = insertParticle(cell, macroscopicCellPosition, macroscopicCellSize, meanVelocity, temperature, boundaryForceController);</span></a>
+<a name="30"><span class="lineNum">      30 </span><span class="lineNoCov">          0 :     action = insertParticle(cell, couplingCellPosition, couplingCellSize, meanVelocity, temperature, boundaryForceController);</span></a>
 <a name="31"><span class="lineNum">      31 </span><span class="lineNoCov">          0 :     if (action == coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Insertion) {</span></a>
 <a name="32"><span class="lineNum">      32 </span><span class="lineNoCov">          0 :       cell.addMicroscopicMass(-moleculeMass);</span></a>
 <a name="33"><span class="lineNum">      33 </span>            :     }</a>
@@ -110,16 +110,16 @@
 <a name="48"><span class="lineNum">      48 </span>            : </a>
 <a name="49"><span class="lineNum">      49 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
 <a name="50"><span class="lineNum">      50 </span><span class="lineNoCov">          0 : typename coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Action coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;::insertParticle(</span></a>
-<a name="51"><span class="lineNum">      51 </span>            :     coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell, const tarch::la::Vector&lt;dim, double&gt;&amp; macroscopicCellPosition,</a>
-<a name="52"><span class="lineNum">      52 </span>            :     const tarch::la::Vector&lt;dim, double&gt;&amp; macroscopicCellSize, const tarch::la::Vector&lt;dim, double&gt;&amp; meanVelocity, const double&amp; temperature,</a>
+<a name="51"><span class="lineNum">      51 </span>            :     coupling::datastructures::CouplingCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell, const tarch::la::Vector&lt;dim, double&gt;&amp; couplingCellPosition,</a>
+<a name="52"><span class="lineNum">      52 </span>            :     const tarch::la::Vector&lt;dim, double&gt;&amp; couplingCellSize, const tarch::la::Vector&lt;dim, double&gt;&amp; meanVelocity, const double&amp; temperature,</a>
 <a name="53"><span class="lineNum">      53 </span>            :     const coupling::BoundaryForceController&lt;LinkedCell, dim&gt;&amp; boundaryForceController) {</a>
 <a name="54"><span class="lineNum">      54 </span><span class="lineNoCov">          0 :   coupling::datastructures::Molecule&lt;dim&gt; molecule;</span></a>
 <a name="55"><span class="lineNum">      55 </span>            : </a>
 <a name="56"><span class="lineNum">      56 </span>            :   const typename coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Action action =</a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :       findParticlePosition(cell, macroscopicCellPosition, macroscopicCellSize, molecule, boundaryForceController);</span></a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :       findParticlePosition(cell, couplingCellPosition, couplingCellSize, molecule, boundaryForceController);</span></a>
 <a name="58"><span class="lineNum">      58 </span>            : </a>
 <a name="59"><span class="lineNum">      59 </span>            :   // if insertion was successful, initialise velocity according to temperature</a>
-<a name="60"><span class="lineNum">      60 </span>            :   // in macroscopic cell</a>
+<a name="60"><span class="lineNum">      60 </span>            :   // in coupling cell</a>
 <a name="61"><span class="lineNum">      61 </span><span class="lineNoCov">          0 :   if (action == coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Insertion) {</span></a>
 <a name="62"><span class="lineNum">      62 </span>            :     // initialise velocity of molecule</a>
 <a name="63"><span class="lineNum">      63 </span><span class="lineNoCov">          0 :     tarch::la::Vector&lt;dim, double&gt; velocity(0.0);</span></a>
@@ -142,7 +142,7 @@
 <a name="80"><span class="lineNum">      80 </span>            : </a>
 <a name="81"><span class="lineNum">      81 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
 <a name="82"><span class="lineNum">      82 </span>            : typename coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Action</a>
-<a name="83"><span class="lineNum">      83 </span><span class="lineNoCov">          0 : coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;::deleteParticle(coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell,</span></a>
+<a name="83"><span class="lineNum">      83 </span><span class="lineNoCov">          0 : coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;::deleteParticle(coupling::datastructures::CouplingCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell,</span></a>
 <a name="84"><span class="lineNum">      84 </span>            :                                                                   const coupling::BoundaryForceController&lt;LinkedCell, dim&gt;&amp; boundaryForceController) {</a>
 <a name="85"><span class="lineNum">      85 </span>            :   // count particles with computeMassMapping</a>
 <a name="86"><span class="lineNum">      86 </span><span class="lineNoCov">          0 :   coupling::cellmappings::ComputeMassMapping&lt;LinkedCell, dim&gt; computeMassMapping(_mdSolverInterface);</span></a>
@@ -167,8 +167,8 @@
 <a name="105"><span class="lineNum">     105 </span>            : </a>
 <a name="106"><span class="lineNum">     106 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
 <a name="107"><span class="lineNum">     107 </span><span class="lineNoCov">          0 : typename coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Action coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;::findParticlePosition(</span></a>
-<a name="108"><span class="lineNum">     108 </span>            :     coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; thisCell, const tarch::la::Vector&lt;dim, double&gt;&amp; macroscopicCellPosition,</a>
-<a name="109"><span class="lineNum">     109 </span>            :     const tarch::la::Vector&lt;dim, double&gt;&amp; macroscopicCellSize, coupling::datastructures::Molecule&lt;dim&gt;&amp; molecule,</a>
+<a name="108"><span class="lineNum">     108 </span>            :     coupling::datastructures::CouplingCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; thisCell, const tarch::la::Vector&lt;dim, double&gt;&amp; couplingCellPosition,</a>
+<a name="109"><span class="lineNum">     109 </span>            :     const tarch::la::Vector&lt;dim, double&gt;&amp; couplingCellSize, coupling::datastructures::Molecule&lt;dim&gt;&amp; molecule,</a>
 <a name="110"><span class="lineNum">     110 </span>            :     const coupling::BoundaryForceController&lt;LinkedCell, dim&gt;&amp; boundaryForceController) {</a>
 <a name="111"><span class="lineNum">     111 </span>            :   // count particles with computeMassMapping</a>
 <a name="112"><span class="lineNum">     112 </span><span class="lineNoCov">          0 :   coupling::cellmappings::ComputeMassMapping&lt;LinkedCell, dim&gt; computeMassMapping(_mdSolverInterface);</span></a>
@@ -181,14 +181,14 @@
 <a name="119"><span class="lineNum">     119 </span><span class="lineNoCov">          0 :     numberDensity = 1.0;</span></a>
 <a name="120"><span class="lineNum">     120 </span>            :   }</a>
 <a name="121"><span class="lineNum">     121 </span><span class="lineNoCov">          0 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :     numberDensity = numberDensity / macroscopicCellSize[d];</span></a>
+<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :     numberDensity = numberDensity / couplingCellSize[d];</span></a>
 <a name="123"><span class="lineNum">     123 </span>            :   }</a>
 <a name="124"><span class="lineNum">     124 </span>            : </a>
 <a name="125"><span class="lineNum">     125 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; position(0.0);</span></a>
 <a name="126"><span class="lineNum">     126 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; positionOld(0.0);</span></a>
 <a name="127"><span class="lineNum">     127 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; force(0.0);</span></a>
 <a name="128"><span class="lineNum">     128 </span>            : </a>
-<a name="129"><span class="lineNum">     129 </span>            :   /** index of linked cell (within linked cell domain, NOT within macroscopic</a>
+<a name="129"><span class="lineNum">     129 </span>            :   /** index of linked cell (within linked cell domain, NOT within coupling</a>
 <a name="130"><span class="lineNum">     130 </span>            :    * cell!) where molecule is placed in */</a>
 <a name="131"><span class="lineNum">     131 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, unsigned int&gt; linkedCellIndex(0);</span></a>
 <a name="132"><span class="lineNum">     132 </span>            : </a>
@@ -226,8 +226,8 @@
 <a name="164"><span class="lineNum">     164 </span>            :   // _usherParams._offsetFromOuterBoundary. This is required since we may</a>
 <a name="165"><span class="lineNum">     165 </span>            :   // encounter instabilities due to open boundary forcing which is not included</a>
 <a name="166"><span class="lineNum">     166 </span>            :   // in the potential enery evaluation of the USHER scheme</a>
-<a name="167"><span class="lineNum">     167 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; upperRightBoundaries(macroscopicCellPosition + macroscopicCellSize);</span></a>
-<a name="168"><span class="lineNum">     168 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; lowerLeftBoundaries(macroscopicCellPosition);</span></a>
+<a name="167"><span class="lineNum">     167 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; upperRightBoundaries(couplingCellPosition + couplingCellSize);</span></a>
+<a name="168"><span class="lineNum">     168 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; lowerLeftBoundaries(couplingCellPosition);</span></a>
 <a name="169"><span class="lineNum">     169 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; domainLower(_mdSolverInterface-&gt;getGlobalMDDomainOffset());</span></a>
 <a name="170"><span class="lineNum">     170 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; domainUpper(_mdSolverInterface-&gt;getGlobalMDDomainSize() + domainLower);</span></a>
 <a name="171"><span class="lineNum">     171 </span><span class="lineNoCov">          0 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
@@ -248,7 +248,7 @@
 <a name="186"><span class="lineNum">     186 </span>            : </a>
 <a name="187"><span class="lineNum">     187 </span>            :     // generate random start position</a>
 <a name="188"><span class="lineNum">     188 </span><span class="lineNoCov">          0 :     for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="189"><span class="lineNum">     189 </span><span class="lineNoCov">          0 :       position[d] = macroscopicCellPosition[d] + macroscopicCellSize[d] * tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();</span></a>
+<a name="189"><span class="lineNum">     189 </span><span class="lineNoCov">          0 :       position[d] = couplingCellPosition[d] + couplingCellSize[d] * tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();</span></a>
 <a name="190"><span class="lineNum">     190 </span>            :     }</a>
 <a name="191"><span class="lineNum">     191 </span>            : </a>
 <a name="192"><span class="lineNum">     192 </span>            :     // determine force and energy that act on molecule</a>
@@ -327,7 +327,7 @@
 <a name="265"><span class="lineNum">     265 </span><span class="lineNoCov">          0 :       molecule.setPosition(position);</span></a>
 <a name="266"><span class="lineNum">     266 </span>            : </a>
 <a name="267"><span class="lineNum">     267 </span>            :       // restart searching if the new position of the particle is outside the</a>
-<a name="268"><span class="lineNum">     268 </span>            :       // macroscopic cell</a>
+<a name="268"><span class="lineNum">     268 </span>            :       // coupling cell</a>
 <a name="269"><span class="lineNum">     269 </span><span class="lineNoCov">          0 :       for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
 <a name="270"><span class="lineNum">     270 </span><span class="lineNoCov">          0 :         restartSearch = restartSearch || (position[d] &gt;= upperRightBoundaries[d]) || (position[d] &lt;= lowerLeftBoundaries[d]);</span></a>
 <a name="271"><span class="lineNum">     271 </span>            :       }</a>

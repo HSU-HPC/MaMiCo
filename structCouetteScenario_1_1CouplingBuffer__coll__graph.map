@@ -1,0 +1,5 @@
+<map id="CouetteScenario::CouplingBuffer" name="CouetteScenario::CouplingBuffer">
+<area shape="rect" id="Node000001" title="holds the buffers for the data transfer" alt="" coords="7,124,181,165"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1datastructures_1_1FlexibleCellContainer.html" title=" " alt="" coords="5,5,183,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,61,97,123,91,123,91,61"/>
+</map>

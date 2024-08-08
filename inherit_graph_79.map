@@ -1,3 +1,13 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="5,5,131,46"/>
+<area shape="rect" id="Node000000" href="$classcoupling_1_1solvers_1_1AbstractCouetteSolver.html" title=" " alt="" coords="5,39,187,79"/>
+<area shape="rect" id="Node000001" href="$classcoupling_1_1solvers_1_1IcoFoamInterface.html" title=" " alt="" coords="247,5,370,46"/>
+<area shape="poly" id="edge63_Node000000_Node000001" title=" " alt="" coords="202,40,246,33,247,38,202,45"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1solvers_1_1NumericalSolver.html" title="is a virtual base class for the interface for a numerical fluid solver for the Couette scenario" alt="" coords="247,71,370,111"/>
+<area shape="poly" id="edge64_Node000000_Node000002" title=" " alt="" coords="202,72,247,79,246,84,202,78"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1solvers_1_1FiniteDifferenceSolver.html" title="implements a simple one&#45;dimensional finite&#45;diffference solver for the Couette flow." alt="" coords="430,71,578,111"/>
+<area shape="poly" id="edge65_Node000002_Node000003" title=" " alt="" coords="385,88,430,88,430,94,385,94"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1solvers_1_1LBCouetteSolver.html" title="implements a three&#45;dimensional Lattice&#45;Boltzmann Couette flow solver." alt="" coords="442,136,566,177"/>
+<area shape="poly" id="edge66_Node000002_Node000004" title=" " alt="" coords="385,114,443,133,442,138,384,119"/>
+<area shape="rect" id="Node000005" href="$classcoupling_1_1interface_1_1PintableMacroSolver.html" title=" " alt="" coords="235,136,382,177"/>
+<area shape="poly" id="edge67_Node000005_Node000004" title=" " alt="" coords="397,154,442,154,442,159,397,159"/>
 </map>

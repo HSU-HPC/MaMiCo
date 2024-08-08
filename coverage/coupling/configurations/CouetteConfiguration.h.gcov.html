@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">67</td>
-            <td class="headerCovTableEntry">147</td>
-            <td class="headerCovTableEntryLo">45.6 %</td>
+            <td class="headerCovTableEntry">146</td>
+            <td class="headerCovTableEntryLo">45.9 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">1</td>
@@ -296,124 +296,123 @@
 <a name="234"><span class="lineNum">     234 </span>            :     }</a>
 <a name="235"><span class="lineNum">     235 </span>            : </a>
 <a name="236"><span class="lineNum">     236 </span><span class="lineCov">          4 :     if (cfg.miSolverType == SYNTHETIC) {</span></a>
-<a name="237"><span class="lineNum">     237 </span><span class="lineNoCov">          0 :       if (cfg.macro2Md || cfg.totalNumberMDSimulations &gt; 1 || cfg.lbNumberProcesses[0] != 1 || cfg.lbNumberProcesses[1] != 1 ||</span></a>
-<a name="238"><span class="lineNum">     238 </span><span class="lineNoCov">          0 :           cfg.lbNumberProcesses[2] != 1) {</span></a>
-<a name="239"><span class="lineNum">     239 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;Invalid configuration: Synthetic MD runs sequentially on &quot;</span></a>
-<a name="240"><span class="lineNum">     240 </span>            :                      &quot;rank 0 only. &quot;</a>
-<a name="241"><span class="lineNum">     241 </span>            :                   &lt;&lt; &quot;It does neither support parallel communication nor &quot;</a>
-<a name="242"><span class="lineNum">     242 </span><span class="lineNoCov">          0 :                      &quot;multi-instance sampling&quot;</span></a>
-<a name="243"><span class="lineNum">     243 </span><span class="lineNoCov">          0 :                   &lt;&lt; std::endl;</span></a>
-<a name="244"><span class="lineNum">     244 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
-<a name="245"><span class="lineNum">     245 </span>            :       }</a>
-<a name="246"><span class="lineNum">     246 </span>            :     }</a>
-<a name="247"><span class="lineNum">     247 </span><span class="lineCov">          4 :     if (cfg.maSolverType == COUETTE_ANALYTICAL) {</span></a>
-<a name="248"><span class="lineNum">     248 </span><span class="lineNoCov">          0 :       if (cfg.twoWayCoupling) {</span></a>
-<a name="249"><span class="lineNum">     249 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;Invalid configuration: COUETTE_ANALYTICAL does not &quot;</span></a>
-<a name="250"><span class="lineNum">     250 </span><span class="lineNoCov">          0 :                      &quot;support twoWayCoupling&quot;</span></a>
-<a name="251"><span class="lineNum">     251 </span><span class="lineNoCov">          0 :                   &lt;&lt; std::endl;</span></a>
-<a name="252"><span class="lineNum">     252 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
-<a name="253"><span class="lineNum">     253 </span>            :       }</a>
-<a name="254"><span class="lineNum">     254 </span>            :     }</a>
-<a name="255"><span class="lineNum">     255 </span>            : </a>
-<a name="256"><span class="lineNum">     256 </span><span class="lineCov">          8 :     return cfg;</span></a>
-<a name="257"><span class="lineNum">     257 </span><span class="lineCov">          4 :   }</span></a>
-<a name="258"><span class="lineNum">     258 </span>            : </a>
-<a name="259"><span class="lineNum">     259 </span>            : #if (BUILD_WITH_OPENFOAM)</a>
-<a name="260"><span class="lineNum">     260 </span>            :   /** @brief holds the variables necessary for the interface to the IcoFoam</a>
-<a name="261"><span class="lineNum">     261 </span>            :    * solver  */</a>
-<a name="262"><span class="lineNum">     262 </span>            :   struct FoamConfig {</a>
-<a name="263"><span class="lineNum">     263 </span>            :     /** @brief the path to the directory, where the folder with the IcoFoam</a>
-<a name="264"><span class="lineNum">     264 </span>            :      * OpenFOAM setup files are */</a>
-<a name="265"><span class="lineNum">     265 </span>            :     std::string directory;</a>
-<a name="266"><span class="lineNum">     266 </span>            :     /** @brief the name of the OpenFOAM folder */</a>
-<a name="267"><span class="lineNum">     267 </span>            :     std::string folder;</a>
-<a name="268"><span class="lineNum">     268 </span>            :     /** @brief the cubic mesh with a cubic hole has 12 boundaries, this vector</a>
-<a name="269"><span class="lineNum">     269 </span>            :      * tells which of them</a>
-<a name="270"><span class="lineNum">     270 </span>            :      *         shall be coupled with the md; The order has to be the same as in</a>
-<a name="271"><span class="lineNum">     271 </span>            :      * the blockMeshDict */</a>
-<a name="272"><span class="lineNum">     272 </span>            :     tarch::la::Vector&lt;12, unsigned int&gt; boundariesWithMD;</a>
-<a name="273"><span class="lineNum">     273 </span>            :   };</a>
-<a name="274"><span class="lineNum">     274 </span>            : #endif</a>
-<a name="275"><span class="lineNum">     275 </span>            : </a>
-<a name="276"><span class="lineNum">     276 </span>            :   /** @brief channel is always expected to have origin at (0.0,0.0,0.0) and to</a>
-<a name="277"><span class="lineNum">     277 </span>            :    * be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0) */</a>
-<a name="278"><span class="lineNum">     278 </span>            :   double channelheight;</a>
-<a name="279"><span class="lineNum">     279 </span>            :   /** @brief velocity of moving wall (lower boundary moves) */</a>
-<a name="280"><span class="lineNum">     280 </span>            :   tarch::la::Vector&lt;3, double&gt; wallVelocity;</a>
-<a name="281"><span class="lineNum">     281 </span>            :   /** @brief number of coupling cycles that will be done, while the wall</a>
-<a name="282"><span class="lineNum">     282 </span>            :    * velocity is the wallInitVelocity */</a>
-<a name="283"><span class="lineNum">     283 </span>            :   int wallInitCycles;</a>
-<a name="284"><span class="lineNum">     284 </span>            :   /** @brief the velocity at the moving wall (z=0) while the wallInitCycles*/</a>
-<a name="285"><span class="lineNum">     285 </span>            :   tarch::la::Vector&lt;3, double&gt; wallInitVelocity;</a>
-<a name="286"><span class="lineNum">     286 </span>            :   /** @brief total number of oscillation periods of the oscillating wall</a>
-<a name="287"><span class="lineNum">     287 </span>            :    * velocity*/</a>
-<a name="288"><span class="lineNum">     288 </span>            :   double wallOscillations;</a>
-<a name="289"><span class="lineNum">     289 </span>            :   /** @brief number of coupling cycles, that is continuum time steps; MD/DPD:</a>
-<a name="290"><span class="lineNum">     290 </span>            :    * 1000 */</a>
-<a name="291"><span class="lineNum">     291 </span>            :   int couplingCycles;</a>
-<a name="292"><span class="lineNum">     292 </span>            :   /** @brief true if data will be send &amp; received from the md to the continuum</a>
-<a name="293"><span class="lineNum">     293 </span>            :    * solver */</a>
-<a name="294"><span class="lineNum">     294 </span>            :   bool md2Macro;</a>
-<a name="295"><span class="lineNum">     295 </span>            :   /** @brief true if data will be send &amp; received from the continuum to the md</a>
-<a name="296"><span class="lineNum">     296 </span>            :    * solver  */</a>
-<a name="297"><span class="lineNum">     297 </span>            :   bool macro2Md;</a>
-<a name="298"><span class="lineNum">     298 </span>            :   /** @brief true if the signal to noise ratio shall be evaluated */</a>
-<a name="299"><span class="lineNum">     299 </span>            :   bool computeSNR;</a>
-<a name="300"><span class="lineNum">     300 </span>            :   /** @brief true if from the md solver will be applied as boundary condition</a>
-<a name="301"><span class="lineNum">     301 </span>            :    * for the continuum solver */</a>
-<a name="302"><span class="lineNum">     302 </span>            :   bool twoWayCoupling;</a>
-<a name="303"><span class="lineNum">     303 </span>            :   /** @brief number of coupling cycles before a filter is applied*/</a>
-<a name="304"><span class="lineNum">     304 </span>            :   int filterInitCycles;</a>
-<a name="305"><span class="lineNum">     305 </span>            :   /** @brief the time step interval for writing the md data to csv files  */</a>
-<a name="306"><span class="lineNum">     306 </span>            :   int csvEveryTimestep;</a>
-<a name="307"><span class="lineNum">     307 </span>            :   /** @brief the type of continuum solver */</a>
-<a name="308"><span class="lineNum">     308 </span>            :   MacroSolverType maSolverType;</a>
-<a name="309"><span class="lineNum">     309 </span>            :   /** @brief the type of md solver */</a>
-<a name="310"><span class="lineNum">     310 </span>            :   MicroSolverType miSolverType;</a>
-<a name="311"><span class="lineNum">     311 </span>            :   /** @brief the general density of the fluid under consideration */</a>
-<a name="312"><span class="lineNum">     312 </span>            :   double density;</a>
-<a name="313"><span class="lineNum">     313 </span>            :   /** @brief the kinematic viscosity of the fluid under consideration */</a>
-<a name="314"><span class="lineNum">     314 </span>            :   double kinVisc;</a>
-<a name="315"><span class="lineNum">     315 </span>            :   /** @brief only for LB couette solver: number of processes */</a>
-<a name="316"><span class="lineNum">     316 </span>            :   tarch::la::Vector&lt;3, unsigned int&gt; lbNumberProcesses;</a>
-<a name="317"><span class="lineNum">     317 </span>            :   /** @brief  only for LB couette solver: VTK plotting per time step */</a>
-<a name="318"><span class="lineNum">     318 </span>            :   int plotEveryTimestep;</a>
-<a name="319"><span class="lineNum">     319 </span>            :   /** @brief number of cycles the continuum solver is advanced before the</a>
-<a name="320"><span class="lineNum">     320 </span>            :    * coupling is enabled */</a>
-<a name="321"><span class="lineNum">     321 </span>            :   int initAdvanceCycles;</a>
-<a name="322"><span class="lineNum">     322 </span>            :   /** @brief the start temperature for the fluid under consideration */</a>
-<a name="323"><span class="lineNum">     323 </span>            :   double temp;</a>
-<a name="324"><span class="lineNum">     324 </span>            :   /** @brief number of equilibartion time steps = number of time steps that</a>
-<a name="325"><span class="lineNum">     325 </span>            :    * the md will run before the coupling is enabled */</a>
-<a name="326"><span class="lineNum">     326 </span>            :   int equSteps;</a>
-<a name="327"><span class="lineNum">     327 </span>            :   /** @brief the number of md simulation instances in a multi-instance</a>
-<a name="328"><span class="lineNum">     328 </span>            :    * coupling, -1 = dynamic */</a>
-<a name="329"><span class="lineNum">     329 </span>            :   int totalNumberMDSimulations;</a>
-<a name="330"><span class="lineNum">     330 </span>            :   /** @brief the minimum number of md simulation instances in dynamic MD coupling  */</a>
-<a name="331"><span class="lineNum">     331 </span>            :   int lowerBoundNumberMDSimulations;</a>
-<a name="332"><span class="lineNum">     332 </span>            :   /** @brief only for dynamic MD: target absolute velocity error at start of all coupling cycles */</a>
-<a name="333"><span class="lineNum">     333 </span>            :   double absVelErrStart;</a>
-<a name="334"><span class="lineNum">     334 </span>            :   /** @brief only for dynamic MD: target absolute velocity error at end of all coupling cycles */</a>
-<a name="335"><span class="lineNum">     335 </span>            :   double absVelErrEnd;</a>
-<a name="336"><span class="lineNum">     336 </span>            :   /** @brief the sigma for the random noise in the case of synthetic md solver</a>
-<a name="337"><span class="lineNum">     337 </span>            :    */</a>
-<a name="338"><span class="lineNum">     338 </span>            :   double noiseSigma;</a>
-<a name="339"><span class="lineNum">     339 </span>            :   /** @todo piet */</a>
-<a name="340"><span class="lineNum">     340 </span>            :   bool twsLoop;</a>
-<a name="341"><span class="lineNum">     341 </span>            :   /** @todo piet*/</a>
-<a name="342"><span class="lineNum">     342 </span>            :   int twsLoopMin;</a>
-<a name="343"><span class="lineNum">     343 </span>            :   /** @todo piet */</a>
-<a name="344"><span class="lineNum">     344 </span>            :   int twsLoopMax;</a>
-<a name="345"><span class="lineNum">     345 </span>            :   /** @todo piet */</a>
-<a name="346"><span class="lineNum">     346 </span>            :   int twsLoopStep;</a>
-<a name="347"><span class="lineNum">     347 </span>            : </a>
-<a name="348"><span class="lineNum">     348 </span>            : #if (BUILD_WITH_OPENFOAM)</a>
-<a name="349"><span class="lineNum">     349 </span>            :   /** @brief the configurations for the OpenFoam solver */</a>
-<a name="350"><span class="lineNum">     350 </span>            :   FoamConfig foam;</a>
-<a name="351"><span class="lineNum">     351 </span>            : #endif</a>
-<a name="352"><span class="lineNum">     352 </span>            : };</a>
-<a name="353"><span class="lineNum">     353 </span>            : </a>
-<a name="354"><span class="lineNum">     354 </span>            : #endif</a>
+<a name="237"><span class="lineNum">     237 </span><span class="lineNoCov">          0 :       if (cfg.macro2Md || cfg.totalNumberMDSimulations &gt; 1 || cfg.lbNumberProcesses[0] != 1 || cfg.lbNumberProcesses[1] != 1 || cfg.lbNumberProcesses[2] != 1) {</span></a>
+<a name="238"><span class="lineNum">     238 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;Invalid configuration: Synthetic MD runs sequentially on &quot;</span></a>
+<a name="239"><span class="lineNum">     239 </span>            :                      &quot;rank 0 only. &quot;</a>
+<a name="240"><span class="lineNum">     240 </span>            :                   &lt;&lt; &quot;It does neither support parallel communication nor &quot;</a>
+<a name="241"><span class="lineNum">     241 </span><span class="lineNoCov">          0 :                      &quot;multi-instance sampling&quot;</span></a>
+<a name="242"><span class="lineNum">     242 </span><span class="lineNoCov">          0 :                   &lt;&lt; std::endl;</span></a>
+<a name="243"><span class="lineNum">     243 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
+<a name="244"><span class="lineNum">     244 </span>            :       }</a>
+<a name="245"><span class="lineNum">     245 </span>            :     }</a>
+<a name="246"><span class="lineNum">     246 </span><span class="lineCov">          4 :     if (cfg.maSolverType == COUETTE_ANALYTICAL) {</span></a>
+<a name="247"><span class="lineNum">     247 </span><span class="lineNoCov">          0 :       if (cfg.twoWayCoupling) {</span></a>
+<a name="248"><span class="lineNum">     248 </span><span class="lineNoCov">          0 :         std::cout &lt;&lt; &quot;Invalid configuration: COUETTE_ANALYTICAL does not &quot;</span></a>
+<a name="249"><span class="lineNum">     249 </span><span class="lineNoCov">          0 :                      &quot;support twoWayCoupling&quot;</span></a>
+<a name="250"><span class="lineNum">     250 </span><span class="lineNoCov">          0 :                   &lt;&lt; std::endl;</span></a>
+<a name="251"><span class="lineNum">     251 </span><span class="lineNoCov">          0 :         exit(EXIT_FAILURE);</span></a>
+<a name="252"><span class="lineNum">     252 </span>            :       }</a>
+<a name="253"><span class="lineNum">     253 </span>            :     }</a>
+<a name="254"><span class="lineNum">     254 </span>            : </a>
+<a name="255"><span class="lineNum">     255 </span><span class="lineCov">          8 :     return cfg;</span></a>
+<a name="256"><span class="lineNum">     256 </span><span class="lineCov">          4 :   }</span></a>
+<a name="257"><span class="lineNum">     257 </span>            : </a>
+<a name="258"><span class="lineNum">     258 </span>            : #if (BUILD_WITH_OPENFOAM)</a>
+<a name="259"><span class="lineNum">     259 </span>            :   /** @brief holds the variables necessary for the interface to the IcoFoam</a>
+<a name="260"><span class="lineNum">     260 </span>            :    * solver  */</a>
+<a name="261"><span class="lineNum">     261 </span>            :   struct FoamConfig {</a>
+<a name="262"><span class="lineNum">     262 </span>            :     /** @brief the path to the directory, where the folder with the IcoFoam</a>
+<a name="263"><span class="lineNum">     263 </span>            :      * OpenFOAM setup files are */</a>
+<a name="264"><span class="lineNum">     264 </span>            :     std::string directory;</a>
+<a name="265"><span class="lineNum">     265 </span>            :     /** @brief the name of the OpenFOAM folder */</a>
+<a name="266"><span class="lineNum">     266 </span>            :     std::string folder;</a>
+<a name="267"><span class="lineNum">     267 </span>            :     /** @brief the cubic mesh with a cubic hole has 12 boundaries, this vector</a>
+<a name="268"><span class="lineNum">     268 </span>            :      * tells which of them</a>
+<a name="269"><span class="lineNum">     269 </span>            :      *         shall be coupled with the md; The order has to be the same as in</a>
+<a name="270"><span class="lineNum">     270 </span>            :      * the blockMeshDict */</a>
+<a name="271"><span class="lineNum">     271 </span>            :     tarch::la::Vector&lt;12, unsigned int&gt; boundariesWithMD;</a>
+<a name="272"><span class="lineNum">     272 </span>            :   };</a>
+<a name="273"><span class="lineNum">     273 </span>            : #endif</a>
+<a name="274"><span class="lineNum">     274 </span>            : </a>
+<a name="275"><span class="lineNum">     275 </span>            :   /** @brief channel is always expected to have origin at (0.0,0.0,0.0) and to</a>
+<a name="276"><span class="lineNum">     276 </span>            :    * be cubic (MD 30: 50.0, MD 60: 100.0, MD 120: 200.0) */</a>
+<a name="277"><span class="lineNum">     277 </span>            :   double channelheight;</a>
+<a name="278"><span class="lineNum">     278 </span>            :   /** @brief velocity of moving wall (lower boundary moves) */</a>
+<a name="279"><span class="lineNum">     279 </span>            :   tarch::la::Vector&lt;3, double&gt; wallVelocity;</a>
+<a name="280"><span class="lineNum">     280 </span>            :   /** @brief number of coupling cycles that will be done, while the wall</a>
+<a name="281"><span class="lineNum">     281 </span>            :    * velocity is the wallInitVelocity */</a>
+<a name="282"><span class="lineNum">     282 </span>            :   int wallInitCycles;</a>
+<a name="283"><span class="lineNum">     283 </span>            :   /** @brief the velocity at the moving wall (z=0) while the wallInitCycles*/</a>
+<a name="284"><span class="lineNum">     284 </span>            :   tarch::la::Vector&lt;3, double&gt; wallInitVelocity;</a>
+<a name="285"><span class="lineNum">     285 </span>            :   /** @brief total number of oscillation periods of the oscillating wall</a>
+<a name="286"><span class="lineNum">     286 </span>            :    * velocity*/</a>
+<a name="287"><span class="lineNum">     287 </span>            :   double wallOscillations;</a>
+<a name="288"><span class="lineNum">     288 </span>            :   /** @brief number of coupling cycles, that is continuum time steps; MD/DPD:</a>
+<a name="289"><span class="lineNum">     289 </span>            :    * 1000 */</a>
+<a name="290"><span class="lineNum">     290 </span>            :   int couplingCycles;</a>
+<a name="291"><span class="lineNum">     291 </span>            :   /** @brief true if data will be send &amp; received from the md to the continuum</a>
+<a name="292"><span class="lineNum">     292 </span>            :    * solver */</a>
+<a name="293"><span class="lineNum">     293 </span>            :   bool md2Macro;</a>
+<a name="294"><span class="lineNum">     294 </span>            :   /** @brief true if data will be send &amp; received from the continuum to the md</a>
+<a name="295"><span class="lineNum">     295 </span>            :    * solver  */</a>
+<a name="296"><span class="lineNum">     296 </span>            :   bool macro2Md;</a>
+<a name="297"><span class="lineNum">     297 </span>            :   /** @brief true if the signal to noise ratio shall be evaluated */</a>
+<a name="298"><span class="lineNum">     298 </span>            :   bool computeSNR;</a>
+<a name="299"><span class="lineNum">     299 </span>            :   /** @brief true if from the md solver will be applied as boundary condition</a>
+<a name="300"><span class="lineNum">     300 </span>            :    * for the continuum solver */</a>
+<a name="301"><span class="lineNum">     301 </span>            :   bool twoWayCoupling;</a>
+<a name="302"><span class="lineNum">     302 </span>            :   /** @brief number of coupling cycles before a filter is applied*/</a>
+<a name="303"><span class="lineNum">     303 </span>            :   int filterInitCycles;</a>
+<a name="304"><span class="lineNum">     304 </span>            :   /** @brief the time step interval for writing the md data to csv files  */</a>
+<a name="305"><span class="lineNum">     305 </span>            :   int csvEveryTimestep;</a>
+<a name="306"><span class="lineNum">     306 </span>            :   /** @brief the type of continuum solver */</a>
+<a name="307"><span class="lineNum">     307 </span>            :   MacroSolverType maSolverType;</a>
+<a name="308"><span class="lineNum">     308 </span>            :   /** @brief the type of md solver */</a>
+<a name="309"><span class="lineNum">     309 </span>            :   MicroSolverType miSolverType;</a>
+<a name="310"><span class="lineNum">     310 </span>            :   /** @brief the general density of the fluid under consideration */</a>
+<a name="311"><span class="lineNum">     311 </span>            :   double density;</a>
+<a name="312"><span class="lineNum">     312 </span>            :   /** @brief the kinematic viscosity of the fluid under consideration */</a>
+<a name="313"><span class="lineNum">     313 </span>            :   double kinVisc;</a>
+<a name="314"><span class="lineNum">     314 </span>            :   /** @brief only for LB couette solver: number of processes */</a>
+<a name="315"><span class="lineNum">     315 </span>            :   tarch::la::Vector&lt;3, unsigned int&gt; lbNumberProcesses;</a>
+<a name="316"><span class="lineNum">     316 </span>            :   /** @brief  only for LB couette solver: VTK plotting per time step */</a>
+<a name="317"><span class="lineNum">     317 </span>            :   int plotEveryTimestep;</a>
+<a name="318"><span class="lineNum">     318 </span>            :   /** @brief number of cycles the continuum solver is advanced before the</a>
+<a name="319"><span class="lineNum">     319 </span>            :    * coupling is enabled */</a>
+<a name="320"><span class="lineNum">     320 </span>            :   int initAdvanceCycles;</a>
+<a name="321"><span class="lineNum">     321 </span>            :   /** @brief the start temperature for the fluid under consideration */</a>
+<a name="322"><span class="lineNum">     322 </span>            :   double temp;</a>
+<a name="323"><span class="lineNum">     323 </span>            :   /** @brief number of equilibartion time steps = number of time steps that</a>
+<a name="324"><span class="lineNum">     324 </span>            :    * the md will run before the coupling is enabled */</a>
+<a name="325"><span class="lineNum">     325 </span>            :   int equSteps;</a>
+<a name="326"><span class="lineNum">     326 </span>            :   /** @brief the number of md simulation instances in a multi-instance</a>
+<a name="327"><span class="lineNum">     327 </span>            :    * coupling, -1 = dynamic */</a>
+<a name="328"><span class="lineNum">     328 </span>            :   int totalNumberMDSimulations;</a>
+<a name="329"><span class="lineNum">     329 </span>            :   /** @brief the minimum number of md simulation instances in dynamic MD coupling  */</a>
+<a name="330"><span class="lineNum">     330 </span>            :   int lowerBoundNumberMDSimulations;</a>
+<a name="331"><span class="lineNum">     331 </span>            :   /** @brief only for dynamic MD: target absolute velocity error at start of all coupling cycles */</a>
+<a name="332"><span class="lineNum">     332 </span>            :   double absVelErrStart;</a>
+<a name="333"><span class="lineNum">     333 </span>            :   /** @brief only for dynamic MD: target absolute velocity error at end of all coupling cycles */</a>
+<a name="334"><span class="lineNum">     334 </span>            :   double absVelErrEnd;</a>
+<a name="335"><span class="lineNum">     335 </span>            :   /** @brief the sigma for the random noise in the case of synthetic md solver</a>
+<a name="336"><span class="lineNum">     336 </span>            :    */</a>
+<a name="337"><span class="lineNum">     337 </span>            :   double noiseSigma;</a>
+<a name="338"><span class="lineNum">     338 </span>            :   /** @todo piet */</a>
+<a name="339"><span class="lineNum">     339 </span>            :   bool twsLoop;</a>
+<a name="340"><span class="lineNum">     340 </span>            :   /** @todo piet*/</a>
+<a name="341"><span class="lineNum">     341 </span>            :   int twsLoopMin;</a>
+<a name="342"><span class="lineNum">     342 </span>            :   /** @todo piet */</a>
+<a name="343"><span class="lineNum">     343 </span>            :   int twsLoopMax;</a>
+<a name="344"><span class="lineNum">     344 </span>            :   /** @todo piet */</a>
+<a name="345"><span class="lineNum">     345 </span>            :   int twsLoopStep;</a>
+<a name="346"><span class="lineNum">     346 </span>            : </a>
+<a name="347"><span class="lineNum">     347 </span>            : #if (BUILD_WITH_OPENFOAM)</a>
+<a name="348"><span class="lineNum">     348 </span>            :   /** @brief the configurations for the OpenFoam solver */</a>
+<a name="349"><span class="lineNum">     349 </span>            :   FoamConfig foam;</a>
+<a name="350"><span class="lineNum">     350 </span>            : #endif</a>
+<a name="351"><span class="lineNum">     351 </span>            : };</a>
+<a name="352"><span class="lineNum">     352 </span>            : </a>
+<a name="353"><span class="lineNum">     353 </span>            : #endif</a>
 </pre>
       </td>
     </tr>

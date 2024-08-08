@@ -1,7 +1,7 @@
 <map id="coupling::solvers::LBCouetteSolverInterface" name="coupling::solvers::LBCouetteSolverInterface">
-<area shape="rect" id="Node000001" title="interface for the LBCouetteSolver" alt="" coords="433,53,604,94"/>
+<area shape="rect" id="Node000001" title="interface for the LBCouetteSolver" alt="" coords="438,45,609,86"/>
 <area shape="rect" id="Node000002" href="$classcoupling_1_1interface_1_1MacroscopicSolverInterface.html" title=" " alt="" coords="5,5,224,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,25,323,31,409,42,449,50,448,55,408,47,323,36,239,31"/>
-<area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="55,100,174,141"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,125,294,128,351,125,408,117,444,106,477,92,479,97,446,111,409,122,352,130,294,134,189,131"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,27,414,42,437,45,437,50,413,47,239,32"/>
+<area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="55,85,174,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,112,296,117,355,115,413,107,448,97,480,84,482,89,450,102,414,112,356,120,296,123,189,118"/>
 </map>

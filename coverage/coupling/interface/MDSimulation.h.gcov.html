@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -62,7 +62,7 @@
 <pre class="source">
 <a name="1"><span class="lineNum">       1 </span>            : #pragma once</a>
 <a name="2"><span class="lineNum">       2 </span>            : </a>
-<a name="3"><span class="lineNum">       3 </span>            : #include &quot;coupling/services/MacroscopicCellService.h&quot;</a>
+<a name="3"><span class="lineNum">       3 </span>            : #include &quot;coupling/services/CouplingCellService.h&quot;</a>
 <a name="4"><span class="lineNum">       4 </span>            : </a>
 <a name="5"><span class="lineNum">       5 </span>            : namespace coupling {</a>
 <a name="6"><span class="lineNum">       6 </span>            : namespace interface {</a>
@@ -95,10 +95,10 @@
 <a name="33"><span class="lineNum">      33 </span>            :   /** sortMoleculesIntoCells*/</a>
 <a name="34"><span class="lineNum">      34 </span>            :   virtual void sortMoleculesIntoCells() = 0;</a>
 <a name="35"><span class="lineNum">      35 </span>            : </a>
-<a name="36"><span class="lineNum">      36 </span>            :   /** setMacroscopicCellService</a>
-<a name="37"><span class="lineNum">      37 </span>            :    *    @param macroscopicCellService</a>
+<a name="36"><span class="lineNum">      36 </span>            :   /** setCouplingCellService</a>
+<a name="37"><span class="lineNum">      37 </span>            :    *    @param couplingCellService</a>
 <a name="38"><span class="lineNum">      38 </span>            :    */</a>
-<a name="39"><span class="lineNum">      39 </span>            :   virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService&lt;MDSIMULATIONFACTORY_DIMENSION&gt;* macroscopicCellService) = 0;</a>
+<a name="39"><span class="lineNum">      39 </span>            :   virtual void setCouplingCellService(coupling::services::CouplingCellService&lt;MDSIMULATIONFACTORY_DIMENSION&gt;* couplingCellService) = 0;</a>
 <a name="40"><span class="lineNum">      40 </span>            : </a>
 <a name="41"><span class="lineNum">      41 </span>            :   /** initialises the _molecularDynamicsSimulation solver</a>
 <a name="42"><span class="lineNum">      42 </span>            :    *    @sa simplemd::MolecularDynamicsSimulation::initServices()</a>

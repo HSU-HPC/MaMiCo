@@ -1,5 +1,5 @@
 <map id="coupling::VelocityGradientRelaxation&lt; LinkedCell, dim &gt;" name="coupling::VelocityGradientRelaxation&lt; LinkedCell, dim &gt;">
 <area shape="rect" id="Node000001" title="carries out velocity relaxation (similar to the SetMomentumMapping procedure)." alt="" coords="5,94,198,135"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1MomentumInsertion.html" title="used to manipulate the momentum/ velocity of the molecules contained in a macroscopic cell." alt="" coords="6,5,197,46"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1MomentumInsertion.html" title="used to manipulate the momentum/ velocity of the molecules contained in a coupling cell." alt="" coords="6,5,197,46"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,62,104,94,99,94,99,62"/>
 </map>

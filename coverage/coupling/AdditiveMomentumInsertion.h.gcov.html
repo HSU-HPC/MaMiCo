@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -70,7 +70,7 @@
 <a name="8"><span class="lineNum">       8 </span>            : #include &quot;coupling/MomentumInsertion.h&quot;</a>
 <a name="9"><span class="lineNum">       9 </span>            : #include &quot;coupling/cell-mappings/ComputeMassMapping.h&quot;</a>
 <a name="10"><span class="lineNum">      10 </span>            : #include &quot;coupling/cell-mappings/SetMomentumMapping.h&quot;</a>
-<a name="11"><span class="lineNum">      11 </span>            : #include &quot;coupling/datastructures/MacroscopicCell.h&quot;</a>
+<a name="11"><span class="lineNum">      11 </span>            : #include &quot;coupling/datastructures/CouplingCell.h&quot;</a>
 <a name="12"><span class="lineNum">      12 </span>            : #include &quot;tarch/la/Vector.h&quot;</a>
 <a name="13"><span class="lineNum">      13 </span>            : </a>
 <a name="14"><span class="lineNum">      14 </span>            : /** @brief everything necessary for coupling operations, is defined in here */</a>
@@ -79,10 +79,10 @@
 <a name="17"><span class="lineNum">      17 </span>            : }</a>
 <a name="18"><span class="lineNum">      18 </span>            : </a>
 <a name="19"><span class="lineNum">      19 </span>            : /** This class allows to add momentum to molecules. In each MD timestep, it</a>
-<a name="20"><span class="lineNum">      20 </span>            :  * takes a respective fraction from the momentum buffer of a macroscopic cell</a>
-<a name="21"><span class="lineNum">      21 </span>            :  * and adds this momentum to the molecules of the macroscopic cell.</a>
+<a name="20"><span class="lineNum">      20 </span>            :  * takes a respective fraction from the momentum buffer of a coupling cell</a>
+<a name="21"><span class="lineNum">      21 </span>            :  * and adds this momentum to the molecules of the coupling cell.</a>
 <a name="22"><span class="lineNum">      22 </span>            :  *  @brief used to manipulate the momentum/velocity of the molecules contained</a>
-<a name="23"><span class="lineNum">      23 </span>            :  * in a macroscopic cell.</a>
+<a name="23"><span class="lineNum">      23 </span>            :  * in a coupling cell.</a>
 <a name="24"><span class="lineNum">      24 </span>            :  *  @tparam LinkedCell the LinkedCell class is given by the implementation of</a>
 <a name="25"><span class="lineNum">      25 </span>            :  * linked cells in the molecular dynamics simulation</a>
 <a name="26"><span class="lineNum">      26 </span>            :  *  @tparam dim the integer dim refers to the spacial dimension of the</a>
@@ -105,41 +105,40 @@
 <a name="43"><span class="lineNum">      43 </span>            :   /** returns 1 since momentum shall be inserted in every time step</a>
 <a name="44"><span class="lineNum">      44 </span>            :    *  @brief returns the interval of time steps for momentum insertion</a>
 <a name="45"><span class="lineNum">      45 </span>            :    *  @returns 1 */</a>
-<a name="46"><span class="lineNum">      46 </span><span class="lineNoCov">          0 :   virtual unsigned int getTimeIntervalPerMomentumInsertion() const { return 1; }</span></a>
+<a name="46"><span class="lineNum">      46 </span><span class="lineNoCov">          0 :   unsigned int getTimeIntervalPerMomentumInsertion() const override { return 1; }</span></a>
 <a name="47"><span class="lineNum">      47 </span>            : </a>
-<a name="48"><span class="lineNum">      48 </span>            :   /** inserts the momentum of the macroscopic cell and distributes it over all</a>
+<a name="48"><span class="lineNum">      48 </span>            :   /** inserts the momentum of the coupling cell and distributes it over all</a>
 <a name="49"><span class="lineNum">      49 </span>            :    * molecules. This method does not conserve the kinetic energy of the</a>
-<a name="50"><span class="lineNum">      50 </span>            :    * respective macroscopic cell. To conserve the energy as well, see the</a>
+<a name="50"><span class="lineNum">      50 </span>            :    * respective coupling cell. To conserve the energy as well, see the</a>
 <a name="51"><span class="lineNum">      51 </span>            :    * description of MomentumController on details how to do that.</a>
 <a name="52"><span class="lineNum">      52 </span>            :    *  @brief inserts momentum to the cell</a>
-<a name="53"><span class="lineNum">      53 </span>            :    *  @param cell macroscopic cell to insert momentum to</a>
-<a name="54"><span class="lineNum">      54 </span>            :    *  @param currentMacroscopicCellIndex macroscopic cell index of the cell */</a>
-<a name="55"><span class="lineNum">      55 </span><span class="lineNoCov">          0 :   virtual void insertMomentum(coupling::datastructures::MacroscopicCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell,</span></a>
-<a name="56"><span class="lineNum">      56 </span>            :                               const unsigned int&amp; currentMacroscopicCellIndex) const {</a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :     const unsigned int timeIntervalMomentumInsertion = getTimeIntervalPerMomentumInsertion();</span></a>
-<a name="58"><span class="lineNum">      58 </span>            :     // determine fraction of momentum that is to be inserted in this frame</a>
-<a name="59"><span class="lineNum">      59 </span><span class="lineNoCov">          0 :     double fraction = 1.0 / ((_numberMDTimestepsPerCouplingCycle / timeIntervalMomentumInsertion) +</span></a>
-<a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 :                              (_numberMDTimestepsPerCouplingCycle % timeIntervalMomentumInsertion != 0));</span></a>
-<a name="61"><span class="lineNum">      61 </span><span class="lineNoCov">          0 :     tarch::la::Vector&lt;dim, double&gt; momentum(fraction * cell.getMicroscopicMomentum());</span></a>
-<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :     tarch::la::Vector&lt;dim, double&gt; zeroMomentum(0.0);</span></a>
-<a name="63"><span class="lineNum">      63 </span>            : </a>
-<a name="64"><span class="lineNum">      64 </span>            :     // if there is some momentum to be transferred, do so</a>
-<a name="65"><span class="lineNum">      65 </span><span class="lineNoCov">          0 :     if (tarch::la::dot(momentum, momentum) != 0.0) {</span></a>
-<a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :       coupling::cellmappings::ComputeMassMapping&lt;LinkedCell, dim&gt; computeMassMapping(coupling::MomentumInsertion&lt;LinkedCell, dim&gt;::_mdSolverInterface);</span></a>
-<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :       cell.iterateConstCells(computeMassMapping);</span></a>
-<a name="68"><span class="lineNum">      68 </span>            :       unsigned int numberParticles = computeMassMapping.getNumberOfParticles();</a>
-<a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :       coupling::cellmappings::SetMomentumMapping&lt;LinkedCell, dim&gt; setMomentumMapping(zeroMomentum, momentum, numberParticles,</span></a>
-<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :                                                                                      coupling::MomentumInsertion&lt;LinkedCell, dim&gt;::_mdSolverInterface);</span></a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :       cell.iterateCells(setMomentumMapping);</span></a>
-<a name="72"><span class="lineNum">      72 </span><span class="lineNoCov">          0 :     }</span></a>
-<a name="73"><span class="lineNum">      73 </span><span class="lineNoCov">          0 :   }</span></a>
-<a name="74"><span class="lineNum">      74 </span>            : </a>
-<a name="75"><span class="lineNum">      75 </span>            : private:</a>
-<a name="76"><span class="lineNum">      76 </span>            :   const unsigned int _numberMDTimestepsPerCouplingCycle; ///&lt; The number of molecular dynamics</a>
-<a name="77"><span class="lineNum">      77 </span>            :                                                          ///&lt; timesteps within one coupling</a>
-<a name="78"><span class="lineNum">      78 </span>            :                                                          ///&lt; cycle */</a>
-<a name="79"><span class="lineNum">      79 </span>            : };</a>
-<a name="80"><span class="lineNum">      80 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_ADDITIVEMOMENTUMINSERTION_H_</a>
+<a name="53"><span class="lineNum">      53 </span>            :    *  @param cell coupling cell to insert momentum to</a>
+<a name="54"><span class="lineNum">      54 </span>            :    *  @param idx coupling cell index of the cell */</a>
+<a name="55"><span class="lineNum">      55 </span><span class="lineNoCov">          0 :   void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell, I02 idx) const override {</span></a>
+<a name="56"><span class="lineNum">      56 </span><span class="lineNoCov">          0 :     const unsigned int timeIntervalMomentumInsertion = getTimeIntervalPerMomentumInsertion();</span></a>
+<a name="57"><span class="lineNum">      57 </span>            :     // determine fraction of momentum that is to be inserted in this frame</a>
+<a name="58"><span class="lineNum">      58 </span><span class="lineNoCov">          0 :     double fraction = 1.0 / ((_numberMDTimestepsPerCouplingCycle / timeIntervalMomentumInsertion) +</span></a>
+<a name="59"><span class="lineNum">      59 </span><span class="lineNoCov">          0 :                              (_numberMDTimestepsPerCouplingCycle % timeIntervalMomentumInsertion != 0));</span></a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 :     tarch::la::Vector&lt;dim, double&gt; momentum(fraction * cell.getMicroscopicMomentum());</span></a>
+<a name="61"><span class="lineNum">      61 </span><span class="lineNoCov">          0 :     tarch::la::Vector&lt;dim, double&gt; zeroMomentum(0.0);</span></a>
+<a name="62"><span class="lineNum">      62 </span>            : </a>
+<a name="63"><span class="lineNum">      63 </span>            :     // if there is some momentum to be transferred, do so</a>
+<a name="64"><span class="lineNum">      64 </span><span class="lineNoCov">          0 :     if (tarch::la::dot(momentum, momentum) != 0.0) {</span></a>
+<a name="65"><span class="lineNum">      65 </span><span class="lineNoCov">          0 :       coupling::cellmappings::ComputeMassMapping&lt;LinkedCell, dim&gt; computeMassMapping(coupling::MomentumInsertion&lt;LinkedCell, dim&gt;::_mdSolverInterface);</span></a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :       cell.iterateConstCells(computeMassMapping);</span></a>
+<a name="67"><span class="lineNum">      67 </span>            :       unsigned int numberParticles = computeMassMapping.getNumberOfParticles();</a>
+<a name="68"><span class="lineNum">      68 </span><span class="lineNoCov">          0 :       coupling::cellmappings::SetMomentumMapping&lt;LinkedCell, dim&gt; setMomentumMapping(zeroMomentum, momentum, numberParticles,</span></a>
+<a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :                                                                                      coupling::MomentumInsertion&lt;LinkedCell, dim&gt;::_mdSolverInterface);</span></a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :       cell.iterateCells(setMomentumMapping);</span></a>
+<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :     }</span></a>
+<a name="72"><span class="lineNum">      72 </span><span class="lineNoCov">          0 :   }</span></a>
+<a name="73"><span class="lineNum">      73 </span>            : </a>
+<a name="74"><span class="lineNum">      74 </span>            : private:</a>
+<a name="75"><span class="lineNum">      75 </span>            :   const unsigned int _numberMDTimestepsPerCouplingCycle; ///&lt; The number of molecular dynamics</a>
+<a name="76"><span class="lineNum">      76 </span>            :                                                          ///&lt; timesteps within one coupling</a>
+<a name="77"><span class="lineNum">      77 </span>            :                                                          ///&lt; cycle */</a>
+<a name="78"><span class="lineNum">      78 </span>            : };</a>
+<a name="79"><span class="lineNum">      79 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_ADDITIVEMOMENTUMINSERTION_H_</a>
 </pre>
       </td>
     </tr>

@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -88,9 +88,9 @@
 <a name="26"><span class="lineNum">      26 </span>            :   using CellIndex_T = coupling::indexing::CellIndex&lt;dim, coupling::indexing::IndexTrait::vector, scope..., coupling::indexing::IndexTrait::md2macro,</a>
 <a name="27"><span class="lineNum">      27 </span>            :                                                     coupling::indexing::IndexTrait::noGhost&gt;;</a>
 <a name="28"><span class="lineNum">      28 </span>            : </a>
-<a name="29"><span class="lineNum">      29 </span><span class="lineNoCov">          0 :   NLM(const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; inputCellVector_unfiltered,</span></a>
-<a name="30"><span class="lineNum">      30 </span>            :       const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; inputCellVector_prefiltered,</a>
-<a name="31"><span class="lineNum">      31 </span>            :       const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; outputCellVector, const std::array&lt;bool, 7&gt; filteredValues, int tws, double sigsq,</a>
+<a name="29"><span class="lineNum">      29 </span><span class="lineNoCov">          0 :   NLM(const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; inputCellVector_unfiltered,</span></a>
+<a name="30"><span class="lineNum">      30 </span>            :       const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; inputCellVector_prefiltered,</a>
+<a name="31"><span class="lineNum">      31 </span>            :       const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; outputCellVector, const std::array&lt;bool, 7&gt; filteredValues, int tws, double sigsq,</a>
 <a name="32"><span class="lineNum">      32 </span>            :       double sigsq_rel, double hsq, double hsq_rel, int M = 2, int d = 1)</a>
 <a name="33"><span class="lineNum">      33 </span>            :       : coupling::filtering::JunctorInterface&lt;dim, 2, 1&gt;({inputCellVector_unfiltered, inputCellVector_prefiltered}, {outputCellVector}, filteredValues, &quot;NLM&quot;),</a>
 <a name="34"><span class="lineNum">      34 </span><span class="lineNoCov">          0 :         _timeWindowSize(tws), _M(M), _d(d), _sigsq(sigsq), _sigsq_rel(sigsq_rel), _hsq(hsq), _hsq_rel(hsq_rel), _cycleCounter(0), _t(0),</span></a>

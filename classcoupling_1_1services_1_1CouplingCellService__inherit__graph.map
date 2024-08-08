@@ -1,0 +1,7 @@
+<map id="coupling::services::CouplingCellService&lt; dim &gt;" name="coupling::services::CouplingCellService&lt; dim &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,45,149,101"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1services_1_1CouplingCellServiceDummy.html" title=" " alt="" coords="197,5,384,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,54,196,48,196,53,164,60"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1services_1_1CouplingCellServiceImpl.html" title=" " alt="" coords="206,85,374,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,87,206,95,205,100,163,92"/>
+</map>

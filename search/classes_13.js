@@ -1,7 +1,21 @@
 var searchData=
 [
-  ['writer4cells_0',['Writer4Cells',['../classcoupling_1_1MacroscopicCellPlotter_1_1Writer4Cells.html',1,'coupling::MacroscopicCellPlotter']]],
-  ['writer4molecules_1',['Writer4Molecules',['../classcoupling_1_1MacroscopicCellPlotter_1_1Writer4Molecules.html',1,'coupling::MacroscopicCellPlotter']]],
-  ['writetofile_2',['WriteToFile',['../classcoupling_1_1filtering_1_1WriteToFile.html',1,'coupling::filtering']]],
-  ['writetofilejunctor_3',['WriteToFileJunctor',['../classcoupling_1_1filtering_1_1WriteToFileJunctor.html',1,'coupling::filtering']]]
+  ['wrapper_0',['Wrapper',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4applyboundaryforce_1',['Wrapper4ApplyBoundaryForce',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4ApplyBoundaryForce.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4applytemperature_2',['Wrapper4ApplyTemperature',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4ApplyTemperature.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4computeandsetcurrentvelocity_3',['Wrapper4ComputeAndSetCurrentVelocity',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4ComputeAndSetCurrentVelocity.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4computeandstoretemperature_4',['Wrapper4ComputeAndStoreTemperature',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4ComputeAndStoreTemperature.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4distributemomentum_5',['Wrapper4DistributeMomentum',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4DistributeMomentum.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4perturbatevelocity_6',['Wrapper4PerturbateVelocity',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4PerturbateVelocity.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4processinnercouplingcellaftermdtimestep_7',['Wrapper4ProcessInnerCouplingCellAfterMDTimestep',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4ProcessInnerCouplingCellAfterMDTimestep.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4processinnercouplingcellafterreceivingmacroscopicsolverdata_8',['Wrapper4ProcessInnerCouplingCellAfterReceivingMacroscopicSolverData',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4ProcessInnerCouplingCellAfterReceivingMacroscopicSolverData.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4processinnercouplingcellbeforereceivingmacroscopicsolverdata_9',['Wrapper4ProcessInnerCouplingCellBeforeReceivingMacroscopicSolverData',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4ProcessInnerCouplingCellBeforeReceivingMacroscopicSolverData.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4processinnercouplingcellbeforesendingmdsolverdata_10',['Wrapper4ProcessInnerCouplingCellBeforeSendingMDSolverData',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4ProcessInnerCouplingCellBeforeSendingMDSolverData.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4processoutercouplingcellafterreceivingmacroscopicsolverdata_11',['Wrapper4ProcessOuterCouplingCellAfterReceivingMacroscopicSolverData',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4ProcessOuterCouplingCellAfterReceivingMacroscopicSolverData.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4processoutercouplingcellbeforereceivingmacroscopicsolverdata_12',['Wrapper4ProcessOuterCouplingCellBeforeReceivingMacroscopicSolverData',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4ProcessOuterCouplingCellBeforeReceivingMacroscopicSolverData.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['wrapper4processoutercouplingcellbeforesendingmdsolverdata_13',['Wrapper4ProcessOuterCouplingCellBeforeSendingMDSolverData',['../classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper4ProcessOuterCouplingCellBeforeSendingMDSolverData.html',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['writer4cells_14',['Writer4Cells',['../classcoupling_1_1CouplingCellPlotter_1_1Writer4Cells.html',1,'coupling::CouplingCellPlotter']]],
+  ['writer4molecules_15',['Writer4Molecules',['../classcoupling_1_1CouplingCellPlotter_1_1Writer4Molecules.html',1,'coupling::CouplingCellPlotter']]],
+  ['writetofile_16',['WriteToFile',['../classcoupling_1_1filtering_1_1WriteToFile.html',1,'coupling::filtering']]],
+  ['writetofilejunctor_17',['WriteToFileJunctor',['../classcoupling_1_1filtering_1_1WriteToFileJunctor.html',1,'coupling::filtering']]]
 ];

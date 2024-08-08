@@ -1,0 +1,5 @@
+<map id="coupling::services::CouplingCellServiceImpl&lt; LinkedCell, dim &gt;::Wrapper4ProcessInnerCouplingCellAfterReceivingMacroscopicSolverData" name="coupling::services::CouplingCellServiceImpl&lt; LinkedCell, dim &gt;::Wrapper4ProcessInnerCouplingCellAfterReceivingMacroscopicSolverData">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,109,287,195"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1services_1_1CouplingCellServiceImpl_1_1Wrapper.html" title=" " alt="" coords="53,5,239,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,77,149,109,143,109,143,77"/>
+</map>

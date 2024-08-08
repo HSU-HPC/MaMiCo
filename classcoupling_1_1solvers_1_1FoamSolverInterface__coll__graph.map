@@ -1,7 +1,7 @@
 <map id="coupling::solvers::FoamSolverInterface&lt; dim &gt;" name="coupling::solvers::FoamSolverInterface&lt; dim &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="407,41,549,97"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="412,41,554,97"/>
 <area shape="rect" id="Node000002" href="$classcoupling_1_1interface_1_1MacroscopicSolverInterface.html" title="interface for the macroscopic, i.e. continuum solver" alt="" coords="5,5,195,61"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,41,407,60,406,65,210,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,41,412,60,411,65,210,46"/>
 <area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="34,85,166,126"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="181,105,278,103,382,93,406,88,407,93,383,98,278,108,182,110"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,96,387,78,411,75,412,80,388,83,182,101"/>
 </map>

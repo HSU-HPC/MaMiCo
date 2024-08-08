@@ -1,18 +1,17 @@
 <map id="coupling::solvers::FiniteDifferenceSolver" name="coupling::solvers::FiniteDifferenceSolver">
-<area shape="rect" id="Node000001" title="implements a simple one&#45;dimensional finite&#45;diffference solver for the Couette flow." alt="" coords="649,131,797,171"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1solvers_1_1NumericalSolver.html" title="is a virtual base class for the interface for a numerical fluid solver for the Couette scenario" alt="" coords="399,131,522,171"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="538,157,649,157,649,162,538,162"/>
-<area shape="poly" id="edge7_Node000001_Node000002" title=" " alt="" coords="538,140,649,140,649,145,538,145"/>
+<area shape="rect" id="Node000001" title="implements a simple one&#45;dimensional finite&#45;diffference solver for the Couette flow." alt="" coords="654,184,802,225"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1solvers_1_1NumericalSolver.html" title="is a virtual base class for the interface for a numerical fluid solver for the Couette scenario" alt="" coords="404,136,527,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="543,168,654,188,653,193,542,173"/>
 <area shape="rect" id="Node000003" href="$classcoupling_1_1solvers_1_1AbstractCouetteSolver.html" title=" " alt="" coords="5,5,187,46"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="203,26,289,39,334,51,376,69,416,97,445,128,441,132,412,101,373,73,332,56,288,44,202,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="203,25,292,39,338,52,381,70,402,84,422,100,451,134,447,137,418,104,399,88,378,75,336,57,291,44,202,30"/>
 <area shape="rect" id="Node000004" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="37,71,155,111"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="171,98,375,130,399,134,398,140,374,135,170,103"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="171,99,380,134,404,139,403,144,379,139,170,104"/>
 <area shape="rect" id="Node000005" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="37,136,155,177"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="170,153,398,149,398,155,171,158"/>
-<area shape="rect" id="Node000006" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="37,207,155,247"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="171,231,218,231,270,228,323,219,373,203,385,194,397,182,417,169,420,174,400,186,389,198,376,208,324,224,270,233,218,237,171,236"/>
-<area shape="rect" id="Node000007" href="$classScenario.html" title=" " alt="" coords="60,272,132,297"/>
-<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="147,291,199,296,259,294,320,281,348,269,373,252,384,237,386,221,387,202,397,183,411,170,415,174,401,186,392,204,391,221,389,239,377,256,350,273,321,286,260,299,199,301,147,296"/>
-<area shape="rect" id="Node000008" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="401,196,520,237"/>
-<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="534,195,648,167,649,172,535,201"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="171,154,403,154,403,159,171,159"/>
+<area shape="rect" id="Node000006" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="37,201,155,242"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="171,217,270,209,379,189,420,175,422,180,380,194,271,214,171,222"/>
+<area shape="rect" id="Node000007" href="$classScenario.html" title=" " alt="" coords="60,266,132,292"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="148,282,200,283,261,278,322,263,351,251,378,235,387,225,390,214,393,201,402,188,417,175,421,179,406,191,398,203,395,215,391,227,381,239,354,255,324,268,261,283,200,288,148,287"/>
+<area shape="rect" id="Node000008" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="406,201,524,242"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="540,214,654,207,654,212,540,219"/>
 </map>

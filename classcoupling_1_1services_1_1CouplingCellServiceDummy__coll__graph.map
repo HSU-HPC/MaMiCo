@@ -1,0 +1,12 @@
+<map id="coupling::services::CouplingCellServiceDummy&lt; dim &gt;" name="coupling::services::CouplingCellServiceDummy&lt; dim &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="564,92,752,148"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1services_1_1CouplingCellService.html" title=" " alt="" coords="255,5,398,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="414,53,565,93,563,98,413,58"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1sendrecv_1_1FromMacro2MDSendOnly.html" title=" " alt="" coords="236,84,417,155"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="433,117,564,117,564,122,433,122"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title=" " alt="" coords="5,132,187,203"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="201,143,235,136,236,141,202,149"/>
+<area shape="rect" id="Node000005" href="$classcoupling_1_1sendrecv_1_1FromMD2MacroRecvOnly.html" title=" " alt="" coords="236,179,417,250"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="202,187,236,193,235,199,201,192"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="432,182,563,144,565,149,433,187"/>
+</map>

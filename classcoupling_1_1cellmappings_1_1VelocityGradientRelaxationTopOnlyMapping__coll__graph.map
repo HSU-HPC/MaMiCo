@@ -1,9 +1,11 @@
 <map id="coupling::cellmappings::VelocityGradientRelaxationTopOnlyMapping&lt; LinkedCell, dim &gt;" name="coupling::cellmappings::VelocityGradientRelaxationTopOnlyMapping&lt; LinkedCell, dim &gt;">
-<area shape="rect" id="Node000001" title="This is the same as the class coupling::cellmappings::VelocityGradientRelaxationMapping,..." alt="" coords="62,304,292,360"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1cellmappings_1_1VelocityGradientRelaxationMapping.html" title="This class relaxes velocities of molecules towards an interpolated avergaged velocity value." alt="" coords="86,199,268,255"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,270,180,303,174,303,174,270"/>
-<area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="5,5,138,46"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="65,62,60,117,64,147,75,174,98,197,95,200,71,176,59,148,54,117,60,61"/>
-<area shape="rect" id="Node000004" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="223,5,341,46"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="285,62,278,118,269,148,255,177,231,200,228,197,251,173,264,146,273,117,280,61"/>
+<area shape="rect" id="Node000001" title="This is the same as the class coupling::cellmappings::VelocityGradientRelaxationMapping,..." alt="" coords="847,79,1076,135"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1cellmappings_1_1VelocityGradientRelaxationMapping.html" title="This class relaxes velocities of molecules towards an interpolated avergaged velocity value." alt="" coords="615,79,797,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="813,104,846,104,846,110,813,110"/>
+<area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="330,47,448,87"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="464,74,615,93,614,98,463,79"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1indexing_1_1CellIndex.html" title=" " alt="" coords="313,112,466,182"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="481,133,614,116,615,121,482,138"/>
+<area shape="rect" id="Node000005" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="5,127,138,167"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="153,144,312,144,312,150,153,150"/>
 </map>

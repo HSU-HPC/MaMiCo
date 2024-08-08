@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -84,8 +84,8 @@
 <a name="22"><span class="lineNum">      22 </span>            : </a>
 <a name="23"><span class="lineNum">      23 </span>            : template &lt;unsigned int dim&gt; class coupling::filtering::Constant : public coupling::filtering::FilterInterface&lt;dim&gt; {</a>
 <a name="24"><span class="lineNum">      24 </span>            : public:</a>
-<a name="25"><span class="lineNum">      25 </span><span class="lineNoCov">          0 :   Constant(const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; inputCellVector,</span></a>
-<a name="26"><span class="lineNum">      26 </span>            :            const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; outputCellVector, const std::array&lt;bool, 7&gt; filteredValues,</a>
+<a name="25"><span class="lineNum">      25 </span><span class="lineNoCov">          0 :   Constant(const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt;&amp; inputCellVector,</span></a>
+<a name="26"><span class="lineNum">      26 </span>            :            const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt;&amp; outputCellVector, const std::array&lt;bool, 7&gt; filteredValues,</a>
 <a name="27"><span class="lineNum">      27 </span>            :            const tarch::la::Vector&lt;dim, bool&gt; filteredDims, const double constant)</a>
 <a name="28"><span class="lineNum">      28 </span><span class="lineNoCov">          0 :       : coupling::filtering::FilterInterface&lt;dim&gt;(inputCellVector, outputCellVector, filteredValues, &quot;Constant&quot;), _constant(constant),</span></a>
 <a name="29"><span class="lineNum">      29 </span><span class="lineNoCov">          0 :         _filteredDims(filteredDims) {}</span></a>

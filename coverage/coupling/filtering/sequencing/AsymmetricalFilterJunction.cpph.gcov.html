@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -77,16 +77,16 @@
 <a name="15"><span class="lineNum">      15 </span>            : </a>
 <a name="16"><span class="lineNum">      16 </span>            :   // These four are not to be confused with member variables of similar names.</a>
 <a name="17"><span class="lineNum">      17 </span>            :   // Watch out for the &quot;_&quot; in front of member variables.</a>
-<a name="18"><span class="lineNum">      18 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; inputCellVector_primary = coupling::filtering::FilterSequence&lt;dim&gt;::_inputCellVector;</span></a>
-<a name="19"><span class="lineNum">      19 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; outputCellVector_primary = coupling::filtering::FilterSequence&lt;dim&gt;::_cellVector2;</span></a>
+<a name="18"><span class="lineNum">      18 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; inputCellVector_primary = coupling::filtering::FilterSequence&lt;dim&gt;::_inputCellVector;</span></a>
+<a name="19"><span class="lineNum">      19 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; outputCellVector_primary = coupling::filtering::FilterSequence&lt;dim&gt;::_cellVector2;</span></a>
 <a name="20"><span class="lineNum">      20 </span>            : </a>
-<a name="21"><span class="lineNum">      21 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; inputCellVector_secondary = _inputCellVector_secondary;</span></a>
+<a name="21"><span class="lineNum">      21 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; inputCellVector_secondary = _inputCellVector_secondary;</span></a>
 <a name="22"><span class="lineNum">      22 </span>            :   // Note: To prevent counter intuitive design, secondary output has been</a>
 <a name="23"><span class="lineNum">      23 </span>            :   // disabled, i.e. all junctors in an AFJ take the same secondary input.</a>
 <a name="24"><span class="lineNum">      24 </span>            :   // There</a>
 <a name="25"><span class="lineNum">      25 </span>            :   // is a chance that this will be re-enabled in the future, if it is needed for</a>
 <a name="26"><span class="lineNum">      26 </span>            :   // a certain junctor to work.</a>
-<a name="27"><span class="lineNum">      27 </span>            :   // std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;* &gt;</a>
+<a name="27"><span class="lineNum">      27 </span>            :   // std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;* &gt;</a>
 <a name="28"><span class="lineNum">      28 </span>            :   // outputCellVector_secondary = _cellVector2_secondary;</a>
 <a name="29"><span class="lineNum">      29 </span>            : </a>
 <a name="30"><span class="lineNum">      30 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>

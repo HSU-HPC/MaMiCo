@@ -1,33 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classcoupling_1_1filtering_1_1FilterInterface.html" title=" " alt="" coords="5,353,156,394"/>
-<area shape="rect" id="Node000001" href="$classcoupling_1_1filtering_1_1JunctorInterface.html" title=" " alt="" coords="239,5,368,61"/>
-<area shape="poly" id="edge5_Node000000_Node000001" title=" " alt="" coords="85,337,97,280,119,209,153,136,175,102,202,71,219,58,238,48,240,53,222,62,206,75,180,105,158,139,124,211,102,281,90,338"/>
-<area shape="rect" id="Node000003" href="$classcoupling_1_1filtering_1_1AsymmetricalJunctorInterface.html" title=" " alt="" coords="204,85,404,141"/>
-<area shape="poly" id="edge7_Node000000_Node000003" title=" " alt="" coords="90,338,106,296,130,246,162,196,202,151,218,139,221,144,205,155,166,199,135,248,111,298,95,339"/>
-<area shape="rect" id="Node000005" href="$classcoupling_1_1filtering_1_1Constant.html" title=" " alt="" coords="243,165,365,206"/>
-<area shape="poly" id="edge9_Node000000_Node000005" title=" " alt="" coords="98,338,140,275,169,243,202,215,241,196,243,201,205,219,173,247,144,279,102,341"/>
-<area shape="rect" id="Node000006" href="$classcoupling_1_1filtering_1_1FilterFromFunction.html" title=" " alt="" coords="236,229,372,285"/>
-<area shape="poly" id="edge10_Node000000_Node000006" title=" " alt="" coords="123,342,202,295,234,280,236,285,205,300,126,346"/>
-<area shape="rect" id="Node000007" href="$classcoupling_1_1filtering_1_1FilterInterfaceReadOnly.html" title=" " alt="" coords="222,309,386,365"/>
-<area shape="poly" id="edge11_Node000000_Node000007" title=" " alt="" coords="170,356,221,348,222,353,171,361"/>
-<area shape="rect" id="Node000011" href="$classcoupling_1_1filtering_1_1Gauss.html" title=" " alt="" coords="229,389,379,430"/>
-<area shape="poly" id="edge15_Node000000_Node000011" title=" " alt="" coords="171,385,229,394,228,400,171,390"/>
-<area shape="rect" id="Node000012" href="$classcoupling_1_1filtering_1_1JunctorInterface.html" title=" " alt="" coords="230,453,378,509"/>
-<area shape="poly" id="edge16_Node000000_Node000012" title=" " alt="" coords="131,399,205,439,230,450,228,455,202,444,128,404"/>
-<area shape="rect" id="Node000013" href="$classcoupling_1_1filtering_1_1POD.html" title=" " alt="" coords="246,533,362,574"/>
-<area shape="poly" id="edge17_Node000000_Node000013" title=" " alt="" coords="104,405,146,464,174,493,205,519,246,538,244,543,202,523,170,497,142,467,99,408"/>
-<area shape="rect" id="Node000014" href="$classcoupling_1_1filtering_1_1ReadFromFile.html" title=" " alt="" coords="228,598,380,639"/>
-<area shape="poly" id="edge18_Node000000_Node000014" title=" " alt="" coords="96,407,112,448,135,495,166,542,205,583,229,598,226,602,202,587,162,546,131,498,107,450,91,409"/>
-<area shape="rect" id="Node000015" href="$classcoupling_1_1filtering_1_1SequentialFilter.html" title=" " alt="" coords="224,664,384,704"/>
-<area shape="poly" id="edge19_Node000000_Node000015" title=" " alt="" coords="90,408,103,461,126,526,159,592,180,622,205,648,225,662,222,666,202,653,176,625,154,594,121,528,98,463,85,409"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1filtering_1_1NLM.html" title=" " alt="" coords="452,13,593,54"/>
-<area shape="poly" id="edge6_Node000001_Node000002" title=" " alt="" coords="384,30,452,30,452,36,384,36"/>
-<area shape="rect" id="Node000004" href="$classcoupling_1_1filtering_1_1WriteToFileJunctor.html" title=" " alt="" coords="454,85,591,141"/>
-<area shape="poly" id="edge8_Node000003_Node000004" title=" " alt="" coords="419,110,454,110,454,116,419,116"/>
-<area shape="rect" id="Node000008" href="$classcoupling_1_1filtering_1_1Copy.html" title=" " alt="" coords="464,252,581,292"/>
-<area shape="poly" id="edge12_Node000007_Node000008" title=" " alt="" coords="399,306,464,286,465,292,401,311"/>
-<area shape="rect" id="Node000009" href="$classcoupling_1_1filtering_1_1Strouhal.html" title=" " alt="" coords="464,317,582,358"/>
-<area shape="poly" id="edge13_Node000007_Node000009" title=" " alt="" coords="401,334,463,334,463,340,401,340"/>
-<area shape="rect" id="Node000010" href="$classcoupling_1_1filtering_1_1WriteToFile.html" title=" " alt="" coords="454,382,591,423"/>
-<area shape="poly" id="edge14_Node000007_Node000010" title=" " alt="" coords="401,363,455,380,453,385,399,368"/>
+<area shape="rect" id="Node000000" href="$classcoupling_1_1datastructures_1_1CellContainer.html" title=" " alt="" coords="5,13,178,54"/>
+<area shape="rect" id="Node000001" href="$classcoupling_1_1datastructures_1_1LinkedCellContainer.html" title="provides access to the coupling cells with linked cells." alt="" coords="226,5,384,61"/>
+<area shape="poly" id="edge4_Node000000_Node000001" title=" " alt="" coords="193,30,225,30,225,36,193,36"/>
 </map>

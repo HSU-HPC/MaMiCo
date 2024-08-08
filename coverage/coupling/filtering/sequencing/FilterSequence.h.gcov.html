@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -116,7 +116,7 @@
 <a name="54"><span class="lineNum">      54 </span>            :    * Filter Sequences are constructed in</a>
 <a name="55"><span class="lineNum">      55 </span>            :    * coupling::FilterPipeline::loadSequencesFromXML(...).</a>
 <a name="56"><span class="lineNum">      56 </span>            :    */</a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :   FilterSequence(const char* name, const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; inputCells,</span></a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :   FilterSequence(const char* name, const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; inputCells,</span></a>
 <a name="58"><span class="lineNum">      58 </span>            : #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</a>
 <a name="59"><span class="lineNum">      59 </span>            :                  MPI_Comm comm,</a>
 <a name="60"><span class="lineNum">      60 </span>            : #endif</a>
@@ -267,7 +267,7 @@
 <a name="205"><span class="lineNum">     205 </span>            :   /*</a>
 <a name="206"><span class="lineNum">     206 </span>            :    * Allows changing the input cells after init.</a>
 <a name="207"><span class="lineNum">     207 </span>            :    */</a>
-<a name="208"><span class="lineNum">     208 </span><span class="lineNoCov">          0 :   virtual void updateInputCellVector(const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; newInputCellVector) {</span></a>
+<a name="208"><span class="lineNum">     208 </span><span class="lineNoCov">          0 :   virtual void updateInputCellVector(const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; newInputCellVector) {</span></a>
 <a name="209"><span class="lineNum">     209 </span><span class="lineNoCov">          0 :     _inputCellVector = newInputCellVector; // call copy constructor</span></a>
 <a name="210"><span class="lineNum">     210 </span>            : </a>
 <a name="211"><span class="lineNum">     211 </span>            :     // cc this change to this sequence's first vector.</a>
@@ -284,7 +284,7 @@
 <a name="222"><span class="lineNum">     222 </span>            :    * Some sequences have more than one output, thus the optional parameter. Has</a>
 <a name="223"><span class="lineNum">     223 </span>            :    * no effect on a basic FilterSequence.</a>
 <a name="224"><span class="lineNum">     224 </span>            :    */</a>
-<a name="225"><span class="lineNum">     225 </span><span class="lineNoCov">          0 :   virtual const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; getOutputCellVector(unsigned int outputIndex = 0) const {</span></a>
+<a name="225"><span class="lineNum">     225 </span><span class="lineNoCov">          0 :   virtual const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt;&amp; getOutputCellVector(unsigned int outputIndex = 0) const {</span></a>
 <a name="226"><span class="lineNum">     226 </span><span class="lineNoCov">          0 :     if (_filters.empty())</span></a>
 <a name="227"><span class="lineNum">     227 </span><span class="lineNoCov">          0 :       return _inputCellVector;</span></a>
 <a name="228"><span class="lineNum">     228 </span>            : </a>
@@ -340,9 +340,9 @@
 <a name="278"><span class="lineNum">     278 </span>            : protected:</a>
 <a name="279"><span class="lineNum">     279 </span>            :   const char* _name;</a>
 <a name="280"><span class="lineNum">     280 </span>            : </a>
-<a name="281"><span class="lineNum">     281 </span>            :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _inputCellVector; // points to (foreign) input vector</a>
-<a name="282"><span class="lineNum">     282 </span>            :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _cellVector1;     // allocated for this sequence only</a>
-<a name="283"><span class="lineNum">     283 </span>            :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _cellVector2;     // allocated for this sequence only</a>
+<a name="281"><span class="lineNum">     281 </span>            :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; _inputCellVector; // points to (foreign) input vector</a>
+<a name="282"><span class="lineNum">     282 </span>            :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; _cellVector1;     // allocated for this sequence only</a>
+<a name="283"><span class="lineNum">     283 </span>            :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; _cellVector2;     // allocated for this sequence only</a>
 <a name="284"><span class="lineNum">     284 </span>            : </a>
 <a name="285"><span class="lineNum">     285 </span>            : #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</a>
 <a name="286"><span class="lineNum">     286 </span>            :   MPI_Comm _comm;</a>

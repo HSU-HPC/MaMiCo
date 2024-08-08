@@ -1,5 +1,5 @@
 <map id="coupling::sendrecv::DataExchangeFromMacro2MD&lt; dim &gt;" name="coupling::sendrecv::DataExchangeFromMacro2MD&lt; dim &gt;">
-<area shape="rect" id="Node000001" title="data exchange from the macroscopic solver to the MD solver. Derived from the class coupling::sendrecv..." alt="" coords="266,13,469,68"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1sendrecv_1_1DataExchange.html" title=" " alt="" coords="5,5,218,76"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,38,265,38,265,43,233,43"/>
+<area shape="rect" id="Node000001" title="data exchange from the macroscopic solver to the MD solver. Derived from the class coupling::sendrecv..." alt="" coords="242,13,445,68"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1sendrecv_1_1DataExchange.html" title=" " alt="" coords="5,5,194,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,38,241,38,241,43,209,43"/>
 </map>

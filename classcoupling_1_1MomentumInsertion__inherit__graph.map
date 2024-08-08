@@ -1,6 +1,6 @@
 <map id="coupling::MomentumInsertion&lt; LinkedCell, dim &gt;" name="coupling::MomentumInsertion&lt; LinkedCell, dim &gt;">
-<area shape="rect" id="Node000001" title="used to manipulate the momentum/ velocity of the molecules contained in a macroscopic cell." alt="" coords="5,136,196,177"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1AdditiveMomentumInsertion.html" title="used to manipulate the momentum/velocity of the molecules contained in a macroscopic cell." alt="" coords="274,5,461,46"/>
+<area shape="rect" id="Node000001" title="used to manipulate the momentum/ velocity of the molecules contained in a coupling cell." alt="" coords="5,136,196,177"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1AdditiveMomentumInsertion.html" title="used to manipulate the momentum/velocity of the molecules contained in a coupling cell." alt="" coords="274,5,461,46"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,124,185,89,243,57,275,44,277,49,245,61,188,94,140,128"/>
 <area shape="rect" id="Node000003" href="$classcoupling_1_1NieVelocityImposition.html" title="Velocity imposition scheme following the respective paper by Nie et al., J. Fluid...." alt="" coords="267,71,468,111"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="201,129,281,109,282,115,202,134"/>

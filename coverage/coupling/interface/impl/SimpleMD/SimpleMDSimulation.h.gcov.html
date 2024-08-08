@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">9</td>
@@ -75,7 +75,7 @@
 <a name="13"><span class="lineNum">      13 </span>            : class SimpleMDSimulation : public coupling::interface::MDSimulation, public simplemd::MolecularDynamicsSimulation {</a>
 <a name="14"><span class="lineNum">      14 </span>            : public:</a>
 <a name="15"><span class="lineNum">      15 </span><span class="lineCov">         12 :   SimpleMDSimulation(const simplemd::configurations::MolecularDynamicsConfiguration&amp; configuration)</span></a>
-<a name="16"><span class="lineNum">      16 </span><span class="lineCov">         12 :       : coupling::interface::MDSimulation(), simplemd::MolecularDynamicsSimulation(configuration), _macroscopicCellService(NULL), _couplingSwitchedOn(true) {}</span></a>
+<a name="16"><span class="lineNum">      16 </span><span class="lineCov">         12 :       : coupling::interface::MDSimulation(), simplemd::MolecularDynamicsSimulation(configuration), _couplingCellService(NULL), _couplingSwitchedOn(true) {}</span></a>
 <a name="17"><span class="lineNum">      17 </span>            : </a>
 <a name="18"><span class="lineNum">      18 </span><span class="lineCov">         12 :   virtual ~SimpleMDSimulation() {}</span></a>
 <a name="19"><span class="lineNum">      19 </span>            : </a>
@@ -106,11 +106,11 @@
 <a name="44"><span class="lineNum">      44 </span>            :     // sampling volumes (hence: after communication with neighbours and molecule</a>
 <a name="45"><span class="lineNum">      45 </span>            :     // updates); do it BEFORE quantities are manipulated as we can then also do</a>
 <a name="46"><span class="lineNum">      46 </span>            :     // some pre-processing here.</a>
-<a name="47"><span class="lineNum">      47 </span><span class="lineNoCov">          0 :     _macroscopicCellService-&gt;processInnerMacroscopicCellAfterMDTimestep();</span></a>
+<a name="47"><span class="lineNum">      47 </span><span class="lineNoCov">          0 :     _couplingCellService-&gt;processInnerCouplingCellAfterMDTimestep();</span></a>
 <a name="48"><span class="lineNum">      48 </span>            :     // ------------ coupling step: distribute mass ---------------------</a>
-<a name="49"><span class="lineNum">      49 </span><span class="lineNoCov">          0 :     _macroscopicCellService-&gt;distributeMass(t);</span></a>
+<a name="49"><span class="lineNum">      49 </span><span class="lineNoCov">          0 :     _couplingCellService-&gt;distributeMass(t);</span></a>
 <a name="50"><span class="lineNum">      50 </span>            :     // for isothermal simulations: apply thermostat</a>
-<a name="51"><span class="lineNum">      51 </span><span class="lineNoCov">          0 :     _macroscopicCellService-&gt;applyTemperatureToMolecules(t);</span></a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineNoCov">          0 :     _couplingCellService-&gt;applyTemperatureToMolecules(t);</span></a>
 <a name="52"><span class="lineNum">      52 </span>            : </a>
 <a name="53"><span class="lineNum">      53 </span>            :     // ---------- from here: go on with usual MD algorithm</a>
 <a name="54"><span class="lineNum">      54 </span>            :     // ------------------------------</a>
@@ -121,9 +121,9 @@
 <a name="59"><span class="lineNum">      59 </span>            : </a>
 <a name="60"><span class="lineNum">      60 </span>            :     // distribute momentum -&gt; some methods require modification of force terms,</a>
 <a name="61"><span class="lineNum">      61 </span>            :     // therefore we call it AFTER the force computation and before everything else</a>
-<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :     _macroscopicCellService-&gt;distributeMomentum(t);</span></a>
+<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :     _couplingCellService-&gt;distributeMomentum(t);</span></a>
 <a name="63"><span class="lineNum">      63 </span>            :     // apply boundary forces</a>
-<a name="64"><span class="lineNum">      64 </span><span class="lineNoCov">          0 :     _macroscopicCellService-&gt;applyBoundaryForce(t);</span></a>
+<a name="64"><span class="lineNum">      64 </span><span class="lineNoCov">          0 :     _couplingCellService-&gt;applyBoundaryForce(t);</span></a>
 <a name="65"><span class="lineNum">      65 </span>            :     // evaluate statistics</a>
 <a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :     evaluateStatistics(t);</span></a>
 <a name="67"><span class="lineNum">      67 </span>            : </a>
@@ -153,8 +153,8 @@
 <a name="91"><span class="lineNum">      91 </span><span class="lineNoCov">          0 :         (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {</span></a>
 <a name="92"><span class="lineNum">      92 </span><span class="lineNoCov">          0 :       _moleculeService-&gt;reorganiseMemory(*_parallelTopologyService, *_linkedCellService);</span></a>
 <a name="93"><span class="lineNum">      93 </span>            :     }</a>
-<a name="94"><span class="lineNum">      94 </span>            :     // plot also macroscopic cell information</a>
-<a name="95"><span class="lineNum">      95 </span><span class="lineNoCov">          0 :     _macroscopicCellService-&gt;plotEveryMicroscopicTimestep(t);</span></a>
+<a name="94"><span class="lineNum">      94 </span>            :     // plot also coupling cell information</a>
+<a name="95"><span class="lineNum">      95 </span><span class="lineNoCov">          0 :     _couplingCellService-&gt;plotEveryMicroscopicTimestep(t);</span></a>
 <a name="96"><span class="lineNum">      96 </span>            : </a>
 <a name="97"><span class="lineNum">      97 </span><span class="lineNoCov">          0 :     _linkedCellService-&gt;iterateCells(*_emptyLinkedListsMapping, false);</span></a>
 <a name="98"><span class="lineNum">      98 </span>            : </a>
@@ -174,13 +174,13 @@
 <a name="112"><span class="lineNum">     112 </span>            :     // nop required, since the linked cells are very tightly linked to mamico</a>
 <a name="113"><span class="lineNum">     113 </span><span class="lineNoCov">          0 :   }</span></a>
 <a name="114"><span class="lineNum">     114 </span>            : </a>
-<a name="115"><span class="lineNum">     115 </span><span class="lineNoCov">          0 :   virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService&lt;MDSIMULATIONFACTORY_DIMENSION&gt;* macroscopicCellService) {</span></a>
-<a name="116"><span class="lineNum">     116 </span><span class="lineNoCov">          0 :     _macroscopicCellService = macroscopicCellService;</span></a>
+<a name="115"><span class="lineNum">     115 </span><span class="lineNoCov">          0 :   virtual void setCouplingCellService(coupling::services::CouplingCellService&lt;MDSIMULATIONFACTORY_DIMENSION&gt;* couplingCellService) {</span></a>
+<a name="116"><span class="lineNum">     116 </span><span class="lineNoCov">          0 :     _couplingCellService = couplingCellService;</span></a>
 <a name="117"><span class="lineNum">     117 </span>            :     // set the cell service also in singleton of mamico interface provider -&gt;</a>
 <a name="118"><span class="lineNum">     118 </span>            :     // typically not required in coupling, but makes the simulation state more</a>
 <a name="119"><span class="lineNum">     119 </span>            :     // consistent compared to using LAMMPS</a>
-<a name="120"><span class="lineNum">     120 </span><span class="lineNoCov">          0 :     coupling::interface::MamicoInterfaceProvider&lt;simplemd::LinkedCell, MDSIMULATIONFACTORY_DIMENSION&gt;::getInstance().setMacroscopicCellService(</span></a>
-<a name="121"><span class="lineNum">     121 </span>            :         macroscopicCellService);</a>
+<a name="120"><span class="lineNum">     120 </span><span class="lineNoCov">          0 :     coupling::interface::MamicoInterfaceProvider&lt;simplemd::LinkedCell, MDSIMULATIONFACTORY_DIMENSION&gt;::getInstance().setCouplingCellService(</span></a>
+<a name="121"><span class="lineNum">     121 </span>            :         couplingCellService);</a>
 <a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :   }</span></a>
 <a name="123"><span class="lineNum">     123 </span>            : </a>
 <a name="124"><span class="lineNum">     124 </span><span class="lineNoCov">          0 :   virtual void init() { initServices(); }</span></a>
@@ -204,8 +204,8 @@
 <a name="142"><span class="lineNum">     142 </span><span class="lineCov">         12 :   const simplemd::services::MolecularPropertiesService&amp; getMolecularPropertiesService() { return *_molecularPropertiesService; }</span></a>
 <a name="143"><span class="lineNum">     143 </span>            : </a>
 <a name="144"><span class="lineNum">     144 </span>            : private:</a>
-<a name="145"><span class="lineNum">     145 </span>            :   /** @brief the macroscopic cell service for the coupled md simulation  */</a>
-<a name="146"><span class="lineNum">     146 </span>            :   coupling::services::MacroscopicCellService&lt;MD_DIM&gt;* _macroscopicCellService;</a>
+<a name="145"><span class="lineNum">     145 </span>            :   /** @brief the coupling cell service for the coupled md simulation  */</a>
+<a name="146"><span class="lineNum">     146 </span>            :   coupling::services::CouplingCellService&lt;MD_DIM&gt;* _couplingCellService;</a>
 <a name="147"><span class="lineNum">     147 </span>            :   /** @brief bool holding the current state of the coupling: true - coupled</a>
 <a name="148"><span class="lineNum">     148 </span>            :    * simulation and false - independent md simulation */</a>
 <a name="149"><span class="lineNum">     149 </span>            :   bool _couplingSwitchedOn;</a>

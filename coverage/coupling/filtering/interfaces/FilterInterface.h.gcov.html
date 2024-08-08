@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -79,8 +79,8 @@
 <a name="17"><span class="lineNum">      17 </span>            : } // namespace coupling</a>
 <a name="18"><span class="lineNum">      18 </span>            : </a>
 <a name="19"><span class="lineNum">      19 </span>            : /**</a>
-<a name="20"><span class="lineNum">      20 </span>            :  * Generic interface for filters that are to be applied to data of</a>
-<a name="21"><span class="lineNum">      21 </span>            :  * coupling::MacroscopicCells before MD to Macro transfer. Implementations can</a>
+<a name="20"><span class="lineNum">      20 </span>            :  * Generic interface for filters that are to be applied to</a>
+<a name="21"><span class="lineNum">      21 </span>            :  * coupling::CellContainer before MD to Macro transfer. Implementations can</a>
 <a name="22"><span class="lineNum">      22 </span>            :  * be found in coupling/filtering/filters.</a>
 <a name="23"><span class="lineNum">      23 </span>            :  *</a>
 <a name="24"><span class="lineNum">      24 </span>            :  * If you wish to use a filter that does not alter its input data, i.e that is</a>
@@ -98,161 +98,160 @@
 <a name="36"><span class="lineNum">      36 </span>            :    * FilterSequence. You can customize parameterization in</a>
 <a name="37"><span class="lineNum">      37 </span>            :    * coupling::FilterSequence::loadFiltersFromXML(...).</a>
 <a name="38"><span class="lineNum">      38 </span>            :    */</a>
-<a name="39"><span class="lineNum">      39 </span><span class="lineNoCov">          0 :   FilterInterface(const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; inputCellVector,</span></a>
-<a name="40"><span class="lineNum">      40 </span>            :                   const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; outputCellVector, const std::array&lt;bool, 7&gt; filteredValues,</a>
-<a name="41"><span class="lineNum">      41 </span>            :                   const char* type)</a>
-<a name="42"><span class="lineNum">      42 </span>            :       :</a>
-<a name="43"><span class="lineNum">      43 </span>            : </a>
-<a name="44"><span class="lineNum">      44 </span><span class="lineNoCov">          0 :         _inputCells(inputCellVector), _outputCells(outputCellVector), _type(type) {</span></a>
-<a name="45"><span class="lineNum">      45 </span>            :     // microscopic mass</a>
-<a name="46"><span class="lineNum">      46 </span><span class="lineNoCov">          0 :     if (filteredValues[0]) {</span></a>
-<a name="47"><span class="lineNum">      47 </span><span class="lineNoCov">          0 :       _scalarAccessFunctionPairs.push_back(</span></a>
-<a name="48"><span class="lineNum">      48 </span>            :           {&amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::getMicroscopicMass, &amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::setMicroscopicMass});</a>
-<a name="49"><span class="lineNum">      49 </span>            :     }</a>
-<a name="50"><span class="lineNum">      50 </span>            :     // microscopic momentum</a>
-<a name="51"><span class="lineNum">      51 </span><span class="lineNoCov">          0 :     if (filteredValues[1]) {</span></a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineNoCov">          0 :       _vectorAccessFunctionPairs.push_back(</span></a>
-<a name="53"><span class="lineNum">      53 </span>            :           {&amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::getMicroscopicMomentum, &amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::setMicroscopicMomentum});</a>
-<a name="54"><span class="lineNum">      54 </span>            :     }</a>
-<a name="55"><span class="lineNum">      55 </span>            :     // macroscopic mass</a>
-<a name="56"><span class="lineNum">      56 </span><span class="lineNoCov">          0 :     if (filteredValues[2]) {</span></a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :       _scalarAccessFunctionPairs.push_back(</span></a>
-<a name="58"><span class="lineNum">      58 </span>            :           {&amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::getMacroscopicMass, &amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::setMacroscopicMass});</a>
-<a name="59"><span class="lineNum">      59 </span>            :     }</a>
-<a name="60"><span class="lineNum">      60 </span>            :     // macroscopic momentum</a>
-<a name="61"><span class="lineNum">      61 </span><span class="lineNoCov">          0 :     if (filteredValues[3]) {</span></a>
-<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :       _vectorAccessFunctionPairs.push_back(</span></a>
-<a name="63"><span class="lineNum">      63 </span>            :           {&amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::getMacroscopicMomentum, &amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::setMacroscopicMomentum});</a>
-<a name="64"><span class="lineNum">      64 </span>            :     }</a>
-<a name="65"><span class="lineNum">      65 </span>            :     // potential energy</a>
-<a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :     if (filteredValues[4]) {</span></a>
-<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :       _scalarAccessFunctionPairs.push_back(</span></a>
-<a name="68"><span class="lineNum">      68 </span>            :           {&amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::getPotentialEnergy, &amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::setPotentialEnergy});</a>
-<a name="69"><span class="lineNum">      69 </span>            :     }</a>
-<a name="70"><span class="lineNum">      70 </span>            :     // velocity</a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :     if (filteredValues[5]) {</span></a>
-<a name="72"><span class="lineNum">      72 </span><span class="lineNoCov">          0 :       _vectorAccessFunctionPairs.push_back(</span></a>
-<a name="73"><span class="lineNum">      73 </span>            :           {&amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::getCurrentVelocity, &amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::setCurrentVelocity});</a>
-<a name="74"><span class="lineNum">      74 </span>            :     }</a>
-<a name="75"><span class="lineNum">      75 </span>            :     // temperature</a>
-<a name="76"><span class="lineNum">      76 </span><span class="lineNoCov">          0 :     if (filteredValues[6]) {</span></a>
-<a name="77"><span class="lineNum">      77 </span><span class="lineNoCov">          0 :       _scalarAccessFunctionPairs.push_back(</span></a>
-<a name="78"><span class="lineNum">      78 </span>            :           {&amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::getTemperature, &amp;coupling::datastructures::MacroscopicCell&lt;dim&gt;::setTemperature});</a>
-<a name="79"><span class="lineNum">      79 </span>            :     }</a>
-<a name="80"><span class="lineNum">      80 </span><span class="lineNoCov">          0 :   }</span></a>
-<a name="81"><span class="lineNum">      81 </span>            : </a>
-<a name="82"><span class="lineNum">      82 </span><span class="lineNoCov">          0 :   FilterInterface(const char* type)</span></a>
-<a name="83"><span class="lineNum">      83 </span><span class="lineNoCov">          0 :       : _type(type) { /* Used by incomplete implementations of FilterInterface.</span></a>
-<a name="84"><span class="lineNum">      84 </span>            :                          Should be redesigned via meta class.*/</a>
-<a name="85"><span class="lineNum">      85 </span>            :   }</a>
-<a name="86"><span class="lineNum">      86 </span>            : </a>
-<a name="87"><span class="lineNum">      87 </span><span class="lineNoCov">          0 :   virtual ~FilterInterface(){};</span></a>
-<a name="88"><span class="lineNum">      88 </span>            : </a>
-<a name="89"><span class="lineNum">      89 </span>            :   /*</a>
-<a name="90"><span class="lineNum">      90 </span>            :    * Applies the filter to all cells that are within the filter's sequence's</a>
-<a name="91"><span class="lineNum">      91 </span>            :    * domain.</a>
-<a name="92"><span class="lineNum">      92 </span>            :    *</a>
-<a name="93"><span class="lineNum">      93 </span>            :    * It is very important that this method provides complete output data,</a>
-<a name="94"><span class="lineNum">      94 </span>            :    * i.e uses all elements of _scalarSetters and _vectorSetters on all elements</a>
-<a name="95"><span class="lineNum">      95 </span>            :    * of _outputCells. If this is not the case, you dont want to use this</a>
-<a name="96"><span class="lineNum">      96 </span>            :    * interface, but rather coupling::FilterInterfaceReadOnly and use its method</a>
-<a name="97"><span class="lineNum">      97 </span>            :    * copyInputToOutput().</a>
-<a name="98"><span class="lineNum">      98 </span>            :    */</a>
-<a name="99"><span class="lineNum">      99 </span>            :   virtual void operator()() = 0;</a>
-<a name="100"><span class="lineNum">     100 </span>            : </a>
-<a name="101"><span class="lineNum">     101 </span><span class="lineNoCov">          0 :   void updateCellData(const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; new_inputCells,</span></a>
-<a name="102"><span class="lineNum">     102 </span>            :                       const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; new_outputCells) {</a>
-<a name="103"><span class="lineNum">     103 </span><span class="lineNoCov">          0 :     if (new_inputCells.size() != new_outputCells.size())</span></a>
-<a name="104"><span class="lineNum">     104 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;New input-, output-, and indexing vectors must &quot;</span></a>
-<a name="105"><span class="lineNum">     105 </span>            :                                &quot;be of identical size.&quot;);</a>
-<a name="106"><span class="lineNum">     106 </span>            : </a>
-<a name="107"><span class="lineNum">     107 </span><span class="lineNoCov">          0 :     _inputCells = new_inputCells;</span></a>
-<a name="108"><span class="lineNum">     108 </span><span class="lineNoCov">          0 :     _outputCells = new_outputCells;</span></a>
-<a name="109"><span class="lineNum">     109 </span>            : </a>
-<a name="110"><span class="lineNum">     110 </span>            : #ifdef DEBUG_FILTER_INTERFACE</a>
-<a name="111"><span class="lineNum">     111 </span>            :     std::cout &lt;&lt; &quot;           FI: Updated cell data.&quot; &lt;&lt; std::endl;</a>
-<a name="112"><span class="lineNum">     112 </span>            : #endif</a>
-<a name="113"><span class="lineNum">     113 </span><span class="lineNoCov">          0 :   }</span></a>
-<a name="114"><span class="lineNum">     114 </span>            : </a>
-<a name="115"><span class="lineNum">     115 </span>            :   /*</a>
-<a name="116"><span class="lineNum">     116 </span>            :    * Basic Getters/Setters</a>
-<a name="117"><span class="lineNum">     117 </span>            :    */</a>
-<a name="118"><span class="lineNum">     118 </span><span class="lineNoCov">          0 :   const char* getType() const { return _type; }</span></a>
-<a name="119"><span class="lineNum">     119 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; getInputCells() const { return _inputCells; }</span></a>
-<a name="120"><span class="lineNum">     120 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; getOutputCells() const { return _outputCells; }</span></a>
-<a name="121"><span class="lineNum">     121 </span>            : </a>
-<a name="122"><span class="lineNum">     122 </span>            :   using CellIndex_T = coupling::indexing::CellIndex&lt;dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro,</a>
-<a name="123"><span class="lineNum">     123 </span>            :                                                     coupling::indexing::IndexTrait::noGhost&gt;;</a>
-<a name="124"><span class="lineNum">     124 </span>            :   /*</a>
-<a name="125"><span class="lineNum">     125 </span>            :    * Advanced Getters/Setters</a>
-<a name="126"><span class="lineNum">     126 </span>            :    */</a>
-<a name="127"><span class="lineNum">     127 </span>            :   coupling::datastructures::MacroscopicCell&lt;dim&gt;* getInputCellOfIndex(const CellIndex_T&amp; index) {</a>
-<a name="128"><span class="lineNum">     128 </span>            :     if (index.get() &lt; _inputCells.size) {</a>
-<a name="129"><span class="lineNum">     129 </span>            :       return _inputCells[index.get()];</a>
-<a name="130"><span class="lineNum">     130 </span>            :     } else {</a>
-<a name="131"><span class="lineNum">     131 </span>            :       std::cout &lt;&lt; &quot;Index not found: &quot; &lt;&lt; index &lt;&lt; std::endl;</a>
-<a name="132"><span class="lineNum">     132 </span>            :       throw std::runtime_error(&quot;FilterInterface: getInputCellofIndex(): Could not find index.&quot;);</a>
-<a name="133"><span class="lineNum">     133 </span>            :     }</a>
-<a name="134"><span class="lineNum">     134 </span>            :   }</a>
-<a name="135"><span class="lineNum">     135 </span>            :   coupling::datastructures::MacroscopicCell&lt;dim&gt;* getOutputCellOfIndex(const CellIndex_T&amp; index) {</a>
-<a name="136"><span class="lineNum">     136 </span>            :     if (index.get() &lt; _outputCells.size) {</a>
-<a name="137"><span class="lineNum">     137 </span>            :       return _outputCells[index.get()];</a>
-<a name="138"><span class="lineNum">     138 </span>            :     } else {</a>
-<a name="139"><span class="lineNum">     139 </span>            :       std::cout &lt;&lt; &quot;Index not found: &quot; &lt;&lt; index &lt;&lt; std::endl;</a>
-<a name="140"><span class="lineNum">     140 </span>            :       throw std::runtime_error(&quot;FilterInterface: getOutputCellofIndex(): Could not find index.&quot;);</a>
-<a name="141"><span class="lineNum">     141 </span>            :     }</a>
-<a name="142"><span class="lineNum">     142 </span>            :   }</a>
-<a name="143"><span class="lineNum">     143 </span>            : </a>
-<a name="144"><span class="lineNum">     144 </span>            :   /*</a>
-<a name="145"><span class="lineNum">     145 </span>            :    * Only used in one scenario:</a>
-<a name="146"><span class="lineNum">     146 </span>            :    *  - this is at index 0 in FS</a>
-<a name="147"><span class="lineNum">     147 </span>            :    *  - new filter gets dynamically linked into FS at index 0</a>
-<a name="148"><span class="lineNum">     148 </span>            :    * In that case, this was previously getting input from MD but won't be any</a>
-<a name="149"><span class="lineNum">     149 </span>            :    * longer. The newly added filter will provide input for this one instead.</a>
-<a name="150"><span class="lineNum">     150 </span>            :    */</a>
-<a name="151"><span class="lineNum">     151 </span><span class="lineNoCov">          0 :   void setInputCells(const std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt;&amp; newInputCells) { _inputCells = newInputCells; }</span></a>
-<a name="152"><span class="lineNum">     152 </span>            : </a>
-<a name="153"><span class="lineNum">     153 </span>            :   // Size = number of cells in this filter.</a>
-<a name="154"><span class="lineNum">     154 </span>            :   int getSize() const { return _inputCells.size(); }</a>
-<a name="155"><span class="lineNum">     155 </span>            : </a>
-<a name="156"><span class="lineNum">     156 </span>            :   /*</a>
-<a name="157"><span class="lineNum">     157 </span>            :    * Used by filter implementations to iterate over physical properties stored</a>
-<a name="158"><span class="lineNum">     158 </span>            :    * in a MacroscopicCell.</a>
-<a name="159"><span class="lineNum">     159 </span>            :    *</a>
-<a name="160"><span class="lineNum">     160 </span>            :    * Examplary usage:</a>
-<a name="161"><span class="lineNum">     161 </span>            :    * 'for(auto scalar : _scalarAccessFunctionPairs)' loops over all scalar</a>
-<a name="162"><span class="lineNum">     162 </span>            :    * properties (e.g. macro/micro mass, temperate) filtered by this specific</a>
-<a name="163"><span class="lineNum">     163 </span>            :    * filter.</a>
-<a name="164"><span class="lineNum">     164 </span>            :    */</a>
-<a name="165"><span class="lineNum">     165 </span>            :   struct ScalarAccessFunctionPair {</a>
-<a name="166"><span class="lineNum">     166 </span>            :     const double&amp; (coupling::datastructures::MacroscopicCell&lt;dim&gt;::*get)() const; // getter function pointer</a>
-<a name="167"><span class="lineNum">     167 </span>            :     void (coupling::datastructures::MacroscopicCell&lt;dim&gt;::*set)(const double&amp;);   // setter function pointer</a>
-<a name="168"><span class="lineNum">     168 </span>            :   };</a>
-<a name="169"><span class="lineNum">     169 </span>            :   struct VectorAccessFunctionPair {</a>
-<a name="170"><span class="lineNum">     170 </span>            :     const tarch::la::Vector&lt;dim, double&gt;&amp; (coupling::datastructures::MacroscopicCell&lt;dim&gt;::*get)() const;</a>
-<a name="171"><span class="lineNum">     171 </span>            :     void (coupling::datastructures::MacroscopicCell&lt;dim&gt;::*set)(const tarch::la::Vector&lt;dim, double&gt;&amp;);</a>
-<a name="172"><span class="lineNum">     172 </span>            :   };</a>
-<a name="173"><span class="lineNum">     173 </span>            : </a>
-<a name="174"><span class="lineNum">     174 </span>            : protected:</a>
-<a name="175"><span class="lineNum">     175 </span>            :   /**</a>
-<a name="176"><span class="lineNum">     176 </span>            :    *  Filters should read from input vector and write to output vector.</a>
-<a name="177"><span class="lineNum">     177 </span>            :    *  Both vectors use the same indexing by default.</a>
-<a name="178"><span class="lineNum">     178 </span>            :    *    All unmodified cells of the output vector are implicitly copied from</a>
-<a name="179"><span class="lineNum">     179 </span>            :    *their respective input counterpart, i.e it is not mandatory to have any</a>
-<a name="180"><span class="lineNum">     180 </span>            :    *output.</a>
-<a name="181"><span class="lineNum">     181 </span>            :    */</a>
-<a name="182"><span class="lineNum">     182 </span>            :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _inputCells;</a>
-<a name="183"><span class="lineNum">     183 </span>            :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _outputCells;</a>
-<a name="184"><span class="lineNum">     184 </span>            : </a>
-<a name="185"><span class="lineNum">     185 </span>            :   // scalars getters/setters</a>
-<a name="186"><span class="lineNum">     186 </span>            :   std::vector&lt;ScalarAccessFunctionPair&gt; _scalarAccessFunctionPairs;</a>
-<a name="187"><span class="lineNum">     187 </span>            : </a>
-<a name="188"><span class="lineNum">     188 </span>            :   // vectors getters/setters</a>
-<a name="189"><span class="lineNum">     189 </span>            :   std::vector&lt;VectorAccessFunctionPair&gt; _vectorAccessFunctionPairs;</a>
-<a name="190"><span class="lineNum">     190 </span>            : </a>
-<a name="191"><span class="lineNum">     191 </span>            :   // unique identifier per filter class</a>
-<a name="192"><span class="lineNum">     192 </span>            :   const char* _type;</a>
-<a name="193"><span class="lineNum">     193 </span>            : };</a>
+<a name="39"><span class="lineNum">      39 </span><span class="lineNoCov">          0 :   FilterInterface(const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt;&amp; inputCellVector,</span></a>
+<a name="40"><span class="lineNum">      40 </span>            :                   const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt;&amp; outputCellVector, const std::array&lt;bool, 7&gt; filteredValues, const char* type)</a>
+<a name="41"><span class="lineNum">      41 </span>            :       :</a>
+<a name="42"><span class="lineNum">      42 </span>            : </a>
+<a name="43"><span class="lineNum">      43 </span><span class="lineNoCov">          0 :         _inputCells(inputCellVector), _outputCells(outputCellVector), _type(type) {</span></a>
+<a name="44"><span class="lineNum">      44 </span>            :     // microscopic mass</a>
+<a name="45"><span class="lineNum">      45 </span><span class="lineNoCov">          0 :     if (filteredValues[0]) {</span></a>
+<a name="46"><span class="lineNum">      46 </span><span class="lineNoCov">          0 :       _scalarAccessFunctionPairs.push_back(</span></a>
+<a name="47"><span class="lineNum">      47 </span>            :           {&amp;coupling::datastructures::CouplingCell&lt;dim&gt;::getMicroscopicMass, &amp;coupling::datastructures::CouplingCell&lt;dim&gt;::setMicroscopicMass});</a>
+<a name="48"><span class="lineNum">      48 </span>            :     }</a>
+<a name="49"><span class="lineNum">      49 </span>            :     // microscopic momentum</a>
+<a name="50"><span class="lineNum">      50 </span><span class="lineNoCov">          0 :     if (filteredValues[1]) {</span></a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineNoCov">          0 :       _vectorAccessFunctionPairs.push_back(</span></a>
+<a name="52"><span class="lineNum">      52 </span>            :           {&amp;coupling::datastructures::CouplingCell&lt;dim&gt;::getMicroscopicMomentum, &amp;coupling::datastructures::CouplingCell&lt;dim&gt;::setMicroscopicMomentum});</a>
+<a name="53"><span class="lineNum">      53 </span>            :     }</a>
+<a name="54"><span class="lineNum">      54 </span>            :     // macroscopic mass</a>
+<a name="55"><span class="lineNum">      55 </span><span class="lineNoCov">          0 :     if (filteredValues[2]) {</span></a>
+<a name="56"><span class="lineNum">      56 </span><span class="lineNoCov">          0 :       _scalarAccessFunctionPairs.push_back(</span></a>
+<a name="57"><span class="lineNum">      57 </span>            :           {&amp;coupling::datastructures::CouplingCell&lt;dim&gt;::getMacroscopicMass, &amp;coupling::datastructures::CouplingCell&lt;dim&gt;::setMacroscopicMass});</a>
+<a name="58"><span class="lineNum">      58 </span>            :     }</a>
+<a name="59"><span class="lineNum">      59 </span>            :     // macroscopic momentum</a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 :     if (filteredValues[3]) {</span></a>
+<a name="61"><span class="lineNum">      61 </span><span class="lineNoCov">          0 :       _vectorAccessFunctionPairs.push_back(</span></a>
+<a name="62"><span class="lineNum">      62 </span>            :           {&amp;coupling::datastructures::CouplingCell&lt;dim&gt;::getMacroscopicMomentum, &amp;coupling::datastructures::CouplingCell&lt;dim&gt;::setMacroscopicMomentum});</a>
+<a name="63"><span class="lineNum">      63 </span>            :     }</a>
+<a name="64"><span class="lineNum">      64 </span>            :     // potential energy</a>
+<a name="65"><span class="lineNum">      65 </span><span class="lineNoCov">          0 :     if (filteredValues[4]) {</span></a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :       _scalarAccessFunctionPairs.push_back(</span></a>
+<a name="67"><span class="lineNum">      67 </span>            :           {&amp;coupling::datastructures::CouplingCell&lt;dim&gt;::getPotentialEnergy, &amp;coupling::datastructures::CouplingCell&lt;dim&gt;::setPotentialEnergy});</a>
+<a name="68"><span class="lineNum">      68 </span>            :     }</a>
+<a name="69"><span class="lineNum">      69 </span>            :     // velocity</a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 :     if (filteredValues[5]) {</span></a>
+<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :       _vectorAccessFunctionPairs.push_back(</span></a>
+<a name="72"><span class="lineNum">      72 </span>            :           {&amp;coupling::datastructures::CouplingCell&lt;dim&gt;::getCurrentVelocity, &amp;coupling::datastructures::CouplingCell&lt;dim&gt;::setCurrentVelocity});</a>
+<a name="73"><span class="lineNum">      73 </span>            :     }</a>
+<a name="74"><span class="lineNum">      74 </span>            :     // temperature</a>
+<a name="75"><span class="lineNum">      75 </span><span class="lineNoCov">          0 :     if (filteredValues[6]) {</span></a>
+<a name="76"><span class="lineNum">      76 </span><span class="lineNoCov">          0 :       _scalarAccessFunctionPairs.push_back(</span></a>
+<a name="77"><span class="lineNum">      77 </span>            :           {&amp;coupling::datastructures::CouplingCell&lt;dim&gt;::getTemperature, &amp;coupling::datastructures::CouplingCell&lt;dim&gt;::setTemperature});</a>
+<a name="78"><span class="lineNum">      78 </span>            :     }</a>
+<a name="79"><span class="lineNum">      79 </span><span class="lineNoCov">          0 :   }</span></a>
+<a name="80"><span class="lineNum">      80 </span>            : </a>
+<a name="81"><span class="lineNum">      81 </span><span class="lineNoCov">          0 :   FilterInterface(const char* type)</span></a>
+<a name="82"><span class="lineNum">      82 </span><span class="lineNoCov">          0 :       : _type(type) { /* Used by incomplete implementations of FilterInterface.</span></a>
+<a name="83"><span class="lineNum">      83 </span>            :                          Should be redesigned via meta class.*/</a>
+<a name="84"><span class="lineNum">      84 </span>            :   }</a>
+<a name="85"><span class="lineNum">      85 </span>            : </a>
+<a name="86"><span class="lineNum">      86 </span><span class="lineNoCov">          0 :   virtual ~FilterInterface() {};</span></a>
+<a name="87"><span class="lineNum">      87 </span>            : </a>
+<a name="88"><span class="lineNum">      88 </span>            :   /*</a>
+<a name="89"><span class="lineNum">      89 </span>            :    * Applies the filter to all cells that are within the filter's sequence's</a>
+<a name="90"><span class="lineNum">      90 </span>            :    * domain.</a>
+<a name="91"><span class="lineNum">      91 </span>            :    *</a>
+<a name="92"><span class="lineNum">      92 </span>            :    * It is very important that this method provides complete output data,</a>
+<a name="93"><span class="lineNum">      93 </span>            :    * i.e uses all elements of _scalarSetters and _vectorSetters on all elements</a>
+<a name="94"><span class="lineNum">      94 </span>            :    * of _outputCells. If this is not the case, you dont want to use this</a>
+<a name="95"><span class="lineNum">      95 </span>            :    * interface, but rather coupling::FilterInterfaceReadOnly and use its method</a>
+<a name="96"><span class="lineNum">      96 </span>            :    * copyInputToOutput().</a>
+<a name="97"><span class="lineNum">      97 </span>            :    */</a>
+<a name="98"><span class="lineNum">      98 </span>            :   virtual void operator()() = 0;</a>
+<a name="99"><span class="lineNum">      99 </span>            : </a>
+<a name="100"><span class="lineNum">     100 </span><span class="lineNoCov">          0 :   void updateCellData(const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt;&amp; new_inputCells,</span></a>
+<a name="101"><span class="lineNum">     101 </span>            :                       const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt;&amp; new_outputCells) {</a>
+<a name="102"><span class="lineNum">     102 </span><span class="lineNoCov">          0 :     if (new_inputCells.size() != new_outputCells.size())</span></a>
+<a name="103"><span class="lineNum">     103 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;New input-, output-, and indexing vectors must &quot;</span></a>
+<a name="104"><span class="lineNum">     104 </span>            :                                &quot;be of identical size.&quot;);</a>
+<a name="105"><span class="lineNum">     105 </span>            : </a>
+<a name="106"><span class="lineNum">     106 </span><span class="lineNoCov">          0 :     _inputCells = new_inputCells;</span></a>
+<a name="107"><span class="lineNum">     107 </span><span class="lineNoCov">          0 :     _outputCells = new_outputCells;</span></a>
+<a name="108"><span class="lineNum">     108 </span>            : </a>
+<a name="109"><span class="lineNum">     109 </span>            : #ifdef DEBUG_FILTER_INTERFACE</a>
+<a name="110"><span class="lineNum">     110 </span>            :     std::cout &lt;&lt; &quot;           FI: Updated cell data.&quot; &lt;&lt; std::endl;</a>
+<a name="111"><span class="lineNum">     111 </span>            : #endif</a>
+<a name="112"><span class="lineNum">     112 </span><span class="lineNoCov">          0 :   }</span></a>
+<a name="113"><span class="lineNum">     113 </span>            : </a>
+<a name="114"><span class="lineNum">     114 </span>            :   /*</a>
+<a name="115"><span class="lineNum">     115 </span>            :    * Basic Getters/Setters</a>
+<a name="116"><span class="lineNum">     116 </span>            :    */</a>
+<a name="117"><span class="lineNum">     117 </span><span class="lineNoCov">          0 :   const char* getType() const { return _type; }</span></a>
+<a name="118"><span class="lineNum">     118 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; getInputCells() const { return _inputCells; }</span></a>
+<a name="119"><span class="lineNum">     119 </span><span class="lineNoCov">          0 :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; getOutputCells() const { return _outputCells; }</span></a>
+<a name="120"><span class="lineNum">     120 </span>            : </a>
+<a name="121"><span class="lineNum">     121 </span>            :   using CellIndex_T = coupling::indexing::CellIndex&lt;dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro,</a>
+<a name="122"><span class="lineNum">     122 </span>            :                                                     coupling::indexing::IndexTrait::noGhost&gt;;</a>
+<a name="123"><span class="lineNum">     123 </span>            :   /*</a>
+<a name="124"><span class="lineNum">     124 </span>            :    * Advanced Getters/Setters</a>
+<a name="125"><span class="lineNum">     125 </span>            :    */</a>
+<a name="126"><span class="lineNum">     126 </span>            :   coupling::datastructures::CouplingCell&lt;dim&gt;* getInputCellOfIndex(const CellIndex_T&amp; index) {</a>
+<a name="127"><span class="lineNum">     127 </span>            :     if (index.get() &lt; _inputCells.size) {</a>
+<a name="128"><span class="lineNum">     128 </span>            :       return _inputCells[index.get()];</a>
+<a name="129"><span class="lineNum">     129 </span>            :     } else {</a>
+<a name="130"><span class="lineNum">     130 </span>            :       std::cout &lt;&lt; &quot;Index not found: &quot; &lt;&lt; index &lt;&lt; std::endl;</a>
+<a name="131"><span class="lineNum">     131 </span>            :       throw std::runtime_error(&quot;FilterInterface: getInputCellofIndex(): Could not find index.&quot;);</a>
+<a name="132"><span class="lineNum">     132 </span>            :     }</a>
+<a name="133"><span class="lineNum">     133 </span>            :   }</a>
+<a name="134"><span class="lineNum">     134 </span>            :   coupling::datastructures::CouplingCell&lt;dim&gt;* getOutputCellOfIndex(const CellIndex_T&amp; index) {</a>
+<a name="135"><span class="lineNum">     135 </span>            :     if (index.get() &lt; _outputCells.size) {</a>
+<a name="136"><span class="lineNum">     136 </span>            :       return _outputCells[index.get()];</a>
+<a name="137"><span class="lineNum">     137 </span>            :     } else {</a>
+<a name="138"><span class="lineNum">     138 </span>            :       std::cout &lt;&lt; &quot;Index not found: &quot; &lt;&lt; index &lt;&lt; std::endl;</a>
+<a name="139"><span class="lineNum">     139 </span>            :       throw std::runtime_error(&quot;FilterInterface: getOutputCellofIndex(): Could not find index.&quot;);</a>
+<a name="140"><span class="lineNum">     140 </span>            :     }</a>
+<a name="141"><span class="lineNum">     141 </span>            :   }</a>
+<a name="142"><span class="lineNum">     142 </span>            : </a>
+<a name="143"><span class="lineNum">     143 </span>            :   /*</a>
+<a name="144"><span class="lineNum">     144 </span>            :    * Only used in one scenario:</a>
+<a name="145"><span class="lineNum">     145 </span>            :    *  - this is at index 0 in FS</a>
+<a name="146"><span class="lineNum">     146 </span>            :    *  - new filter gets dynamically linked into FS at index 0</a>
+<a name="147"><span class="lineNum">     147 </span>            :    * In that case, this was previously getting input from MD but won't be any</a>
+<a name="148"><span class="lineNum">     148 </span>            :    * longer. The newly added filter will provide input for this one instead.</a>
+<a name="149"><span class="lineNum">     149 </span>            :    */</a>
+<a name="150"><span class="lineNum">     150 </span><span class="lineNoCov">          0 :   void setInputCells(const std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt;&amp; newInputCells) { _inputCells = newInputCells; }</span></a>
+<a name="151"><span class="lineNum">     151 </span>            : </a>
+<a name="152"><span class="lineNum">     152 </span>            :   // Size = number of cells in this filter.</a>
+<a name="153"><span class="lineNum">     153 </span>            :   int getSize() const { return _inputCells.size(); }</a>
+<a name="154"><span class="lineNum">     154 </span>            : </a>
+<a name="155"><span class="lineNum">     155 </span>            :   /*</a>
+<a name="156"><span class="lineNum">     156 </span>            :    * Used by filter implementations to iterate over physical properties stored</a>
+<a name="157"><span class="lineNum">     157 </span>            :    * in a CouplingCell.</a>
+<a name="158"><span class="lineNum">     158 </span>            :    *</a>
+<a name="159"><span class="lineNum">     159 </span>            :    * Examplary usage:</a>
+<a name="160"><span class="lineNum">     160 </span>            :    * 'for(auto scalar : _scalarAccessFunctionPairs)' loops over all scalar</a>
+<a name="161"><span class="lineNum">     161 </span>            :    * properties (e.g. macro/micro mass, temperate) filtered by this specific</a>
+<a name="162"><span class="lineNum">     162 </span>            :    * filter.</a>
+<a name="163"><span class="lineNum">     163 </span>            :    */</a>
+<a name="164"><span class="lineNum">     164 </span>            :   struct ScalarAccessFunctionPair {</a>
+<a name="165"><span class="lineNum">     165 </span>            :     const double&amp; (coupling::datastructures::CouplingCell&lt;dim&gt;::*get)() const; // getter function pointer</a>
+<a name="166"><span class="lineNum">     166 </span>            :     void (coupling::datastructures::CouplingCell&lt;dim&gt;::*set)(const double&amp;);   // setter function pointer</a>
+<a name="167"><span class="lineNum">     167 </span>            :   };</a>
+<a name="168"><span class="lineNum">     168 </span>            :   struct VectorAccessFunctionPair {</a>
+<a name="169"><span class="lineNum">     169 </span>            :     const tarch::la::Vector&lt;dim, double&gt;&amp; (coupling::datastructures::CouplingCell&lt;dim&gt;::*get)() const;</a>
+<a name="170"><span class="lineNum">     170 </span>            :     void (coupling::datastructures::CouplingCell&lt;dim&gt;::*set)(const tarch::la::Vector&lt;dim, double&gt;&amp;);</a>
+<a name="171"><span class="lineNum">     171 </span>            :   };</a>
+<a name="172"><span class="lineNum">     172 </span>            : </a>
+<a name="173"><span class="lineNum">     173 </span>            : protected:</a>
+<a name="174"><span class="lineNum">     174 </span>            :   /**</a>
+<a name="175"><span class="lineNum">     175 </span>            :    *  Filters should read from input vector and write to output vector.</a>
+<a name="176"><span class="lineNum">     176 </span>            :    *  Both vectors use the same indexing by default.</a>
+<a name="177"><span class="lineNum">     177 </span>            :    *    All unmodified cells of the output vector are implicitly copied from</a>
+<a name="178"><span class="lineNum">     178 </span>            :    *their respective input counterpart, i.e it is not mandatory to have any</a>
+<a name="179"><span class="lineNum">     179 </span>            :    *output.</a>
+<a name="180"><span class="lineNum">     180 </span>            :    */</a>
+<a name="181"><span class="lineNum">     181 </span>            :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; _inputCells;</a>
+<a name="182"><span class="lineNum">     182 </span>            :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; _outputCells;</a>
+<a name="183"><span class="lineNum">     183 </span>            : </a>
+<a name="184"><span class="lineNum">     184 </span>            :   // scalars getters/setters</a>
+<a name="185"><span class="lineNum">     185 </span>            :   std::vector&lt;ScalarAccessFunctionPair&gt; _scalarAccessFunctionPairs;</a>
+<a name="186"><span class="lineNum">     186 </span>            : </a>
+<a name="187"><span class="lineNum">     187 </span>            :   // vectors getters/setters</a>
+<a name="188"><span class="lineNum">     188 </span>            :   std::vector&lt;VectorAccessFunctionPair&gt; _vectorAccessFunctionPairs;</a>
+<a name="189"><span class="lineNum">     189 </span>            : </a>
+<a name="190"><span class="lineNum">     190 </span>            :   // unique identifier per filter class</a>
+<a name="191"><span class="lineNum">     191 </span>            :   const char* _type;</a>
+<a name="192"><span class="lineNum">     192 </span>            : };</a>
 </pre>
       </td>
     </tr>

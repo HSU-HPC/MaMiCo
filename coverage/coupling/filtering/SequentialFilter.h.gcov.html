@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -131,11 +131,11 @@
 <a name="69"><span class="lineNum">      69 </span>            : </a>
 <a name="70"><span class="lineNum">      70 </span>            :   /*</a>
 <a name="71"><span class="lineNum">      71 </span>            :    * Auxilliary functions providing an interface between low-level double</a>
-<a name="72"><span class="lineNum">      72 </span>            :    * buffers used by MPI and Macro Cells.</a>
+<a name="72"><span class="lineNum">      72 </span>            :    * buffers used by MPI and Coupling Cells.</a>
 <a name="73"><span class="lineNum">      73 </span>            :    */</a>
-<a name="74"><span class="lineNum">      74 </span>            :   void macroscopicCellToBuffer(std::vector&lt;double&gt;&amp; buf, const coupling::datastructures::MacroscopicCell&lt;dim&gt;* cell);</a>
+<a name="74"><span class="lineNum">      74 </span>            :   void couplingCellToBuffer(std::vector&lt;double&gt;&amp; buf, const coupling::datastructures::CouplingCell&lt;dim&gt;* cell);</a>
 <a name="75"><span class="lineNum">      75 </span>            : </a>
-<a name="76"><span class="lineNum">      76 </span>            :   void bufferToMacroscopicCell(const std::vector&lt;double&gt;&amp; buf, coupling::datastructures::MacroscopicCell&lt;dim&gt;* cell);</a>
+<a name="76"><span class="lineNum">      76 </span>            :   void bufferToCouplingCell(const std::vector&lt;double&gt;&amp; buf, coupling::datastructures::CouplingCell&lt;dim&gt;* cell);</a>
 <a name="77"><span class="lineNum">      77 </span>            : </a>
 <a name="78"><span class="lineNum">      78 </span>            :   // The sequentialized Filter</a>
 <a name="79"><span class="lineNum">      79 </span>            :   coupling::filtering::FilterInterface&lt;dim&gt;* _filter;</a>
@@ -148,19 +148,19 @@
 <a name="86"><span class="lineNum">      86 </span>            : </a>
 <a name="87"><span class="lineNum">      87 </span>            :   // Globalized variants of cell data structures (i.e spanning across all cells</a>
 <a name="88"><span class="lineNum">      88 </span>            :   // of the global domain). Only the master rank uses these.</a>
-<a name="89"><span class="lineNum">      89 </span>            :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _inputCells_Global;</a>
-<a name="90"><span class="lineNum">      90 </span>            :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _outputCells_Global;</a>
+<a name="89"><span class="lineNum">      89 </span>            :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; _inputCells_Global;</a>
+<a name="90"><span class="lineNum">      90 </span>            :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; _outputCells_Global;</a>
 <a name="91"><span class="lineNum">      91 </span>            : </a>
 <a name="92"><span class="lineNum">      92 </span>            :   // Used by the processing rank to remember from which rank it received cells</a>
 <a name="93"><span class="lineNum">      93 </span>            :   // located at which global index TODO: use CellIndex?</a>
 <a name="94"><span class="lineNum">      94 </span>            :   std::vector&lt;unsigned int&gt; _cellRanks;</a>
 <a name="95"><span class="lineNum">      95 </span>            : </a>
-<a name="96"><span class="lineNum">      96 </span>            :   // Buffers macro cells for MPI communication</a>
+<a name="96"><span class="lineNum">      96 </span>            :   // Buffers coupling cells for MPI communication</a>
 <a name="97"><span class="lineNum">      97 </span>            :   std::vector&lt;double&gt; _cellbuf;</a>
 <a name="98"><span class="lineNum">      98 </span>            : </a>
 <a name="99"><span class="lineNum">      99 </span>            :   // Used by the processing rank to remember its local domain</a>
-<a name="100"><span class="lineNum">     100 </span>            :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _inputCells_Local;</a>
-<a name="101"><span class="lineNum">     101 </span>            :   std::vector&lt;coupling::datastructures::MacroscopicCell&lt;dim&gt;*&gt; _outputCells_Local;</a>
+<a name="100"><span class="lineNum">     100 </span>            :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; _inputCells_Local;</a>
+<a name="101"><span class="lineNum">     101 </span>            :   std::vector&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*&gt; _outputCells_Local;</a>
 <a name="102"><span class="lineNum">     102 </span>            : };</a>
 <a name="103"><span class="lineNum">     103 </span>            : </a>
 <a name="104"><span class="lineNum">     104 </span>            : #include &quot;SequentialFilter.cpph&quot;</a>

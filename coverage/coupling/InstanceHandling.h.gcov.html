@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-02 12:09:49</td>
+            <td class="headerValue">2024-08-08 15:44:53</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">12</td>
@@ -79,12 +79,12 @@
 <a name="17"><span class="lineNum">      17 </span>            :  *Initialization, execution of MD time steps and shutdown are abstracted into</a>
 <a name="18"><span class="lineNum">      18 </span>            :  *this class. In order to launch a new MF simulatio, a slot has to be chosen</a>
 <a name="19"><span class="lineNum">      19 </span>            :  *first (either manualy or using coupling::MultiMDMediator). Then</a>
-<a name="20"><span class="lineNum">      20 </span>            :  *MultiMDCellService initializes a new MacroscopicCellService via</a>
+<a name="20"><span class="lineNum">      20 </span>            :  *MultiMDCellService initializes a new CouplingCellService via</a>
 <a name="21"><span class="lineNum">      21 </span>            :  *MultiMDMediator. In the activated slot, a new MD simulation is launched. The</a>
 <a name="22"><span class="lineNum">      22 </span>            :  *new MD instance has to be equilibrated first and then it can be coupled to the</a>
 <a name="23"><span class="lineNum">      23 </span>            :  *simulation. In order to remove a MD simulation, the MD simulation and its</a>
 <a name="24"><span class="lineNum">      24 </span>            :  *corresponding MDSolverInterface are shut down. Then, the respective instance</a>
-<a name="25"><span class="lineNum">      25 </span>            :  *of the MacroscopicCellService is removed. Finally, the selected slot will be</a>
+<a name="25"><span class="lineNum">      25 </span>            :  *of the CouplingCellService is removed. Finally, the selected slot will be</a>
 <a name="26"><span class="lineNum">      26 </span>            :  *set to inactive. This slot is now available again for the launch of a new MD</a>
 <a name="27"><span class="lineNum">      27 </span>            :  *instance in the future.</a>
 <a name="28"><span class="lineNum">      28 </span>            :  *      @brief Simulation slots are managed (i.e., added/removed) via this</a>
@@ -243,7 +243,7 @@
 <a name="181"><span class="lineNum">     181 </span>            :    */</a>
 <a name="182"><span class="lineNum">     182 </span>            :   void simulateTimesteps(const unsigned int&amp; t, unsigned int&amp; T, coupling::services::MultiMDCellService&lt;LinkedCell, dim&gt;&amp; multiMDCellService) {</a>
 <a name="183"><span class="lineNum">     183 </span>            :     for (unsigned int i = 0; i &lt; _mdSimulations.size(); ++i) {</a>
-<a name="184"><span class="lineNum">     184 </span>            :       coupling::interface::MamicoInterfaceProvider&lt;LinkedCell, dim&gt;::getInstance().setMacroscopicCellService(&amp;multiMDCellService.getMacroscopicCellService(i));</a>
+<a name="184"><span class="lineNum">     184 </span>            :       coupling::interface::MamicoInterfaceProvider&lt;LinkedCell, dim&gt;::getInstance().setCouplingCellService(&amp;multiMDCellService.getCouplingCellService(i));</a>
 <a name="185"><span class="lineNum">     185 </span>            :       coupling::interface::MamicoInterfaceProvider&lt;LinkedCell, dim&gt;::getInstance().setMDSolverInterface(_mdSolverInterface[i]);</a>
 <a name="186"><span class="lineNum">     186 </span>            : </a>
 <a name="187"><span class="lineNum">     187 </span>            :       if (_mdSimulations[i] != nullptr) {</a>
@@ -312,51 +312,50 @@
 <a name="250"><span class="lineNum">     250 </span>            :    * corresponding MD solver interface.</a>
 <a name="251"><span class="lineNum">     251 </span>            :    *    @param index</a>
 <a name="252"><span class="lineNum">     252 </span>            :    */</a>
-<a name="253"><span class="lineNum">     253 </span>            :   void</a>
-<a name="254"><span class="lineNum">     254 </span><span class="lineCov">          4 :   rmMDSimulation(const unsigned int&amp; index) {</span></a>
-<a name="255"><span class="lineNum">     255 </span><span class="lineCov">          4 :     if (_mdSimulations[index] != nullptr) {</span></a>
-<a name="256"><span class="lineNum">     256 </span><span class="lineCov">          4 :       _mdSimulations[index]-&gt;shutdown();</span></a>
-<a name="257"><span class="lineNum">     257 </span><span class="lineCov">          4 :       delete _mdSimulations[index];</span></a>
-<a name="258"><span class="lineNum">     258 </span><span class="lineCov">          4 :       _mdSimulations[index] = nullptr;</span></a>
-<a name="259"><span class="lineNum">     259 </span>            :     } else {</a>
-<a name="260"><span class="lineNum">     260 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;WARNING coupling::InstanceHandling::rmMDSimulation() : &quot;</span></a>
-<a name="261"><span class="lineNum">     261 </span>            :                    &quot;_mdSimulations at index &quot;</a>
-<a name="262"><span class="lineNum">     262 </span><span class="lineNoCov">          0 :                 &lt;&lt; index &lt;&lt; &quot; == null!&quot; &lt;&lt; std::endl;</span></a>
-<a name="263"><span class="lineNum">     263 </span>            :     }</a>
-<a name="264"><span class="lineNum">     264 </span>            :     //_mdSimulations.erase(_mdSimulations.begin()+index);</a>
-<a name="265"><span class="lineNum">     265 </span>            : </a>
-<a name="266"><span class="lineNum">     266 </span><span class="lineCov">          4 :     if (_mdSolverInterface[index] != nullptr) {</span></a>
-<a name="267"><span class="lineNum">     267 </span><span class="lineCov">          4 :       delete _mdSolverInterface[index];</span></a>
-<a name="268"><span class="lineNum">     268 </span><span class="lineCov">          4 :       _mdSolverInterface[index] = nullptr;</span></a>
-<a name="269"><span class="lineNum">     269 </span>            :     } else {</a>
-<a name="270"><span class="lineNum">     270 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;WARNING coupling::InstanceHandling::rmMDSimulation() : &quot;</span></a>
-<a name="271"><span class="lineNum">     271 </span>            :                    &quot;_mdSolverInterface at index &quot;</a>
-<a name="272"><span class="lineNum">     272 </span><span class="lineNoCov">          0 :                 &lt;&lt; index &lt;&lt; &quot; == null!&quot; &lt;&lt; std::endl;</span></a>
-<a name="273"><span class="lineNum">     273 </span>            :     }</a>
-<a name="274"><span class="lineNum">     274 </span>            :     //_mdSolverInterface.erase(_mdSolverInterface.begin()+index);</a>
-<a name="275"><span class="lineNum">     275 </span><span class="lineCov">          4 :   }</span></a>
-<a name="276"><span class="lineNum">     276 </span>            : </a>
-<a name="277"><span class="lineNum">     277 </span>            :   /** sets single cell services in each MD simulation after initialising</a>
-<a name="278"><span class="lineNum">     278 </span>            :    * macroscopic cell service for multi-MD case</a>
-<a name="279"><span class="lineNum">     279 </span>            :    *    @param multiMDCellService</a>
-<a name="280"><span class="lineNum">     280 </span>            :    */</a>
-<a name="281"><span class="lineNum">     281 </span>            :   void setMacroscopicCellServices(coupling::services::MultiMDCellService&lt;LinkedCell, dim&gt;&amp; multiMDCellService) {</a>
-<a name="282"><span class="lineNum">     282 </span>            :     for (unsigned int i = 0; i &lt; _mdSimulations.size(); ++i) {</a>
-<a name="283"><span class="lineNum">     283 </span>            :       _mdSimulations[i]-&gt;setMacroscopicCellService(&amp;(multiMDCellService.getMacroscopicCellService(i)));</a>
-<a name="284"><span class="lineNum">     284 </span>            :     }</a>
-<a name="285"><span class="lineNum">     285 </span>            :   }</a>
-<a name="286"><span class="lineNum">     286 </span>            : </a>
-<a name="287"><span class="lineNum">     287 </span>            : private:</a>
-<a name="288"><span class="lineNum">     288 </span>            :   std::vector&lt;coupling::interface::MDSimulation*&gt; _mdSimulations;</a>
-<a name="289"><span class="lineNum">     289 </span>            :   std::vector&lt;coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;*&gt; _mdSolverInterface;</a>
-<a name="290"><span class="lineNum">     290 </span>            : </a>
-<a name="291"><span class="lineNum">     291 </span>            :   simplemd::configurations::MolecularDynamicsConfiguration&amp; _mdConfig;</a>
-<a name="292"><span class="lineNum">     292 </span>            :   coupling::configurations::MaMiCoConfiguration&lt;dim&gt;&amp; _mamicoConfig;</a>
-<a name="293"><span class="lineNum">     293 </span>            : </a>
-<a name="294"><span class="lineNum">     294 </span>            :   const tarch::utils::MultiMDService&lt;dim&gt;&amp; _multiMDService;</a>
-<a name="295"><span class="lineNum">     295 </span>            : };</a>
-<a name="296"><span class="lineNum">     296 </span>            : </a>
-<a name="297"><span class="lineNum">     297 </span>            : #endif //_INSTANCE_HANDLING_H_</a>
+<a name="253"><span class="lineNum">     253 </span><span class="lineCov">          4 :   void rmMDSimulation(const unsigned int&amp; index) {</span></a>
+<a name="254"><span class="lineNum">     254 </span><span class="lineCov">          4 :     if (_mdSimulations[index] != nullptr) {</span></a>
+<a name="255"><span class="lineNum">     255 </span><span class="lineCov">          4 :       _mdSimulations[index]-&gt;shutdown();</span></a>
+<a name="256"><span class="lineNum">     256 </span><span class="lineCov">          4 :       delete _mdSimulations[index];</span></a>
+<a name="257"><span class="lineNum">     257 </span><span class="lineCov">          4 :       _mdSimulations[index] = nullptr;</span></a>
+<a name="258"><span class="lineNum">     258 </span>            :     } else {</a>
+<a name="259"><span class="lineNum">     259 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;WARNING coupling::InstanceHandling::rmMDSimulation() : &quot;</span></a>
+<a name="260"><span class="lineNum">     260 </span>            :                    &quot;_mdSimulations at index &quot;</a>
+<a name="261"><span class="lineNum">     261 </span><span class="lineNoCov">          0 :                 &lt;&lt; index &lt;&lt; &quot; == null!&quot; &lt;&lt; std::endl;</span></a>
+<a name="262"><span class="lineNum">     262 </span>            :     }</a>
+<a name="263"><span class="lineNum">     263 </span>            :     //_mdSimulations.erase(_mdSimulations.begin()+index);</a>
+<a name="264"><span class="lineNum">     264 </span>            : </a>
+<a name="265"><span class="lineNum">     265 </span><span class="lineCov">          4 :     if (_mdSolverInterface[index] != nullptr) {</span></a>
+<a name="266"><span class="lineNum">     266 </span><span class="lineCov">          4 :       delete _mdSolverInterface[index];</span></a>
+<a name="267"><span class="lineNum">     267 </span><span class="lineCov">          4 :       _mdSolverInterface[index] = nullptr;</span></a>
+<a name="268"><span class="lineNum">     268 </span>            :     } else {</a>
+<a name="269"><span class="lineNum">     269 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;WARNING coupling::InstanceHandling::rmMDSimulation() : &quot;</span></a>
+<a name="270"><span class="lineNum">     270 </span>            :                    &quot;_mdSolverInterface at index &quot;</a>
+<a name="271"><span class="lineNum">     271 </span><span class="lineNoCov">          0 :                 &lt;&lt; index &lt;&lt; &quot; == null!&quot; &lt;&lt; std::endl;</span></a>
+<a name="272"><span class="lineNum">     272 </span>            :     }</a>
+<a name="273"><span class="lineNum">     273 </span>            :     //_mdSolverInterface.erase(_mdSolverInterface.begin()+index);</a>
+<a name="274"><span class="lineNum">     274 </span><span class="lineCov">          4 :   }</span></a>
+<a name="275"><span class="lineNum">     275 </span>            : </a>
+<a name="276"><span class="lineNum">     276 </span>            :   /** sets single cell services in each MD simulation after initialising</a>
+<a name="277"><span class="lineNum">     277 </span>            :    * coupling cell service for multi-MD case</a>
+<a name="278"><span class="lineNum">     278 </span>            :    *    @param multiMDCellService</a>
+<a name="279"><span class="lineNum">     279 </span>            :    */</a>
+<a name="280"><span class="lineNum">     280 </span>            :   void setCouplingCellServices(coupling::services::MultiMDCellService&lt;LinkedCell, dim&gt;&amp; multiMDCellService) {</a>
+<a name="281"><span class="lineNum">     281 </span>            :     for (unsigned int i = 0; i &lt; _mdSimulations.size(); ++i) {</a>
+<a name="282"><span class="lineNum">     282 </span>            :       _mdSimulations[i]-&gt;setCouplingCellService(&amp;(multiMDCellService.getCouplingCellService(i)));</a>
+<a name="283"><span class="lineNum">     283 </span>            :     }</a>
+<a name="284"><span class="lineNum">     284 </span>            :   }</a>
+<a name="285"><span class="lineNum">     285 </span>            : </a>
+<a name="286"><span class="lineNum">     286 </span>            : private:</a>
+<a name="287"><span class="lineNum">     287 </span>            :   std::vector&lt;coupling::interface::MDSimulation*&gt; _mdSimulations;</a>
+<a name="288"><span class="lineNum">     288 </span>            :   std::vector&lt;coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;*&gt; _mdSolverInterface;</a>
+<a name="289"><span class="lineNum">     289 </span>            : </a>
+<a name="290"><span class="lineNum">     290 </span>            :   simplemd::configurations::MolecularDynamicsConfiguration&amp; _mdConfig;</a>
+<a name="291"><span class="lineNum">     291 </span>            :   coupling::configurations::MaMiCoConfiguration&lt;dim&gt;&amp; _mamicoConfig;</a>
+<a name="292"><span class="lineNum">     292 </span>            : </a>
+<a name="293"><span class="lineNum">     293 </span>            :   const tarch::utils::MultiMDService&lt;dim&gt;&amp; _multiMDService;</a>
+<a name="294"><span class="lineNum">     294 </span>            : };</a>
+<a name="295"><span class="lineNum">     295 </span>            : </a>
+<a name="296"><span class="lineNum">     296 </span>            : #endif //_INSTANCE_HANDLING_H_</a>
 </pre>
       </td>
     </tr>

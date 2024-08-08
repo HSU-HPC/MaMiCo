@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['initadvancecycles_0',['initAdvanceCycles',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a26078c991d1ce10f21dab6c1704b1ff2',1,'coupling::configurations::CouetteConfig']]]
+  ['kinvisc_0',['kinVisc',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a5dd2ed87f9af3d09966ea91390e53f1d',1,'coupling::configurations::CouetteConfig']]]
 ];
