@@ -36,3 +36,7 @@ docs/
 coupling/tests/test
 *.checkpoint
 .vscode/launch.json
+*.ova
+*.bp.tar.gz
+*.bp
+*.txt
