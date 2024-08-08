@@ -48,7 +48,7 @@ template <class LinkedCell, unsigned int dim> class CouplingCellServiceImpl;
  */
 template <unsigned int dim> class coupling::services::CouplingCellService {
 public:
-  CouplingCellService(unsigned int ID, unsigned int topologyOffset) : _id(ID), _topologyOffset(topologyOffset)  {
+  CouplingCellService(unsigned int ID, unsigned int topologyOffset) : _id(ID), _topologyOffset(topologyOffset) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "CouplingCellService::CouplingCellService(): Set ID=" << _id << std::endl;
 #endif

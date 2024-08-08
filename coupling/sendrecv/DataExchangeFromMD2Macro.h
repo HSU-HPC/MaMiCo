@@ -42,7 +42,7 @@ public:
    */
   DataExchangeFromMD2Macro(coupling::interface::MacroscopicSolverInterface<dim>* interface, unsigned int topologyOffset, unsigned int tagoffset = 0)
       : coupling::sendrecv::DataExchange<coupling::datastructures::CouplingCell<dim>, dim>(TAG_FROM_MD2MACRO + tagoffset), _msi(interface),
-      _topologyOffset(topologyOffset) {
+        _topologyOffset(topologyOffset) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "DataExchangeFromMD2Macro initialised..." << std::endl;
 #endif

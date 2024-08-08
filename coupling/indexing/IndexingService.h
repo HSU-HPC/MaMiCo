@@ -23,8 +23,7 @@ template <unsigned int dim> class IndexingService;
 namespace coupling {
 namespace indexing {
 
-template <unsigned int dim>
-std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex, unsigned int topologyOffset);
+template <unsigned int dim> std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex, unsigned int topologyOffset);
 
 } // namespace indexing
 } // namespace coupling
