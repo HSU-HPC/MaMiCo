@@ -40,8 +40,8 @@ public:
    * 	@param interface macroscopic solver interface
    * 	@param tagoffset 0 per default
    */
-  DataExchangeFromMacro2MD(coupling::interface::MacroscopicSolverInterface<dim>* interface, unsigned int tagoffset = 0)
-      : coupling::sendrecv::DataExchange<coupling::datastructures::CouplingCell<dim>, dim>(TAG_FROM_MACRO2MD + tagoffset), _msi(interface) {
+  DataExchangeFromMacro2MD(coupling::interface::MacroscopicSolverInterface<dim>* interface, unsigned int topologyOffset, unsigned int tagoffset = 0)
+      : coupling::sendrecv::DataExchange<coupling::datastructures::CouplingCell<dim>, dim>(TAG_FROM_MACRO2MD + tagoffset), _msi(interface), _topologyOffset(topologyOffset) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "DataExchangeFromMacro2MD initialised..." << std::endl;
 #endif
@@ -57,8 +57,8 @@ public:
    */
   std::vector<unsigned int> getTargetRanks(I01 idx) override {
     // if we need information on MD side, return the respective ranks via
-    if (!I12::contains(idx)) {
-      return IDXS.getRanksForGlobalIndex(idx);
+    if (I08::contains(idx) && !I12::contains(idx)) {
+      return IDXS.getRanksForGlobalIndex(idx, _topologyOffset);
       // otherwise return empty vector
     }
     return std::vector<unsigned int>();
@@ -112,5 +112,6 @@ public:
 
 private:
   coupling::interface::MacroscopicSolverInterface<dim>* _msi;
+  unsigned int _topologyOffset;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SENDRECV_DATAEXCHANGEFROMMACRO2MD_H_

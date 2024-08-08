@@ -24,7 +24,7 @@ namespace coupling {
 namespace indexing {
 
 template <unsigned int dim>
-std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex, const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells);
+std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex, unsigned int topologyOffset);
 
 } // namespace indexing
 } // namespace coupling
@@ -155,9 +155,9 @@ public:
    * domain EXCLUDING global ghost layer cells.
    * @returns vector of all cells which contain the index
    */
-  std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex) const;
+  std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex, unsigned int topologyOffset) const;
 
-  unsigned int getUniqueRankForCouplingCell(const BaseIndex<dim>& globalCellIndex) const;
+  unsigned int getUniqueRankForCouplingCell(const BaseIndex<dim>& globalCellIndex, unsigned int topologyOffset) const;
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   MPI_Comm getComm() const {
@@ -238,13 +238,9 @@ public:
     return _scalarNumberProcesses;
   }
 
-  void updateTopologyOffset(unsigned int newOffset) {
-    _parallelTopology = coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(_parallelTopologyType, _numberProcesses, newOffset);
-  }
-
 private:
   unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
-                                            const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells) const;
+                                            const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells, unsigned int topologyOffset) const;
 
   /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const
   unsigned int _scalarNumberProcesses;

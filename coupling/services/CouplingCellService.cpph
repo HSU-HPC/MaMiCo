@@ -18,10 +18,10 @@ coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::CouplingCellServic
     const coupling::configurations::ThermostatConfiguration& thermostatConfiguration, unsigned int numberMDTimestepsPerCouplingCycle,
     const coupling::configurations::CouplingCellConfiguration<dim>& couplingCellConfiguration, const char* filterPipelineConfiguration,
     const tarch::utils::MultiMDService<dim>& multiMDService, unsigned int topologyOffset, int tws)
-    : coupling::services::CouplingCellService<dim>(ID), _numberMDTimestepsPerCouplingCycle(numberMDTimestepsPerCouplingCycle),
+    : coupling::services::CouplingCellService<dim>(ID, topologyOffset), _numberMDTimestepsPerCouplingCycle(numberMDTimestepsPerCouplingCycle),
       // initialise interface pointers before coupling cells are initialised
-      _mdSolverInterface(mdSolverInterface), _macroscopicSolverInterface(macroscopicSolverInterface), _deFromMacro2MD(_macroscopicSolverInterface, ID),
-      _deFromMD2Macro(_macroscopicSolverInterface, ID), _couplingCells(couplingCellConfiguration.getNumberLinkedCellsPerCouplingCell(), mdSolverInterface),
+      _mdSolverInterface(mdSolverInterface), _macroscopicSolverInterface(macroscopicSolverInterface), _deFromMacro2MD(_macroscopicSolverInterface, topologyOffset, ID),
+      _deFromMD2Macro(_macroscopicSolverInterface, topologyOffset, ID), _couplingCells(couplingCellConfiguration.getNumberLinkedCellsPerCouplingCell(), mdSolverInterface),
       _filterPipeline(nullptr), _filterPipelineConfiguration(filterPipelineConfiguration), _multiMDService(multiMDService),
       _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(mdSolverInterface, _couplingCells.getLinkedCellContainer(),
                                                                                                  numberMDTimestepsPerCouplingCycle)),

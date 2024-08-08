@@ -320,7 +320,7 @@ public:
     std::vector<std::function<void(void)>> operations;
     tarch::la::Vector<3, int> one{1, 1, 1};
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    operations.push_back([one]() { IndexingService<3>::getInstance().getRanksForGlobalIndex(T1{one}); });
+    operations.push_back([one]() { IndexingService<3>::getInstance().getRanksForGlobalIndex(T1{one}, 0); });
     operations.push_back([]() { IndexingService<3>::getInstance().getComm(); });
 #endif
     operations.push_back([]() { IndexingService<3>::getInstance().getRank(); });
@@ -355,9 +355,9 @@ public:
     service.initWithCells({12}, {2, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u);
 
     // out of domain
-    CPPUNIT_ASSERT_THROW(service.getUniqueRankForCouplingCell({1, 14, 1}, {12}), std::runtime_error);
-    CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForCouplingCell({1, 1, 1}, {12}), 0u);
-    CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForCouplingCell({7, 1, 1}, {12}), 1u);
+    CPPUNIT_ASSERT_THROW(service.getUniqueRankForCouplingCell({1, 14, 1}, {12}, 0), std::runtime_error);
+    CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForCouplingCell({1, 1, 1}, {12}, 0), 0u);
+    CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForCouplingCell({7, 1, 1}, {12}, 0), 1u);
   }
 
 private:

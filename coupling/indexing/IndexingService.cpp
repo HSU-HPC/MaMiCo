@@ -419,11 +419,11 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
   for (unsigned int d = 1; d < dim; d++)
     _scalarNumberProcesses *= _numberProcesses[d];
 
-  const unsigned int parallelTopologyOffset = (_rank / _scalarNumberProcesses) * _scalarNumberProcesses; // copied from IndexConversion
   _parallelTopology =
-      coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(parallelTopologyType, _numberProcesses, parallelTopologyOffset);
+      coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(parallelTopologyType, _numberProcesses);
 
-  auto coords = _parallelTopology->getProcessCoordinates(_rank);
+  const unsigned int topologyOffset = (_rank / _scalarNumberProcesses) * _scalarNumberProcesses;
+  auto coords = _parallelTopology->getProcessCoordinates(_rank, topologyOffset);
   tarch::la::Vector<3, int> boxMin, boxMax;
   // init boundaries of all local, non-m2m, GL including indexing types
   {
@@ -502,7 +502,7 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
  * This was in large parts stolen from IndexConversion.
  */
 template <unsigned int dim>
-std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex) const {
+std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex, unsigned int topologyOffset) const {
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
   if (!_isInitialized) {
@@ -513,7 +513,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
   std::vector<unsigned int> ranks;
   // using the old meaning of 'globalNumberCouplingCells' from
   // IndexConversion
-  const auto globalNumberCouplingCells = BaseIndex<dim>::numberCellsInDomain - tarch::la::Vector<dim, unsigned int>{2};
+  const auto globalNumberCouplingCells = I08::numberCellsInDomain;
 
   // start and end coordinates of neighboured cells.
   tarch::la::Vector<3, unsigned int> start(0);
@@ -545,7 +545,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
         }
 
         // determine the unique rank for this cell
-        const unsigned int rank = getUniqueRankForCouplingCell(thisGlobalCellIndex, globalNumberCouplingCells);
+        const unsigned int rank = getUniqueRankForCouplingCell(thisGlobalCellIndex, globalNumberCouplingCells, topologyOffset);
 
         // add this rank to the vector with all ranks if we did not add this one
         // before
@@ -575,7 +575,8 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 template <unsigned int dim>
 unsigned int
 coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
-                                                                       const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells) const {
+                                                                       const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells,
+                                                                       unsigned int topologyOffset) const {
   // vector containing avg number of macro cells, not counting global GL.
   tarch::la::Vector<dim, unsigned int> averageLocalNumberCouplingCells{0};
   for (unsigned int d = 0; d < dim; d++) {
@@ -608,11 +609,10 @@ coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingCell(tarch::la
       processCoords[d] = (globalCellIndex[d] - 1) / averageLocalNumberCouplingCells[d];
     }
   }
-
-  return _parallelTopology->getRank(processCoords);
+  return _parallelTopology->getRank(processCoords, topologyOffset);
 }
 
-template <unsigned int dim> unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingCell(const BaseIndex<dim>& globalCellIndex) const {
+template <unsigned int dim> unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingCell(const BaseIndex<dim>& globalCellIndex, unsigned int topologyOffset) const {
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
   if (!_isInitialized) {
@@ -620,7 +620,7 @@ template <unsigned int dim> unsigned int coupling::indexing::IndexingService<dim
   }
 #endif
 
-  return getUniqueRankForCouplingCell((tarch::la::Vector<dim, unsigned int>)(globalCellIndex.get()), I09::numberCellsInDomain);
+  return getUniqueRankForCouplingCell((tarch::la::Vector<dim, unsigned int>)(globalCellIndex.get()), I09::numberCellsInDomain, topologyOffset);
 }
 
 // declare specialisation of IndexingService

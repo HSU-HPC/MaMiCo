@@ -492,9 +492,6 @@ public:
         unsigned int newIndex = i * newLocalNumberMDSimulations + j;
 
         newCouplingCellServices[newIndex] = _couplingCellServices[index];
-        if (newIndex < newBlockOffset || newIndex >= newBlockOffset + newLocalNumberMDSimulations) {
-          IDXS.updateTopologyOffset((newIndex / newLocalNumberMDSimulations) * _intNumberProcesses);
-        }
       }
 
       auto pos = _warmupPhase.begin() + newLocalNumberMDSimulations * i - i;
@@ -533,9 +530,6 @@ public:
         unsigned int index = i * _localNumberMDSimulations + j;
         unsigned int newIndex = i * newLocalNumberMDSimulations + j;
         newCouplingCellServices[newIndex] = _couplingCellServices[index];
-        if (newIndex < newBlockOffset || newIndex >= newBlockOffset + newLocalNumberMDSimulations) {
-          IDXS.updateTopologyOffset((newIndex / newLocalNumberMDSimulations) * _intNumberProcesses);
-        }
       }
       newCouplingCellServices[(i + 1) * newLocalNumberMDSimulations - 1] = nullptr;
 

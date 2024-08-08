@@ -32,28 +32,28 @@ template <unsigned int dim> class XYZTopology;
 template <unsigned int dim> class coupling::paralleltopology::XYZTopology : public coupling::paralleltopology::ParallelTopology<dim> {
 public:
   /** Constructor */
-  XYZTopology(tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int topologyOffset)
+  XYZTopology(tarch::la::Vector<dim, unsigned int> numberProcesses)
       : coupling::paralleltopology::ParallelTopology<dim>(), _numberProcesses(numberProcesses),
-        _divisionFactor4NumberProcesses(coupling::initDivisionFactor<dim>(numberProcesses)), _topologyOffset(topologyOffset) {}
+        _divisionFactor4NumberProcesses(coupling::initDivisionFactor<dim>(numberProcesses)) {}
 
   /** Destructor */
   virtual ~XYZTopology() {}
 
-  tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const {
+  tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank, unsigned int topologyOffset) const {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Rank=" << rank
-              << " corresponds to process coordinates=" << coupling::getVectorCellIndex<dim>(rank - _topologyOffset, _divisionFactor4NumberProcesses)
+              << " corresponds to process coordinates=" << coupling::getVectorCellIndex<dim>(rank - topologyOffset, _divisionFactor4NumberProcesses)
               << std::endl;
 #endif
-    return coupling::getVectorCellIndex<dim>(rank - _topologyOffset, _divisionFactor4NumberProcesses);
+    return coupling::getVectorCellIndex<dim>(rank - topologyOffset, _divisionFactor4NumberProcesses);
   }
 
-  unsigned int getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const {
+  unsigned int getRank(tarch::la::Vector<dim, unsigned int> processCoordinates, unsigned int topologyOffset) const {
     unsigned int index = processCoordinates[dim - 1];
     for (int d = dim - 2; d > -1; d--) {
       index = _numberProcesses[d] * index + processCoordinates[d];
     }
-    return index + _topologyOffset;
+    return index + topologyOffset;
   }
 
 private:
@@ -61,8 +61,6 @@ private:
   const tarch::la::Vector<dim, unsigned int> _numberProcesses;
   /* division factor for number of processes */
   const tarch::la::Vector<dim, unsigned int> _divisionFactor4NumberProcesses;
-  /* offset in ranks for linear shift of xyz-topology */
-  const unsigned int _topologyOffset;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_PARALLELTOPOLOGY_XYZTOPOLOGY_H_

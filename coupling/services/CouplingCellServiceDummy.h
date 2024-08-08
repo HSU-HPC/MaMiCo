@@ -39,8 +39,9 @@ public:
                            const coupling::configurations::CouplingCellConfiguration<dim>& couplingCellConfiguration,    // configuration for coupling cells
                                                                                                                          // and respective plotting
                            unsigned int topologyOffset)
-      : coupling::services::CouplingCellService<dim>(ID), _macroscopicSolverInterface(macroscopicSolverInterface),
-        _deFromMacro2MD(_macroscopicSolverInterface, ID), _deFromMD2Macro(_macroscopicSolverInterface, ID) {
+      : coupling::services::CouplingCellService<dim>(ID, topologyOffset), _macroscopicSolverInterface(macroscopicSolverInterface),
+        _deFromMacro2MD(_macroscopicSolverInterface, topologyOffset, ID), _deFromMD2Macro(_macroscopicSolverInterface, topologyOffset, ID) {
+
     if (_macroscopicSolverInterface == NULL) {
       std::cout << "ERROR "
                    "coupling::services::CouplingCellServiceDummy::"
