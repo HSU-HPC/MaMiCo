@@ -25,12 +25,14 @@
 #else
 #define COUPLING_MD_PARALLEL COUPLING_MD_NO
 #endif
-// message tags for MPI parallelisation. For each MacroscopicCellService, we add
+// message tags for MPI parallelisation. For each CouplingCellService, we add
 // the ID of the cell service to the tags from below to yield a unique tag for
 // each operation. this currently supports a maximum of <10M instances of
-// MacroscopicCellService.
+// CouplingCellService.
 #define TAG_FROM_MD2MACRO 100000
 #define TAG_FROM_MACRO2MD 500000
+
+#define IDXS coupling::indexing::IndexingService<dim>::getInstance()
 
 #include "tarch/la/Vector.h"
 #include "tarch/utils/OstreamOperators.h"

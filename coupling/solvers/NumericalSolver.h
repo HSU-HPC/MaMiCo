@@ -14,12 +14,11 @@
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif
-#include "coupling/IndexConversion.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
+#include "coupling/datastructures/FlexibleCellContainer.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/services/ParallelTimeIntegrationService.h"
 #include "coupling/solvers/CouetteSolver.h"
-
 namespace coupling {
 namespace solvers {
 class NumericalSolver;
@@ -153,11 +152,9 @@ public:
    *  @param mdDomainSize total 3d size of the md domain
    *  @param overlapStrip the number of cells in the overlap layer;
    *                      The overlap of md and macro cells
-   *  @param indexConversion instance of the indexConversion
-   *  @param recvIndice the macroscopic indices that will be received
+   *  @param recvIndice the coupling cell indices that will be received
    *  @param size the number of cells that will be received */
-  void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip,
-                     const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size) {
+  void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip) {
     if (skipRank()) {
       return;
     }
@@ -168,8 +165,8 @@ public:
         std::cout << "ERROR NumericalSolver::setMDBoundary(): offset does not match!" << std::endl;
         exit(EXIT_FAILURE);
       }
-      _globalNumberMacroscopicCells[d] = (floor(mdDomainSize[d] / _dx + 0.5));
-      if (fabs(_globalNumberMacroscopicCells[d] * _dx - mdDomainSize[d]) / _dx > 1.0e-8) {
+      _globalNumberCouplingCells[d] = (floor(mdDomainSize[d] / _dx + 0.5));
+      if (fabs(_globalNumberCouplingCells[d] * _dx - mdDomainSize[d]) / _dx > 1.0e-8) {
         std::cout << "ERROR NumericalSolver::setMDBoundary(): globalNumber "
                      "does not match!"
                   << std::endl;
@@ -186,7 +183,7 @@ public:
           bool isMDCell = true;
           for (int d = 0; d < 3; d++) {
             isMDCell = isMDCell && (globalCoords[d] > _offset[d] + (int)overlapStrip - 1) &&
-                       (globalCoords[d] < _offset[d] + _globalNumberMacroscopicCells[d] - (int)overlapStrip);
+                       (globalCoords[d] < _offset[d] + _globalNumberCouplingCells[d] - (int)overlapStrip);
           }
           if (isMDCell) {
             _flag[get(x, y, z)] = MD_BOUNDARY;
@@ -198,12 +195,9 @@ public:
 
   /** @brief applies the values received from the MD-solver within the
    * conntinuum solver
-   *  @param recvBuffer holds the data from the md solver
-   *  @param recvIndice the indices to connect the data from the buffer with
-   * macroscopic cells
-   *  @param indexConversion instance of the indexConversion */
-  virtual void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
-                                   const coupling::IndexConversion<3>& indexConversion) = 0;
+   *  @param md2macroBuffer holds the data from the md solver
+   * coupling cells*/
+  virtual void setMDBoundaryValues(coupling::datastructures::FlexibleCellContainer<3>& md2macroBuffer) = 0;
 
   /** @brief returns the number of process, regards parallel runs
    *  @returns the number of processes */
@@ -239,12 +233,12 @@ private:
   tarch::la::Vector<3, unsigned int> getProcessCoordinates() const {
     tarch::la::Vector<3, unsigned int> coords(0);
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    int rank;
-    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
+    constexpr int dim = 3;
+    unsigned int rank = IDXS.getRank();
     // determine rank coordinates
-    coords[2] = ((unsigned int)rank) / (_processes[0] * _processes[1]);
-    coords[1] = (((unsigned int)rank) - coords[2] * _processes[0] * _processes[1]) / _processes[0];
-    coords[0] = ((unsigned int)rank) - coords[2] * _processes[0] * _processes[1] - coords[1] * _processes[0];
+    coords[2] = rank / (_processes[0] * _processes[1]);
+    coords[1] = (rank - coords[2] * _processes[0] * _processes[1]) / _processes[0];
+    coords[0] = rank - coords[2] * _processes[0] * _processes[1] - coords[1] * _processes[0];
 #endif
     return coords;
   }
@@ -601,8 +595,8 @@ protected:
   tarch::la::Vector<6, int> _parallelNeighbours{(-1)};
   /** @brief offset of the md domain */
   tarch::la::Vector<3, int> _offset{(-1)};
-  /** @brief the total number of macroscopic cells of the coupled simulation */
-  tarch::la::Vector<3, int> _globalNumberMacroscopicCells{(-1)};
+  /** @brief the total number of coupling cells of the coupled simulation */
+  tarch::la::Vector<3, int> _globalNumberCouplingCells{(-1)};
   const Scenario* _scen;
 };
 

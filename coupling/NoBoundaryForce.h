@@ -28,10 +28,8 @@ public:
   virtual ~NoBoundaryForce() {}
 
   /** @brief dummy function, doesn't do anything
-   *  @param cell the macroscopic cell to apply no force
-   *  @param currentLocalMacroscopicCellIndex the linearised local index of the
-   * macroscopic cell*/
-  virtual void applyBoundaryForce(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                                  const unsigned int& currentLocalMacroscopicCellIndex) {}
+   *  @param cell the coupling cell to apply no force
+   * coupling cell*/
+  virtual void applyBoundaryForce(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell) {}
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_NOBOUNDARYFORCE_H_

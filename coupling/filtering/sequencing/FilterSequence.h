@@ -54,7 +54,7 @@ public:
    * Filter Sequences are constructed in
    * coupling::FilterPipeline::loadSequencesFromXML(...).
    */
-  FilterSequence(const char* name, const std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCells,
+  FilterSequence(const char* name, const std::vector<coupling::datastructures::CouplingCell<dim>*> inputCells,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                  MPI_Comm comm,
 #endif
@@ -205,7 +205,7 @@ public:
   /*
    * Allows changing the input cells after init.
    */
-  virtual void updateInputCellVector(const std::vector<coupling::datastructures::MacroscopicCell<dim>*> newInputCellVector) {
+  virtual void updateInputCellVector(const std::vector<coupling::datastructures::CouplingCell<dim>*> newInputCellVector) {
     _inputCellVector = newInputCellVector; // call copy constructor
 
     // cc this change to this sequence's first vector.
@@ -222,7 +222,7 @@ public:
    * Some sequences have more than one output, thus the optional parameter. Has
    * no effect on a basic FilterSequence.
    */
-  virtual const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& getOutputCellVector(unsigned int outputIndex = 0) const {
+  virtual const std::vector<coupling::datastructures::CouplingCell<dim>*>& getOutputCellVector(unsigned int outputIndex = 0) const {
     if (_filters.empty())
       return _inputCellVector;
 
@@ -278,9 +278,9 @@ private:
 protected:
   const char* _name;
 
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _inputCellVector; // points to (foreign) input vector
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _cellVector1;     // allocated for this sequence only
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _cellVector2;     // allocated for this sequence only
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _inputCellVector; // points to (foreign) input vector
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _cellVector1;     // allocated for this sequence only
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _cellVector2;     // allocated for this sequence only
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm _comm;

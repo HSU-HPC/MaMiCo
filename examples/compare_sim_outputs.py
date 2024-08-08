@@ -10,11 +10,12 @@ Why? Allows for easy comparison of the simulation output between different imple
 __author__ = "Ruben"
 
 import os
+import subprocess
 import sys
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
-import subprocess
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 

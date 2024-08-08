@@ -41,8 +41,8 @@ template <unsigned int dim, coupling::indexing::IndexTrait... scope> class coupl
                                                     coupling::indexing::IndexTrait::noGhost>;
 
 public:
-  Gauss(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
-        const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues, unsigned int dimension,
+  Gauss(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
+        const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues, unsigned int dimension,
         int sigma, const char* extrapolationStrategy)
       : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "GAUSS"), _dim(dimension), _sigma(sigma),
         _kernel(generateKernel()) {

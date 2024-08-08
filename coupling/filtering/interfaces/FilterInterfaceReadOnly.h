@@ -21,8 +21,8 @@ template <unsigned int dim> class FilterInterfaceReadOnly;
 
 template <unsigned int dim> class coupling::filtering::FilterInterfaceReadOnly : public coupling::filtering::FilterInterface<dim> {
 public:
-  FilterInterfaceReadOnly(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
-                          const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues,
+  FilterInterfaceReadOnly(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
+                          const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues,
                           const char* type)
       : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, type) {}
 

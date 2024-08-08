@@ -49,9 +49,8 @@ public:
 
   /** writes molecule data to the corresponding stringstreams.
    *	@param cell
-   *	@param cellIndex
    */
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {

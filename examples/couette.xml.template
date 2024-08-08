@@ -143,13 +143,13 @@
   <!-- MaMiCo configuration for NieTest, as described in the respective paper -->
   <mamico>
     <!-- "write-every-macroscopic-timestep" means CFD time step /-->
-    <macroscopic-cell-configuration
+    <coupling-cell-configuration
       cell-size="2.5 ; 2.5 ; 2.5"
-      linked-cells-per-macroscopic-cell="1 ; 1 ; 1"
+      linked-cells-per-coupling-cell="1 ; 1 ; 1"
       write-every-microscopic-timestep="0"
-      microscopic-filename="MacroscopicCell_micro"
+      microscopic-filename="CouplingCell_micro"
       write-every-macroscopic-timestep="0"
-      macroscopic-filename="MacroscopicCell_macro"
+      macroscopic-filename="CouplingCell_macro"
     />
     <!-- particle-insertion type="usher" enables removal of particles  /-->
     <!-- TODO choose insert-every-timestep automatically /-->

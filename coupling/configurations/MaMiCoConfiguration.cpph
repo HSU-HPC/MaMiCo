@@ -6,8 +6,8 @@ template <unsigned int dim> void coupling::configurations::MaMiCoConfiguration<d
   for (tinyxml2::XMLElement* child = node->FirstChildElement(); child != NULL; child = child->NextSiblingElement()) {
     std::string nodename(child->Value());
 
-    if (nodename == _macroscopicCellConfiguration.getTag()) {
-      _macroscopicCellConfiguration.parseSubtag(child);
+    if (nodename == _couplingCellConfiguration.getTag()) {
+      _couplingCellConfiguration.parseSubtag(child);
     } else if (nodename == _particleInsertionConfiguration.getTag()) {
       _particleInsertionConfiguration.parseSubtag(child);
       _isDefinedParticleInsertion = true;
@@ -34,7 +34,7 @@ template <unsigned int dim> void coupling::configurations::MaMiCoConfiguration<d
     }
   }
 
-  _isValid = _momentumInsertionConfiguration.isValid() && _particleInsertionConfiguration.isValid() && _macroscopicCellConfiguration.isValid() &&
+  _isValid = _momentumInsertionConfiguration.isValid() && _particleInsertionConfiguration.isValid() && _couplingCellConfiguration.isValid() &&
              _transferStrategyConfiguration.isValid() && _boundaryForceConfiguration.isValid() && _parallelTopologyConfiguration.isValid() &&
              _timeIntegrationConfiguration.isValid();
 }

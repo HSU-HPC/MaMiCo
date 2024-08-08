@@ -37,7 +37,7 @@ public:
       exit(EXIT_FAILURE);
     }
     const coupling::IndexConversion<dim>& indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
 
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);

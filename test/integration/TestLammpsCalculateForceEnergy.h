@@ -45,7 +45,7 @@ public:
       exit(EXIT_FAILURE);
     }
     const coupling::IndexConversion<dim>& indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMacroscopicCellService()->getIndexConversion();
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
 
     // compute LJ parameters (copy-paste from calculateForceAndEnergy)
     const double sigma6 = pow(mdSolverInterface->getMoleculeSigma(), 6.0);
