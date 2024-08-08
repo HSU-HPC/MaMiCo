@@ -16,7 +16,6 @@ import coloredlogs
 import matplotlib.pyplot as mplt
 import numpy as np
 import pandas as pd
-import pythonfilters as pf
 from lbmpy.parameterization import Scaling
 from lbmpy.session import *
 
