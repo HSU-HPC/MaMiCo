@@ -63,6 +63,9 @@ public:
    */
   coupling::paralleltopology::ParallelTopologyType getParallelTopologyType() const { return _type; }
 
+protected:
+  ParallelTopologyConfiguration(coupling::paralleltopology::ParallelTopologyType type) : _type(type), _isValid(true) {}
+
 private:
   coupling::paralleltopology::ParallelTopologyType _type;
 

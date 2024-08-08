@@ -4,7 +4,7 @@
 
 #pragma once
 
-//#define DEBUG_FILTER_PIPELINE
+// #define DEBUG_FILTER_PIPELINE
 #define POST_MULTI_INSTANCE_FILTERING_YES true
 #define POST_MULTI_INSTANCE_FILTERING_NO false
 
@@ -12,7 +12,10 @@
 #include "coupling/filtering/sequencing/AsymmetricalFilterJunction.h"
 #include "coupling/filtering/sequencing/FilterJunction.h"
 #include "coupling/filtering/sequencing/FilterSequence.h"
+#include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/tinyxml2/tinyxml2.h"
+
+using tarch::configuration::ParseConfiguration;
 
 namespace coupling {
 namespace filtering {
@@ -79,7 +82,7 @@ private:
   /*
    * Detects errors in XML config file.
    */
-  bool configIsValid(tinyxml2::XMLDocument& cfgfile);
+  bool configIsValid(ParseConfiguration::XMLConfiguration& xmlConfig);
 
   /*
    * Interprets configuration of sequences and intializes them. Parameters
@@ -100,7 +103,7 @@ private:
    */
   std::vector<coupling::datastructures::MacroscopicCell<dim>*> _outerCells;
 
-  tinyxml2::XMLDocument _config;
+  ParseConfiguration::XMLConfiguration _config;
 
   /*
    * Scope in which this FilterPipeline is applied. Cf. coupling::Scope

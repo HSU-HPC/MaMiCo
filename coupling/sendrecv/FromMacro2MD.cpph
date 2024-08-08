@@ -3,66 +3,7 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 
-template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::writeToSendBuffer(const coupling::IndexConversion<dim>& indexConversion,
-                                                                               coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
-                                                                               const std::vector<MacroscopicCell*>& macroscopicCells,
-                                                                               const unsigned int* const globalCellIndices) {
-  const unsigned int numberCells = (unsigned int)macroscopicCells.size();
-  for (unsigned int i = 0; i < numberCells; i++) {
-    const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
-    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(indexConversion, dataExchange, *macroscopicCells[i], globalVectorIndex);
-  }
-}
-
-template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::allocateReceiveBuffers(const coupling::IndexConversion<dim>& indexConversion,
-                                                                                    coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange) {
-  // start and end coordinates of local domain in coupling tool (including ghost layers <-> + Vector<...>(2) )
-  const tarch::la::Vector<3, unsigned int> start(0);
-  const tarch::la::Vector<3, unsigned int> end =
-      start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
-  tarch::la::Vector<3, unsigned int> loop(0);
-
-  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
-    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
-      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-        // determine global vector cell index of this cell
-        tarch::la::Vector<dim, unsigned int> globalVectorIndex = coupling::initDimVector<dim>(loop);
-        globalVectorIndex = indexConversion.convertLocalToGlobalVectorCellIndex(globalVectorIndex);
-
-        // call allocateReceiveBuffers for this cell
-        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiveBuffers(indexConversion, dataExchange, globalVectorIndex);
-      }
-    }
-  }
-}
-
-template <class MacroscopicCell, unsigned int dim>
-void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::readFromReceiveBuffer(const coupling::IndexConversion<dim>& indexConversion,
-                                                                                   coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
-                                                                                   const std::vector<MacroscopicCell*>& macroscopicCells) {
-  // start and end coordinates of local domain in coupling tool (including ghost layers <-> + Vector<...>(2) )
-  const tarch::la::Vector<3, unsigned int> start(0);
-  const tarch::la::Vector<3, unsigned int> end =
-      start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
-  tarch::la::Vector<3, unsigned int> loop(0);
-
-  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
-    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
-      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-        // determine global vector cell index of this cell and local linearised cell index
-        tarch::la::Vector<dim, unsigned int> globalVectorIndex = coupling::initDimVector<dim>(loop);
-        const unsigned int localIndex = indexConversion.getLocalCellIndex(globalVectorIndex);
-        globalVectorIndex = indexConversion.convertLocalToGlobalVectorCellIndex(globalVectorIndex);
-
-        // call readFromReceiveBuffer for this cell
-        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiveBuffer(indexConversion, dataExchange, *macroscopicCells[localIndex],
-                                                                                           globalVectorIndex);
-      }
-    }
-  }
-}
+#pragma region sequential operations
 
 template <class MacroscopicCell, unsigned int dim>
 void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::sendFromMacro2MD(const coupling::IndexConversion<dim>& indexConversion,
@@ -89,11 +30,46 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::sendFromMacro2MDNon
   writeToSendBuffer(indexConversion, dataExchange, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
 
   // allocate all requests -> needs to be called AFTER all buffers are filled
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests(indexConversion);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateRequests();
 
   // trigger MPI calls for send/recv
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceiving(indexConversion, dataExchange);
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending(indexConversion, dataExchange);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerReceiving(dataExchange);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::triggerSending(dataExchange);
+}
+
+template <class MacroscopicCell, unsigned int dim>
+void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::allocateReceiveBuffers(const coupling::IndexConversion<dim>& indexConversion,
+                                                                                    coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange) {
+  // start and end coordinates of local domain in coupling tool (including ghost layers <-> + Vector<...>(2) )
+  const tarch::la::Vector<3, unsigned int> start(0);
+  const tarch::la::Vector<3, unsigned int> end =
+      start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
+  tarch::la::Vector<3, unsigned int> loop(0);
+
+  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
+    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
+      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
+        // determine global vector cell index of this cell
+        tarch::la::Vector<dim, unsigned int> globalVectorIndex = coupling::initDimVector<dim>(loop);
+        globalVectorIndex = indexConversion.convertLocalToGlobalVectorCellIndex(globalVectorIndex);
+
+        // call allocateReceiveBuffers for this cell
+        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateReceiveBuffers(dataExchange, globalVectorIndex);
+      }
+    }
+  }
+}
+
+template <class MacroscopicCell, unsigned int dim>
+void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::writeToSendBuffer(const coupling::IndexConversion<dim>& indexConversion,
+                                                                               coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                                                               const std::vector<MacroscopicCell*>& macroscopicCells,
+                                                                               const unsigned int* const globalCellIndices) {
+  const unsigned int numberCells = (unsigned int)macroscopicCells.size();
+  for (unsigned int i = 0; i < numberCells; i++) {
+    const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
+    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToSendBuffer(dataExchange, *macroscopicCells[i], globalVectorIndex);
+  }
 }
 
 template <class MacroscopicCell, unsigned int dim>
@@ -101,8 +77,137 @@ void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::wait4SendFromMacro2
                                                                                    coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
                                                                                    const std::vector<MacroscopicCell*>& macroscopicCellsFromMamico) {
   // wait for all send- and receive operations to complete
-  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations(indexConversion);
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllOperations();
 
   // fill information from receive buffers into the macroscopic cells
   readFromReceiveBuffer(indexConversion, dataExchange, macroscopicCellsFromMamico);
 }
+
+template <class MacroscopicCell, unsigned int dim>
+void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::readFromReceiveBuffer(const coupling::IndexConversion<dim>& indexConversion,
+                                                                                   coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                                                                   const std::vector<MacroscopicCell*>& macroscopicCells) {
+  // start and end coordinates of local domain in coupling tool (including ghost layers <-> + Vector<...>(2) )
+  const tarch::la::Vector<3, unsigned int> start(0);
+  const tarch::la::Vector<3, unsigned int> end =
+      start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
+  tarch::la::Vector<3, unsigned int> loop(0);
+
+  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
+    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
+      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
+        // determine global vector cell index of this cell and local linearised cell index
+        tarch::la::Vector<dim, unsigned int> globalVectorIndex = coupling::initDimVector<dim>(loop);
+        const unsigned int localIndex = indexConversion.getLocalCellIndex(globalVectorIndex);
+        globalVectorIndex = indexConversion.convertLocalToGlobalVectorCellIndex(globalVectorIndex);
+
+        // call readFromReceiveBuffer for this cell
+        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromReceiveBuffer(dataExchange, *macroscopicCells[localIndex], globalVectorIndex);
+      }
+    }
+  }
+}
+
+#pragma endregion // sequential operations
+
+#pragma region collective operations
+template <class MacroscopicCell, unsigned int dim>
+void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::bcastFromMacro2MD(
+    std::vector<coupling::sendrecv::DataExchangeFromMacro2MD<dim>*>& dataExchangeFromMacroscopicCellServices,
+    const std::vector<MacroscopicCell*>& macroscopicCellsFromMacroscopicSolver, const unsigned int* const globalCellIndicesFromMacroscopicSolver,
+    std::vector<std::vector<MacroscopicCell*>> macroscopicCellsFromMamico) {
+  // empty send and receive buffers
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::deleteBuffers();
+
+  const unsigned int rank = dataExchangeFromMacroscopicCellServices[0]->getIndexConversion()->getThisRank();
+
+  for (auto& de : dataExchangeFromMacroscopicCellServices) {
+    if (nullptr == de)
+      continue;
+    auto indexConversion = de->getIndexConversion();
+    // TODO compute target ranks here and pass them in
+    writeToSendBufferCollective(*indexConversion, *de, macroscopicCellsFromMacroscopicSolver, globalCellIndicesFromMacroscopicSolver);
+    allocateReceiveBuffersCollective(*indexConversion, *de);
+  }
+
+  SendReceiveBuffer<MacroscopicCell, dim>::allocateBcastRequests(rank);
+
+  // SendReceiveBuffer<MacroscopicCell,dim >::triggerReceivingCollective(indexConversion, dataExchange);
+  SendReceiveBuffer<MacroscopicCell, dim>::triggerBcasts(rank);
+
+  coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::waitAllCollectiveOperations();
+
+  for (unsigned int i = 0; i < dataExchangeFromMacroscopicCellServices.size(); ++i) {
+    if (macroscopicCellsFromMamico[i].empty())
+      continue;
+    if (nullptr == dataExchangeFromMacroscopicCellServices[i])
+      continue;
+    readFromCollectiveBuffer(*dataExchangeFromMacroscopicCellServices[i]->getIndexConversion(), *dataExchangeFromMacroscopicCellServices[i],
+                             macroscopicCellsFromMamico[i]);
+  }
+}
+
+template <class MacroscopicCell, unsigned int dim>
+void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::writeToSendBufferCollective(const coupling::IndexConversion<dim>& indexConversion,
+                                                                                         coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                                                                         const std::vector<MacroscopicCell*>& macroscopicCells,
+                                                                                         const unsigned int* const globalCellIndices) {
+  const auto numberCells = (unsigned int)macroscopicCells.size();
+  for (unsigned int i = 0; i < numberCells; i++) {
+    const tarch::la::Vector<dim, unsigned int> globalVectorIndex = indexConversion.getGlobalVectorCellIndex(globalCellIndices[i]);
+    coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::writeToBcastBuffer(indexConversion, dataExchange, *macroscopicCells[i], globalVectorIndex);
+  }
+}
+
+template <class MacroscopicCell, unsigned int dim>
+void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::allocateReceiveBuffersCollective(
+    const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange) {
+
+  // start and end coordinates of local domain in coupling tool (including ghost layers <-> + Vector<...>(2) )
+  const tarch::la::Vector<3, unsigned int> start(0);
+  const tarch::la::Vector<3, unsigned int> end =
+      start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
+  tarch::la::Vector<3, unsigned int> loop(0);
+
+  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
+    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
+      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
+        // determine global vector cell index of this cell
+        tarch::la::Vector<dim, unsigned int> globalVectorIndex = coupling::initDimVector<dim>(loop);
+
+        globalVectorIndex = indexConversion.convertLocalToGlobalVectorCellIndex(globalVectorIndex);
+
+        // call allocateReceiveBuffers for this cell
+        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::allocateBcastBufferForReceiving(indexConversion, dataExchange, globalVectorIndex);
+      }
+    }
+  }
+}
+
+template <class MacroscopicCell, unsigned int dim>
+void coupling::sendrecv::FromMacro2MD<MacroscopicCell, dim>::readFromCollectiveBuffer(const coupling::IndexConversion<dim>& indexConversion,
+                                                                                      coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
+                                                                                      const std::vector<MacroscopicCell*>& macroscopicCells) {
+  // start and end coordinates of local domain in coupling tool (including ghost layers <-> + Vector<...>(2) )
+  const tarch::la::Vector<3, unsigned int> start(0);
+  const tarch::la::Vector<3, unsigned int> end =
+      start + coupling::initRange<dim>(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
+  tarch::la::Vector<3, unsigned int> loop(0);
+
+  for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
+    for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
+      for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
+        // determine global vector cell index of this cell and local linearised cell index
+        tarch::la::Vector<dim, unsigned int> globalVectorIndex = coupling::initDimVector<dim>(loop);
+        const unsigned int localIndex = indexConversion.getLocalCellIndex(globalVectorIndex);
+        globalVectorIndex = indexConversion.convertLocalToGlobalVectorCellIndex(globalVectorIndex);
+
+        // call readFromReceiveBuffer for this cell
+        coupling::sendrecv::SendReceiveBuffer<MacroscopicCell, dim>::readFromCollectiveBuffer(indexConversion, dataExchange, *macroscopicCells[localIndex],
+                                                                                              globalVectorIndex);
+      }
+    }
+  }
+}
+
+#pragma endregion // collective operations

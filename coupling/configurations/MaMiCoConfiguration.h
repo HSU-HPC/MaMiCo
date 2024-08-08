@@ -1,7 +1,6 @@
 // Copyright (C) 2015 Technische Universitaet Muenchen
 // This file is part of the Mamico project. For conditions of distribution
-// and use, please see the copyright notice in Mamico's main folder, or at
-// www5.in.tum.de/mamico
+// and use, please see the copyright notice in Mamico's main folder
 #ifndef _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MAMICOCONFIGURATION_H_
 #define _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MAMICOCONFIGURATION_H_
 
@@ -11,6 +10,7 @@
 #include "coupling/configurations/ParallelTopologyConfiguration.h"
 #include "coupling/configurations/ParticleInsertionConfiguration.h"
 #include "coupling/configurations/ThermostatConfiguration.h"
+#include "coupling/configurations/TimeIntegrationConfiguration.h"
 #include "coupling/configurations/TransferStrategyConfiguration.h"
 #include "tarch/configuration/Configuration.h"
 #include "tarch/la/Vector.h"
@@ -132,6 +132,17 @@ public:
     return _parallelTopologyConfiguration;
   }
 
+  /**
+   *  @return _timeIntegrationConfiguration
+   */
+  const coupling::configurations::TimeIntegrationConfiguration& getTimeIntegrationConfiguration() const {
+    // is optional, thus always defined
+    return _timeIntegrationConfiguration;
+  }
+
+  /**
+   * @return _thermostatConfiguration
+   */
   const coupling::configurations::ThermostatConfiguration& getThermostatConfiguration() const {
     if (!_isDefinedThermostat) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
@@ -150,6 +161,7 @@ private:
   coupling::configurations::BoundaryForceConfiguration<dim> _boundaryForceConfiguration;
   coupling::configurations::TransferStrategyConfiguration<dim> _transferStrategyConfiguration;
   coupling::configurations::ParallelTopologyConfiguration _parallelTopologyConfiguration;
+  coupling::configurations::TimeIntegrationConfiguration _timeIntegrationConfiguration;
   coupling::configurations::ThermostatConfiguration _thermostatConfiguration;
   bool _isDefinedParticleInsertion;
   bool _isDefinedMomentumInsertion;

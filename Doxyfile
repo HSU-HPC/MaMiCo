@@ -873,14 +873,10 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                =  coupling/interface/impl/ \
-			   coupling/tests/build_espresso/ \
-			   coupling/tests/build_lammps/ \
-			   coupling/tests/build_lbcouettesolver/ \
-			   coupling/tests/build_mardyn/ \
-			   coupling/tests/build_nie/ \
-			   coupling/tests/unittests/ \
+			   test/ \
 			   simplemd/ \
-			   tarch/tests \
+               ls1/ \
+               examples/ \
 			   
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
@@ -2263,7 +2259,7 @@ HIDE_UNDOC_RELATIONS   = YES
 # set to NO
 # The default value is: YES.
 
-HAVE_DOT               = NO
+HAVE_DOT               = YES
 
 # The DOT_NUM_THREADS specifies the number of dot invocations doxygen is allowed
 # to run in parallel. When set to 0 doxygen will base this on the number of

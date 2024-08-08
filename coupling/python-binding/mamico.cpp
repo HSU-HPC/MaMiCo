@@ -23,10 +23,17 @@
 // for debugging purposes only
 #include <iostream>
 
-//#define PYBIND_USE_DMALLOC
-// used for memory debugging
+// #define PYBIND_USE_DMALLOC
+//  used for memory debugging
 #ifdef PYBIND_USE_DMALLOC
 #include "dmalloc.h"
+#endif
+
+#if defined(LS1_MARDYN)
+#include "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
+#include "coupling/interface/impl/ls1/LS1StaticCommData.h"
+#include "utils/Logger.h"
+using Log::global_log;
 #endif
 
 /**
@@ -173,6 +180,12 @@ int initMPI() {
   MPI_Init(&argc, &argv);
   delete[] argv;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+#if defined(LS1_MARDYN)
+  global_log = new Log::Logger(Log::Error);
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+  global_log->set_mpi_output_root(0);
+#endif
+#endif
   return rank;
 }
 
@@ -641,6 +654,14 @@ PYBIND11_MODULE(mamico, mamico) {
   coupling.def(
       "getMDSimulation",
       [](const simplemd::configurations::MolecularDynamicsConfiguration& c1, const coupling::configurations::MaMiCoConfiguration<3>& c2, void* comm) {
+#if defined(LS1_MARDYN)
+        auto offset = c1.getDomainConfiguration().getGlobalDomainOffset();
+        coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
+        coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
+        coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
+        coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
+
+#endif
         return coupling::interface::SimulationAndInterfaceFactory::getInstance().getMDSimulation(c1, c2, (MPI_Comm)comm);
       },
       "simpleMDConfig"_a, "mamicoConfig"_a, "localComm"_a, py::return_value_policy::take_ownership);

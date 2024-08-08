@@ -89,6 +89,14 @@ public:
    */
   ParticleInsertionType getParticleInsertionType() const { return _particleInsertionType; }
 
+protected:
+  ParticleInsertionConfiguration(unsigned int insertDeleteMassEveryTimestep, double rSigmaCoeff, double meanPotentialEnergyFactor, double uOverlapCoeff,
+                                 double stepRefCoeff, unsigned int iterMax, unsigned int restartMax, double tolerance, double offsetFromOuterBoundary,
+                                 ParticleInsertionType particleInsertionType)
+      : _insertDeleteMassEveryTimestep(insertDeleteMassEveryTimestep), _rSigmaCoeff(rSigmaCoeff), _meanPotentialEnergyFactor(meanPotentialEnergyFactor),
+        _uOverlapCoeff(uOverlapCoeff), _stepRefCoeff(stepRefCoeff), _iterMax(iterMax), _restartMax(restartMax), _tolerance(tolerance),
+        _offsetFromOuterBoundary(offsetFromOuterBoundary), _particleInsertionType(particleInsertionType){};
+
 private:
   static const std::string INSERT_DELETE_MASS_EVERY_TIMESTEP;
   static const std::string RSIGMA_COEFF;

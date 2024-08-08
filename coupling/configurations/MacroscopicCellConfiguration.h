@@ -78,6 +78,14 @@ public:
    */
   std::string getMacroscopicFilename() const { return _macroscopicFilename; }
 
+protected:
+  MacroscopicCellConfiguration(tarch::la::Vector<dim, double> macroscopicCellSize, tarch::la::Vector<dim, unsigned int> linkedCellsPerMacroscopicCell,
+                               unsigned int writeEveryMicroscopicTimestep, std::string microscopicFilename, unsigned int writeEveryMacroscopicTimestep,
+                               std::string macroscopicFilename)
+      : _isValid(true), _macroscopicCellSize(macroscopicCellSize), _linkedCellsPerMacroscopicCell(linkedCellsPerMacroscopicCell),
+        _writeEveryMicroscopicTimestep(writeEveryMicroscopicTimestep), _microscopicFilename(microscopicFilename),
+        _writeEveryMacroscopicTimestep(writeEveryMacroscopicTimestep), _macroscopicFilename(macroscopicFilename) {}
+
 private:
   static const std::string MACROSCOPIC_CELL_SIZE;
   static const std::string LINKED_CELLS_PER_MACROSCOPIC_CELL;

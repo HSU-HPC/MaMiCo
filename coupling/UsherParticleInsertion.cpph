@@ -233,6 +233,7 @@ typename coupling::ParticleInsertion<LinkedCell, dim>::Action coupling::UsherPar
         molecule.setPotentialEnergy(0.0);
 #ifdef USHER_DEBUG
         std::cout << "low energy hole" << std::endl;
+        _particlesInserted++;
 #endif
         return coupling::ParticleInsertion<LinkedCell, dim>::Insertion;
       }

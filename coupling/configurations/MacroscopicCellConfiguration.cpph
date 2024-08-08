@@ -22,7 +22,7 @@ template <unsigned int dim> void coupling::configurations::MacroscopicCellConfig
   int buffer = -1;
 
   // parse macroscopic cell size
-  tarch::configuration::ParseConfiguration::readVector<dim, double>(_macroscopicCellSize, node, MACROSCOPIC_CELL_SIZE);
+  tarch::configuration::ParseConfiguration::readVectorMandatory<dim, double>(_macroscopicCellSize, node, MACROSCOPIC_CELL_SIZE);
   for (unsigned int d = 0; d < dim; d++) {
     if (_macroscopicCellSize[d] <= 0.0) {
       std::cout << "ERROR coupling::configurations::MacroscopicCellConfiguration: ";
@@ -33,7 +33,7 @@ template <unsigned int dim> void coupling::configurations::MacroscopicCellConfig
   }
 
   // parse linked cells per macroscopic cell
-  tarch::configuration::ParseConfiguration::readVector<dim, int>(getCells, node, LINKED_CELLS_PER_MACROSCOPIC_CELL);
+  tarch::configuration::ParseConfiguration::readVectorMandatory<dim, int>(getCells, node, LINKED_CELLS_PER_MACROSCOPIC_CELL);
   for (unsigned int d = 0; d < dim; d++) {
     if (getCells[d] <= 0) {
       std::cout << "ERROR coupling::configurations::MacroscopicCellConfiguration: ";
