@@ -55,12 +55,11 @@ public:
    */
   template <unsigned int dim>
   static coupling::paralleltopology::ParallelTopology<dim>* getParallelTopology(coupling::paralleltopology::ParallelTopologyType type,
-                                                                                tarch::la::Vector<dim, unsigned int> numberProcesses,
-                                                                                unsigned int topologyOffset) {
+                                                                                tarch::la::Vector<dim, unsigned int> numberProcesses) {
     if (type == XYZ) {
-      return new coupling::paralleltopology::XYZTopology<dim>(numberProcesses, topologyOffset);
+      return new coupling::paralleltopology::XYZTopology<dim>(numberProcesses);
     } else if (type == ZYX) {
-      return new coupling::paralleltopology::ZYXTopology<dim>(numberProcesses, topologyOffset);
+      return new coupling::paralleltopology::ZYXTopology<dim>(numberProcesses);
     } else {
       return NULL;
     }

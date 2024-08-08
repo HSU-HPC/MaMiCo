@@ -347,7 +347,7 @@ if("${MD_SIM}" STREQUAL "LS1_MARDYN") #to be removed when ls1 updates to use the
   target_compile_options(mamico INTERFACE -Wno-reorder)
 endif()
 if(BUILD_WITH_MPI)
-  target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
+  target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK)
   target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
     target_compile_options(mamico INTERFACE -Wno-uninitialized)
@@ -424,11 +424,11 @@ if(ENABLE_COVERAGE)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
-  target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
+  target_compile_definitions(mamico INTERFACE MDCoupledDebug MDCoupledError TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
   target_compile_options(mamico INTERFACE -Og -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
   if (NOT ENABLE_COVERAGE)
-    target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE PINT_DEBUG)
+    target_compile_definitions(mamico INTERFACE MDCoupledDebug MDCoupledError TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE PINT_DEBUG)
   endif()
   target_compile_options(mamico INTERFACE -Og -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
@@ -514,13 +514,12 @@ set(CLANGFORMAT_SOURCES
   "tarch/la/Matrix.h"
   "tarch/TarchDefinitions.h"
   "coupling/services/MultiMDCellService.h"
-  "coupling/services/MacroscopicCellServiceMacroOnly.h"
-  "coupling/services/MacroscopicCellService.cpph"
-  "coupling/services/MacroscopicCellTraversalWrappers.cpph"
-  "coupling/services/MacroscopicCellService.h"
+  "coupling/services/CouplingCellServiceDummy.h"
+  "coupling/services/CouplingCellService.cpph"
+  "coupling/services/CouplingCellTraversalWrappers.cpph"
+  "coupling/services/CouplingCellService.h"
   "coupling/ErrorEstimation.h"
   "coupling/ParticleInsertion.h"
-  "coupling/IndexConversionMD2Macro.cpph"
   "coupling/SetGivenVelocity4MomentumInsertion.h"
   "coupling/MomentumController.h"
   "coupling/filtering/FilterPipeline.cpph"
@@ -560,7 +559,7 @@ set(CLANGFORMAT_SOURCES
   "coupling/python-binding/mamico.cpp"
   "coupling/python-binding/conversion.h"
   "coupling/NoParticleInsertion.h"
-  "coupling/MacroscopicCellPlotter.h"
+  "coupling/CouplingCellPlotter.h"
   "coupling/NoMomentumInsertion.h"
   "coupling/cell-mappings/ComputeKineticEnergyMapping.h"
   "coupling/cell-mappings/MoleculeExtractor.h"
@@ -579,7 +578,6 @@ set(CLANGFORMAT_SOURCES
   "coupling/cell-mappings/NieVelocityImpositionMapping.h"
   "coupling/cell-mappings/ZhouBoundaryForce.h"
   "coupling/ZhouBoundaryForceController.h"
-  "coupling/IndexConversionMD2Macro.h"
   "coupling/indexing/CellIndex.cpph"
   "coupling/indexing/IndexingService.cpp"
   "coupling/indexing/Operations.h"
@@ -598,12 +596,10 @@ set(CLANGFORMAT_SOURCES
   "coupling/sendrecv/SendReceiveBuffer.cpph"
   "coupling/sendrecv/FromMacro2MD.cpph"
   "coupling/sendrecv/FromMD2Macro.h"
-  "coupling/IndexConversion.cpph"
   "coupling/UsherParticleInsertion.cpph"
   "coupling/NoBoundaryForce.h"
   "coupling/CouplingMDDefinitions.h"
   "coupling/AdditiveMomentumInsertion.h"
-  "coupling/IndexConversion.h"
   "coupling/transferstrategies/AveragingTransferStrategy.h"
   "coupling/transferstrategies/TransferStrategy4NieCoupling.h"
   "coupling/transferstrategies/TransferStrategy4SchwarzCoupling.h"
@@ -616,9 +612,9 @@ set(CLANGFORMAT_SOURCES
   "coupling/paralleltopology/ZYXTopology.h"
   "coupling/paralleltopology/XYZTopology.h"
   "coupling/paralleltopology/ParallelTopologyFactory.h"
-  "coupling/datastructures/MacroscopicCells.h"
-  "coupling/datastructures/MacroscopicCell.h"
-  "coupling/datastructures/MacroscopicCells.cpph"
+  "coupling/datastructures/CellContainer.h"
+  "coupling/datastructures/FlexibleCellContainer.h"
+  "coupling/datastructures/CouplingCell.h"
   "coupling/datastructures/Molecule.h"
   "coupling/MultiMDMediator.h"
   "coupling/configurations/ParticleInsertionConfiguration.h"
@@ -628,9 +624,9 @@ set(CLANGFORMAT_SOURCES
   "coupling/configurations/MaMiCoConfiguration.cpph"
   "coupling/configurations/MomentumInsertionConfiguration.h"
   "coupling/configurations/ParallelTopologyConfiguration.h"
-  "coupling/configurations/MacroscopicCellConfiguration.h"
+  "coupling/configurations/CouplingCellConfiguration.h"
   "coupling/configurations/ParticleInsertionConfiguration.cpp"
-  "coupling/configurations/MacroscopicCellConfiguration.cpph"
+  "coupling/configurations/CouplingCellConfiguration.cpph"
   "coupling/configurations/MaMiCoConfiguration.h"
   "coupling/configurations/ThermostatConfiguration.h"
   "coupling/configurations/TimeIntegrationConfiguration.h"
@@ -659,7 +655,6 @@ set(CLANGFORMAT_SOURCES
   "coupling/interface/MDSolverInterface.h"
   "coupling/interface/PintableMacroSolver.h"
   "coupling/KineticEnergyController.h"
-  "coupling/solvers/FiniteDifferenceSolver.h"
   "coupling/solvers/FDCouetteSolver.h"
   "coupling/solvers/IcoFoamInterface.h"
   "coupling/solvers/LBCouetteSolver.h"
@@ -704,10 +699,12 @@ set(CLANGFORMAT_SOURCES
   "test/unit/coupling/interface/impl/ls1/LS1MoleculeTest.cpp"
   "test/unit/coupling/interface/impl/ls1/LS1RegionWrapperTest.cpp"
   "test/unit/coupling/interface/impl/ls1/LS1StaticCommDataTest.cpp"
+  "test/unit/coupling/datastructures/LinkedCellContainerTest.cpp"
+  "test/unit/coupling/datastructures/FlexibleCellContainerTest.cpp"
+  "test/unit/coupling/datastructures/CellContainerTest.cpp"
   "coupling/scenario/CouetteScenario.h"
   "coupling/scenario/main_couette.cpp"
   "coupling/scenario/Scenario.h"
-  "coupling/MPIIndexConversion.h"
   "coupling/InstanceHandling.h"
   "coupling/MomentumInsertion.h"
   "simplemd/services/ExternalForceService.cpp"

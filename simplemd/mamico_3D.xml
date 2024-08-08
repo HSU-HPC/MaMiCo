@@ -2,12 +2,12 @@
 
 <!-- example for a mamico configuration, as used in form of sub-tags in extended xml-files -->
 <mamico>
-  <macroscopic-cell-configuration
+  <coupling-cell-configuration
     cell-size="2.5 ; 2.5; 2.5"
     write-every-microscopic-timestep="0"
-    microscopic-filename="MacroscopicCell_micro"
+    microscopic-filename="CouplingCell_micro"
     write-every-macroscopic-timestep="0"
-    macroscopic-filename="MacroscopicCell_macro"
+    macroscopic-filename="CouplingCell_macro"
   />
   <particle-insertion type="none" maximum-number-of-iterations="100" maximum-number-of-restarts="500" />
   <momentum-insertion type="velocity-gradient-relaxation" velocity-relaxation-factor="0.05" />

@@ -234,8 +234,7 @@ public:
     }
 
     if (cfg.miSolverType == SYNTHETIC) {
-      if (cfg.macro2Md || cfg.totalNumberMDSimulations > 1 || cfg.lbNumberProcesses[0] != 1 || cfg.lbNumberProcesses[1] != 1 ||
-          cfg.lbNumberProcesses[2] != 1) {
+      if (cfg.macro2Md || cfg.totalNumberMDSimulations > 1 || cfg.lbNumberProcesses[0] != 1 || cfg.lbNumberProcesses[1] != 1 || cfg.lbNumberProcesses[2] != 1) {
         std::cout << "Invalid configuration: Synthetic MD runs sequentially on "
                      "rank 0 only. "
                   << "It does neither support parallel communication nor "

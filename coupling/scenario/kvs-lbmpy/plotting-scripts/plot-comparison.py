@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-from pandas import read_csv 
 import math
+
 import matplotlib.pyplot as mplt
+from pandas import read_csv
 
 #Variation of helper script plot4.py for cases in which CS data is not present
 #This implies no SNR computation

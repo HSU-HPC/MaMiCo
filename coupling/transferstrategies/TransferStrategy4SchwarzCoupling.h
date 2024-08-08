@@ -28,61 +28,56 @@ class coupling::transferstrategies::TransferStrategy4SchwarzCoupling : public co
 public:
   /** @brief a simple
    *  @param mdSolverInterface interface for the md solver
-   *  @param indexConversion an instance of the indexConversion
    *  @param numberMDSteps number of md time steps within one coupling time step
    */
-  TransferStrategy4SchwarzCoupling(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                                   const coupling::IndexConversion<dim>& indexConversion, unsigned int numberMDSteps)
-      : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion), _massMapping(mdSolverInterface),
+  TransferStrategy4SchwarzCoupling(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberMDSteps)
+      : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface), _massMapping(mdSolverInterface),
         _momentumMapping(mdSolverInterface), _timestepCounter(0), _sampleCounter(0), _numberMDSteps(numberMDSteps), _sampleEveryTimestep(1) {}
 
   /** @brief a dummy destructor*/
   virtual ~TransferStrategy4SchwarzCoupling() {}
 
   /** @brief the sample counter is reseted (0)*/
-  virtual void beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData();
+  void beginProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData() override;
 
   /** the momentum is converted to velocity (velocity = momentum/mass) and
    * stored in the microscopicMomentum the mass is not applied, therefore the
    * macroscopicMass is set to 0 the macroscopic quantities are reseted (0)
    *  @brief the data received from the macro solver is processed
-   *  @param cell the macroscopic cell to be processed
-   *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                              const unsigned int& index);
+   *  @param cell the coupling cell to be processed
+   *  @param index the index of the coupling cell */
+  void processInnerCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                   I02 index) override;
 
   /** @brief the momentum is converted to velocity (velocity = momentum/mass)
    * and stored in the microscopicMomentum the mass is not applied, therefore
    * the macroscopicMass is set to 0 the macroscopic quantities are reseted (0)
    *  @brief the data received from the macro solver is processed
-   *  @param cell the macroscopic cell to be processed
-   *  @param index the index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellAfterReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                              const unsigned int& index);
+   *  @param cell the coupling cell to be processed
+   *  @param index the index of the coupling cell */
+  void processOuterCouplingCellAfterReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                   I02 index) override;
 
   /** @brief the data collected during the md time steps is averaged
    * (/numberMDSteps)
-   *  @param cell the macroscopic cell to be processed
-   *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                    const unsigned int& index);
+   *  @param cell the coupling cell to be processed
+   *  @param index the index of the coupling cell */
+  void processInnerCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override;
 
   /** @brief the macroscopic quantities are reseted (0)
-   *  @param cell the macroscopic cell to be processed
-   *  @param index the index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                    const unsigned int& index);
+   *  @param cell the coupling cell to be processed
+   *  @param index the index of the coupling cell */
+  void processOuterCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override;
 
   /** @brief the _timestepCounter is incremented and if sample()==true the
    * _sampleCounter too */
-  virtual void beginProcessInnerMacroscopicCellsAfterMDTimestep();
+  void beginProcessInnerCouplingCellsAfterMDTimestep() override;
 
   /** @brief the mass and momentum are evaluated in the cell and stored in the
    * macroscopic quantities
-   *  @param cell the macroscopic cell to be processed
-   *  @param index the index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellAfterMDTimestep(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                          const unsigned int& index);
+   *  @param cell the coupling cell to be processed
+   *  @param index the index of the coupling cell */
+  void processInnerCouplingCellAfterMDTimestep(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override;
 
 protected:
   /** @brief depending on the sampling interval (_sampleEveryTimestep) true is

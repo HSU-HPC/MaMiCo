@@ -2,13 +2,13 @@
 
 <scenario-configuration>
   <mamico>
-    <macroscopic-cell-configuration
+    <coupling-cell-configuration
       cell-size="2.5 ; 2.5 ; 2.5"
-      linked-cells-per-macroscopic-cell="1 ; 1 ; 1"
+      linked-cells-per-coupling-cell="1 ; 1 ; 1"
       write-every-microscopic-timestep="0"
-      microscopic-filename="MacroscopicCell_micro"
+      microscopic-filename="CouplingCell_micro"
       write-every-macroscopic-timestep="0"
-      macroscopic-filename="MacroscopicCell_macro"
+      macroscopic-filename="CouplingCell_macro"
     />
     <particle-insertion type="usher" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
     <!--<particle-insertion type="none" />/-->

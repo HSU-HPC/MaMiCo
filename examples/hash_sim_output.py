@@ -8,10 +8,10 @@ Why? Allows for easy comparison of the simulation output between different imple
 
 __author__ = "Ruben"
 
-import sys
-import subprocess
-from pathlib import Path
 import os
+import subprocess
+import sys
+from pathlib import Path
 
 OUTPUT_FILE_EXTENSIONS = [
     ".csv",

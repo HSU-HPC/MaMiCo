@@ -50,7 +50,7 @@ public:
     unsigned int localNumberCells = 1;
     const tarch::la::Vector<MDSIMULATIONFACTORY_DIMENSION, unsigned int> numberProcs = _configuration.getMPIConfiguration().getNumberOfProcesses();
     const tarch::la::Vector<MDSIMULATIONFACTORY_DIMENSION, double> domainSize = _configuration.getDomainConfiguration().getGlobalDomainSize();
-    const tarch::la::Vector<MDSIMULATIONFACTORY_DIMENSION, double> meshsize = _mamicoConfiguration.getMacroscopicCellConfiguration().getMacroscopicCellSize();
+    const tarch::la::Vector<MDSIMULATIONFACTORY_DIMENSION, double> meshsize = _mamicoConfiguration.getCouplingCellConfiguration().getCouplingCellSize();
     // determine max. number of cells required on each process
     for (unsigned int d = 0; d < MDSIMULATIONFACTORY_DIMENSION; d++) {
       const unsigned int cells = (unsigned int)ceil(domainSize[d] / meshsize[d] / numberProcs[d]);
@@ -84,19 +84,19 @@ public:
       std::cout << "ERROR sortMoleculesIntoCells(): interface==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMacroscopicCellService();
-    if (macroscopicCellService == NULL) {
-      std::cout << "ERROR sortMoleculesIntoCells(): macroscopicCellService==NULL!" << std::endl;
+    coupling::services::CouplingCellService<MDSIMULATIONFACTORY_DIMENSION>* couplingCellService =
+        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getCouplingCellService();
+    if (couplingCellService == NULL) {
+      std::cout << "ERROR sortMoleculesIntoCells(): couplingCellService==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    interface->updateAllCells(macroscopicCellService->getIndexConversion());
+    interface->updateAllCells(couplingCellService->getIndexConversion());
   }
 
-  // set macroscopic cell service to MamicoInterfaceProvider
-  virtual void setMacroscopicCellService(coupling::services::MacroscopicCellService<MDSIMULATIONFACTORY_DIMENSION>* macroscopicCellService) {
-    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMacroscopicCellService(
-        macroscopicCellService);
+  // set coupling cell service to MamicoInterfaceProvider
+  virtual void setCouplingCellService(coupling::services::CouplingCellService<MDSIMULATIONFACTORY_DIMENSION>* couplingCellService) {
+    coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setCouplingCellService(
+        couplingCellService);
   }
 
   // init LAMMPS simulation for LJ as provided in xml-config

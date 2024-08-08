@@ -1,5 +1,9 @@
 #pragma once
 
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+#include <sstream>
+#endif
+
 namespace coupling {
 namespace indexing {
 
