@@ -19,28 +19,32 @@ public:
   void operator=(LS1StaticCommData const&) = delete;
 
   // data sets and gets
-  void setConfigFilename(std::string name) { ls1ConfigFilename = name; }
-  const std::string getConfigFilename() { return ls1ConfigFilename; }
+  void setConfigFilename(std::string name) { _ls1ConfigFilename = name; }
+  const std::string getConfigFilename() { return _ls1ConfigFilename; }
 
-  void setBoxOffsetAtDim(int dim, double offset) { boxoffset[dim] = offset; }
-  const double getBoxOffsetAtDim(int dim) { return boxoffset[dim]; }
+  void setBoxOffsetAtDim(int dim, double offset) { _boxoffset[dim] = offset; }
+  const double getBoxOffsetAtDim(int dim) { return _boxoffset[dim]; }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-  void setLocalCommunicator(MPI_Comm comm) { localComm = comm; }
-  MPI_Comm getLocalCommunicator() { return localComm; }
+  void setLocalCommunicator(MPI_Comm comm) { _localComm = comm; }
+  MPI_Comm getLocalCommunicator() { return _localComm; }
 
-  void setDomainGridDecompAtDim(int dim, int breakdown) { domainGridDecomp[dim] = breakdown; }
-  const int getDomainGridDecompAtDim(int dim) { return domainGridDecomp[dim]; }
-  std::array<int, 3> getDomainGridDecomp() { return domainGridDecomp; }
+  void setDomainGridDecompAtDim(int dim, int breakdown) { _domainGridDecomp[dim] = breakdown; }
+  const int getDomainGridDecompAtDim(int dim) { return _domainGridDecomp[dim]; }
+  std::array<int, 3> getDomainGridDecomp() { return _domainGridDecomp; }
+
+  void setSubdomainWeights(std::array<std::vector<unsigned int>, 3> subdomainWeights) { _subdomainWeights = subdomainWeights; }
+  const std::array <std::vector<unsigned int> ,3> getSubdomainWeights() { return _subdomainWeights; }
 #endif
 
 private:
   LS1StaticCommData() {}
-  std::string ls1ConfigFilename;
-  std::array<double, 3> boxoffset; // temporary till ls1 offset is natively supported
+  std::string _ls1ConfigFilename;
+  std::array<double, 3> _boxoffset; // temporary till ls1 offset is natively supported
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-  MPI_Comm localComm;
-  std::array<int, 3> domainGridDecomp;
+  MPI_Comm _localComm;
+  std::array<int, 3> _domainGridDecomp;
+  std::array<std::vector<unsigned int> ,3 >_subdomainWeights;
 #endif
 };
 } // namespace interface

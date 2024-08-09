@@ -57,7 +57,7 @@
 							<lower> <x>0</x> <y>0</y> <z>0</z> </lower>
 							<upper> <x>40</x> <y>40</y> <z>40</z> </upper>
 						</object>
-						<velocityAssigner type="EqualVelocityDistribution" enableRandomSeed="0"></velocityAssigner>
+						<velocityAssigner type="EqualVelocityDistribution" enableRandomSeed="false"></velocityAssigner>
 					</objectgenerator>
 				</generator>
 				</phasespacepoint>

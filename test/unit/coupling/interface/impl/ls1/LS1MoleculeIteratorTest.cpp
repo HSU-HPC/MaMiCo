@@ -32,8 +32,8 @@ public:
 #else
     _ls1ConfigFileName = "../test/unit/coupling/interface/impl/ls1/ls1gridconfig.xml";
 #endif
-    global_log = new Log::Logger(Log::None);
-    global_log->set_mpi_output_root(0);
+    Log::global_log = new Log::Logger(Log::None);
+    Log::global_log->set_mpi_output_root(0);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, 0);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, 0);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, 0);
