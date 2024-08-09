@@ -1,0 +1,21 @@
+#! /bin/bash
+
+OUTPUT="$(pwd)/couette.xml"
+
+cd "$(dirname "$0")" || exit
+
+# Create venv and install dependencies if it does not exist
+if [ ! -f ".venv" ]
+then
+    python -m venv .venv
+    # shellcheck source=/dev/null
+    source .venv/bin/activate
+    pip install -r requirements.txt
+fi
+
+# Activate venv (in case not active already)
+# shellcheck source=/dev/null
+source .venv/bin/activate
+
+# Run the config builder
+python3 src/main.py "$OUTPUT"
