@@ -37,8 +37,8 @@ public:
 #else
     _ls1ConfigFileName = "../test/unit/coupling/interface/impl/ls1/ls1gridconfig.xml";
 #endif
-    global_log = new Log::Logger(Log::None);
-    global_log->set_mpi_output_root(0);
+    Log::global_log = new Log::Logger(Log::None);
+    Log::global_log->set_mpi_output_root(0);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, 0);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, 0);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, 0);
@@ -165,44 +165,53 @@ public:
 
   void testGetCell() {
     // setup
-    // create interface with coupling cell size 10 and 2 linked cells per mac.cell per dimension, hence linked cells are size 5,5,5
+    // create interface with coupling cell size 10 and 2 linked cells per coupling cell per dimension, hence linked cells are size 5,5,5
     tarch::la::Vector<3, double> couplingCellSize(10.0);
     tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell(2);
     // index converter
     tarch::la::Vector<3, unsigned int> globalNumberCells(4); // hence size becomes 40x40x40
     tarch::la::Vector<3, unsigned int> numberProcesses(1);
     int rank = 0;
+    const unsigned dim = 3;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     for (int i = 0; i < 3; i++)
       numberProcesses[i] = _domainGridDecomposition[i];
 #endif
-    coupling::indexing::IndexingService<3>::getInstance().init(globalNumberCells, numberProcesses, coupling::paralleltopology::ZYX, 3, (unsigned int)rank);
+
     coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell);
-    const coupling::IndexConversion<3> indexConversion(globalNumberCells, numberProcesses, rank, interface.getGlobalMDDomainSize(),
-                                                       interface.getGlobalMDDomainOffset(), coupling::paralleltopology::ZYX);
+    IDXS.initWithMDSize(
+      interface.getGlobalMDDomainSize(), 
+      interface.getGlobalMDDomainOffset(), 
+      numberProcesses, 
+      couplingCellSize,
+      coupling::paralleltopology::ZYX, 
+      3, 
+      (unsigned int)rank
+      );
 
     // first: try to get ghost cell, make sure there is error
-    CPPUNIT_ASSERT_THROW(interface.getLinkedCell({0, 0, 0}, {1, 1, 1}, {2, 2, 2}, indexConversion), std::runtime_error);
+    CPPUNIT_ASSERT_THROW(interface.getLinkedCell(I00{0}, {1, 1, 1}, {2, 2, 2}), std::runtime_error);
 
     // then: get an internal cell and check whether the bounds are as expected
-    for (unsigned int macX = 1; macX <= globalNumberCells[0] / numberProcesses[0]; macX++) {
-      for (unsigned int macY = 1; macY <= globalNumberCells[1] / numberProcesses[1]; macY++) {
-        for (unsigned int macZ = 1; macZ <= globalNumberCells[2] / numberProcesses[2]; macZ++) {
+    for (int coupX = 1; coupX <= (int)(globalNumberCells[0] / numberProcesses[0]); coupX++) {
+      for (int coupY = 1; coupY <= (int)(globalNumberCells[1] / numberProcesses[1]); coupY++) {
+        for (int coupZ = 1; coupZ <= (int)(globalNumberCells[2] / numberProcesses[2]); coupZ++) {
           for (unsigned int linkX = 0; linkX < linkedCellsPerCouplingCell[0]; linkX++) {
             for (unsigned int linkY = 0; linkY < linkedCellsPerCouplingCell[1]; linkY++) {
               for (unsigned int linkZ = 0; linkZ < linkedCellsPerCouplingCell[2]; linkZ++) {
-                ls1::LS1RegionWrapper cell = interface.getLinkedCell({macX, macY, macZ}, {linkX, linkY, linkZ}, linkedCellsPerCouplingCell, indexConversion);
+                I03 coupCell({coupX, coupY, coupZ});
+                ls1::LS1RegionWrapper cell = interface.getLinkedCell(coupCell, {linkX, linkY, linkZ}, linkedCellsPerCouplingCell);
 
                 tarch::la::Vector<3, double> receivedStart = {cell.getStartRegionAtDim(0), cell.getStartRegionAtDim(1), cell.getStartRegionAtDim(2)};
                 tarch::la::Vector<3, double> receivedEnd = {cell.getEndRegionAtDim(0), cell.getEndRegionAtDim(1), cell.getEndRegionAtDim(2)};
                 tarch::la::Vector<3, double> actualStart = {
                     // hacked for 2x2x1
-                    ((macX - 1) * couplingCellSize[0]) + (linkX * couplingCellSize[0] / linkedCellsPerCouplingCell[0] +
+                    ((coupX - 1) * couplingCellSize[0]) + (linkX * couplingCellSize[0] / linkedCellsPerCouplingCell[0] +
                                                           ((rank / numberProcesses[0]) * couplingCellSize[0] * globalNumberCells[0] / numberProcesses[0])),
-                    ((macY - 1) * couplingCellSize[1]) + (linkY * couplingCellSize[1] / linkedCellsPerCouplingCell[1] +
+                    ((coupY - 1) * couplingCellSize[1]) + (linkY * couplingCellSize[1] / linkedCellsPerCouplingCell[1] +
                                                           ((rank % numberProcesses[0]) * couplingCellSize[1] * globalNumberCells[1] / numberProcesses[1])),
-                    ((macZ - 1) * couplingCellSize[2]) + (linkZ * couplingCellSize[2] / linkedCellsPerCouplingCell[2])};
+                    ((coupZ - 1) * couplingCellSize[2]) + (linkZ * couplingCellSize[2] / linkedCellsPerCouplingCell[2])};
                 tarch::la::Vector<3, double> actualEnd = {actualStart[0] + couplingCellSize[0] / linkedCellsPerCouplingCell[0],
                                                           actualStart[1] + couplingCellSize[1] / linkedCellsPerCouplingCell[1],
                                                           actualStart[2] + couplingCellSize[2] / linkedCellsPerCouplingCell[2]};
@@ -216,9 +225,9 @@ public:
               } // linkZ
             } // linkY
           } // linkX
-        } // macZ
-      } // macY
-    } // macX
+        } // coupZ
+      } // coupY
+    } // coupX
   }
 
   void testGetCellIterator() {
@@ -230,35 +239,43 @@ public:
     tarch::la::Vector<3, unsigned int> globalNumberCells(4); // hence size becomes 40x40x40
     tarch::la::Vector<3, unsigned int> numberProcesses(1);
     int rank = 0;
+    unsigned const int dim = 3;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     for (int i = 0; i < 3; i++)
       numberProcesses[i] = _domainGridDecomposition[i];
 #endif
-    coupling::indexing::IndexingService<3>::getInstance().init(globalNumberCells, numberProcesses, coupling::paralleltopology::ZYX, 3, (unsigned int)rank);
     coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell);
-    const coupling::IndexConversion<3> indexConversion(globalNumberCells, numberProcesses, rank, interface.getGlobalMDDomainSize(),
-                                                       interface.getGlobalMDDomainOffset(), coupling::paralleltopology::ZYX);
+    IDXS.initWithMDSize(
+      interface.getGlobalMDDomainSize(), 
+      interface.getGlobalMDDomainOffset(), 
+      numberProcesses, 
+      couplingCellSize,
+      coupling::paralleltopology::ZYX, 
+      3, 
+      (unsigned int)rank
+      );
 
     // first: try to get ghost cell, make sure there is error
-    CPPUNIT_ASSERT_THROW(interface.getLinkedCell({0, 0, 0}, {1, 1, 1}, {2, 2, 2}, indexConversion), std::runtime_error);
+    CPPUNIT_ASSERT_THROW(interface.getLinkedCell(I00{0}, {1, 1, 1}, {2, 2, 2}), std::runtime_error);
 
     // then: get internal cells and verify cell contents
-    for (unsigned int macX = 1; macX <= globalNumberCells[0] / numberProcesses[0]; macX++) {
-      for (unsigned int macY = 1; macY <= globalNumberCells[1] / numberProcesses[1]; macY++) {
-        for (unsigned int macZ = 1; macZ <= globalNumberCells[2] / numberProcesses[2]; macZ++) {
+    for (int coupX = 1; coupX <= (int)(globalNumberCells[0] / numberProcesses[0]); coupX++) {
+      for (int coupY = 1; coupY <= (int)(globalNumberCells[1] / numberProcesses[1]); coupY++) {
+        for (int coupZ = 1; coupZ <= (int)(globalNumberCells[2] / numberProcesses[2]); coupZ++) {
           for (unsigned int linkX = 0; linkX < linkedCellsPerCouplingCell[0]; linkX++) {
             for (unsigned int linkY = 0; linkY < linkedCellsPerCouplingCell[1]; linkY++) {
               for (unsigned int linkZ = 0; linkZ < linkedCellsPerCouplingCell[2]; linkZ++) {
-                ls1::LS1RegionWrapper cell = interface.getLinkedCell({macX, macY, macZ}, {linkX, linkY, linkZ}, linkedCellsPerCouplingCell, indexConversion);
+                I03 coupCell({coupX, coupY, coupZ});
+                ls1::LS1RegionWrapper cell = interface.getLinkedCell(coupCell, {linkX, linkY, linkZ}, linkedCellsPerCouplingCell);
 
                 double actualStart[3] = {
                     // hacked for 2x2x1
-                    ((macX - 1) * couplingCellSize[0]) + (linkX * couplingCellSize[0] / linkedCellsPerCouplingCell[0] +
+                    ((coupX - 1) * couplingCellSize[0]) + (linkX * couplingCellSize[0] / linkedCellsPerCouplingCell[0] +
                                                           ((rank / numberProcesses[0]) * couplingCellSize[0] * globalNumberCells[0] / numberProcesses[0])),
-                    ((macY - 1) * couplingCellSize[1]) + (linkY * couplingCellSize[1] / linkedCellsPerCouplingCell[1] +
+                    ((coupY - 1) * couplingCellSize[1]) + (linkY * couplingCellSize[1] / linkedCellsPerCouplingCell[1] +
                                                           ((rank % numberProcesses[0]) * couplingCellSize[1] * globalNumberCells[1] / numberProcesses[1])),
-                    ((macZ - 1) * couplingCellSize[2]) + (linkZ * couplingCellSize[2] / linkedCellsPerCouplingCell[2])};
+                    ((coupZ - 1) * couplingCellSize[2]) + (linkZ * couplingCellSize[2] / linkedCellsPerCouplingCell[2])};
                 double actualEnd[3] = {actualStart[0] + couplingCellSize[0] / linkedCellsPerCouplingCell[0],
                                        actualStart[1] + couplingCellSize[1] / linkedCellsPerCouplingCell[1],
                                        actualStart[2] + couplingCellSize[2] / linkedCellsPerCouplingCell[2]};
@@ -284,9 +301,9 @@ public:
               } // linkZ
             } // linkY
           } // linkX
-        } // macZ
-      } // macY
-    } // macX
+        } // coupZ
+      } // coupY
+    } // coupX
   }
 
   void testMassSync() {
