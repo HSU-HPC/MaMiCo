@@ -252,6 +252,7 @@ private:
   bool _isInitialized = false;
 #endif
   bool _initedWithMDSize = false;
+  tarch::la::Vector<dim, std::vector<unsigned int> > _subdomainOwnership;
   tarch::la::Vector<dim, double> _globalMDDomainSize;
   tarch::la::Vector<dim, double> _globalMDDomainOffset;
   tarch::la::Vector<dim, double> _couplingCellSize;
