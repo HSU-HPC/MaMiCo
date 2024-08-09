@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<scenario-configuration>
+  <couette-test>
+    <domain
+      channelheight="{cfd-size}"
+      wall-init-velocity="0.0 ; 0.0 ; 0.0"
+      wall-init-cycles="0"
+      wall-velocity="{wall-velocity} ; 0.0 ; 0.0"
+      wall-oscillations="0"
+    />
+    <coupling
+      coupling-cycles="{coupling-cycles}"
+      two-way-coupling="{two-way-coupling}"
+      send-from-md-to-macro="yes"
+      filter-init-cycles="0"
+      write-csv-every-timestep="10"
+      send-from-macro-to-md="yes"
+      compute-snr="no"
+    />
+    <macroscopic-solver
+      type="{cfd-solver}"
+      viscosity="2.14"
+      number-of-processes="1 ; 1 ; 1"
+      plot-every-timestep="0"
+      init-advance-cycles="0"
+      foam-setup-directory="path/to/FoamSetup/parent/foler"
+      foam-setup-folder="FoamSetup"
+      boundaries-with-MD="0; 0; 0; 0; 0; 0; 1; 1; 1; 1; 1; 1"
+    />
+    <microscopic-solver
+      type="{md-solver}"
+      temperature="1.1"
+      equilibration-steps="{equilibration-steps}"
+      number-md-simulations="{num-md-sims}"
+      density="0.813037037"
+    />
+  </couette-test>
+  <mamico>
+    <coupling-cell-configuration
+      cell-size="{cell-size} ; {cell-size} ; {cell-size}"
+      linked-cells-per-coupling-cell="{linked-cells-per-coupling-cell} ; {linked-cells-per-coupling-cell} ; {linked-cells-per-coupling-cell}"
+      write-every-microscopic-timestep="0"
+      microscopic-filename="CouplingCell_micro"
+      write-every-macroscopic-timestep="0"
+      macroscopic-filename="CouplingCell_macro"
+    />
+    <particle-insertion type="none" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
+    <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
+    <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" shift-by-timesteps="0.5"/>
+    <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.81" temperature="1.1" />
+    <parallel-topology type="xyz" />
+    <thermostat type='outerLayers' number-layers='1' />
+  </mamico>
+
+  <molecular-dynamics>
+    <molecule-configuration
+      mass="1.0"
+      temperature="1.27"
+      sigma="1.0"
+      epsilon="1.0"
+      mean-velocity="0.0 ; 0.0 ; 0.0"
+    ></molecule-configuration>
+    <mpi-configuration number-of-processes="{mpi-size-x} ; {mpi-size-y} ; {mpi-size-z}" ></mpi-configuration>
+    <simulation-configuration
+      dt="0.005"
+      number-of-timesteps="{timesteps-per-coupling-cycle}"
+      reorganise-memory-every-timestep="20"
+      compute-macroscopic-quantities-every-timestep="0"
+      fix-seed="no"
+    ></simulation-configuration>
+    <!-- TODO <vtk-configuration filename="Molecules" write-every-timestep="{vtk-write-frequency}"></vtk-configuration> -->
+    <!-- <adios2-configuration directory-name="adiosOutput" write-every-timestep="0"></adios2-configuration>
+    <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration> -->
+    <domain-configuration
+      molecules-per-direction="{molecules-per-direction} ; {molecules-per-direction} ; {molecules-per-direction}"
+      domain-size="{md-size} ; {md-size} ; {md-size}"
+      domain-offset="10.0 ; 10.0 ; 2.5"
+      cutoff-radius="2.2"
+      linked-cell-size="2.5 ; 2.5 ; 2.5"
+      k_B="1.0"
+      block-size="100"
+
+      bottom-south-west="reflecting" bottom-south="reflecting" bottom-south-east="reflecting"
+      bottom-west="reflecting"       bottom="reflecting"       bottom-east="reflecting"
+      bottom-north-west="reflecting" bottom-north="reflecting" bottom-north-east="reflecting"
+
+      south-west="reflecting"        south="reflecting"        south-east="reflecting"
+      west="reflecting"                                          east="reflecting"
+      north-west="reflecting"        north="reflecting"        north-east="reflecting"
+
+      top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"
+      top-west="reflecting"          top="reflecting"          top-east="reflecting"
+      top-north-west="reflecting"    top-north="reflecting"    top-north-east="reflecting"
+    > </domain-configuration>
+
+  </molecular-dynamics>
+  <filter-pipeline>
+    {filtering}
+  </filter-pipeline>
+</scenario-configuration>

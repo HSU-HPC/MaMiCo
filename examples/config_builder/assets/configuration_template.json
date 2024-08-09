@@ -1,0 +1,175 @@
+[
+  {
+    "key": "domain",
+    "label": "domain size",
+    "options": [
+      {
+        "selected": true,
+        "value": 1,
+        "label": "small",
+        "description": "MD/CFD domain size = 30/50 cubed"
+      },
+      {
+        "value": 2,
+        "label": "medium",
+        "description": "MD/CFD domain size = 60/100 cubed"
+      },
+      {
+        "value": 3,
+        "label": "large",
+        "description": "MD/CFD domain size = 120/100 cubed"
+      }
+    ]
+  },
+  {
+    "key": "solver_md",
+    "label": "MD solver",
+    "options": [
+      {
+        "selected": true,
+        "value": "md",
+        "label": "Simple MD"
+      },
+      {
+        "value": "ls1",
+        "label": "ls1 mardyn"
+      }
+    ]
+  },
+  {
+    "key": "solver_cfd",
+    "label": "CFD solver",
+    "options": [
+      {
+        "value": "analytical"
+      },
+      {
+        "selected": true,
+        "value": "lb"
+      },
+      {
+        "value": "fd"
+      },
+      {
+        "value": "foam"
+      }
+    ]
+  },
+  {
+    "key": "mpi_ranks",
+    "label": "ranks/MD inst.",
+    "options": [
+      {
+        "selected": true,
+        "value": 1
+      },
+      {
+        "value": 2
+      },
+      {
+        "value": 4
+      },
+      {
+        "value": 8
+      },
+      {
+        "value": 64
+      },
+      {
+        "value": 512
+      }
+    ]
+  },
+  {
+    "key": "cell_size",
+    "label": "cell size",
+    "options": [
+      {
+        "selected": true,
+        "value": 2.5
+      },
+      {
+        "value": 5
+      }
+    ]
+  },
+  {
+    "key": "boundary",
+    "options": [
+      {
+        "selected": true,
+        "value": "reflecting"
+      },
+      {
+        "value": "periodic"
+      }
+    ]
+  },
+  {
+    "key": "coupling_2way",
+    "label": "2-way coupling",
+    "options": [
+      {
+        "selected": true,
+        "value": false
+      },
+      {
+        "value": true
+      }
+    ]
+  },
+  {
+    "key": "filtering",
+    "options": [
+      {
+        "selected": true,
+        "value": false
+      },
+      {
+        "value": "nlm",
+        "label": "non-local means"
+      },
+      {
+        "value": "gauss",
+        "label": "2D gaussian"
+      }
+    ]
+  },
+  {
+    "key": "simulation",
+    "options": [
+      {
+        "selected": true,
+        "value": "test",
+        "description": "50 coupling cycles"
+      },
+      {
+        "value": "short",
+        "description": "250 * domain size^2 coupling cycles"
+      },
+      {
+        "value": "normal",
+        "description": "500 * domain size^2 coupling cycles"
+      }
+    ]
+  },
+  {
+    "key": "multi_md",
+    "label": "MD instances",
+    "options": [
+      {
+        "selected": true,
+        "value": 1
+      },
+      {
+        "value": 2
+      },
+      {
+        "value": 20
+      },
+      {
+        "value": 200
+      }
+    ]
+  }
+]
