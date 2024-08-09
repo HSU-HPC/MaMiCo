@@ -38,13 +38,12 @@ public:
    *  The index linkedCellInCouplingCell corresponds to the coordinates of the linked cell inside the
    *  given coupling cell. These coordinates thus lie in a range (0,linkedCellsPerCouplingCell-1).
    */
-  virtual ls1::LS1RegionWrapper& getLinkedCell(const CellIndex_T& couplingCellIndex,
-                                               const tarch::la::Vector<3, unsigned int>& linkedCellInCouplingCell,
-                                               const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell)  {
+  virtual ls1::LS1RegionWrapper& getLinkedCell(const CellIndex_T& couplingCellIndex, const tarch::la::Vector<3, unsigned int>& linkedCellInCouplingCell,
+                                               const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell) {
     // ghost layer not allowed to have linked cells
     if (!CellIndex_T::contains(couplingCellIndex))
-        throw std::runtime_error("ERROR in LS1MDSolverInterface::getLinkedCell(): ghost coupling cells may not have linked cells!");
-                                                
+      throw std::runtime_error("ERROR in LS1MDSolverInterface::getLinkedCell(): ghost coupling cells may not have linked cells!");
+
     // size of the coupling cell
     const unsigned int dim = 3; // Used by expansion of IDXS macro
     tarch::la::Vector<3, double> macroCellSize(IDXS.getCouplingCellSize());
