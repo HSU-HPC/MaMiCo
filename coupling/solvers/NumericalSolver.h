@@ -14,10 +14,11 @@
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif
-#include "coupling/IndexConversion.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
+#include "coupling/datastructures/FlexibleCellContainer.h"
+#include "coupling/indexing/IndexingService.h"
+#include "coupling/services/ParallelTimeIntegrationService.h"
 #include "coupling/solvers/CouetteSolver.h"
-
 namespace coupling {
 namespace solvers {
 class NumericalSolver;
@@ -43,9 +44,9 @@ public:
    *  @param processes defines on how many processes the solver will run;
    *                   1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes  */
   NumericalSolver(const double channelheight, const double dx, const double dt, const double kinVisc, const int plotEveryTimestep, const std::string filestem,
-                  const tarch::la::Vector<3, unsigned int> processes)
+                  const tarch::la::Vector<3, unsigned int> processes, const Scenario* scen = nullptr)
       : coupling::solvers::AbstractCouetteSolver<3>(), _channelheight(channelheight), _dx(dx), _dt(dt), _kinVisc(kinVisc), _processes(processes),
-        _plotEveryTimestep(plotEveryTimestep), _filestem(filestem) {
+        _plotEveryTimestep(plotEveryTimestep), _filestem(filestem), _scen(scen) {
     _vel = new double[3 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
     _density = new double[(_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
     _flag = new Flag[(_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
@@ -151,11 +152,9 @@ public:
    *  @param mdDomainSize total 3d size of the md domain
    *  @param overlapStrip the number of cells in the overlap layer;
    *                      The overlap of md and macro cells
-   *  @param indexConversion instance of the indexConversion
-   *  @param recvIndice the macroscopic indices that will be received
+   *  @param recvIndice the coupling cell indices that will be received
    *  @param size the number of cells that will be received */
-  void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip,
-                     const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size) {
+  void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip) {
     if (skipRank()) {
       return;
     }
@@ -166,8 +165,8 @@ public:
         std::cout << "ERROR NumericalSolver::setMDBoundary(): offset does not match!" << std::endl;
         exit(EXIT_FAILURE);
       }
-      _globalNumberMacroscopicCells[d] = (floor(mdDomainSize[d] / _dx + 0.5));
-      if (fabs(_globalNumberMacroscopicCells[d] * _dx - mdDomainSize[d]) / _dx > 1.0e-8) {
+      _globalNumberCouplingCells[d] = (floor(mdDomainSize[d] / _dx + 0.5));
+      if (fabs(_globalNumberCouplingCells[d] * _dx - mdDomainSize[d]) / _dx > 1.0e-8) {
         std::cout << "ERROR NumericalSolver::setMDBoundary(): globalNumber "
                      "does not match!"
                   << std::endl;
@@ -184,7 +183,7 @@ public:
           bool isMDCell = true;
           for (int d = 0; d < 3; d++) {
             isMDCell = isMDCell && (globalCoords[d] > _offset[d] + (int)overlapStrip - 1) &&
-                       (globalCoords[d] < _offset[d] + _globalNumberMacroscopicCells[d] - (int)overlapStrip);
+                       (globalCoords[d] < _offset[d] + _globalNumberCouplingCells[d] - (int)overlapStrip);
           }
           if (isMDCell) {
             _flag[get(x, y, z)] = MD_BOUNDARY;
@@ -196,12 +195,9 @@ public:
 
   /** @brief applies the values received from the MD-solver within the
    * conntinuum solver
-   *  @param recvBuffer holds the data from the md solver
-   *  @param recvIndice the indices to connect the data from the buffer with
-   * macroscopic cells
-   *  @param indexConversion instance of the indexConversion */
-  virtual void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
-                                   const coupling::IndexConversion<3>& indexConversion) = 0;
+   *  @param md2macroBuffer holds the data from the md solver
+   * coupling cells*/
+  virtual void setMDBoundaryValues(coupling::datastructures::FlexibleCellContainer<3>& md2macroBuffer) = 0;
 
   /** @brief returns the number of process, regards parallel runs
    *  @returns the number of processes */
@@ -223,18 +219,26 @@ public:
    *  @param wallVelocity new wall velocity to apply */
   virtual void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) = 0;
 
+  /** determines the "avg" domain size which is the domain size on each MPI
+   * process, except for potentially the last one (the last one may include
+   * additional cells) */
+  static int getAvgDomainSize(double channelheight, double dx, tarch::la::Vector<3, unsigned int> processes, int d) {
+    int globalDomainSize = floor((channelheight + 0.5) / dx);
+    return globalDomainSize / processes[d];
+  }
+
 private:
   /** @brief determines the process coordinates
    *  @returns the coordinates of the current process */
   tarch::la::Vector<3, unsigned int> getProcessCoordinates() const {
     tarch::la::Vector<3, unsigned int> coords(0);
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    constexpr int dim = 3;
+    unsigned int rank = IDXS.getRank();
     // determine rank coordinates
-    coords[2] = ((unsigned int)rank) / (_processes[0] * _processes[1]);
-    coords[1] = (((unsigned int)rank) - coords[2] * _processes[0] * _processes[1]) / _processes[0];
-    coords[0] = ((unsigned int)rank) - coords[2] * _processes[0] * _processes[1] - coords[1] * _processes[0];
+    coords[2] = rank / (_processes[0] * _processes[1]);
+    coords[1] = (rank - coords[2] * _processes[0] * _processes[1]) / _processes[0];
+    coords[0] = rank - coords[2] * _processes[0] * _processes[1] - coords[1] * _processes[0];
 #endif
     return coords;
   }
@@ -244,8 +248,8 @@ private:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     int rank;
     int size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
+    MPI_Comm_size(coupling::indexing::IndexingService<3>::getInstance().getComm(), &size);
     // check if enough ranks are available
     if (_processes[0] * _processes[1] * _processes[2] > (unsigned int)size) {
       std::cout << "ERROR NumericalSolver::determineParallelNeighbours(): Not "
@@ -328,7 +332,7 @@ private:
     tarch::la::Vector<3, unsigned int> coords(0);
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
     // if this rank is outside the range given by processes: return 0
     // -> cannot use method skipRank() here, since _processes may not be
     // initialized yet!
@@ -348,14 +352,6 @@ private:
     } else {
       return globalDomainSize / processes[d] + globalDomainSize % processes[d];
     }
-  }
-
-  /** determines the "avg" domain size which is the domain size on each MPI
-   * process, except for potentially the last one (the last one may include
-   * additional cells) */
-  int getAvgDomainSize(double channelheight, double dx, tarch::la::Vector<3, unsigned int> processes, int d) const {
-    int globalDomainSize = floor((channelheight + 0.5) / dx);
-    return globalDomainSize / processes[d];
   }
 
 protected:
@@ -424,8 +420,26 @@ protected:
     return x + (lengthx + 2) * y;
   }
 
-  /** @brief create vtk plot if required */
   void plot() const {
+    int rank = 0; // rank in MPI-parallel simulations
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
+#endif
+    std::stringstream ss;
+    ss << _filestem << "_r" << rank << "_c" << _counter;
+    if (_scen != nullptr) {
+      auto ts = _scen->getTimeIntegrationService();
+      if (ts != nullptr) {
+        if (ts->isPintEnabled())
+          ss << "_i" << ts->getInteration();
+      }
+    }
+    ss << ".vtk";
+    plot(ss.str());
+  }
+
+  /** @brief create vtk plot if required */
+  void plot(std::string filename) const {
     // only plot output if this is the correct timestep
     if (_plotEveryTimestep < 1) {
       return;
@@ -433,17 +447,9 @@ protected:
     if (_counter % _plotEveryTimestep != 0) {
       return;
     }
-    // const tarch::la::Vector<3,unsigned int> coords(getProcessCoordinates());
-    // // offset of domain for MPI-parallel simulations
-    int rank = 0; // rank in MPI-parallel simulations
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-#endif
-    std::stringstream ss;
-    ss << _filestem << "_" << rank << "_" << _counter << ".vtk";
-    std::ofstream file(ss.str().c_str());
+    std::ofstream file(filename.c_str());
     if (!file.is_open()) {
-      std::cout << "ERROR NumericalSolver::plot(): Could not open file " << ss.str() << "!" << std::endl;
+      std::cout << "ERROR NumericalSolver::plot(): Could not open file " << filename << "!" << std::endl;
       exit(EXIT_FAILURE);
     }
     std::stringstream flag, density, velocity;
@@ -503,7 +509,7 @@ protected:
   bool skipRank() const {
     int rank = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
 #endif
     return ((unsigned int)rank > _processes[0] * _processes[1] * _processes[2] - 1);
   }
@@ -589,8 +595,9 @@ protected:
   tarch::la::Vector<6, int> _parallelNeighbours{(-1)};
   /** @brief offset of the md domain */
   tarch::la::Vector<3, int> _offset{(-1)};
-  /** @brief the total number of macroscopic cells of the coupled simulation */
-  tarch::la::Vector<3, int> _globalNumberMacroscopicCells{(-1)};
+  /** @brief the total number of coupling cells of the coupled simulation */
+  tarch::la::Vector<3, int> _globalNumberCouplingCells{(-1)};
+  const Scenario* _scen;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_SOLVERS_NUMERICALSOLVER_H_

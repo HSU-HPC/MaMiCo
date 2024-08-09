@@ -6,8 +6,8 @@
 #define _MOLECULARDYNAMICS_COUPLING_CELLMAPPINGS_VELOCITYGRADIENTRELAXATIONMAPPING_H_
 
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/IndexConversion.h"
-#include "coupling/datastructures/MacroscopicCell.h"
+#include "coupling/datastructures/CouplingCell.h"
+#include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/Molecule.h"
 #include "tarch/la/Matrix.h"
@@ -23,9 +23,9 @@ template <class LinkedCell, unsigned int dim> class VelocityGradientRelaxationTo
 /** This class relaxes velocities of molecules towards an interpolated avergaged
  *velocity value. Only molecules within a three cell-wide boundary strip are
  *considered if they are inside the one cell-wide boundary strip that is spanned
- *by the outermost non-ghost macroscopic cell midpoints. Currently, a
+ *by the outermost non-ghost coupling cell midpoints. Currently, a
  *second-order interpolation of the molecules in the outer boundary strip is
- *used (that is the first layer with three macroscopic cells needs to be
+ *used (that is the first layer with three coupling cells needs to be
  *initialised with valid LB velocities).
  *	@brief This class relaxes velocities of molecules towards an
  *interpolated avergaged velocity value.
@@ -42,25 +42,17 @@ public:
    *microscopicmomentum-buffers).
    *	@param velocityRelaxationFactor
    *	@param currentVelocity
-   *	@param currentLocalMacroscopicCellIndex
+   *	@param cellIndex
    *	@param mdSolverInterface
-   *	@param indexConversion
-   *	@param macroscopicCells
+   *	@param couplingCells
    */
-  VelocityGradientRelaxationMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity,
-                                    const unsigned int& currentLocalMacroscopicCellIndex,
+  VelocityGradientRelaxationMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity, const I02& cellIndex,
                                     coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                                    const coupling::IndexConversion<dim>& indexConversion,
-                                    const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells)
-      : _mdSolverInterface(mdSolverInterface), _indexConversion(indexConversion),
-        _globalNumberCellsWithGhostLayer(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2)),
-        _localNumberCellsWithGhostLayer(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2)),
-        _globalVectorCellIndex(indexConversion.convertLocalToGlobalVectorCellIndex(indexConversion.getLocalVectorCellIndex(currentLocalMacroscopicCellIndex))),
-        _localVectorCellIndex(indexConversion.getLocalVectorCellIndex(currentLocalMacroscopicCellIndex)),
-        _domainOffset(indexConversion.getGlobalMDDomainOffset()), _cellSize(indexConversion.getMacroscopicCellSize()), _macroscopicCells(macroscopicCells),
-        _velocityRelaxationFactor(velocityRelaxationFactor), _currentVelocity(currentVelocity), _innerLowerLeft(getInnerLowerLeftCorner()),
-        _innerUpperRight(getInnerUpperRightCorner()), _outerLowerLeft(getOuterLowerLeftCorner()), _outerUpperRight(getOuterUpperRightCorner()),
-        _currentLocalMacroscopicCellIndex(currentLocalMacroscopicCellIndex), _ignoreThisCell(ignoreThisCell(currentLocalMacroscopicCellIndex)) {}
+                                    const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells)
+      : _mdSolverInterface(mdSolverInterface), _couplingCells(couplingCells), _velocityRelaxationFactor(velocityRelaxationFactor),
+        _currentVelocity(currentVelocity), _innerLowerLeft(getInnerLowerLeftCorner()), _innerUpperRight(getInnerUpperRightCorner()),
+        _outerLowerLeft(getOuterLowerLeftCorner()), _outerUpperRight(getOuterUpperRightCorner()), _cellIdx(cellIndex),
+        _ignoreThisCell(ignoreThisCell(cellIndex)) {}
 
   /** Destructor */
   virtual ~VelocityGradientRelaxationMapping() {}
@@ -73,21 +65,20 @@ public:
    */
   void endCellIteration() {}
 
-  /** computes the current velocity directly from macroscopic cell and the new
+  /** computes the current velocity directly from coupling cell and the new
    *velocity (microscopicMomentum) with second-order interpolation multiplies
    *the difference between the two with the velocity relaxation factor add it to
    *the velocity of the molecule and applies it to the molecule.
    *	@param cell
-   *	@param cellIndex
    */
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-    // if this macroscopic cell is not interesting, skip it immediately
+  void handleCell(LinkedCell& cell) {
+    // if this coupling cell is not interesting, skip it immediately
     if (_ignoreThisCell) {
       return;
     }
 
     // std::cout << "Handle VelocityGradientRelaxation in cell " <<
-    // _localVectorCellIndex << "=" <<  _currentLocalMacroscopicCellIndex <<
+    // I03{_cellIdx}.get() << "=" <<  _cellIdx <<
     // std::endl;
     coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
@@ -96,24 +87,24 @@ public:
       tarch::la::Vector<dim, double> velocity = wrapper.getVelocity();
       const tarch::la::Vector<dim, double> position(wrapper.getPosition());
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "VelocityGradientRelaxationMapping: Process cell " << _globalVectorCellIndex << ", molecule " << position << std::endl;
+      std::cout << "VelocityGradientRelaxationMapping: Process cell " << _cellIdx << ", molecule " << position << std::endl;
 #endif
       if (relaxMolecule(position)) {
         tarch::la::Vector<dim, double> normalisedPosition(0.0);
         bool secondCake = false;
-        // index of macroscopic cell values that are involved in interpolation
+        // index of coupling cell values that are involved in interpolation
         // process
-        unsigned int macroscopicCellIndex[10];
+        I02 couplingCellIndex[10];
         // determine cell indices and the "correct cake" for interpolation
-        createMacroscopicCellIndex4SecondOrderInterpolation(position, normalisedPosition, secondCake, macroscopicCellIndex);
+        createCouplingCellIndex4SecondOrderInterpolation(position, normalisedPosition, secondCake, couplingCellIndex);
 
         tarch::la::Vector<dim, double> newVelocity(0.0);
         tarch::la::Vector<dim, double> oldVelocity(0.0);
 
         // get newVelocity (microscopicMomentum) with second-order interpolation
-        interpolateVelocitySecondOrder(macroscopicCellIndex, normalisedPosition, secondCake, newVelocity);
-        // get current velocity directly from macroscopic cell
-        oldVelocity = _macroscopicCells[_currentLocalMacroscopicCellIndex].getCurrentVelocity();
+        interpolateVelocitySecondOrder(couplingCellIndex, normalisedPosition, secondCake, newVelocity);
+        // get current velocity directly from coupling cell
+        oldVelocity = _couplingCells[_cellIdx.get()].getCurrentVelocity();
 
         velocity += _velocityRelaxationFactor * (newVelocity - oldVelocity);
         wrapper.setVelocity(velocity);
@@ -123,11 +114,10 @@ public:
           if (normalisedPosition[d] > 2.0) {
             std::cout << "ERROR cellmappings::VelocityGradientRelaxationMapping: "
                          "normalisedPosition>2.0! "
-                      << "Local vector index=" << _localVectorCellIndex << " , global vector index=" << _globalVectorCellIndex
-                      << ", currentLocalCellIndex=" << _currentLocalMacroscopicCellIndex << ", Norm. position=" << normalisedPosition
-                      << ", Actual position=" << position << std::endl;
+                      << "Local vector index=" << I03{_cellIdx} << " , global vector index=" << I01{_cellIdx} << ", currentLocalCellIndex=" << _cellIdx
+                      << ", Norm. position=" << normalisedPosition << ", Actual position=" << position << std::endl;
             for (unsigned int i = 0; i < 10; i++) {
-              std::cout << macroscopicCellIndex[i] << " ";
+              std::cout << couplingCellIndex[i] << " ";
             }
             std::cout << std::endl;
             exit(EXIT_FAILURE);
@@ -135,9 +125,9 @@ public:
           if (normalisedPosition[d] < 0.0) {
             std::cout << "ERROR cellmappings::VelocityGradientRelaxationMapping: "
                          "normalisedPosition<0.0! "
-                      << _localVectorCellIndex << " ," << normalisedPosition << std::endl;
+                      << I03{_cellIdx} << " ," << normalisedPosition << std::endl;
             for (unsigned int i = 0; i < 10; i++) {
-              std::cout << macroscopicCellIndex[i] << " ";
+              std::cout << couplingCellIndex[i] << " ";
             }
             std::cout << std::endl;
             exit(EXIT_FAILURE);
@@ -145,10 +135,10 @@ public:
         }
         if ((tarch::la::dot(newVelocity, newVelocity) > 1000.0) || (tarch::la::dot(oldVelocity, oldVelocity) > 1000.0)) {
           for (unsigned int i = 0; i < 10; i++) {
-            std::cout << macroscopicCellIndex[i] << " ";
+            std::cout << couplingCellIndex[i] << " ";
           }
           std::cout << std::endl;
-          std::cout << "ERROR: velocity to high! " << oldVelocity << "  " << newVelocity << "  " << _localVectorCellIndex << std::endl;
+          std::cout << "ERROR: velocity to high! " << oldVelocity << "  " << newVelocity << "  " << I03{_cellIdx} << std::endl;
           exit(EXIT_FAILURE);
         }
 #endif
@@ -162,7 +152,7 @@ protected:
   /**
    *	@param position
    *	@returns true, if the position 'position' is within the respective
-   *boundary strip that is spanned by the two outermost macroscopic cell
+   *boundary strip that is spanned by the two outermost coupling cell
    *midpoints
    */
   virtual bool relaxMolecule(const tarch::la::Vector<dim, double>& position) const {
@@ -177,36 +167,24 @@ protected:
   }
 
   /**
-   *	@param currentLocalMacroscopicCellIndex
-   *	@returns true if all molecules in this macroscopic cell do not require
+   *	@param idx
+   *	@returns true if all molecules in this coupling cell do not require
    *any velocity relaxation (-> used to speed up the code)
    */
-  bool ignoreThisCell(const unsigned int& currentLocalMacroscopicCellIndex) const {
-    const tarch::la::Vector<dim, unsigned int> globalIndex =
-        _indexConversion.convertLocalToGlobalVectorCellIndex(_indexConversion.getLocalVectorCellIndex(currentLocalMacroscopicCellIndex));
+  bool ignoreThisCell(const I02& idx) const {
+    const tarch::la::Vector<dim, unsigned int> globalIndex{I01{idx}.get()};
     bool innerCell = true;
     for (unsigned int d = 0; d < dim; d++) {
-      innerCell = innerCell && ((globalIndex[d] > 2) && (globalIndex[d] < _globalNumberCellsWithGhostLayer[d] - 3));
+      innerCell = innerCell && ((globalIndex[d] > 2) && (globalIndex[d] < I01::numberCellsInDomain[d] - 3));
     }
-
     return innerCell;
   }
 
   coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;
-  const coupling::IndexConversion<dim>& _indexConversion;
-  // _globalNumberCellsWithGhostLayer,_domainOffset and _cellsize are already
-  // available in _indexConversion. However, we store them here to reduce the
-  // number of computations.
-  const tarch::la::Vector<dim, unsigned int> _globalNumberCellsWithGhostLayer;
-  const tarch::la::Vector<dim, unsigned int> _localNumberCellsWithGhostLayer;
-  const tarch::la::Vector<dim, unsigned int> _globalVectorCellIndex;
-  const tarch::la::Vector<dim, unsigned int> _localVectorCellIndex;
-  const tarch::la::Vector<dim, double> _domainOffset;
-  const tarch::la::Vector<dim, double> _cellSize;
-  const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const _macroscopicCells;
+  const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const _couplingCells;
   /** relaxation factor for velocity relaxation */
   const double _velocityRelaxationFactor;
-  /** current velocity in this macroscopic cell */
+  /** current velocity in this coupling cell */
   const tarch::la::Vector<dim, double> _currentVelocity;
 
   /** boundary points of the boundary strip under consideration */
@@ -215,63 +193,58 @@ protected:
   const tarch::la::Vector<dim, double> _outerLowerLeft;
   const tarch::la::Vector<dim, double> _outerUpperRight;
 
-  /** index of macroscopic cell under consideration */
-  const unsigned int _currentLocalMacroscopicCellIndex;
-  /** true, if all molecules in this cell do not require any velocity relaxation
-   */
+  I02 _cellIdx;
+  /** true, if all molecules in this cell do not require any velocity relaxation */
   bool _ignoreThisCell;
 
 private:
   /**
    *	@returns the inner lower left corner of the cell
    */
-  tarch::la::Vector<dim, double> getInnerLowerLeftCorner() const {
-    return _indexConversion.getGlobalMDDomainOffset() + 1.5 * _indexConversion.getMacroscopicCellSize();
-  }
+  tarch::la::Vector<dim, double> getInnerLowerLeftCorner() const { return IDXS.getGlobalMDDomainOffset() + 1.5 * IDXS.getCouplingCellSize(); }
   /**
    *	@returns the inner upper right corner of the cell
    */
   tarch::la::Vector<dim, double> getInnerUpperRightCorner() const {
-    return _indexConversion.getGlobalMDDomainOffset() + _indexConversion.getGlobalMDDomainSize() - 1.5 * _indexConversion.getMacroscopicCellSize();
+    return IDXS.getGlobalMDDomainOffset() + IDXS.getGlobalMDDomainSize() - 1.5 * IDXS.getCouplingCellSize();
   }
   /**
    *	@returns the outer lower left corner of the cell
    */
-  tarch::la::Vector<dim, double> getOuterLowerLeftCorner() const {
-    return _indexConversion.getGlobalMDDomainOffset() + 0.5 * _indexConversion.getMacroscopicCellSize();
-  }
+  tarch::la::Vector<dim, double> getOuterLowerLeftCorner() const { return IDXS.getGlobalMDDomainOffset() + 0.5 * IDXS.getCouplingCellSize(); }
   /**
    *	@returns the outer upper right corner of the cell
    */
   tarch::la::Vector<dim, double> getOuterUpperRightCorner() const {
-    return _indexConversion.getGlobalMDDomainOffset() + _indexConversion.getGlobalMDDomainSize() - 0.5 * _indexConversion.getMacroscopicCellSize();
+    return IDXS.getGlobalMDDomainOffset() + IDXS.getGlobalMDDomainSize() - 0.5 * IDXS.getCouplingCellSize();
   }
 
-  /** creates a macroscopic cell index for the second order interpolation.
+  /** creates a coupling cell index for the second order interpolation.
    *	@param position
    *	@param normalisedPosition
    *	@param secondCake
-   *	@param macroscopicCellIndex
+   *	@param res
    */
-  void createMacroscopicCellIndex4SecondOrderInterpolation(const tarch::la::Vector<dim, double>& position, tarch::la::Vector<dim, double>& normalisedPosition,
-                                                           bool& secondCake, unsigned int* macroscopicCellIndex) const {
+  void createCouplingCellIndex4SecondOrderInterpolation(const tarch::la::Vector<dim, double>& position, tarch::la::Vector<dim, double>& normalisedPosition,
+                                                        bool& secondCake, I02* res) const {
     // compute lower left cell index and normalised position;
     // the normalised position is chosen such that the origin (0,0...,0)
-    // coincides with the lower left... macroscopic cell's midpoint
-    tarch::la::Vector<dim, unsigned int> globalCellIndex = _globalVectorCellIndex;
-    tarch::la::Vector<dim, double> cellMidpoint = _domainOffset - 0.5 * _cellSize;
-    tarch::la::Vector<dim, unsigned int> lowerLeftCellIndex = _localVectorCellIndex;
-    unsigned int lowerLeftIndex = 0;
+    // coincides with the lower left... coupling cell's midpoint
+
+    tarch::la::Vector<dim, double> cellMidpoint = _cellIdx.getCellMidPoint();
+    auto cellSize = IDXS.getCouplingCellSize();
+    tarch::la::Vector<dim, unsigned int> globalCellIndex{I01{_cellIdx}.get()};
+    tarch::la::Vector<dim, unsigned int> lowerLeftCellIndex{I03{_cellIdx}.get()};
 
     // determine cell mid point and normalised position in this loop
     for (unsigned int d = 0; d < dim; d++) {
-      // determine mid point of current macroscopic cell
-      cellMidpoint[d] = cellMidpoint[d] + globalCellIndex[d] * _cellSize[d];
+      // determine mid point of current coupling cell
+
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      if ((position[d] < cellMidpoint[d] - 0.5 * _cellSize[d]) || (position[d] > cellMidpoint[d] + 0.5 * _cellSize[d])) {
+      if ((position[d] < cellMidpoint[d] - 0.5 * cellSize[d]) || (position[d] > cellMidpoint[d] + 0.5 * cellSize[d])) {
         std::cout << "ERROR "
                      "VelocityGradientRelaxationMapping::"
-                     "createMacroscopicCellIndex4SecondOrderInterpolation: "
+                     "createCouplingCellIndex4SecondOrderInterpolation: "
                      "Input position "
                   << position;
         std::cout << " out of range of cell " << globalCellIndex << "!" << std::endl;
@@ -289,23 +262,23 @@ private:
       if (lowerLeftCellIndex[d] == 1) {
         lowerLeftCellIndex[d]--;
         globalCellIndex[d]--;
-      } else if (lowerLeftCellIndex[d] == _localNumberCellsWithGhostLayer[d] - 2) {
+      } else if (lowerLeftCellIndex[d] == I03::numberCellsInDomain[d] - 2) {
         lowerLeftCellIndex[d]--;
         globalCellIndex[d]--;
       }
 
       // determine normalised position
-      normalisedPosition[d] = (position[d] - (_domainOffset[d] - 0.5 * _cellSize[d]) - globalCellIndex[d] * _cellSize[d]) / _cellSize[d];
+      normalisedPosition[d] = (position[d] - (IDXS.getGlobalMDDomainOffset()[d] - 0.5 * cellSize[d]) - globalCellIndex[d] * cellSize[d]) / cellSize[d];
     }
-    lowerLeftIndex = _indexConversion.getLocalCellIndex(lowerLeftCellIndex);
+    unsigned int lowerLeftIndex = I02{I03{tarch::la::Vector<3, int>{lowerLeftCellIndex}}}.get();
 
     if (dim == 2) {
       std::cout << "Not implemented correctly yet!" << std::endl;
       exit(EXIT_FAILURE);
     } else if (dim == 3) {
-      const unsigned int localNumberCells01 = _localNumberCellsWithGhostLayer[0] * _localNumberCellsWithGhostLayer[1];
-      const unsigned int localNumber2Cells0 = 2 * _localNumberCellsWithGhostLayer[0];
-      const unsigned int localNumber2Cells01Plus2Cells0 = 2 * localNumberCells01 + 2 * _localNumberCellsWithGhostLayer[0];
+      const unsigned int localNumberCells01 = I03::numberCellsInDomain[0] * I03::numberCellsInDomain[1];
+      const unsigned int localNumber2Cells0 = 2 * I03::numberCellsInDomain[0];
+      const unsigned int localNumber2Cells01Plus2Cells0 = 2 * localNumberCells01 + 2 * I03::numberCellsInDomain[0];
 
       tarch::la::Vector<dim, double> normal;
       normal[0] = 1.0;
@@ -314,35 +287,37 @@ private:
       tarch::la::Vector<dim, double> relPos(normalisedPosition);
       relPos[0] -= 2.0;
 
+      // THE CAKE IS A LIE
+
       // first cake:
       if (tarch::la::dot(relPos, normal) < 0.0) {
         secondCake = false;
-        macroscopicCellIndex[0] = lowerLeftIndex;
-        macroscopicCellIndex[1] = lowerLeftIndex + 1;
-        macroscopicCellIndex[2] = lowerLeftIndex + 2;
-        macroscopicCellIndex[3] = lowerLeftIndex + _localNumberCellsWithGhostLayer[0];
-        macroscopicCellIndex[4] = lowerLeftIndex + localNumber2Cells0;
-        macroscopicCellIndex[5] = lowerLeftIndex + localNumberCells01;
-        macroscopicCellIndex[6] = lowerLeftIndex + localNumberCells01 + _localNumberCellsWithGhostLayer[0] + 1;
-        macroscopicCellIndex[7] = lowerLeftIndex + 2 * localNumberCells01;
-        macroscopicCellIndex[8] = lowerLeftIndex + 2 * localNumberCells01 + 2;
-        macroscopicCellIndex[9] = lowerLeftIndex + localNumber2Cells01Plus2Cells0;
+        res[0] = I02{lowerLeftIndex};
+        res[1] = I02{lowerLeftIndex + 1};
+        res[2] = I02{lowerLeftIndex + 2};
+        res[3] = I02{lowerLeftIndex + I03::numberCellsInDomain[0]};
+        res[4] = I02{lowerLeftIndex + localNumber2Cells0};
+        res[5] = I02{lowerLeftIndex + localNumberCells01};
+        res[6] = I02{lowerLeftIndex + localNumberCells01 + I03::numberCellsInDomain[0] + 1};
+        res[7] = I02{lowerLeftIndex + 2 * localNumberCells01};
+        res[8] = I02{lowerLeftIndex + 2 * localNumberCells01 + 2};
+        res[9] = I02{lowerLeftIndex + localNumber2Cells01Plus2Cells0};
         // second cake
       } else {
         secondCake = true;
-        macroscopicCellIndex[0] = lowerLeftIndex + 2;
-        macroscopicCellIndex[1] = lowerLeftIndex + _localNumberCellsWithGhostLayer[0] + 2;
-        macroscopicCellIndex[2] = lowerLeftIndex + localNumber2Cells0;
-        macroscopicCellIndex[3] = lowerLeftIndex + localNumber2Cells0 + 1;
-        macroscopicCellIndex[4] = lowerLeftIndex + localNumber2Cells0 + 2;
-        macroscopicCellIndex[5] = lowerLeftIndex + localNumberCells01 + _localNumberCellsWithGhostLayer[0] + 1;
-        macroscopicCellIndex[6] = lowerLeftIndex + localNumberCells01 + 2 * _localNumberCellsWithGhostLayer[0] + 2;
-        macroscopicCellIndex[7] = lowerLeftIndex + 2 * localNumberCells01 + 2;
-        macroscopicCellIndex[8] = lowerLeftIndex + localNumber2Cells01Plus2Cells0;
-        macroscopicCellIndex[9] = lowerLeftIndex + localNumber2Cells01Plus2Cells0 + 2;
+        res[0] = I02{lowerLeftIndex + 2};
+        res[1] = I02{lowerLeftIndex + I03::numberCellsInDomain[0] + 2};
+        res[2] = I02{lowerLeftIndex + localNumber2Cells0};
+        res[3] = I02{lowerLeftIndex + localNumber2Cells0 + 1};
+        res[4] = I02{lowerLeftIndex + localNumber2Cells0 + 2};
+        res[5] = I02{lowerLeftIndex + localNumberCells01 + I03::numberCellsInDomain[0] + 1};
+        res[6] = I02{lowerLeftIndex + localNumberCells01 + 2 * I03::numberCellsInDomain[0] + 2};
+        res[7] = I02{lowerLeftIndex + 2 * localNumberCells01 + 2};
+        res[8] = I02{lowerLeftIndex + localNumber2Cells01Plus2Cells0};
+        res[9] = I02{lowerLeftIndex + localNumber2Cells01Plus2Cells0 + 2};
       }
     } else {
-      std::cout << "ERROR createMacroscopicCellIndex4Interpolation(position): "
+      std::cout << "ERROR createCouplingCellIndex4Interpolation(position): "
                    "only 2D/3D supported!"
                 << std::endl;
       exit(EXIT_FAILURE);
@@ -356,7 +331,7 @@ private:
    *	@param secondCake
    *	@param newVelocity
    */
-  void interpolateVelocitySecondOrder(unsigned int* cellIndex, const tarch::la::Vector<dim, double>& normalisedPosition, const bool& secondCake,
+  void interpolateVelocitySecondOrder(I02* cellIndex, const tarch::la::Vector<dim, double>& normalisedPosition, const bool& secondCake,
                                       tarch::la::Vector<dim, double>& newVelocity) const {
     if (dim == 2) {
       // TODO
@@ -367,7 +342,7 @@ private:
 
       // extract velocities from cells
       for (int i = 0; i < 10; i++) {
-        velocity[i] = _macroscopicCells[cellIndex[i]].getMicroscopicMomentum();
+        velocity[i] = _couplingCells[cellIndex[i].get()].getMicroscopicMomentum();
       }
 
       if (secondCake) {
@@ -435,10 +410,9 @@ public:
    *microscopicmomentum-buffers).
    *	@param velocityRelaxationFactor
    *	@param currentVelocity
-   *	@param currentLocalMacroscopicCellIndex
+   *	@param cellIndex
    *	@param mdSolverInterface
-   *	@param indexConversion
-   *	@param macroscopicCells
+   *	@param couplingCells
    *	@note  the method ignoreThisCell() of the class
    *coupling::cellmappings::VelocityGradientRelaxationMapping is replaceed.
    *Since this function is called in the constructor of the based class, we
@@ -446,32 +420,27 @@ public:
    *variable from within this constructor (called after base object is
    *constructed)
    */
-  VelocityGradientRelaxationTopOnlyMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity,
-                                           const unsigned int& currentLocalMacroscopicCellIndex,
+  VelocityGradientRelaxationTopOnlyMapping(const double& velocityRelaxationFactor, const tarch::la::Vector<dim, double>& currentVelocity, const I02& cellIndex,
                                            coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                                           const coupling::IndexConversion<dim>& indexConversion,
-                                           const coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>* const macroscopicCells)
-      : coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>(velocityRelaxationFactor, currentVelocity, currentLocalMacroscopicCellIndex,
-                                                                                   mdSolverInterface, indexConversion, macroscopicCells) {
+                                           const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells)
+      : coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>(velocityRelaxationFactor, currentVelocity, cellIndex, mdSolverInterface,
+                                                                                   couplingCells) {
+
     // the following snippet is basically a replacement of the method
     // ignoreThisCell(). Since this function is called in the constructor of the
     // based class, we cannot overwrite it; hence, we solve it by overwriting
     // the respective variable from within this constructor (called after base
     // object is constructed)
-    const tarch::la::Vector<dim, unsigned int> globalIndex =
-        coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>::_indexConversion.convertLocalToGlobalVectorCellIndex(
-            coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>::_indexConversion.getLocalVectorCellIndex(
-                currentLocalMacroscopicCellIndex));
     coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>::_ignoreThisCell =
-        (globalIndex[dim - 1] < coupling::cellmappings::VelocityGradientRelaxationMapping<LinkedCell, dim>::_globalNumberCellsWithGhostLayer[dim - 1] - 3);
+        (I01{cellIndex}.get()[dim - 1] < (int)(I01::numberCellsInDomain[dim - 1]) - 3);
   }
 
 protected:
   /** returns true, if the position 'position' is within the respective boundary
-   *strip that is spanned by the two outermost macroscopic cell midpoints
+   *strip that is spanned by the two outermost coupling cell midpoints
    *	@param position
    *  @return true, if the position 'position' is within the respective boundary
-   *strip that is spanned by the two outermost macroscopic cell midpoints
+   *strip that is spanned by the two outermost coupling cell midpoints
    */
   virtual bool relaxMolecule(const tarch::la::Vector<dim, double>& position) const {
     // check if molecule is in the respective boundary strip (only upper part is

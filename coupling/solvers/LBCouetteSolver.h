@@ -1,26 +1,59 @@
 // Copyright (C) 2015 Technische Universitaet Muenchen
 // This file is part of the Mamico project. For conditions of distribution
-// and use, please see the copyright notice in Mamico's main folder, or at
-// www5.in.tum.de/mamico
+// and use, please see the copyright notice in Mamico's main folder
 #ifndef _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_
 #define _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_
-
-#if defined(_OPENMP)
-#include <omp.h>
-#endif
-#include "coupling/solvers/NumericalSolver.h"
 
 namespace coupling {
 namespace solvers {
 class LBCouetteSolver;
-}
+class LBCouetteSolverState;
+} // namespace solvers
 } // namespace coupling
+
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
+#include "coupling/interface/PintableMacroSolver.h"
+#include "coupling/solvers/NumericalSolver.h"
+#include <cmath>
+
+class coupling::solvers::LBCouetteSolverState : public coupling::interface::PintableMacroSolverState {
+public:
+  LBCouetteSolverState(int size) : _pdf(size, 0) {}
+
+  LBCouetteSolverState(int size, double* pdf) : LBCouetteSolverState(size) { std::copy(pdf, pdf + size, _pdf.data()); }
+
+  std::unique_ptr<State> clone() const override { return std::make_unique<LBCouetteSolverState>(*this); }
+
+  ~LBCouetteSolverState() {}
+
+  int getSizeBytes() const override { return sizeof(double) * _pdf.size(); }
+
+  std::unique_ptr<State> operator+(const State& rhs) override;
+  std::unique_ptr<State> operator-(const State& rhs) override;
+
+  bool operator==(const State& rhs) const override {
+    const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
+    if (other == nullptr)
+      return false;
+    return _pdf == other->_pdf;
+  }
+
+  double* getData() override { return _pdf.data(); }
+  const double* getData() const override { return _pdf.data(); }
+
+  void print(std::ostream& os) const override { os << "<LBCouetteSolverState instance with size " << getSizeBytes() << ">"; }
+
+private:
+  std::vector<double> _pdf;
+};
 
 /** In our scenario, the lower wall is accelerated and the upper wall stands
  * still. The lower wall is located at zero height.
  *  @brief implements a three-dimensional Lattice-Boltzmann Couette flow solver.
  *  @author Philipp Neumann  */
-class coupling::solvers::LBCouetteSolver : public coupling::solvers::NumericalSolver {
+class coupling::solvers::LBCouetteSolver : public coupling::solvers::NumericalSolver, public coupling::interface::PintableMacroSolver {
 public:
   /** @brief a simple constructor
    *  @param channelheight the width and height of the channel in y and z
@@ -38,15 +71,16 @@ public:
    *  @param numThreads number of OpenMP threads */
   LBCouetteSolver(const double channelheight, tarch::la::Vector<3, double> wallVelocity, const double kinVisc, const double dx, const double dt,
                   const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes,
-                  const unsigned int numThreads = 1)
-      : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes),
+                  const unsigned int numThreads = 1, const Scenario* scen = nullptr)
+      : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes, scen), _mode(Mode::coupling), _dt_pint(dt),
         _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)), _wallVelocity((dt / dx) * wallVelocity) {
     // return if required
     if (skipRank()) {
       return;
     }
-    _pdf1 = new double[19 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
-    _pdf2 = new double[19 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
+    _pdfsize = 19 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2);
+    _pdf1 = new double[_pdfsize];
+    _pdf2 = new double[_pdfsize];
 #if defined(_OPENMP)
     omp_set_num_threads(numThreads);
 #endif
@@ -82,6 +116,7 @@ public:
         _pdf2[get(i) * 19 + q] = _W[q];
       }
     }
+    computeDensityAndVelocityEverywhere();
   }
 
   /** @brief a simple destructor */
@@ -146,6 +181,8 @@ public:
       exit(EXIT_FAILURE);
     }
     for (int i = 0; i < timesteps; i++) {
+      if (_plotEveryTimestep >= 1 && _counter % _plotEveryTimestep == 0)
+        computeDensityAndVelocityEverywhere();
       plot();
       collidestream();
       communicate(); // exchange between neighbouring MPI subdomains
@@ -155,29 +192,34 @@ public:
 
   /** @brief applies the values received from the MD-solver within the
    * conntinuum solver
-   *  @param recvBuffer holds the data from the md solver
-   *  @param recvIndice the indices to connect the data from the buffer with
-   * macroscopic cells
-   *  @param indexConversion instance of the indexConversion */
-  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
-                           const coupling::IndexConversion<3>& indexConversion) override {
+   *  @param md2macroBuffer holds the data from the md solver
+   * coupling cells */
+  void setMDBoundaryValues(coupling::datastructures::FlexibleCellContainer<3>& md2macroBuffer) override {
     if (skipRank()) {
       return;
     }
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (_mode == Mode::supervising) {
+      std::cout << "ERROR LBCouetteSolver setMDBoundaryValues() called in supervising mode" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+#endif
+
     // loop over all received cells
-    const unsigned int size = (unsigned int)recvBuffer.size();
-    for (unsigned int i = 0; i < size; i++) {
+    for (auto pair : md2macroBuffer) {
+      I01 idx;
+      const coupling::datastructures::CouplingCell<3>* couplingCell;
+      std::tie(couplingCell, idx) = pair;
       // determine cell index of this cell in LB domain
-      tarch::la::Vector<3, unsigned int> globalCellCoords = indexConversion.getGlobalVectorCellIndex(recvIndices[i]);
+      tarch::la::Vector<3, unsigned int> globalCellCoords{idx.get()};
       globalCellCoords[0] = (globalCellCoords[0] + _offset[0]) - _coords[0] * _avgDomainSizeX;
       globalCellCoords[1] = (globalCellCoords[1] + _offset[1]) - _coords[1] * _avgDomainSizeY;
       globalCellCoords[2] = (globalCellCoords[2] + _offset[2]) - _coords[2] * _avgDomainSizeZ;
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": "
-                << globalCellCoords << std::endl;
+      std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << idx << ": " << globalCellCoords << std::endl;
 #endif
       const int index = get(globalCellCoords[0], globalCellCoords[1], globalCellCoords[2]);
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
       if (_flag[index] != MD_BOUNDARY) {
         std::cout << "ERROR LBCouetteSolver::setMDBoundaryValues(): Cell " << index << " is no MD boundary cell!" << std::endl;
         exit(EXIT_FAILURE);
@@ -188,7 +230,7 @@ public:
       // cell. This interpolation is valid for FLUID-MD_BOUNDARY neighbouring
       // relations only. determine local velocity received from MaMiCo and
       // convert it to LB units; store the velocity in _vel
-      tarch::la::Vector<3, double> localVel((1.0 / recvBuffer[i]->getMacroscopicMass()) * (_dt / _dx) * recvBuffer[i]->getMacroscopicMomentum());
+      tarch::la::Vector<3, double> localVel((1.0 / couplingCell->getMacroscopicMass()) * (_dt / _dx) * couplingCell->getMacroscopicMomentum());
       for (unsigned int d = 0; d < 3; d++) {
         _vel[3 * index + d] = localVel[d];
       }
@@ -221,6 +263,11 @@ public:
     if ((pos[0] < domainOffset[0]) || (pos[0] > domainOffset[0] + _domainSizeX * _dx) || (pos[1] < domainOffset[1]) ||
         (pos[1] > domainOffset[1] + _domainSizeY * _dx) || (pos[2] < domainOffset[2]) || (pos[2] > domainOffset[2] + _domainSizeZ * _dx)) {
       std::cout << "ERROR LBCouetteSolver::getVelocity(): Position " << pos << " out of range!" << std::endl;
+      std::cout << "domainOffset = " << domainOffset << std::endl;
+      std::cout << "_domainSizeX = " << _domainSizeX << std::endl;
+      std::cout << "_domainSizeY = " << _domainSizeY << std::endl;
+      std::cout << "_domainSizeZ = " << _domainSizeZ << std::endl;
+      std::cout << "_dx = " << _dx << std::endl;
       exit(EXIT_FAILURE);
     }
     // compute index for respective cell (_dx+... for ghost cells); use coords
@@ -266,7 +313,123 @@ public:
    *  @param wallVelocity the velocity will be set at the moving wall */
   virtual void setWallVelocity(const tarch::la::Vector<3, double> wallVelocity) override { _wallVelocity = (_dt / _dx) * wallVelocity; }
 
+  /// ------------------------------------------------------------------------------------------------------
+  /// Pint methods    ------   Pint methods    ------   Pint methods    ------   Pint methods    ------   Pint methods
+  /// ------------------------------------------------------------------------------------------------------
+
+  std::unique_ptr<State> getState() override {
+    computeDensityAndVelocityEverywhere();
+    return std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
+  }
+
+  void setState(const std::unique_ptr<State>& input, int cycle) override {
+    const LBCouetteSolverState* state = dynamic_cast<const LBCouetteSolverState*>(input.get());
+
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (state == nullptr) {
+      std::cout << "ERROR LBCouetteSolver setState() wrong state type" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+#endif
+
+    std::copy(state->getData(), state->getData() + _pdfsize, _pdf1);
+    computeDensityAndVelocityEverywhere();
+
+    _counter = cycle;
+  }
+
+  std::unique_ptr<State> operator()(const std::unique_ptr<State>& input, int cycle) override {
+    setState(input, cycle);
+
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (_mode != Mode::supervising) {
+      std::cout << "ERROR LBCouetteSolver operator() called but not in supervising mode" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+#endif
+
+    advance(_dt_pint);
+    return getState();
+  }
+
+  Mode getMode() const override { return _mode; }
+
+  /**
+   * This will create a new instance of this LBCouetteSolver
+   * In the supervisor, setMDBoundary() has not been called, independently of state of couette solver in coupling mode
+   * The supervisor can run with a modified viscosity
+   * The supervisor's operator() advances many coupling cycles at once, interval is stored in _dt_pint
+   */
+  std::unique_ptr<PintableMacroSolver> getSupervisor(int num_cycles, double visc_multiplier) const override {
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (_mode == Mode::supervising) {
+      std::cout << "ERROR LBCouetteSolver getSupervisor(): already in supervising mode" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+#endif
+
+    int numThreads = 1;
+#if defined(_OPENMP)
+    numThreads = omp_get_num_threads();
+#endif
+
+    auto res = std::make_unique<LBCouetteSolver>(_channelheight, _wallVelocity * _dx / _dt, _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep,
+                                                 _filestem + std::string("_supervising"), _processes, numThreads, _scen);
+
+    res->_mode = Mode::supervising;
+    res->_dt_pint = _dt * num_cycles;
+
+    return res;
+  }
+
+  void print(std::ostream& os) const override {
+    if (_mode == Mode::supervising)
+      os << "<LBCouetteSolver instance in supervising mode >";
+    if (_mode == Mode::coupling)
+      os << "<LBCouetteSolver instance in coupling mode >";
+  }
+
+  double get_avg_vel(const std::unique_ptr<State>& state) const override {
+    double vel[3];
+    double density;
+    double res[3]{0, 0, 0};
+    for (int i = 0; i < _pdfsize; i += 19) {
+      LBCouetteSolver::computeDensityAndVelocity(vel, density, state->getData() + i);
+      res[0] += vel[0];
+      res[1] += vel[1];
+      res[2] += vel[2];
+    }
+    if (_pdfsize > 0) {
+      res[0] /= (_pdfsize / 19);
+      res[1] /= (_pdfsize / 19);
+      res[2] /= (_pdfsize / 19);
+    }
+    return std::sqrt(res[0] * res[0] + res[1] * res[1] + res[2] * res[2]);
+  }
+
 private:
+  Mode _mode;
+  double _dt_pint;
+
+  void computeDensityAndVelocityEverywhere() {
+    if (skipRank())
+      return;
+    for (int z = 1; z < _domainSizeZ + 1; z++) {
+      for (int y = 1; y < _domainSizeY + 1; y++) {
+        for (int x = 1; x < _domainSizeX + 1; x++) {
+          const int index = get(x, y, z);
+          const int pI = 19 * index;
+          double* vel = &_vel[3 * index];
+          computeDensityAndVelocity(vel, _density[index], &_pdf1[pI]);
+        }
+      }
+    }
+  }
+
+  /// ------------------------------------------------------------------------------------------------------
+  /// End of Pint methods    ------      End of Pint methods    ------      End of Pint methods    ------      End of Pint methods
+  /// ------------------------------------------------------------------------------------------------------
+
   /** calls stream() and collide() and swaps the fields
    *  @brief collide-stream algorithm for the Lattice-Boltzmann method  */
   void collidestream() {
@@ -440,7 +603,7 @@ private:
    *  @param vel velocity
    *  @param density density
    *  @param pdf partial distribution function */
-  void computeDensityAndVelocity(double* const vel, double& density, const double* const pdf) {
+  static void computeDensityAndVelocity(double* const vel, double& density, const double* const pdf) {
     vel[0] = -(pdf[1] + pdf[5] + pdf[8] + pdf[11] + pdf[15]);
     density = pdf[3] + pdf[7] + pdf[10] + pdf[13] + pdf[17];
     vel[1] = (pdf[4] + pdf[11] + pdf[12] + pdf[13] + pdf[18]) - (pdf[0] + pdf[5] + pdf[6] + pdf[7] + pdf[14]);
@@ -508,8 +671,10 @@ private:
       }
     }
     // send and receive data
-    MPI_Irecv(recvBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagFrom], 1000, MPI_COMM_WORLD, &requests[0]);
-    MPI_Isend(sendBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagTo], 1000, MPI_COMM_WORLD, &requests[1]);
+    MPI_Irecv(recvBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagFrom], 1000,
+              coupling::indexing::IndexingService<3>::getInstance().getComm(), &requests[0]);
+    MPI_Isend(sendBuffer, (domainSize[0] + 2) * (domainSize[1] + 2) * 5, MPI_DOUBLE, _parallelNeighbours[nbFlagTo], 1000,
+              coupling::indexing::IndexingService<3>::getInstance().getComm(), &requests[1]);
     MPI_Waitall(2, requests, status);
     // write data back to pdf field
     if (_parallelNeighbours[nbFlagFrom] != MPI_PROC_NULL) {
@@ -564,6 +729,7 @@ private:
   const double _omega;
   /** @brief velocity of moving wall of Couette flow */
   tarch::la::Vector<3, double> _wallVelocity;
+  int _pdfsize{0};
   /** @brief partical distribution function field */
   double* _pdf1{NULL};
   /** @brief partial distribution function field (stores the old time step)*/

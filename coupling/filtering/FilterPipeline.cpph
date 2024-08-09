@@ -5,13 +5,13 @@
 // TODO: replace exit()s with throws
 
 // constructors of coupling::filtering::FilterPipeline
-template <unsigned int dim>
-coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCells,
-                                                         coupling::filtering::Scope scope, const tarch::utils::MultiMDService<dim>& multiMDService,
-                                                         const char* cfgpath)
+template <class CellIndex_T, unsigned int dim>
+coupling::filtering::FilterPipeline<CellIndex_T, dim>::FilterPipeline(coupling::datastructures::CellContainer<CellIndex_T, dim> inputCells,
+                                                                      coupling::filtering::Scope scope, const tarch::utils::MultiMDService<dim>& multiMDService,
+                                                                      const char* cfgpath)
     :
 
-      _scope(scope)
+      _config(ParseConfiguration::XMLConfiguration::load(cfgpath)), _scope(scope)
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
       ,
       _comm(multiMDService.getLocalCommunicator())
@@ -21,7 +21,7 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
   using namespace std::string_literals;
 
   // check if provided file is written in proper XML
-  if (_config.LoadFile(cfgpath) != tinyxml2::XML_NO_ERROR) {
+  if (_config.error != tinyxml2::XML_SUCCESS) {
     std::cout << "Filter Pipeline config path: " << cfgpath << std::endl;
     throw std::runtime_error("Could not read config for Filter-Pipeline: XML syntax error.");
   }
@@ -31,23 +31,28 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
     exit(EXIT_FAILURE);
 
   // differentiate between per-instance and post-multi-instance filtering
+  I01 idx;
+  coupling::datastructures::CouplingCell<3>* cell;
   switch (_scope) {
   case coupling::filtering::Scope::perInstance:
     // check for valid amount of input cells
     // case 1: the input vector contains the entire MD domain
     if (inputCells.size() == CellIndex<dim, IndexTrait::local>::linearNumberCellsInDomain) {
       using Md2MacroIndex = CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>;
-
-      for (unsigned int i = 0; i < inputCells.size(); i++) {
-        if (Md2MacroIndex::contains(CellIndex<dim, IndexTrait::local>{i}))
-          _md2MacroCells.emplace_back(inputCells[i]);
+      for (auto pair : inputCells) {
+        std::tie(cell, idx) = pair;
+        if (Md2MacroIndex::contains(idx))
+          _md2MacroCells.emplace_back(cell);
         else
-          _outerCells.emplace_back(inputCells[i]);
+          _outerCells.emplace_back(cell);
       }
     }
     // case 2: the input vector contains only the MD-To-Macro domain
     else if (inputCells.size() == CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
-      std::copy(inputCells.begin(), inputCells.end(), std::back_inserter(_md2MacroCells));
+      for (auto pair : inputCells) {
+        std::tie(cell, idx) = pair;
+        _md2MacroCells.emplace_back(cell);
+      }
       _outerCells = {};
     }
     // case 3: the input vector contains a nonexpected amount of cells
@@ -59,14 +64,18 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
     }
 
     // load sequences
-    loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("per-instance"));
+    loadSequencesFromXML(_config.root->FirstChildElement("filter-pipeline")->FirstChildElement("per-instance"));
     break;
   case coupling::filtering::Scope::postMultiInstance:
     // check for valid amount of input cells
     // case 1: the input vector contains the entire global MD-To-Macro domain
     if (inputCells.size() == CellIndex<dim, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) {
-      std::copy(inputCells.begin(), inputCells.end(), std::back_inserter(_md2MacroCells));
+      for (auto pair : inputCells) {
+        std::tie(cell, idx) = pair;
+        _md2MacroCells.emplace_back(cell);
+      }
       _outerCells = {};
+      loadSequencesFromXML(_config.root->FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
     }
     // case 2: the input vector is empty
     else if (inputCells.size() == 0) {
@@ -75,18 +84,30 @@ coupling::filtering::FilterPipeline<dim>::FilterPipeline(std::vector<coupling::d
     }
     // case 3: the input vector contains a nonexpected amount of cells
     else {
-      throw std::runtime_error("Post-Multi-Instance-Filtering: Unexpected cell input size: "s + std::to_string(inputCells.size()) + "\n" + "Expected:"s +
-                               std::to_string(CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) +
-                               "(global MD-To-Macro domain size)");
+      // check if the post-multi-instance filter-pipeline actually contains XML sequences, otherwise ignore
+      if (_config.root->FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance")->FirstChildElement()) {
+        throw std::runtime_error("postMultiInstance FilterPipeline has received an unexpected number of cells: "s + std::to_string(inputCells.size()) + "\n" +
+                                 "Expected: "s +
+                                 std::to_string(CellIndex<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>::linearNumberCellsInDomain) +
+                                 " (global MD-To-Macro domain size) \n This probably means that you are trying to use post-multi-instance filtering together "
+                                 "with a non-trivial parallelization of the macroscopic solver.\n This combination of features is currently not supported. You "
+                                 "can either:\n => use per-instance filtering instead, or\n => use a sequential macroscopic solver, or\n => choose to "
+                                 "parallelize the macroscopic solver so that it does not split the md2Macro-subdomain.");
+      }
     }
-
-    loadSequencesFromXML(_config.FirstChildElement("filter-pipeline")->FirstChildElement("post-multi-instance"));
     break;
   }
 }
 
 // member functions of coupling::filtering::FilterPipeline
-template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::operator()() {
+template <class CellIndex_T, unsigned int dim> double coupling::filtering::FilterPipeline<CellIndex_T, dim>::operator()() {
+  timeval start;
+  timeval end;
+  double runtime = 0;
+  if (IDXS.getRank() == 0) {
+    gettimeofday(&start, NULL);
+  }
+
   for (coupling::filtering::FilterSequence<dim>* sequence : _sequences) {
     // finalize FS's filter vector
     if (sequence->isModifiable()) {
@@ -114,10 +135,16 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::opera
         *(_md2MacroCells[i]) = *(sequenceOutputCells[i]);
     }
   }
+
+  if (IDXS.getRank() == 0) {
+    gettimeofday(&end, NULL);
+    runtime += (double)((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec));
+  }
+  return runtime;
 }
 
-template <unsigned int dim>
-coupling::filtering::FilterSequence<dim>* coupling::filtering::FilterPipeline<dim>::getSequence(const char* sequenceIdentifier) const {
+template <class CellIndex_T, unsigned int dim>
+coupling::filtering::FilterSequence<dim>* coupling::filtering::FilterPipeline<CellIndex_T, dim>::getSequence(const char* sequenceIdentifier) const {
   for (auto sequence : _sequences) {
     if (std::strcmp(sequence->getName(), sequenceIdentifier) == 0) {
       return sequence;
@@ -127,9 +154,10 @@ coupling::filtering::FilterSequence<dim>* coupling::filtering::FilterPipeline<di
 }
 
 // Private functions of coupling::filtering::FilterPipeline:
-template <unsigned int dim> bool coupling::filtering::FilterPipeline<dim>::configIsValid(tinyxml2::XMLDocument& cfgfile) {
+template <class CellIndex_T, unsigned int dim>
+bool coupling::filtering::FilterPipeline<CellIndex_T, dim>::configIsValid(ParseConfiguration::XMLConfiguration& xmlConfig) {
   // Check main node
-  tinyxml2::XMLElement* node = cfgfile.FirstChildElement("filter-pipeline");
+  tinyxml2::XMLElement* node = xmlConfig.root->FirstChildElement("filter-pipeline");
   if (!node) {
     std::cout << "ERROR: Could not read config for Filter-Pipeline: missing "
                  "element <filter-pipeline>"
@@ -177,7 +205,7 @@ template <unsigned int dim> bool coupling::filtering::FilterPipeline<dim>::confi
   return true;
 }
 
-template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadSequencesFromXML(tinyxml2::XMLElement* node) {
+template <class CellIndex_T, unsigned int dim> void coupling::filtering::FilterPipeline<CellIndex_T, dim>::loadSequencesFromXML(tinyxml2::XMLElement* node) {
 
   if (_md2MacroCells.empty()) {
     switch (_scope) { /*TODO: print rank as well */
@@ -252,7 +280,7 @@ template <unsigned int dim> void coupling::filtering::FilterPipeline<dim>::loadS
     std::vector<FilterSequence<dim>*> inputSeqs;
 
     // Holds all input cells for this sequence
-    std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector;
+    std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector;
 
     // Iterate over all inputs specified in input string.
     // Note: If there are non-matching names in input String, they are ignored.

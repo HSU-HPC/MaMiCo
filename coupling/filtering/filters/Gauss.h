@@ -8,12 +8,12 @@
 #include <string>
 #include <vector>
 
-//#define DEBUG_GAUSS
+// #define DEBUG_GAUSS
 #include "coupling/filtering/interfaces/FilterInterface.h"
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class Gauss;
+template <unsigned int dim, coupling::indexing::IndexTrait... scope> class Gauss;
 
 // cf. member variable in coupling::Gauss for more details
 enum GaussExtrapolationStrategy { NONE, MIRROR, REFLECT };
@@ -30,20 +30,19 @@ enum GaussExtrapolationStrategy { NONE, MIRROR, REFLECT };
  *
  * @author Felix Maurer
  */
-template <unsigned int dim> class coupling::filtering::Gauss : public coupling::filtering::FilterInterface<dim> {
+template <unsigned int dim, coupling::indexing::IndexTrait... scope> class coupling::filtering::Gauss : public coupling::filtering::FilterInterface<dim> {
   using coupling::filtering::FilterInterface<dim>::_inputCells;
   using coupling::filtering::FilterInterface<dim>::_outputCells;
   using coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs;
   using coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs;
 
-  using ScalarIndex = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro,
+  using ScalarIndex = coupling::indexing::CellIndex<dim, scope..., coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>;
+  using VectorIndex = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, scope..., coupling::indexing::IndexTrait::md2macro,
                                                     coupling::indexing::IndexTrait::noGhost>;
-  using VectorIndex = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, coupling::indexing::IndexTrait::local,
-                                                    coupling::indexing::IndexTrait::md2macro, coupling::indexing::IndexTrait::noGhost>;
 
 public:
-  Gauss(const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
-        const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues, unsigned int dimension,
+  Gauss(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
+        const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues, unsigned int dimension,
         int sigma, const char* extrapolationStrategy)
       : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "GAUSS"), _dim(dimension), _sigma(sigma),
         _kernel(generateKernel()) {
@@ -80,9 +79,6 @@ public:
   }
 
   void operator()();
-
-  using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, coupling::indexing::IndexTrait::local,
-                                                    coupling::indexing::IndexTrait::md2macro>;
 
 private:
   std::array<double, 1 + 2 * GAUSS_KERNEL_RADIUS> generateKernel();

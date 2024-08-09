@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+  <mamico>
+    <coupling-cell-configuration
+      cell-size="2.5 ; 2.5; 2.5"
+      linked-cells-per-coupling-cell=" 1 ; 1 ; 1"
+      write-every-microscopic-timestep="1000"
+      microscopic-filename="CouplingCell_micro"
+      write-every-macroscopic-timestep="1"
+      macroscopic-filename="CouplingCell_macro"
+    />
+    <particle-insertion type="none" maximum-number-of-iterations="20" maximum-number-of-restarts="10" />
+    <momentum-insertion type="velocity-gradient-relaxation" velocity-relaxation-factor="0.05" />
+    <boundary-force type="none" south="no" north="no" east="no" west="no" bottom="no" top="no" />
+    <transfer-strategy type="schwarz-transfer" />
+    <parallel-topology type="zyx" />
+  </mamico>

@@ -30,8 +30,8 @@ coupling::filtering::SequentialFilter<dim>::SequentialFilter(coupling::filtering
                                                             /*global*/ coupling::indexing::IndexTrait::md2macro,
                                                             coupling::indexing::IndexTrait::noGhost>::linearNumberCellsInDomain;
       for (unsigned int c = 0; c < numcells; c++) {
-        _inputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
-        _outputCells_Global.push_back(new coupling::datastructures::MacroscopicCell<dim>());
+        _inputCells_Global.push_back(new coupling::datastructures::CouplingCell<dim>());
+        _outputCells_Global.push_back(new coupling::datastructures::CouplingCell<dim>());
       }
       _cellRanks.resize(numcells);
     } // end: if rank processing rank
@@ -81,7 +81,9 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
   if (_processingRank == _myRank) {
     // count cells that we update. This should be equal to
     // _inputCells_Global.size().
+#ifdef DEBUG_SEQ_FILTER
     unsigned int cellsUpdated = 0;
+#endif
 
     // Iterate over all (contributing) ranks...
     for (int rank = 0; rank < _commSize; rank++) {
@@ -101,7 +103,9 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
                                IndexTrait::noGhost>(index).get(); // then convert back to unsigned int
 
           *(_inputCells_Global[indexbuf]) = *(_inputCells_Local[index.get()]);
+#ifdef DEBUG_SEQ_FILTER
           cellsUpdated++;
+#endif
         }
 
 #ifdef DEBUG_SEQ_FILTER
@@ -129,12 +133,14 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
 
           // insert data received into global cell data structures TODO: use std
           // list and concat
-          bufferToMacroscopicCell(_cellbuf, _inputCells_Global[indexbuf]);
+          bufferToCouplingCell(_cellbuf, _inputCells_Global[indexbuf]);
 
           // save rank for this cell to be able to send it back later
           _cellRanks[indexbuf] = rank;
 
+#ifdef DEBUG_SEQ_FILTER
           cellsUpdated++;
+#endif
 
 #ifdef DEBUG_SEQ_FILTER_VERBOSE
           std::cout << "			SEQFILTER (" << _myRank << "): Received cell from rank " << rank << std::endl;
@@ -158,7 +164,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
     for (auto& i : CellIndex<dim, IndexTrait::local, IndexTrait::md2macro,
                              IndexTrait::noGhost>()) { // TODO: send all cells at once
       // fill buffer
-      macroscopicCellToBuffer(_cellbuf, _filter->getInputCells()[i.get()]);
+      couplingCellToBuffer(_cellbuf, _filter->getInputCells()[i.get()]);
 
       // send cell
       MPI_Send(_cellbuf.data(), 4 + 3 * dim, MPI_DOUBLE, _processingRank, 0, _comm);
@@ -186,7 +192,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
                      .get(); // then convert back to unsigned int
 
       // find cell in filter's domain and apply
-      bufferToMacroscopicCell(_cellbuf, _filter->getOutputCells()[indexbuf]);
+      bufferToCouplingCell(_cellbuf, _filter->getOutputCells()[indexbuf]);
     }
   }
 }
@@ -211,7 +217,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::pro
     // Now ready to distribute data back to the data's original ranks...
     for (unsigned int c = 0, localCellsUpdated = 0; c < _outputCells_Global.size(); c++) {
       // fill buffers with cell data
-      macroscopicCellToBuffer(_cellbuf, _outputCells_Global[c]);
+      couplingCellToBuffer(_cellbuf, _outputCells_Global[c]);
 
       // get origin rank of cell
       int target_rank = _cellRanks[c];
@@ -222,7 +228,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::pro
 
       // Case: cell belongs to this rank, no communication needed
       if (target_rank == _processingRank) {
-        bufferToMacroscopicCell(_cellbuf, _outputCells_Local[localCellsUpdated]);
+        bufferToCouplingCell(_cellbuf, _outputCells_Local[localCellsUpdated]);
         localCellsUpdated++;
 
 #ifdef DEBUG_SEQ_FILTER_VERBOSE
@@ -246,7 +252,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::pro
 }
 
 template <unsigned int dim>
-void coupling::filtering::SequentialFilter<dim>::macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::MacroscopicCell<dim>* cell) {
+void coupling::filtering::SequentialFilter<dim>::couplingCellToBuffer(std::vector<double>& buf, const coupling::datastructures::CouplingCell<dim>* cell) {
   // Resize if buffer is too small to contain cell data
   if (buf.capacity() < 4 + 3 * dim) {
     buf.resize(4 + 3 * dim);
@@ -281,7 +287,7 @@ void coupling::filtering::SequentialFilter<dim>::macroscopicCellToBuffer(std::ve
 }
 
 template <unsigned int dim>
-void coupling::filtering::SequentialFilter<dim>::bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell) {
+void coupling::filtering::SequentialFilter<dim>::bufferToCouplingCell(const std::vector<double>& buf, coupling::datastructures::CouplingCell<dim>* cell) {
   if (buf.capacity() < 4 + 3 * dim)
     throw std::runtime_error("Buffer too small for cell data!");
 

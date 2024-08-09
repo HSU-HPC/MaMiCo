@@ -110,25 +110,23 @@ public:
   /** Returns transfer strategy configuration.
    * 	@tparam LinkedCell type of the cell
    * 	@param mdSolverInterface
-   * 	@param indexConversion
    * 	@param numberOfMDTimesteps
    * 	@return transfer strategy config
    */
   template <class LinkedCell>
   coupling::transferstrategies::TransferStrategy<LinkedCell, dim>*
-  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                          const coupling::IndexConversion<dim>& indexConversion, unsigned int numberOfMDTimesteps) const {
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberOfMDTimesteps) const {
     if (_type == DirectTransferStrategy) {
-      return new coupling::transferstrategies::DirectTransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion);
+      return new coupling::transferstrategies::DirectTransferStrategy<LinkedCell, dim>(mdSolverInterface);
     } else if (_type == DifferenceTransferStrategy) {
-      return new coupling::transferstrategies::DifferenceTransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion, numberOfMDTimesteps);
+      return new coupling::transferstrategies::DifferenceTransferStrategy<LinkedCell, dim>(mdSolverInterface, numberOfMDTimesteps);
     } else if (_type == TransferStrategy4SchwarzCoupling) {
-      return new coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, dim>(mdSolverInterface, indexConversion, numberOfMDTimesteps);
+      return new coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, dim>(mdSolverInterface, numberOfMDTimesteps);
     } else if (_type == TransferStrategy4NieCoupling) {
-      return new coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>(mdSolverInterface, indexConversion, numberOfMDTimesteps,
-                                                                                             _shiftTimestep, _massFluxBoundary);
+      return new coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>(mdSolverInterface, numberOfMDTimesteps, _shiftTimestep,
+                                                                                             _massFluxBoundary);
     } else if (_type == AveragingTransferStrategy) {
-      return new coupling::transferstrategies::AveragingTransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion);
+      return new coupling::transferstrategies::AveragingTransferStrategy<LinkedCell, dim>(mdSolverInterface);
     } else {
       return NULL;
     }
@@ -138,6 +136,10 @@ public:
    * 	@return _type
    */
   StrategyType getStrategyType() const { return _type; }
+
+protected:
+  TransferStrategyConfiguration(StrategyType type, tarch::la::Vector<2 * dim, bool> massFluxBoundary, double shiftTimestep)
+      : _type(type), _massFluxBoundary(massFluxBoundary), _shiftTimestep(shiftTimestep), _isValid(true) {}
 
 private:
   StrategyType _type;

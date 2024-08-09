@@ -51,7 +51,12 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
   _parallelTopologyService = new simplemd::services::ParallelTopologyService(
       _configuration.getDomainConfiguration().getGlobalDomainSize(), _configuration.getDomainConfiguration().getGlobalDomainOffset(),
       _configuration.getDomainConfiguration().getMeshWidth(), _configuration.getMPIConfiguration().getNumberOfProcesses(),
-      _configuration.getDomainConfiguration().getBoundary());
+      _configuration.getDomainConfiguration().getBoundary()
+#if (MD_PARALLEL == MD_YES)
+          ,
+      MPI_COMM_WORLD
+#endif
+  );
   if (_parallelTopologyService == NULL) {
     std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                  "_parallelTopologyService==NULL!"
@@ -171,7 +176,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
 
 #if BUILD_WITH_ADIOS2
     _Adios2Writer =
-        new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _Adios2Filestem, localDomainOffset, _configuration
+        new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _Adios2Filestem, _configuration
 #if (MD_PARALLEL == MD_YES)
                                                      ,
                                                      MPI_COMM_WORLD
@@ -406,7 +411,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
 
 #if BUILD_WITH_ADIOS2
     _Adios2Writer =
-        new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _Adios2Filestem, localDomainOffset, _configuration
+        new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _Adios2Filestem, _configuration
 #if (MD_PARALLEL == MD_YES)
                                                      ,
                                                      multiMDService.getLocalCommunicator()

@@ -92,7 +92,7 @@ void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLEle
   // read molecules per direction (if no checkpoint is defined as input)
   if ((!_initFromCheckpoint) && (!_initFromSequentialCheckpoint)) {
     tarch::la::Vector<MD_DIM, int> buffer(-1);
-    tarch::configuration::ParseConfiguration::readVector<MD_DIM, int>(buffer, node, MOLECULES_PER_DIRECTION);
+    tarch::configuration::ParseConfiguration::readVectorMandatory<MD_DIM, int>(buffer, node, MOLECULES_PER_DIRECTION);
     for (unsigned int d = 0; d < MD_DIM; d++) {
       if (buffer[d] <= 0) {
         std::cout << MOLECULES_PER_DIRECTION << ": Entry " << d << " is smaller than or equal zero: " << buffer << std::endl;
@@ -104,7 +104,7 @@ void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLEle
   }
 
   // read domain size
-  tarch::configuration::ParseConfiguration::readVector<MD_DIM, double>(_domainSize, node, DOMAIN_SIZE);
+  tarch::configuration::ParseConfiguration::readVectorMandatory<MD_DIM, double>(_domainSize, node, DOMAIN_SIZE);
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (_domainSize[d] <= 0.0) {
       std::cout << DOMAIN_SIZE << ": Entry " << d << " is smaller than or equal zero: " << _domainSize << std::endl;
@@ -114,7 +114,7 @@ void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLEle
   }
 
   // read domain offset
-  tarch::configuration::ParseConfiguration::readVector<MD_DIM, double>(_domainOffset, node, DOMAIN_OFFSET);
+  tarch::configuration::ParseConfiguration::readVectorMandatory<MD_DIM, double>(_domainOffset, node, DOMAIN_OFFSET);
 
   // read cutoff radius and initialise also meshwidth for linked cell scheme
   tarch::configuration::ParseConfiguration::readDoubleMandatory(_cutoffRadius, node, CUTOFF_RADIUS);
@@ -125,7 +125,7 @@ void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLEle
   }
 
   // read linked-cell size if existent; otherwise, use cut-off radius
-  tarch::configuration::ParseConfiguration::readVector<MD_DIM, double>(_meshWidth, node, LINKED_CELL_SIZE);
+  tarch::configuration::ParseConfiguration::readVectorMandatory<MD_DIM, double>(_meshWidth, node, LINKED_CELL_SIZE);
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (_meshWidth[d] < _cutoffRadius) {
       std::cout << "ERROR: Meshwidth(" << d << ") is smaller than cut off radius!" << std::endl;

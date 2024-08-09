@@ -1,10 +1,32 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.0...3.28)
 project(mamico VERSION 2.0 LANGUAGES CXX)
+
+# Make our cmake modules visible to CMake
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 # CMake Policies
 # TODO: check policies
 if(POLICY CMP0057)
   cmake_policy(SET CMP0057 NEW)
+endif()
+
+# Testing and coverage
+option(BUILD_TESTING "Build testing" OFF)
+message(STATUS ">> Build with testing: " ${BUILD_TESTING})
+if (BUILD_TESTING)
+  include(CTest)
+  option(ENABLE_COVERAGE "Enable code coverage, requires GCC and CMAKE_BUILD_TYPE=Debug." OFF)
+  message(STATUS ">> Enable code coverage: " ${ENABLE_COVERAGE})
+endif()
+if (ENABLE_COVERAGE)
+  if (NOT BUILD_TESTING OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(WARNING ">> Disabling code coverage.\n CMAKE_BUILD_TYPE=Debug and BUILD_TESTING=ON required.")
+    set(ENABLE_COVERAGE OFF CACHE BOOL "Enable code coverage, requires GCC and CMAKE_BUILD_TYPE=Debug." FORCE)
+    message(STATUS ">> Enable code coverage: " ${ENABLE_COVERAGE})
+  endif()
+  if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    message(FATAL_ERROR ">> ENABLE_COVERAGE only works with GCC. Change your compiler or set ENABLE_COVERAGE=OFF")
+  endif()
 endif()
 
 #
@@ -14,7 +36,7 @@ endif()
 if(NOT CMAKE_BUILD_TYPE)
   message(WARNING "CMAKE_BUILD_TYPE was not specified. DebugOptimized build is assumed.")
   set(CMAKE_BUILD_TYPE DebugOptimized CACHE STRING "Build type." FORCE)
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug DebugOptimized RelWithDebInfo Release)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS DebugMD Debug DebugOptimized RelWithDebInfo Release)
 endif()
 message(STATUS ">> Build type: " ${CMAKE_BUILD_TYPE})
 # Automatically add the current source and build directories to the include path
@@ -27,8 +49,8 @@ set(MDDim MDDim3 CACHE STRING "Set to MDDim3 or MDDim2, default is MDDim3.")
 message(STATUS ">> MD dimension : " ${MDDim})
 set_property(CACHE MDDim PROPERTY STRINGS MDDim3 MDDim2)
 # Set MD Simulation to use
-set(MD_SIM SIMPLE_MD CACHE STRING "Choose SIMPLE_MD or LAMMPS")
-set_property(CACHE MD_SIM PROPERTY STRINGS SIMPLE_MD LAMMPS_MD LAMMPS_DPD)
+set(MD_SIM SIMPLE_MD CACHE STRING "Choose SIMPLE_MD, LAMMPS, or LS1_MARDYN")
+set_property(CACHE MD_SIM PROPERTY STRINGS SIMPLE_MD LAMMPS_MD LAMMPS_DPD LS1_MARDYN)
 message(STATUS ">> MD simulation used : " ${MD_SIM})
 # Enable the Eigen library used (so far) only for POD filtering, default is off
 option(BUILD_WITH_EIGEN "Enable the Eigen library used (so far) only for POD filtering, default is off." OFF)
@@ -58,13 +80,20 @@ endif()
 if("${MD_SIM}" STREQUAL "SIMPLE_MD" AND BUILD_WITH_LAMMPS)
   message(WARNING ">> BUILD_WITH_LAMMPS is enabled but MD_SIM is SIMPLE_MD. Are you sure?")
 endif()
+
 # Compiler list to be used for compiletest
 set(COMPILETEST_COMPILERS "g++ clang++" CACHE STRING "Compiler list to be used for compiletest")
 message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_COMPILERS})
-# Enable coupling with the preCICE API, default is off
-option(BUILD_WITH_TEST_INDEXING "Enable indexing tests, default is off." OFF)
-message(STATUS ">> Build with indexing tests : " ${BUILD_WITH_TEST_INDEXING})
-#Enable Adios2 output for megamol
+
+# Build mode list to be used for compiletest
+set(COMPILETEST_MODES "Debug DebugOptimized RelWithDebInfo Release" CACHE STRING "Build mode list to be used for compiletest")
+message(STATUS ">> Build mode list to be used for compiletest : " ${COMPILETEST_MODES})
+
+# Enable coupling with pint debug, default is off
+option(BUILD_WITH_PINT_DEBUG "Enable parallel-in-time integration debugging, default is off." OFF)
+message(STATUS ">> Build with PINT_DEBUG : " ${BUILD_WITH_PINT_DEBUG})
+
+# Enable Adios2 output for megamol
 option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
 message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
 
@@ -79,7 +108,7 @@ if(BUILD_WITH_MPI)
 	find_package(MPI REQUIRED)
 endif()
 
-if(BUILD_WITH_ADIOS2)
+if(NOT "${MD_SIM}" STREQUAL "LS1_MARDYN" AND BUILD_WITH_ADIOS2) #ls1 can come bundled with own adios2, hence finding adios2 later for ls1
   enable_language(C)
   find_package(ADIOS2 REQUIRED)
 endif()
@@ -92,7 +121,7 @@ endif()
 if(BUILD_WITH_OPENFOAM)
 	# Check valid OpenFOAM
 	if(DEFINED ENV{WM_PROJECT_DIR})
-		MESSAGE(STATUS ">> OpenFOAM found in : " $ENV{WM_PROJECT_DIR})
+		message(STATUS ">> OpenFOAM found in : " $ENV{WM_PROJECT_DIR})
 	else()
 		message(FATAL_ERROR "The OpenFOAM bashrc is not sourced or OpenFOAM is not installed")
 	endif()
@@ -107,14 +136,94 @@ if(BUILD_WITH_LAMMPS)
   pkg_search_module(LAMMPS REQUIRED liblammps)
 endif()
 
+if("${MD_SIM}" STREQUAL "LS1_MARDYN")
+  set(LS1_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ls1" CACHE PATH "ls1 source directory")
+  set(LS1_BUILD_DIR_NAMES "build-seq;build-par;build" CACHE STRING "ls1 build directory names. First one working is used")
+  list(LENGTH LS1_BUILD_DIR_NAMES NUM_BUILD_DIRS)
+  # we have to use the last one anyway (no other options left in list), so skip that check
+  MATH(EXPR NUM_BUILD_DIRS "${NUM_BUILD_DIRS}-1")
+  set(BUILD_CANDIDATE_IDX 0)
+  list(GET LS1_BUILD_DIR_NAMES ${BUILD_CANDIDATE_IDX} LS1_BUILD_DIR_NAME)
+  while(BUILD_CANDIDATE_IDX LESS NUM_BUILD_DIRS)
+    # check if this build dir works
+    if(EXISTS "${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}")
+      load_cache(${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME} READ_WITH_PREFIX CANDIDATE_CACHE_ ENABLE_MPI PRECISION)
+    endif()
+    if(CANDIDATE_CACHE_PRECISION AND (CANDIDATE_CACHE_ENABLE_MPI STREQUAL BUILD_WITH_MPI))
+      # this candidate build dir seems good, stop searching and try it
+      break()
+    endif()
+    # this candidate build dir does not work, try next one in list
+    MATH(EXPR BUILD_CANDIDATE_IDX "${BUILD_CANDIDATE_IDX}+1")
+    list(GET LS1_BUILD_DIR_NAMES ${BUILD_CANDIDATE_IDX} LS1_BUILD_DIR_NAME)
+  endwhile()
+  message(STATUS ">> ls1 build directory used: " ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME})
+  load_cache(${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME} READ_WITH_PREFIX LS1_CACHE_ ENABLE_AUTOPAS ENABLE_MPI PRECISION ENABLE_VTK ENABLE_ADIOS2 FIND_PACKAGE_ADIOS2 CMAKE_BUILD_TYPE)
+  if(NOT LS1_CACHE_PRECISION)
+    message(FATAL_ERROR "Could not read the ls1 build cache. Please ensure the path to the ls1 root folder and the name of the build folder are correct.")
+  endif()
+  if(LS1_CACHE_ENABLE_MPI AND NOT BUILD_WITH_MPI)
+    message(FATAL_ERROR "ls1 built with MPI, but MaMiCo does not have MPI enabled! Aborting...")
+  endif()
+  if(NOT LS1_CACHE_ENABLE_MPI AND BUILD_WITH_MPI)
+    message(FATAL_ERROR "ls1 not built with MPI, but MaMiCo has MPI enabled! Aborting...")
+  endif()
+  option(LS1_BUILT_WITH_AUTOPAS "Specify whether ls1 was compiled with AutoPas support." ${LS1_CACHE_ENABLE_AUTOPAS})
+  find_library(MarDyn REQUIRED NAMES "libMarDyn.a" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/src )
+  if(LS1_BUILT_WITH_AUTOPAS)
+    find_library(autopas REQUIRED NAMES "libautopas.a" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/src/autopas)
+    if("${LS1_CACHE_CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+      find_library(spdlog REQUIRED NAMES "libspdlogd.a" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/spdlog-build )
+    else()
+      find_library(spdlog REQUIRED NAMES "libspdlog.a" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/spdlog-build)
+    endif()
+    find_library(harmony REQUIRED NAMES "libharmony.a" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/libs/harmony/include/lib )
+  endif()
+  if(LS1_CACHE_ENABLE_VTK)
+    find_library(VTK_LIB xerces-c HINTS $ENV{XERCES_LIBDIR})
+    if(NOT VTK_LIB)
+      message(FATAL_ERROR "xerces-c lib not found. Disable VTK support, if you do not need it.")
+    endif()
+  endif()
+  if(BUILD_WITH_ADIOS2 AND NOT LS1_CACHE_ENABLE_ADIOS2)
+    message(FATAL_ERROR "Please rebuild ls1 with ENABLE_ADIOS2 turned on, if adios2 is needed, else turn BUILD_WITH_ADIOS2 off")
+  endif()
+  if(LS1_CACHE_ENABLE_ADIOS2)
+    if(NOT BUILD_WITH_ADIOS2)
+      message(WARNING "ls1 built with adios2, but BUILD_WITH_ADIOS2 not enabled by MaMiCo!\nProceeding with adios2 enabled only for ls1")
+    endif()
+    if(LS1_CACHE_FIND_PACKAGE_ADIOS2)
+      enable_language(C)
+      find_package(ADIOS2 REQUIRED)
+      message(STATUS "Using adios2 available in environment for ls1")
+    else()
+      enable_language(C)
+      find_package(ADIOS2 REQUIRED PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/adios2fetch-build NO_DEFAULT_PATH)
+      message(STATUS "Using adios2 fetched by ls1")
+      if(BUILD_WITH_ADIOS2)
+        message(WARNING "Both ls1 and MaMiCo will use adios2. Double check the library versions/paths!")
+      endif()
+    endif()
+  endif()
+  message(STATUS ">> ls1 found and initialized")
+endif()
+
+if(BUILD_TESTING)
+  find_package(CppUnit REQUIRED)
+endif()
+
 #
 # simplemd interface
 #
 add_library(simplemd_interface INTERFACE)
 target_compile_definitions(simplemd_interface INTERFACE ${MDDim})
 target_compile_options(simplemd_interface INTERFACE -fpic)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
+
+if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
+  target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
+  target_compile_options(simplemd_interface INTERFACE -Og -g3)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	target_compile_definitions(simplemd_interface INTERFACE MDError)
   target_compile_options(simplemd_interface INTERFACE -Og -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
   target_compile_definitions(simplemd_interface INTERFACE MDError)
@@ -132,7 +241,7 @@ if(BUILD_WITH_MPI)
     target_link_libraries(simplemd_interface INTERFACE MPI::MPI_CXX)
 endif()
 if(BUILD_WITH_ADIOS2)
-if(BUILD_WITH_MPI)
+  if(BUILD_WITH_MPI)
     target_link_libraries(simplemd_interface INTERFACE adios2::cxx11_mpi MPI::MPI_CXX)
   else()
     target_link_libraries(simplemd_interface INTERFACE adios2::cxx11)
@@ -142,7 +251,7 @@ endif()
 message(STATUS ">> CMAKE_CXX_COMPILER : " ${CMAKE_CXX_COMPILER})
 message(STATUS ">> CMAKE_CXX_COMPILER_ID : " ${CMAKE_CXX_COMPILER_ID})
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -O3)
+	target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 	target_compile_options(simplemd_interface INTERFACE -fstrict-aliasing -qpack_semantic=gnu -ipo -align -ansi-alias) #-w
 	target_link_options(simplemd_interface INTERFACE -ipo)
@@ -157,7 +266,7 @@ endif()
 #
 # simplemd library target
 #
-set(SIMPLE_MD_SOURCES 
+set(SIMPLE_MD_SOURCES
   "simplemd/BoundaryTreatment.cpp"
   "simplemd/MolecularDynamicsSimulation.cpp"
   "simplemd/ProfilePlotter.cpp"
@@ -178,7 +287,7 @@ set(SIMPLE_MD_SOURCES
 	"simplemd/configurations/VTKConfiguration.cpp"
 	"simplemd/molecule-mappings/UpdateLinkedCellListsMapping.cpp"
 	"simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
-	"simplemd/molecule-mappings/VTKMoleculeWriter.cpp"    
+	"simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
 	"simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
 	"simplemd/services/ExternalForceService.cpp"
 	"simplemd/services/LinkedCellService.cpp"
@@ -219,24 +328,33 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 # MaMiCo interface
 #
 add_library(mamico INTERFACE)
+if(BUILD_WITH_MPI)
+  option(USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
+  if(USE_COLLECTIVE_MPI)
+    target_compile_definitions(mamico INTERFACE USE_COLLECTIVE_MPI)
+  endif()
+endif()
 if(BUILD_WITH_EIGEN)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
 	target_link_libraries(mamico INTERFACE Eigen3::Eigen)
 endif()
 if(BUILD_WITH_ADIOS2)
-  add_compile_definitions(BUILD_WITH_ADIOS2)
+  target_compile_definitions(mamico INTERFACE BUILD_WITH_ADIOS2)
 endif()
 target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
-target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors -O3)
+target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors)
+if("${MD_SIM}" STREQUAL "LS1_MARDYN") #to be removed when ls1 updates to use the latest autopas
+  target_compile_options(mamico INTERFACE -Wno-reorder)
+endif()
 if(BUILD_WITH_MPI)
-    target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK ENABLE_POST_MULTI_INSTANCE_FILTERING)
-    target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
-      target_compile_options(mamico INTERFACE -Wno-uninitialized)
-    else()
-      target_compile_options(mamico INTERFACE -Wno-maybe-uninitialized)
-    endif()
-    target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
+  target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK)
+  target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
+    target_compile_options(mamico INTERFACE -Wno-uninitialized)
+  else()
+    target_compile_options(mamico INTERFACE -Wno-maybe-uninitialized)
+  endif()
+  target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
 endif()
 if(BUILD_WITH_OPENFOAM)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_OPENFOAM WM_LABEL_SIZE=32 WM_DP NoRepository)
@@ -248,22 +366,70 @@ if(BUILD_WITH_PRECICE)
 	target_compile_definitions(mamico INTERFACE BUILD_WITH_PRECICE)
 	target_link_libraries(mamico INTERFACE precice::precice)
 endif()
-if(BUILD_WITH_TEST_INDEXING)
-	target_compile_definitions(mamico INTERFACE TEST_INDEXING)
+if(BUILD_WITH_PINT_DEBUG)
+  target_compile_definitions(mamico INTERFACE PINT_DEBUG)
 endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang" )
 	target_compile_options(mamico INTERFACE -Wno-undefined-var-template)
 endif()
 # we always link against libsimplemd, even if ${MD_SIM} not SIMPLE_MD, so that we can use the simpleMD configuration
 target_link_libraries(mamico INTERFACE libsimplemd)
-if("${MD_SIM}" STREQUAL "LAMMPS_MD")
+if("${MD_SIM}" STREQUAL "LAMMPS_MD" OR "${MD_SIM}" STREQUAL "LAMMPS_DPD")
   target_link_libraries(mamico INTERFACE ${LAMMPS_LINK_LIBRARIES})
   target_include_directories(mamico INTERFACE ${LAMMPS_INCLUDE_DIRS})
   #target_compile_options(mamico INTERFACE ${LAMMPS_CFLAGS_OTHER})
+elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
+  target_compile_definitions(mamico INTERFACE MAMICO_COUPLING)
+  if ("${LS1_CACHE_PRECISION}" STREQUAL "DOUBLE")
+    target_compile_definitions(mamico INTERFACE MARDYN_DPDP)
+  elseif("${LS1_CACHE_PRECISION}" STREQUAL "SINGLE")
+    target_compile_definitions(mamico INTERFACE MARDYN_SPSP)
+  elseif("${LS1_CACHE_PRECISION}" STREQUAL "MIXED")
+    target_compile_definitions(mamico INTERFACE MARDYN_SPDP)
+  endif()
+  target_include_directories(mamico INTERFACE ${LS1_SRC_DIR}/src ${LS1_SRC_DIR}/libs/rapidxml)
+  target_link_directories(mamico INTERFACE ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/src)
+  target_link_libraries(mamico INTERFACE MarDyn)
+  if(BUILD_WITH_MPI)
+    target_compile_definitions(mamico INTERFACE ENABLE_MPI)
+  endif()
+  if(LS1_BUILT_WITH_AUTOPAS)
+    target_compile_definitions(mamico INTERFACE MARDYN_AUTOPAS)
+    target_include_directories(mamico INTERFACE ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-src/src ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/spdlog-src/include)
+    target_link_directories(mamico INTERFACE ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/src/autopas ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/libs/harmony/include/lib ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/spdlog-build)
+    target_link_libraries(mamico INTERFACE autopas pthread spdlog harmony)
+    #pthread is required by spdlog
+  endif()
+  if(LS1_CACHE_ENABLE_VTK)
+    target_compile_definitions(mamico INTERFACE VTK)
+    target_link_libraries(mamico INTERFACE ${VTK_LIB})
+  endif()
+  if(LS1_CACHE_ENABLE_ADIOS2)
+    if (NOT DEFINED ADIOS2_HAVE_MPI)
+        set(ADIOS2_HAVE_MPI OFF)
+    endif()
+    if ((ADIOS2_HAVE_MPI OR BUILD_WITH_MPI) AND (NOT (ADIOS2_HAVE_MPI AND BUILD_WITH_MPI))) # handish implementation of xor (cmake's EQUAL does not work)
+        message(FATAL_ERROR "
+        ADIOS2_HAVE_MPI set to \"${ADIOS2_HAVE_MPI}\" and mamico BUILD_WITH_MPI is set to \"${BUILD_WITH_MPI}\".
+        For a parallel build, MPI has to be enabled in the packaged ADIOS2 as well as mamico (ADIOS2_ENABLE_MPI=ON, BUILD_WITH_MPI=ON).
+        For a sequential build, deactivate MPI for both.")
+    endif()
+    target_compile_definitions(mamico INTERFACE ENABLE_ADIOS2)
+    target_link_libraries(mamico INTERFACE adios2::adios2)
+  endif()
+endif()
+if(ENABLE_COVERAGE)
+  target_compile_options(mamico INTERFACE --coverage)
+  target_link_libraries(mamico INTERFACE gcov)
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  target_compile_definitions(mamico INTERFACE MDCoupledDebug TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
+if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
+  target_compile_definitions(mamico INTERFACE MDCoupledDebug MDCoupledError TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
+  target_compile_options(mamico INTERFACE -Og -g3)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  if (NOT ENABLE_COVERAGE)
+    target_compile_definitions(mamico INTERFACE MDCoupledDebug MDCoupledError TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE PINT_DEBUG)
+  endif()
   target_compile_options(mamico INTERFACE -Og -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
   target_compile_definitions(mamico INTERFACE MDCoupledError)
@@ -276,14 +442,18 @@ else()
   message(FATAL_ERROR "Unsupported build type")
 endif()
 
+# List of sources for all Mamico targets
+set(MAMICO_SOURCES
+  "coupling/indexing/IndexingService.cpp"
+  "coupling/configurations/ParticleInsertionConfiguration.cpp"
+  "coupling/solvers/LBCouetteSolverState.cpp"
+)
 #
 # Couette target
 #
 set(COUETTE_SOURCES
-		"coupling/indexing/IndexingService.cpp"
-		"coupling/configurations/ParticleInsertionConfiguration.cpp"
-        "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
-        "coupling/tests/main_couette.cpp"
+	${MAMICO_SOURCES}
+  "coupling/scenario/main_couette.cpp"
 )
 add_executable(couette ${COUETTE_SOURCES})
 set_target_properties(couette PROPERTIES CXX_STANDARD 17)
@@ -297,11 +467,10 @@ target_link_libraries(couette PRIVATE mamico)
 #
 if("${MD_SIM}" STREQUAL "LAMMPS_MD")
   set(TEST_LAMMPS_SOURCES
+    ${MAMICO_SOURCES}
     "tarch/tinyxml2/tinyxml2.cpp"
-    "coupling/configurations/ParticleInsertionConfiguration.cpp"
     "tarch/utils/RandomNumberService.cpp"
-    "coupling/tests/main_lammps.cpp"
-    "coupling/indexing/IndexingService.cpp"
+    "test/integration/main_lammps.cpp"
   )
   add_executable(test_lammps ${TEST_LAMMPS_SOURCES})
   set_target_properties(test_lammps PROPERTIES CXX_STANDARD 17)
@@ -316,10 +485,8 @@ endif()
 #
 if(BUILD_WITH_PYBIND11)
 	set(PYBIND_SOURCES11
-			"coupling/indexing/IndexingService.cpp"
-			"coupling/configurations/ParticleInsertionConfiguration.cpp"
-	        "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
-			"coupling/python-binding/mamico.cpp"
+		${MAMICO_SOURCES}
+		"coupling/python-binding/mamico.cpp"
 	)
 	pybind11_add_module(mamico_pybind
 		${PYBIND_SOURCES11}
@@ -333,7 +500,7 @@ endif()
 #
 # Clangformat target
 #
-set(CLANGFORMAT_SOURCES 
+set(CLANGFORMAT_SOURCES
   "tarch/utils/Uncopyable.h"
   "tarch/utils/MultiMDService.cpph"
   "tarch/utils/RandomNumberService.h"
@@ -341,20 +508,18 @@ set(CLANGFORMAT_SOURCES
   "tarch/utils/MultiMDService.h"
   "tarch/configuration/ParseConfiguration.h"
   "tarch/configuration/Configuration.h"
-  "tarch/tests/main_readconfig.cpp"
   "tarch/la/VectorOperations.cpph"
   "tarch/la/Vector.h"
   "tarch/la/ScalarOperations.h"
   "tarch/la/Matrix.h"
   "tarch/TarchDefinitions.h"
   "coupling/services/MultiMDCellService.h"
-  "coupling/services/MacroscopicCellServiceMacroOnly.h"
-  "coupling/services/MacroscopicCellService.cpph"
-  "coupling/services/MacroscopicCellTraversalWrappers.cpph"
-  "coupling/services/MacroscopicCellService.h"
+  "coupling/services/CouplingCellServiceDummy.h"
+  "coupling/services/CouplingCellService.cpph"
+  "coupling/services/CouplingCellTraversalWrappers.cpph"
+  "coupling/services/CouplingCellService.h"
   "coupling/ErrorEstimation.h"
   "coupling/ParticleInsertion.h"
-  "coupling/IndexConversionMD2Macro.cpph"
   "coupling/SetGivenVelocity4MomentumInsertion.h"
   "coupling/MomentumController.h"
   "coupling/filtering/FilterPipeline.cpph"
@@ -394,7 +559,7 @@ set(CLANGFORMAT_SOURCES
   "coupling/python-binding/mamico.cpp"
   "coupling/python-binding/conversion.h"
   "coupling/NoParticleInsertion.h"
-  "coupling/MacroscopicCellPlotter.h"
+  "coupling/CouplingCellPlotter.h"
   "coupling/NoMomentumInsertion.h"
   "coupling/cell-mappings/ComputeKineticEnergyMapping.h"
   "coupling/cell-mappings/MoleculeExtractor.h"
@@ -413,12 +578,9 @@ set(CLANGFORMAT_SOURCES
   "coupling/cell-mappings/NieVelocityImpositionMapping.h"
   "coupling/cell-mappings/ZhouBoundaryForce.h"
   "coupling/ZhouBoundaryForceController.h"
-  "coupling/IndexConversionMD2Macro.h"
   "coupling/indexing/CellIndex.cpph"
   "coupling/indexing/IndexingService.cpp"
   "coupling/indexing/Operations.h"
-  "coupling/indexing/Testing.cpph"
-  "coupling/indexing/Testing.h"
   "coupling/indexing/IndexingService.h"
   "coupling/indexing/CellIndex.h"
   "coupling/sendrecv/FromMacro2MDSendOnly.h"
@@ -434,12 +596,10 @@ set(CLANGFORMAT_SOURCES
   "coupling/sendrecv/SendReceiveBuffer.cpph"
   "coupling/sendrecv/FromMacro2MD.cpph"
   "coupling/sendrecv/FromMD2Macro.h"
-  "coupling/IndexConversion.cpph"
   "coupling/UsherParticleInsertion.cpph"
   "coupling/NoBoundaryForce.h"
   "coupling/CouplingMDDefinitions.h"
   "coupling/AdditiveMomentumInsertion.h"
-  "coupling/IndexConversion.h"
   "coupling/transferstrategies/AveragingTransferStrategy.h"
   "coupling/transferstrategies/TransferStrategy4NieCoupling.h"
   "coupling/transferstrategies/TransferStrategy4SchwarzCoupling.h"
@@ -452,9 +612,9 @@ set(CLANGFORMAT_SOURCES
   "coupling/paralleltopology/ZYXTopology.h"
   "coupling/paralleltopology/XYZTopology.h"
   "coupling/paralleltopology/ParallelTopologyFactory.h"
-  "coupling/datastructures/MacroscopicCells.h"
-  "coupling/datastructures/MacroscopicCell.h"
-  "coupling/datastructures/MacroscopicCells.cpph"
+  "coupling/datastructures/CellContainer.h"
+  "coupling/datastructures/FlexibleCellContainer.h"
+  "coupling/datastructures/CouplingCell.h"
   "coupling/datastructures/Molecule.h"
   "coupling/MultiMDMediator.h"
   "coupling/configurations/ParticleInsertionConfiguration.h"
@@ -464,11 +624,12 @@ set(CLANGFORMAT_SOURCES
   "coupling/configurations/MaMiCoConfiguration.cpph"
   "coupling/configurations/MomentumInsertionConfiguration.h"
   "coupling/configurations/ParallelTopologyConfiguration.h"
-  "coupling/configurations/MacroscopicCellConfiguration.h"
+  "coupling/configurations/CouplingCellConfiguration.h"
   "coupling/configurations/ParticleInsertionConfiguration.cpp"
-  "coupling/configurations/MacroscopicCellConfiguration.cpph"
+  "coupling/configurations/CouplingCellConfiguration.cpph"
   "coupling/configurations/MaMiCoConfiguration.h"
   "coupling/configurations/ThermostatConfiguration.h"
+  "coupling/configurations/TimeIntegrationConfiguration.h"
   "coupling/VelocityGradientRelaxation.h"
   "coupling/BoundaryForceController.h"
   "coupling/interface/MDSimulationFactory.h"
@@ -477,6 +638,11 @@ set(CLANGFORMAT_SOURCES
   "coupling/interface/impl/SimpleMD/SimpleMDMoleculeIterator.h"
   "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
   "coupling/interface/impl/SimpleMD/SimpleMDMolecule.h"
+  "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
+  "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
+  "coupling/interface/impl/ls1/LS1StaticCommData.h"
+  "coupling/interface/impl/ls1/LS1Molecule.h"
+  "coupling/interface/impl/ls1/LS1RegionWrapper.h"
   "coupling/interface/impl/macroscopictestsolvers/TestMacroscopicSolverInterface.h"
   "coupling/interface/impl/macroscopictestsolvers/TestMacroscopicSolver.h"
   "coupling/interface/impl/macroscopictestsolvers/MacroscopicSolverFactory.h"
@@ -487,52 +653,58 @@ set(CLANGFORMAT_SOURCES
   "coupling/interface/MamicoInterfaceProvider.h"
   "coupling/interface/Molecule.h"
   "coupling/interface/MDSolverInterface.h"
+  "coupling/interface/PintableMacroSolver.h"
   "coupling/KineticEnergyController.h"
-  "coupling/solvers/FiniteDifferenceSolver.h"
   "coupling/solvers/FDCouetteSolver.h"
   "coupling/solvers/IcoFoamInterface.h"
-  "coupling/solvers/CoupledMolecularDynamicsSimulation.cpp"
   "coupling/solvers/LBCouetteSolver.h"
   "coupling/solvers/IcoFoamBufferSetup.h"
-  "coupling/solvers/CoupledMolecularDynamicsSimulation.h"
   "coupling/solvers/CouetteSolver.h"
   "coupling/solvers/CouetteSolverInterface.h"
   "coupling/solvers/LBCouetteSolverInterface.h"
   "coupling/solvers/NumericalSolver.h"
-  "coupling/tests/TestEspressoMDMolecule.h"
-  "coupling/tests/Test.h"
-  "coupling/tests/MacroscopicCellsTest.h"
-  "coupling/tests/TestEspressoAddDeleteMolecule.h"
-  "coupling/tests/main_lbcouettesolver.cpp"
-  "coupling/tests/TestLammpsCalculateForceEnergy.h"
-  "coupling/tests/main_couette.cpp"
-  "coupling/tests/CouetteTest.h"
-  "coupling/tests/FromMD2MacroTest.h"
-  "coupling/tests/CompileTest.h"
-  "coupling/tests/FromMacro2MDTest.h"
-  "coupling/tests/TestEspressoMDSolverInterface.h"
-  "coupling/tests/main_lammps.cpp"
-  "coupling/tests/TestLammpsMoleculeIterator.h"
-  "coupling/tests/TestMarDynMolecule.h"
-  "coupling/tests/TestLammpsAddDeleteAtom.h"
-  "coupling/tests/IndexConversionTest.h"
-  "coupling/tests/main_mardyn.cpp"
-  "coupling/tests/TestCell.h"
-  "coupling/tests/TestEspressoForceEnergyCalculation.h"
-  "coupling/tests/TestLammps.h"
-  "coupling/tests/TestLammpsInitialVelocity.h"
-  "coupling/tests/main.cpp"
-  "coupling/tests/TestLBCouetteSolver.h"
-  "coupling/tests/cell_idx_iter_benchmark.cpp"
-  "coupling/tests/TestDataExchangeFromMD2Macro.h"
-  "coupling/tests/main_espresso.cpp"
-  "coupling/tests/TestEspresso.h"
-  "coupling/tests/TestMarDyn.h"
-  "coupling/tests/TestLammpsGhost.h"
-  "coupling/tests/TestMarDynAddDeleteMolecule.h"
-  "coupling/tests/TestEspressoMoleculeIterator.h"
-  "coupling/tests/TestMarDynMoleculeIterator.h"
-  "coupling/MPIIndexConversion.h"
+  "test/integration/TestEspressoMDMolecule.h"
+  "test/integration/Test.h"
+  "test/integration/TestEspressoAddDeleteMolecule.h"
+  "test/integration/main_lbcouettesolver.cpp"
+  "test/integration/TestLammpsCalculateForceEnergy.h"
+  "test/integration/TestEspressoMDSolverInterface.h"
+  "test/integration/main_lammps.cpp"
+  "test/integration/TestLammpsMoleculeIterator.h"
+  "test/integration/TestMarDynMolecule.h"
+  "test/integration/TestLammpsAddDeleteAtom.h"
+  "test/integration/main_mardyn.cpp"
+  "test/integration/TestEspressoForceEnergyCalculation.h"
+  "test/integration/TestLammps.h"
+  "test/integration/TestLammpsInitialVelocity.h"
+  "test/integration/TestLBCouetteSolver.h"
+  "test/integration/cell_idx_iter_benchmark.cpp"
+  "test/integration/main_espresso.cpp"
+  "test/integration/TestEspresso.h"
+  "test/integration/TestMarDyn.h"
+  "test/integration/TestLammpsGhost.h"
+  "test/integration/TestMarDynAddDeleteMolecule.h"
+  "test/integration/TestEspressoMoleculeIterator.h"
+  "test/integration/TestMarDynMoleculeIterator.h"
+  "test/unit/coupling/solvers/LBCouetteSolverStateTest.cpp"
+  "test/unit/coupling/solvers/PintableLBCouetteSolverTest.cpp"
+  "test/unit/getTestNames.cpp"
+  "test/unit/coupling/InstanceHandlingTest.cpp"
+  "test/unit/coupling/indexing/OperationsTest.cpp"
+  "test/unit/coupling/indexing/CellIndexTest.cpp"
+  "test/unit/coupling/indexing/IndexingServiceTest.cpp"
+  "test/unit/coupling/interface/impl/SimpleMD/SimpleMDMoleculeTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1MDSolverInterfaceTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1MoleculeIteratorTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1MoleculeTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1RegionWrapperTest.cpp"
+  "test/unit/coupling/interface/impl/ls1/LS1StaticCommDataTest.cpp"
+  "test/unit/coupling/datastructures/LinkedCellContainerTest.cpp"
+  "test/unit/coupling/datastructures/FlexibleCellContainerTest.cpp"
+  "test/unit/coupling/datastructures/CellContainerTest.cpp"
+  "coupling/scenario/CouetteScenario.h"
+  "coupling/scenario/main_couette.cpp"
+  "coupling/scenario/Scenario.h"
   "coupling/InstanceHandling.h"
   "coupling/MomentumInsertion.h"
   "simplemd/services/ExternalForceService.cpp"
@@ -630,21 +802,105 @@ add_custom_target(
 #
 # compiletest target
 #
-get_filename_component(COMPILETEST_SCRIPT "tarch/tests/CompileTest.sh" ABSOLUTE)
+get_filename_component(COMPILETEST_SCRIPT "cmake/CompileTest.sh" ABSOLUTE)
 add_custom_target(
   compiletest
   COMMAND ${COMPILETEST_SCRIPT}
   ${COMPILETEST_COMPILERS}
+  ${COMPILETEST_MODES}
 )
 
 #
 # Benchmarks target
 #
 set(BENCHMARKS_SOURCES
-		"coupling/indexing/IndexingService.cpp"
-		"coupling/configurations/ParticleInsertionConfiguration.cpp"
-	    "coupling/tests/cell_idx_iter_benchmark.cpp"
+	${MAMICO_SOURCES}
+  "test/integration/cell_idx_iter_benchmark.cpp"
 )
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
 set_target_properties(benchmarks PROPERTIES CXX_STANDARD 17)
 target_link_libraries(benchmarks PRIVATE mamico)
+
+#
+# Coverage
+#
+if(ENABLE_COVERAGE)
+  # find required tools
+  find_program(LCOV lcov REQUIRED)
+  find_program(GENHTML genhtml REQUIRED)
+
+  # add coverage target
+  add_custom_target(
+    coverage
+    # gather data
+    COMMAND
+      ${LCOV} --directory . --capture --exclude */test/* --exclude '/usr/*' --exclude '*/simplemd/*' --output-file coverage.info
+    # generate report
+    COMMAND ${GENHTML} --demangle-cpp -o coverage coverage.info
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+endif()
+
+#
+# Testing
+#
+if (BUILD_TESTING)    
+  file(GLOB_RECURSE TEST_SOURCES_TOP "test/*Test.cpp")
+  list(FILTER TEST_SOURCES_TOP EXCLUDE REGEX "test/unit/coupling/interface/impl/") # remove tests corresponding to specific MD solvers
+  
+  if("${MD_SIM}" STREQUAL "SIMPLE_MD")
+    file(GLOB_RECURSE TEST_SOURCES_MD "test/unit/coupling/interface/impl/SimpleMD/*Test.cpp")
+  elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
+    file(GLOB_RECURSE TEST_SOURCES_MD "test/unit/coupling/interface/impl/ls1/*Test.cpp")
+  elseif("${MD_SIM}" STREQUAL "LAMMPS_MD" OR "${MD_SIM}" STREQUAL "LAMMPS_DPD")
+    file(GLOB_RECURSE TEST_SOURCES_MD "test/unit/coupling/interface/impl/LAMMPS/*Test.cpp")
+  else()
+    message(FATAL_ERROR "Could not determine the MD solver while compiling tests")
+  endif()
+
+  set(TEST_SOURCES ${TEST_SOURCES_TOP} ${TEST_SOURCES_MD})
+  if(GET_TEST_NAMES)
+    add_executable(getTestNames
+      ${MAMICO_SOURCES}
+      "test/unit/getTestNames.cpp"
+      ${TEST_SOURCES}
+    )
+    set_target_properties(getTestNames PROPERTIES CXX_STANDARD 17)
+    target_link_libraries(getTestNames PRIVATE mamico)
+    target_include_directories(getTestNames PRIVATE ${CPPUNIT_INCLUDE_DIRS})
+    target_link_directories(getTestNames PRIVATE ${CPPUNIT_LIBRARY})
+    target_link_libraries(getTestNames PRIVATE cppunit)
+    unset(GET_TEST_NAMES CACHE)
+    return()
+  endif()
+
+  add_executable(testmamico 
+    ${MAMICO_SOURCES} 
+    "test/unit/main.cpp"
+    ${TEST_SOURCES}
+  )
+  set_target_properties(testmamico PROPERTIES CXX_STANDARD 17)
+  target_compile_definitions(testmamico PRIVATE MDCoupledError)
+  target_link_libraries(testmamico PRIVATE mamico)
+  target_include_directories(testmamico PRIVATE ${CPPUNIT_INCLUDE_DIRS})
+  target_link_directories(testmamico PRIVATE ${CPPUNIT_LIBRARY})
+  target_link_libraries(testmamico PRIVATE cppunit)
+
+  message(STATUS ">> Running cmake with GET_TEST_NAMES ON ...")
+  message(STATUS "(((((((((((((((((((((((((((((((((( SUBPROCESSES_START ")
+  execute_process(COMMAND cmake -DGET_TEST_NAMES=ON -DBUILD_TESTING=ON -DENABLE_COVERAGE=OFF -DBUILD_WITH_MPI=${BUILD_WITH_MPI} .)
+  message(STATUS ">> Building getTestNames executable ...")
+  execute_process(COMMAND make -j4 getTestNames)
+  message(STATUS "SUBPROCESSES_END ))))))))))))))))))))))))))))))))))")
+  execute_process(COMMAND ./getTestNames OUTPUT_VARIABLE TEST_NAMES)
+  separate_arguments(TEST_NAMES UNIX_COMMAND ${TEST_NAMES})
+
+  foreach(TEST_NAME ${TEST_NAMES})
+    if (BUILD_WITH_MPI)
+    # We have to use the --oversubscribe OpenMPI option here as openmpi is installed in the test container (see test/docker/Dockerfile) 
+    # and the  the github runner VM has less than 4 VCPUS.
+      add_test(NAME ${TEST_NAME} COMMAND mpirun --oversubscribe -np 4 ./testmamico ${TEST_NAME})
+    else()
+      add_test(NAME ${TEST_NAME} COMMAND ./testmamico ${TEST_NAME})
+    endif()
+  endforeach()
+endif()

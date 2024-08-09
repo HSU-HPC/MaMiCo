@@ -50,35 +50,15 @@ template <IndexTrait t1, IndexTrait t2, IndexTrait... rest> constexpr bool is_or
   }
 }
 
-template <IndexTrait t> constexpr std::string_view print_trait() {
-  if constexpr (t == IndexTrait::vector)
-    return "vector";
-  if constexpr (t == IndexTrait::local)
-    return "local";
-  if constexpr (t == IndexTrait::md2macro)
-    return "md2macro";
-  if constexpr (t == IndexTrait::noGhost)
-    return "noGhost";
-}
-
-template <IndexTrait t1, IndexTrait... rest> constexpr std::string_view print_traitlist() {
-  using namespace std::string_literals;
-
-  if constexpr (sizeof...(rest) == 0) {
-    return print_trait<t1>();
-  } else {
-    return std::string_view{print_trait<t1>().data() + ", "s + print_traitlist<rest...>().data()};
-  }
-}
 } // namespace TraitOperations
 
 /**
- * Index used to describe spatial location of a MacroscopicCell.
+ * Index used to describe spatial location of a CouplingCell.
  * Since various different ways of expressing this location are useful for
  * different applications, IndexTraits are used to describe the context of this
  * index. \n
  *
- * All commonly used (arithmetic) operations on MacroscopicCell indices are
+ * All commonly used (arithmetic) operations on CouplingCell indices are
  * provided as well as seamless conversion between any two ways of expressing
  * these indices. (cf. user-defined conversion function below)\n
  *
@@ -136,7 +116,7 @@ public:
    */
   CellIndex() = default;
   CellIndex(const CellIndex& ci) = default;
-  CellIndex(const value_T& i) : _index(i) {}
+  explicit CellIndex(const value_T& i) : _index(i) {}
 
   /**
    * Conversion function: Convert to CellIndex of same dim but different
@@ -170,7 +150,8 @@ public:
         ++_index[1];
         if (_index[1] == (int)numberCellsInDomain[1]) {
           _index[1] = 0;
-          ++_index[2];
+          if constexpr (dim == 3)
+            ++_index[2];
         }
       }
     } else
@@ -191,7 +172,8 @@ public:
         --_index[1];
         if (_index[1] < 0) {
           _index[1] = numberCellsInDomain[1] - 1;
-          --_index[2];
+          if constexpr (dim == 3)
+            --_index[2];
         }
       }
     } else
@@ -253,6 +235,15 @@ public:
     return true;
   }
 
+  tarch::la::Vector<dim, double> getCellMidPoint() const {
+    BaseIndex<dim> globalIndex{*this};
+    tarch::la::Vector<dim, double> cellMidPoint(IndexingService<dim>::getInstance().getGlobalMDDomainOffset() -
+                                                0.5 * IndexingService<dim>::getInstance().getCouplingCellSize());
+    for (unsigned int d = 0; d < dim; d++)
+      cellMidPoint[d] += ((double)(globalIndex.get()[d])) * IndexingService<dim>::getInstance().getCouplingCellSize()[d];
+    return cellMidPoint;
+  }
+
   /**
    * Defines where this type of cell index starts counting.
    * Read inclusively, e.g.: lowerBoundary = {1,2,3} means {1,2,3} is the first
@@ -289,8 +280,8 @@ public:
     IndexIterator(CellIndex x) : _idx(x) {}
     IndexIterator(const IndexIterator& a) : _idx(a._idx) {}
 
-    CellIndex& operator*() { return _idx; }
-    CellIndex* operator->() { return &_idx; }
+    const CellIndex& operator*() const { return _idx; }
+    const CellIndex* operator->() const { return &_idx; }
 
     // Prefix increment
     IndexIterator& operator++() {
@@ -311,7 +302,18 @@ public:
   private:
     CellIndex _idx;
   };
-  static IndexIterator begin() { return IndexIterator(lowerBoundary); }
+  static IndexIterator begin() {
+    // if constexpr is neccessary here (otherwise benchmark performance breaks, due to runtime if)
+    if constexpr (std::is_same_v<unsigned int, value_T>) {
+      // If this CellIndex is scalar and if the domain is empty, then lowerBoundary can not be converted to CellIndex
+      // Thus we have to return something else as an iterator for the empty domain
+      if (linearNumberCellsInDomain == 0)
+        return IndexIterator(CellIndex{});
+      else
+        return IndexIterator(lowerBoundary);
+    } else
+      return IndexIterator(lowerBoundary);
+  }
   static IndexIterator end() {
     // Todo: This if-else branching is quite slow? (~factor 2)
     if (linearNumberCellsInDomain == 0)
@@ -319,6 +321,8 @@ public:
     else
       return ++IndexIterator(upperBoundary);
   }
+
+  static const char TNAME[];
 
 private:
   value_T _index;

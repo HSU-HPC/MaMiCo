@@ -11,8 +11,8 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
     return EXIT_FAILURE;
   tinyxml2::XMLElement* currFilterNode = sequenceNode->FirstChildElement();
 
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector = _inputCellVector;
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> outputCellVector = _cellVector2;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector = _inputCellVector;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> outputCellVector = _cellVector2;
 
 #ifdef DEBUG_FILTER_PIPELINE
   std::cout << PRINT_PREFIX() << "Initializing filter objects." << std::endl;
@@ -22,9 +22,14 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
   while (currFilterNode) {
     coupling::filtering::FilterInterface<dim>* newfilter = nullptr;
 
-    //###############################################################
-    // This is where you have to define how to handle each filter individually.
-    // Write To File
+    bool sequential = false;
+    if (const char* seqAttr = currFilterNode->Attribute("sequential"))
+      if (std::strcmp(seqAttr, "true") == 0)
+        sequential = true;
+
+    // ###############################################################
+    //  This is where you have to define how to handle each filter individually.
+    //  Write To File
     if (std::strcmp(currFilterNode->Value(), "write-to-file") == 0) {
       bool overwrite = false;
       if (currFilterNode->Attribute("overwrite"))
@@ -105,7 +110,11 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
       const char* extrapolation;
       extrapolation = currFilterNode->Attribute("extrapolation");
 
-      newfilter = new coupling::filtering::Gauss<dim>(inputCellVector, outputCellVector, _filteredValues, (unsigned int)d, sigma, extrapolation);
+      if (sequential)
+        newfilter = new coupling::filtering::Gauss<dim>(inputCellVector, outputCellVector, _filteredValues, (unsigned int)d, sigma, extrapolation);
+      else
+        newfilter = new coupling::filtering::Gauss<dim, coupling::indexing::IndexTrait::local>(inputCellVector, outputCellVector, _filteredValues,
+                                                                                               (unsigned int)d, sigma, extrapolation);
     }
 
     // POD
@@ -167,7 +176,7 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
     }
     */
 
-    //###############################################################
+    // ###############################################################
 
     // Unknown filter identifier
     else {
@@ -177,12 +186,9 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
 
 // sequential filtering
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    if (const char* sequential = currFilterNode->Attribute("sequential")) {
-      if (std::strcmp(sequential, "true") == 0)
-        _filters.push_back(new coupling::filtering::SequentialFilter<dim>(newfilter, _comm));
-      else
-        _filters.push_back(newfilter);
-    } else
+    if (sequential)
+      _filters.push_back(new coupling::filtering::SequentialFilter<dim>(newfilter, _comm));
+    else
 #endif
       _filters.push_back(newfilter);
 
@@ -307,8 +313,8 @@ void coupling::filtering::FilterSequence<dim>::addFilter(
 // TODO: inline in constructor
 template <unsigned int dim> void coupling::filtering::FilterSequence<dim>::initCellVectors() {
   for (auto cell : _inputCellVector) {
-    _cellVector1.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
-    _cellVector2.push_back(new coupling::datastructures::MacroscopicCell<dim>(*cell));
+    _cellVector1.push_back(new coupling::datastructures::CouplingCell<dim>(*cell));
+    _cellVector2.push_back(new coupling::datastructures::CouplingCell<dim>(*cell));
   }
 #ifdef DEBUG_FILTER_PIPELINE
   std::cout << PRINT_PREFIX() << "Initialized cell vectors." << std::endl;

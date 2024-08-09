@@ -15,16 +15,16 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
 
   // These four are not to be confused with member variables of similar names.
   // Watch out for the "_" in front of member variables.
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_primary = coupling::filtering::FilterSequence<dim>::_inputCellVector;
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> outputCellVector_primary = coupling::filtering::FilterSequence<dim>::_cellVector2;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector_primary = coupling::filtering::FilterSequence<dim>::_inputCellVector;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> outputCellVector_primary = coupling::filtering::FilterSequence<dim>::_cellVector2;
 
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCellVector_secondary = _inputCellVector_secondary;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector_secondary = _inputCellVector_secondary;
   // Note: To prevent counter intuitive design, secondary output has been
   // disabled, i.e. all junctors in an AFJ take the same secondary input.
   // There
   // is a chance that this will be re-enabled in the future, if it is needed for
   // a certain junctor to work.
-  // std::vector<coupling::datastructures::MacroscopicCell<dim>* >
+  // std::vector<coupling::datastructures::CouplingCell<dim>* >
   // outputCellVector_secondary = _cellVector2_secondary;
 
 #ifdef DEBUG_FILTER_PIPELINE
@@ -40,8 +40,8 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
     // which implement FilterInterface.
     coupling::filtering::FilterInterface<dim>* newjunctor = nullptr;
 
-    //###############################################################
-    // This is where you have to define how to handle each junctor individually.
+    // ###############################################################
+    //  This is where you have to define how to handle each junctor individually.
 
     // Write To File Junction
     // TODO: documentation about parametrization in .xml
@@ -77,7 +77,7 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
           {currJunctorNode->Attribute("wtf1-location"), currJunctorNode->Attribute("wtf2-location")}, overwrite, oco);
     }
 
-    //###############################################################
+    // ###############################################################
 
     // Unknown junctor identifier
     else {

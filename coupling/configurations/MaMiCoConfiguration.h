@@ -1,16 +1,16 @@
 // Copyright (C) 2015 Technische Universitaet Muenchen
 // This file is part of the Mamico project. For conditions of distribution
-// and use, please see the copyright notice in Mamico's main folder, or at
-// www5.in.tum.de/mamico
+// and use, please see the copyright notice in Mamico's main folder
 #ifndef _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MAMICOCONFIGURATION_H_
 #define _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MAMICOCONFIGURATION_H_
 
 #include "coupling/configurations/BoundaryForceConfiguration.h"
-#include "coupling/configurations/MacroscopicCellConfiguration.h"
+#include "coupling/configurations/CouplingCellConfiguration.h"
 #include "coupling/configurations/MomentumInsertionConfiguration.h"
 #include "coupling/configurations/ParallelTopologyConfiguration.h"
 #include "coupling/configurations/ParticleInsertionConfiguration.h"
 #include "coupling/configurations/ThermostatConfiguration.h"
+#include "coupling/configurations/TimeIntegrationConfiguration.h"
 #include "coupling/configurations/TransferStrategyConfiguration.h"
 #include "tarch/configuration/Configuration.h"
 #include "tarch/la/Vector.h"
@@ -63,9 +63,9 @@ public:
   bool isValid() const { return _isValid; }
 
   /**
-   *  @return _macroscopicCellConfiguration
+   *  @return _couplingCellConfiguration
    */
-  const coupling::configurations::MacroscopicCellConfiguration<dim>& getMacroscopicCellConfiguration() const { return _macroscopicCellConfiguration; }
+  const coupling::configurations::CouplingCellConfiguration<dim>& getCouplingCellConfiguration() const { return _couplingCellConfiguration; }
 
   /**
    *  @return _particleInsertionConfiguration
@@ -132,6 +132,17 @@ public:
     return _parallelTopologyConfiguration;
   }
 
+  /**
+   *  @return _timeIntegrationConfiguration
+   */
+  const coupling::configurations::TimeIntegrationConfiguration& getTimeIntegrationConfiguration() const {
+    // is optional, thus always defined
+    return _timeIntegrationConfiguration;
+  }
+
+  /**
+   * @return _thermostatConfiguration
+   */
   const coupling::configurations::ThermostatConfiguration& getThermostatConfiguration() const {
     if (!_isDefinedThermostat) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
@@ -144,12 +155,13 @@ public:
 
 private:
   bool _isValid;
-  coupling::configurations::MacroscopicCellConfiguration<dim> _macroscopicCellConfiguration;
+  coupling::configurations::CouplingCellConfiguration<dim> _couplingCellConfiguration;
   coupling::configurations::ParticleInsertionConfiguration _particleInsertionConfiguration;
   coupling::configurations::MomentumInsertionConfiguration _momentumInsertionConfiguration;
   coupling::configurations::BoundaryForceConfiguration<dim> _boundaryForceConfiguration;
   coupling::configurations::TransferStrategyConfiguration<dim> _transferStrategyConfiguration;
   coupling::configurations::ParallelTopologyConfiguration _parallelTopologyConfiguration;
+  coupling::configurations::TimeIntegrationConfiguration _timeIntegrationConfiguration;
   coupling::configurations::ThermostatConfiguration _thermostatConfiguration;
   bool _isDefinedParticleInsertion;
   bool _isDefinedMomentumInsertion;
@@ -160,4 +172,4 @@ private:
 };
 #include "coupling/configurations/MaMiCoConfiguration.cpph"
 
-#endif // _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MACROSCOPICCELLCONFIGURATION_H_
+#endif // _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_MAMICOCONFIGURATION_H_

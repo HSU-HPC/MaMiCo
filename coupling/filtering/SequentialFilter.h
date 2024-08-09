@@ -11,8 +11,8 @@
 #define FILTER_SEQUENTIAL true
 #define FILTER_PARALLEL false
 
-//#define DEBUG_SEQ_FILTER
-//#define DEBUG_SEQ_FILTER_VERBOSE
+// #define DEBUG_SEQ_FILTER
+// #define DEBUG_SEQ_FILTER_VERBOSE
 
 namespace coupling {
 namespace filtering {
@@ -69,11 +69,11 @@ private:
 
   /*
    * Auxilliary functions providing an interface between low-level double
-   * buffers used by MPI and Macro Cells.
+   * buffers used by MPI and Coupling Cells.
    */
-  void macroscopicCellToBuffer(std::vector<double>& buf, const coupling::datastructures::MacroscopicCell<dim>* cell);
+  void couplingCellToBuffer(std::vector<double>& buf, const coupling::datastructures::CouplingCell<dim>* cell);
 
-  void bufferToMacroscopicCell(const std::vector<double>& buf, coupling::datastructures::MacroscopicCell<dim>* cell);
+  void bufferToCouplingCell(const std::vector<double>& buf, coupling::datastructures::CouplingCell<dim>* cell);
 
   // The sequentialized Filter
   coupling::filtering::FilterInterface<dim>* _filter;
@@ -86,19 +86,19 @@ private:
 
   // Globalized variants of cell data structures (i.e spanning across all cells
   // of the global domain). Only the master rank uses these.
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _inputCells_Global;
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _outputCells_Global;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _inputCells_Global;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _outputCells_Global;
 
   // Used by the processing rank to remember from which rank it received cells
   // located at which global index TODO: use CellIndex?
   std::vector<unsigned int> _cellRanks;
 
-  // Buffers macro cells for MPI communication
+  // Buffers coupling cells for MPI communication
   std::vector<double> _cellbuf;
 
   // Used by the processing rank to remember its local domain
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _inputCells_Local;
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _outputCells_Local;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _inputCells_Local;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _outputCells_Local;
 };
 
 #include "SequentialFilter.cpph"

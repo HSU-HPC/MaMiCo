@@ -3,6 +3,7 @@ The macro-micro-coupling tool for multiscale coupled molecular-continuum flow si
 
 ## Documentation
 * The source code documentation can be found [here](https://hsu-hpc.github.io/MaMiCo/)
+* The unit test code coverage is [here](https://hsu-hpc.github.io/MaMiCo/coverage/index.html)
 
 ## Requirements and optional dependencies
 To compile and execute MaMiCo on a linux system, you need at least:
@@ -13,10 +14,13 @@ Optional dependencies are:
 * [MPI](https://www.open-mpi.org/), highly recommended for parallel runs, e.g. on clusters.
 * [Eigen 3](http://eigen.tuxfamily.org/), a linear algebra library used for the POD noise filter.
 * [pybind11](https://pybind11.readthedocs.io/en/stable/), for the MaMiCo Python bindings.
-* [OpenFOAM](https://openfoam.org/), for coupling to CFD simulations with OpenFOAM.
+* [OpenFOAM](https://develop.openfoam.com/Development/openfoam/blob/develop/doc/Build.md), for coupling to CFD simulations with OpenFOAM.
 * [preCICE](https://precice.org/), for coupling with other solvers using the preCICE coupling library.
+* [ls1-MarDyn](https://www.ls1-mardyn.de/home.html), for coupling to MD simulations with ls1.
+* [LAMMPS](https://lammps.org/), for coupling to MD simulations with LAMMPS.
+* [LCOV](https://github.com/linux-test-project/lcov) and [gcc](https://gcc.gnu.org/), for test code coverage analysis.
 
-## Build instructions and first steps
+## Build instructions
 * First clone this repository and create a new build directory:
 
         git clone git@github.com:HSU-HPC/MaMiCo.git
@@ -37,9 +41,28 @@ Optional dependencies are:
 
         make
 
-* The previous step has created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. An example simulation configuration can be found [here](https://github.com/HSU-HPC/MaMiCo/blob/master/examples/couette.xml.template).
-* Copy this file to your build folder, rename it 'couette.xml' and modify the configuration to suit your needs.
-* Start the simulation by executing (sequential case) `./couette` or e.g. (MPI-parallel) `mpirun -n 8 ./couette`. 
+### Additional instructions to build with ls1
+* After cloning the repository, initialize the ls1 submodule with
+
+        git submodule init
+        git submodule update
+
+* Follow the instructions on the [ls1 repository](https://github.com/ls1mardyn/ls1-mardyn) to build with cmake, however remember to enable the MAMICO_COUPLING flag, and provide the MaMiCo base directory in the MAMICO_SRC_DIR variable.
+
+* Make MaMiCo as normal, choosing LS1_MARDYN as your MD library.
+
+### Additional instructions to build with LAMMPS
+1. [Download the LAMMPS source code](https://docs.lammps.org/Install_git.html), [build it using CMake](https://docs.lammps.org/Build_cmake.html) with the option `-DBUILD_SHARED_LIBS=ON`, and install it using `make install`.  
+2. Make LAMMPS available through pgk-config with `export PKG_CONFIG_PATH=/home/$(whoami)/.local/lib/pkgconfig`.
+3. Create a symbolic link to the LAMMPS header files in the MaMiCo root folder using `ln -s <path to LAMMPS>/src <path to MaMiCo>/lammps`
+
+## Input file construction and first runs
+* The build instructions have created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. 
+* An example simulation configuration file can be found [here](https://github.com/HSU-HPC/MaMiCo/blob/master/examples/couette.xml.template), other template input files are in the [examples](https://github.com/HSU-HPC/MaMiCo/blob/master/examples) folder as well. 
+* Copy this file to your build folder, rename it 'couette.xml'. 
+* The available options and features are listed directly in the template file via XML comments, so that you can modify the configuration to suit your needs. 
+* Start the simulation by executing (sequential case) `./couette` or e.g. (MPI-parallel) `mpirun -n 8 ./couette`.
+* If you get the error message 'ERROR MoleculeService::MoleculeService: Could not open file CheckpointSimpleMD_10000_reflecting_0.checkpoint!', copy the file of the same name from the 'examples' folder into your build folder.
 * Depending on the configuration, you will obtain various output files in CSV, VTK or other formats. 
 
 ## Papers to cite

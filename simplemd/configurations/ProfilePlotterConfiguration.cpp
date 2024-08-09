@@ -19,7 +19,7 @@ void simplemd::configurations::ProfilePlotterConfiguration::parseSubtag(tinyxml2
   tarch::la::Vector<MD_DIM, int> buf(-1);
   int intBuf = -1;
 
-  tarch::configuration::ParseConfiguration::readVector<MD_DIM, int>(buf, node, START_CELL);
+  tarch::configuration::ParseConfiguration::readVectorMandatory<MD_DIM, int>(buf, node, START_CELL);
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (buf[d] < 0) {
       std::cout << "ERROR simplemd::configurations::ProfilePlotterConfiguration::parseSubtag: " << START_CELL.c_str() << " (entry " << d
@@ -30,7 +30,7 @@ void simplemd::configurations::ProfilePlotterConfiguration::parseSubtag(tinyxml2
     _startCell[d] = (unsigned int)(buf[d]);
   }
 
-  tarch::configuration::ParseConfiguration::readVector<MD_DIM, int>(buf, node, RANGE);
+  tarch::configuration::ParseConfiguration::readVectorMandatory<MD_DIM, int>(buf, node, RANGE);
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (buf[d] < 0) {
       std::cout << "ERROR simplemd::configurations::ProfilePlotterConfiguration::parseSubtag: " << RANGE.c_str() << " (entry " << d << ") is smaller than zero!"
