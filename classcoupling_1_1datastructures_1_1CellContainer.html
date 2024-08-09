@@ -105,6 +105,7 @@ $(function(){ initResizable(false); });
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1datastructures_1_1CellContainer_1_1Iterator.html">Iterator</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides iterator functionality (increment, access as &lt;*cell, index&gt; pair, equality)  <a href="classcoupling_1_1datastructures_1_1CellContainer_1_1Iterator.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -116,14 +117,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac0965d1938e26132940678b995e396c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51d9531c5e24f411a68e4416b696791d" id="r_a51d9531c5e24f411a68e4416b696791d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51d9531c5e24f411a68e4416b696791d">operator&lt;&lt;</a> (<a class="el" href="classcoupling_1_1datastructures_1_1CouplingCell.html">coupling::datastructures::CouplingCell</a>&lt; dim &gt; *couplingCell)</td></tr>
 <tr class="separator:a51d9531c5e24f411a68e4416b696791d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7eb3ded0f9a1051a5cb9b2dbacbbab1" id="r_ad7eb3ded0f9a1051a5cb9b2dbacbbab1"><td class="memItemLeft" align="right" valign="top"><a id="ad7eb3ded0f9a1051a5cb9b2dbacbbab1" name="ad7eb3ded0f9a1051a5cb9b2dbacbbab1"></a>
-unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> () const</td></tr>
+<tr class="memitem:ad7eb3ded0f9a1051a5cb9b2dbacbbab1" id="r_ad7eb3ded0f9a1051a5cb9b2dbacbbab1"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad7eb3ded0f9a1051a5cb9b2dbacbbab1">size</a> () const</td></tr>
 <tr class="separator:ad7eb3ded0f9a1051a5cb9b2dbacbbab1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec8181459721bf3378af35463ae2f642" id="r_aec8181459721bf3378af35463ae2f642"><td class="memItemLeft" align="right" valign="top"><a id="aec8181459721bf3378af35463ae2f642" name="aec8181459721bf3378af35463ae2f642"></a>
-<a class="el" href="classcoupling_1_1datastructures_1_1CellContainer_1_1Iterator.html">Iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> () const</td></tr>
+<tr class="memitem:aec8181459721bf3378af35463ae2f642" id="r_aec8181459721bf3378af35463ae2f642"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1datastructures_1_1CellContainer_1_1Iterator.html">Iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aec8181459721bf3378af35463ae2f642">begin</a> () const</td></tr>
 <tr class="separator:aec8181459721bf3378af35463ae2f642"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a4b4609d3e628fd7236edfe9b479edc" id="r_a2a4b4609d3e628fd7236edfe9b479edc"><td class="memItemLeft" align="right" valign="top"><a id="a2a4b4609d3e628fd7236edfe9b479edc" name="a2a4b4609d3e628fd7236edfe9b479edc"></a>
-<a class="el" href="classcoupling_1_1datastructures_1_1CellContainer_1_1Iterator.html">Iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>end</b> () const</td></tr>
+<tr class="memitem:a2a4b4609d3e628fd7236edfe9b479edc" id="r_a2a4b4609d3e628fd7236edfe9b479edc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1datastructures_1_1CellContainer_1_1Iterator.html">Iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2a4b4609d3e628fd7236edfe9b479edc">end</a> () const</td></tr>
 <tr class="separator:a2a4b4609d3e628fd7236edfe9b479edc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
@@ -134,13 +132,69 @@ Protected Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;class CellIndexT, unsigned int dim&gt;<br />
 class coupling::datastructures::CellContainer&lt; CellIndexT, dim &gt;</div><p>provides access to the coupling cells. Base class for the class <a class="el" href="classcoupling_1_1datastructures_1_1LinkedCellContainer.html" title="provides access to the coupling cells with linked cells.">coupling::datastructures::LinkedCellContainer</a> </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>The <a class="el" href="classcoupling_1_1datastructures_1_1CellContainer.html" title="provides access to the coupling cells. Base class for the class coupling::datastructures::LinkedCellC...">CellContainer</a> is intended to be used for a fixed indexing domain. Once created, it is assumed to hold all cells in that domain. For example, a <a class="el" href="classcoupling_1_1datastructures_1_1CellContainer.html" title="provides access to the coupling cells. Base class for the class coupling::datastructures::LinkedCellC...">CellContainer</a> created with template parameter I02 is expected to contain all cells that are accessible by iterating through I02. CellContainers do not capture relevant cells automatically. It is the responsibility of the calling function to allocate the cells and populate the container completely before using it. Due to this complete and contiguous nature of the datastructure, direct indexing is allowed, and the cell container is expected to start at location 0 of the indexing domain it was initialized with. CellContainers contain pointers to coupling cells, the cells are not owned by the container, hence the calling function must delete the cells later. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">dim</td><td>Number of dimensions; it can be 1, 2 or 3 </td></tr>
   </table>
   </dd>
 </dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aec8181459721bf3378af35463ae2f642" name="aec8181459721bf3378af35463ae2f642"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec8181459721bf3378af35463ae2f642">&#9670;&#160;</a></span>begin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class CellIndexT , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1datastructures_1_1CellContainer_1_1Iterator.html">Iterator</a> <a class="el" href="classcoupling_1_1datastructures_1_1CellContainer.html">coupling::datastructures::CellContainer</a>&lt; CellIndexT, dim &gt;::begin </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Provides pointer to beginning of iterator of this container </p>
+
+</div>
+</div>
+<a id="a2a4b4609d3e628fd7236edfe9b479edc" name="a2a4b4609d3e628fd7236edfe9b479edc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a4b4609d3e628fd7236edfe9b479edc">&#9670;&#160;</a></span>end()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class CellIndexT , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcoupling_1_1datastructures_1_1CellContainer_1_1Iterator.html">Iterator</a> <a class="el" href="classcoupling_1_1datastructures_1_1CellContainer.html">coupling::datastructures::CellContainer</a>&lt; CellIndexT, dim &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Provides pointer to end of iterator of this container </p>
+
+</div>
+</div>
 <a id="a51d9531c5e24f411a68e4416b696791d" name="a51d9531c5e24f411a68e4416b696791d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a51d9531c5e24f411a68e4416b696791d">&#9670;&#160;</a></span>operator&lt;&lt;()</h2>
 
@@ -165,7 +219,12 @@ template&lt;class CellIndexT , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>adds a new coupling cell to the datastructure at the next index (will only work if the data structure is not yet full) </p>
+<p>Adds a new coupling cell to the datastructure at the next index (will only work if the data structure is not yet full) </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cell</td><td>a pointer to the cell to be inserted </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -193,7 +252,42 @@ template&lt;class CellIndexT , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>returns a pointer to the coupling cell without access to linked cells. </p>
+<p>Index based access, returns a pointer to the coupling cell </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>index An index of type CellIndexT i.e. from the initializing subdomain </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the pointer to the requested cell </dd></dl>
+
+</div>
+</div>
+<a id="ad7eb3ded0f9a1051a5cb9b2dbacbbab1" name="ad7eb3ded0f9a1051a5cb9b2dbacbbab1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7eb3ded0f9a1051a5cb9b2dbacbbab1">&#9670;&#160;</a></span>size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class CellIndexT , unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int <a class="el" href="classcoupling_1_1datastructures_1_1CellContainer.html">coupling::datastructures::CellContainer</a>&lt; CellIndexT, dim &gt;::size </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Returns size of the underlying container.</p>
+<p>This size is notably not the number of cells in the index domain. However, in practice the two numbers should be identical, as accessing contents of an incomplete cotnainer is not allowed. </p><dl class="section return"><dt>Returns</dt><dd>the number of cells stored currently </dd></dl>
 
 </div>
 </div>
@@ -219,7 +313,7 @@ template&lt;class CellIndexT , unsigned int dim&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>holds pointers to all coupling cells with linked cells, but without access to linked cells. This is used for interfacing to send-recv operations. </p>
+<p>Holds pointers to all coupling cells. This is used for interfacing to send-recv operations. </p>
 
 </div>
 </div>

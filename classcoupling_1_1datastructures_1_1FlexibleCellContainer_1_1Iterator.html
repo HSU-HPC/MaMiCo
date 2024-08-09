@@ -97,6 +97,11 @@ $(function(){ initResizable(false); });
   <div class="headertitle"><div class="title">coupling::datastructures::FlexibleCellContainer&lt; dim &gt;::Iterator Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Provides iterator functionality (increment, access as &lt;*cell, index&gt; pair, equality)  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="FlexibleCellContainer_8h_source.html">FlexibleCellContainer.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
@@ -112,8 +117,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab3d969affa9e6fb33b8db880e0287076" id="r_ab3d969affa9e6fb33b8db880e0287076"><td class="memItemLeft" align="right" valign="top"><a id="ab3d969affa9e6fb33b8db880e0287076" name="ab3d969affa9e6fb33b8db880e0287076"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Iterator</b> (CouplingCellIterator itCouplingCells, IndexIterator itIdxs)</td></tr>
 <tr class="separator:ab3d969affa9e6fb33b8db880e0287076"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1439a899d17959e6d44ad38d0218dbb2" id="r_a1439a899d17959e6d44ad38d0218dbb2"><td class="memItemLeft" align="right" valign="top"><a id="a1439a899d17959e6d44ad38d0218dbb2" name="a1439a899d17959e6d44ad38d0218dbb2"></a>
-const std::pair&lt; <a class="el" href="classcoupling_1_1datastructures_1_1CouplingCell.html">coupling::datastructures::CouplingCell</a>&lt; dim &gt; *, <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">I01</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>operator*</b> () const</td></tr>
+<tr class="memitem:a1439a899d17959e6d44ad38d0218dbb2" id="r_a1439a899d17959e6d44ad38d0218dbb2"><td class="memItemLeft" align="right" valign="top">const std::pair&lt; <a class="el" href="classcoupling_1_1datastructures_1_1CouplingCell.html">coupling::datastructures::CouplingCell</a>&lt; dim &gt; *, <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">I01</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1439a899d17959e6d44ad38d0218dbb2">operator*</a> () const</td></tr>
 <tr class="separator:a1439a899d17959e6d44ad38d0218dbb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75c7dbe09dd9ee3fbab84a97eceb66d9" id="r_a75c7dbe09dd9ee3fbab84a97eceb66d9"><td class="memItemLeft" align="right" valign="top"><a id="a75c7dbe09dd9ee3fbab84a97eceb66d9" name="a75c7dbe09dd9ee3fbab84a97eceb66d9"></a>
 <a class="el" href="classcoupling_1_1datastructures_1_1FlexibleCellContainer_1_1Iterator.html">Iterator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator++</b> ()</td></tr>
@@ -124,11 +128,9 @@ const std::pair&lt; <a class="el" href="classcoupling_1_1datastructures_1_1Coupl
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:a10a625edcd05f3fe7cbafa88b963ac5b" id="r_a10a625edcd05f3fe7cbafa88b963ac5b"><td class="memItemLeft" align="right" valign="top"><a id="a10a625edcd05f3fe7cbafa88b963ac5b" name="a10a625edcd05f3fe7cbafa88b963ac5b"></a>
-CouplingCellIterator&#160;</td><td class="memItemRight" valign="bottom"><b>_itCouplingCells</b></td></tr>
+<tr class="memitem:a10a625edcd05f3fe7cbafa88b963ac5b" id="r_a10a625edcd05f3fe7cbafa88b963ac5b"><td class="memItemLeft" align="right" valign="top">CouplingCellIterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a10a625edcd05f3fe7cbafa88b963ac5b">_itCouplingCells</a></td></tr>
 <tr class="separator:a10a625edcd05f3fe7cbafa88b963ac5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6403930ea3235838cf6ee88c21fcd03b" id="r_a6403930ea3235838cf6ee88c21fcd03b"><td class="memItemLeft" align="right" valign="top"><a id="a6403930ea3235838cf6ee88c21fcd03b" name="a6403930ea3235838cf6ee88c21fcd03b"></a>
-IndexIterator&#160;</td><td class="memItemRight" valign="bottom"><b>_itIdxs</b></td></tr>
+<tr class="memitem:a6403930ea3235838cf6ee88c21fcd03b" id="r_a6403930ea3235838cf6ee88c21fcd03b"><td class="memItemLeft" align="right" valign="top">IndexIterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6403930ea3235838cf6ee88c21fcd03b">_itIdxs</a></td></tr>
 <tr class="separator:a6403930ea3235838cf6ee88c21fcd03b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
@@ -140,6 +142,90 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (const <a class="el" href="classcoupling_1_1datastructures_1_1FlexibleCellContainer_1_1Iterator.html">Iterator</a> &amp;a, const <a class="el" href="classcoupling_1_1datastructures_1_1FlexibleCellContainer_1_1Iterator.html">Iterator</a> &amp;b)</td></tr>
 <tr class="separator:a27aed9f3ea67a677964fa51de28a5824"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;unsigned int dim&gt;<br />
+class coupling::datastructures::FlexibleCellContainer&lt; dim &gt;::Iterator</div><p>Provides iterator functionality (increment, access as &lt;*cell, index&gt; pair, equality) </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a1439a899d17959e6d44ad38d0218dbb2" name="a1439a899d17959e6d44ad38d0218dbb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1439a899d17959e6d44ad38d0218dbb2">&#9670;&#160;</a></span>operator*()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::pair&lt; <a class="el" href="classcoupling_1_1datastructures_1_1CouplingCell.html">coupling::datastructures::CouplingCell</a>&lt; dim &gt; *, <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">I01</a> &gt; <a class="el" href="classcoupling_1_1datastructures_1_1FlexibleCellContainer.html">coupling::datastructures::FlexibleCellContainer</a>&lt; dim &gt;::Iterator::operator* </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p><a class="el" href="classcoupling_1_1datastructures_1_1FlexibleCellContainer_1_1Iterator.html" title="Provides iterator functionality (increment, access as &lt;*cell, index&gt; pair, equality)">Iterator</a> access, returning the data at the current iterator location</p>
+<dl class="section return"><dt>Returns</dt><dd>a std::pair with the cell pointer and the index of the data that the iterator points to </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a10a625edcd05f3fe7cbafa88b963ac5b" name="a10a625edcd05f3fe7cbafa88b963ac5b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10a625edcd05f3fe7cbafa88b963ac5b">&#9670;&#160;</a></span>_itCouplingCells</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">CouplingCellIterator <a class="el" href="classcoupling_1_1datastructures_1_1FlexibleCellContainer.html">coupling::datastructures::FlexibleCellContainer</a>&lt; dim &gt;::Iterator::_itCouplingCells</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p><a class="el" href="classcoupling_1_1datastructures_1_1FlexibleCellContainer_1_1Iterator.html" title="Provides iterator functionality (increment, access as &lt;*cell, index&gt; pair, equality)">Iterator</a> to underlying cell* vector </p>
+
+</div>
+</div>
+<a id="a6403930ea3235838cf6ee88c21fcd03b" name="a6403930ea3235838cf6ee88c21fcd03b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6403930ea3235838cf6ee88c21fcd03b">&#9670;&#160;</a></span>_itIdxs</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">IndexIterator <a class="el" href="classcoupling_1_1datastructures_1_1FlexibleCellContainer.html">coupling::datastructures::FlexibleCellContainer</a>&lt; dim &gt;::Iterator::_itIdxs</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p><a class="el" href="classcoupling_1_1datastructures_1_1FlexibleCellContainer_1_1Iterator.html" title="Provides iterator functionality (increment, access as &lt;*cell, index&gt; pair, equality)">Iterator</a> to underlying index vector </p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>coupling/datastructures/<a class="el" href="FlexibleCellContainer_8h_source.html">FlexibleCellContainer.h</a></li>
 </ul>
