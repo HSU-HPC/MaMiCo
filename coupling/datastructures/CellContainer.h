@@ -22,6 +22,8 @@ template <class CellIndexT, unsigned int dim> class CellContainer;
 template <class CellIndexT, unsigned int dim> class coupling::datastructures::CellContainer {
 
 public:
+  using _CellIndexT = CellIndexT;
+
   CellContainer() { _couplingCells.reserve(CellIndexT::linearNumberCellsInDomain); }
   CellContainer(std::vector<coupling::datastructures::CouplingCell<dim>*> couplingCells) {
     _couplingCells.reserve(CellIndexT::linearNumberCellsInDomain);

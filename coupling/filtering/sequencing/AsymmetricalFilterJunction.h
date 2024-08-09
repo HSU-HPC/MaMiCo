@@ -24,21 +24,21 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class AsymmetricalFilterJunction;
+template <class Container_T, unsigned int dim> class AsymmetricalFilterJunction;
 }
 } // namespace coupling
 
-template <unsigned int dim> class coupling::filtering::AsymmetricalFilterJunction : public coupling::filtering::FilterSequence<dim> {
+template <class Container_T, unsigned int dim> class coupling::filtering::AsymmetricalFilterJunction : public coupling::filtering::FilterSequence<Container_T, dim> {
 public:
   AsymmetricalFilterJunction(const char* name,
-                             const std::vector<coupling::datastructures::CouplingCell<dim>*> primaryInputCellVector,   // primary input of sequence.
-                             const std::vector<coupling::datastructures::CouplingCell<dim>*> secondaryInputCellVector, // additional data, presented as
+                             const Container_T primaryInputCellVector,   // primary input of sequence.
+                             const coupling::datastructures::FlexibleCellContainer<dim> secondaryInputCellVector, // additional data, presented as
                                                                                                                        // macro cells as well
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                              MPI_Comm comm,
 #endif
                              std::array<bool, 7> filteredValues)
-      : coupling::filtering::FilterSequence<dim>(name, primaryInputCellVector,
+      : coupling::filtering::FilterSequence<Container_T, dim>(name, primaryInputCellVector,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                  comm,
 #endif
@@ -49,9 +49,12 @@ public:
 #endif
 
     // allocate and init secondary cell vectors
-    for (auto cell : _inputCellVector_secondary) {
-      _cellVector1_secondary.push_back(new coupling::datastructures::CouplingCell<dim>(*cell));
-      _cellVector2_secondary.push_back(new coupling::datastructures::CouplingCell<dim>(*cell));
+    I01 idx;
+    coupling::datastructures::CouplingCell<3>* cell;
+    for (auto pair : _inputCellVector_secondary) {
+      std::tie(cell, idx) = pair;
+      _cellVector1_secondary << std::make_pair(new coupling::datastructures::CouplingCell<dim>(*cell), idx);
+      _cellVector2_secondary << std::make_pair(new coupling::datastructures::CouplingCell<dim>(*cell), idx);
     }
 #ifdef DEBUG_FILTER_JUNCTION_ASYM
     std::cout << PRINT_PREFIX() << "Initialized secondary cell vectors." << std::endl;
@@ -59,14 +62,20 @@ public:
     std::cout << PRINT_PREFIX() << "First element of _cellVector2_secondary after init: " << _cellVector2_secondary[0] << std::endl;
 #endif
 
-    coupling::filtering::FilterSequence<dim>::_isModifiable = false; // Dynamic filters are not yet supported. TODO
+    coupling::filtering::FilterSequence<Container_T, dim>::_isModifiable = false; // Dynamic filters are not yet supported. TODO
   }
 
   ~AsymmetricalFilterJunction() {
-    for (auto secondarycell : _cellVector1_secondary)
-      delete secondarycell;
-    for (auto secondarycell : _cellVector2_secondary)
-      delete secondarycell;
+    I01 idx;
+    coupling::datastructures::CouplingCell<3>* cell;
+    for (auto pair : _cellVector1_secondary){
+      std::tie(cell, idx) = pair;
+      delete cell;
+    }
+    for (auto pair : _cellVector2_secondary){
+      std::tie(cell, idx) = pair;
+      delete cell;
+    }
   }
 
   /*
@@ -76,21 +85,21 @@ public:
   int loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) override;
 
   void printFilters() override {
-    std::cout << "Junctors in asymmetrical junction " << coupling::filtering::FilterSequence<dim>::_name << ": ";
-    for (auto f : coupling::filtering::FilterSequence<dim>::_filters)
+    std::cout << "Junctors in asymmetrical junction " << coupling::filtering::FilterSequence<Container_T, dim>::_name << ": ";
+    for (auto f : coupling::filtering::FilterSequence<Container_T, dim>::_filters)
       std::cout << f->getType() << " ";
     std::cout << std::endl;
   }
 
   std::string PRINT_PREFIX() const override {
-    return std::string("	AFJ(").std::string::append(coupling::filtering::FilterSequence<dim>::_name).std::string::append("): ");
+    return std::string("	AFJ(").std::string::append(coupling::filtering::FilterSequence<Container_T, dim>::_name).std::string::append("): ");
   }
 
 private:
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _inputCellVector_secondary;
+  coupling::datastructures::FlexibleCellContainer<dim> _inputCellVector_secondary;
 
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _cellVector1_secondary;
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _cellVector2_secondary;
+  coupling::datastructures::FlexibleCellContainer<dim> _cellVector1_secondary;
+  coupling::datastructures::FlexibleCellContainer<dim> _cellVector2_secondary;
 };
 
 // inlcude implementation

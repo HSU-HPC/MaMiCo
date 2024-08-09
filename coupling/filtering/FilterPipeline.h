@@ -19,17 +19,9 @@ using tarch::configuration::ParseConfiguration;
 
 namespace coupling {
 namespace filtering {
-template <class CellIndex_T, unsigned int dim> class FilterPipeline;
-
-/*
- * Used as member of FilterPipeline. Displays where that FP is used.
- * per instance:		apply filtering for each MD instance
- * individually, before merging instances post multi instance:	apply filtering
- * after MD instances have been merged
- */
-enum class Scope { perInstance, postMultiInstance };
-} // namespace filtering
-} // namespace coupling
+template <class Container_T, unsigned int dim> class FilterPipeline;
+}
+}
 
 /*
  * Manages different branches of filtering sequences.
@@ -39,12 +31,11 @@ enum class Scope { perInstance, postMultiInstance };
  * Macro-Cells as input and output. All configuration is made using an
  * XML-config file and does not require recompilation when modified.
  *
- * @author Felix Maurer
+ * @author Felix Maurer, Piet Jarmatz
  */
-template <class CellIndex_T, unsigned int dim> class coupling::filtering::FilterPipeline {
+template <class Container_T, unsigned int dim> class coupling::filtering::FilterPipeline {
 public:
-  FilterPipeline(const coupling::datastructures::CellContainer<CellIndex_T, dim> inputCells, const coupling::filtering::Scope scope,
-                 const tarch::utils::MultiMDService<dim>& multiMDService, const char* cfgpath);
+  FilterPipeline(const tarch::utils::MultiMDService<dim>& multiMDService, const char* cfgpath);
 
   ~FilterPipeline() {
     for (auto sequence : _sequences)
@@ -70,8 +61,8 @@ public:
    * Not that Junction is a subtype of Sequence, so this is how to get Junctions
    * as well.
    */
-  coupling::filtering::FilterSequence<dim>* getSequence(const char* identifier) const;
-  std::vector<coupling::filtering::FilterSequence<dim>*> getAllSequences() const { return _sequences; }
+  coupling::filtering::FilterSequence<Container_T, dim>* getSequence(const char* identifier) const;
+  std::vector<coupling::filtering::FilterSequence<Container_T, dim>*> getAllSequences() const { return _sequences; }
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   /*
@@ -80,7 +71,7 @@ public:
   MPI_Comm getFilteringCommunicator() { return _comm; };
 #endif
 
-private:
+protected:
   /*
    * Detects errors in XML config file.
    */
@@ -99,21 +90,15 @@ private:
   /*
    * Input cells within the local, md2macro, ghost layer excluding domain
    */
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _md2MacroCells;
+  Container_T _md2MacroCells;
   /*
    * Input cells that do not match the criteria to be in _md2MacroCells.
    */
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _outerCells;
+  coupling::datastructures::FlexibleCellContainer<dim> _outerCells;
 
   ParseConfiguration::XMLConfiguration _config;
 
-  /*
-   * Scope in which this FilterPipeline is applied. Cf. coupling::Scope
-   * definition.
-   */
-  const coupling::filtering::Scope _scope;
-
-  std::vector<coupling::filtering::FilterSequence<dim>*> _sequences;
+  std::vector<coupling::filtering::FilterSequence<Container_T, dim>*> _sequences;
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm _comm;

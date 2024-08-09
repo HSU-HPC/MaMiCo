@@ -28,7 +28,7 @@ coupling::filtering::FilterPipeline<Container_T, dim>::FilterPipeline(const tarc
 }
 
 // member functions of coupling::filtering::FilterPipeline
-template <class CellIndex_T, unsigned int dim> double coupling::filtering::FilterPipeline<CellIndex_T, dim>::operator()() {
+template <class Container_T, unsigned int dim> double coupling::filtering::FilterPipeline<Container_T, dim>::operator()() {
   timeval start;
   timeval end;
   double runtime = 0;
@@ -36,7 +36,7 @@ template <class CellIndex_T, unsigned int dim> double coupling::filtering::Filte
     gettimeofday(&start, NULL);
   }
 
-  for (coupling::filtering::FilterSequence<dim>* sequence : _sequences) {
+  for (coupling::filtering::FilterSequence<Container_T, dim>* sequence : _sequences) {
     // finalize FS's filter vector
     if (sequence->isModifiable()) {
 #ifdef DEBUG_FILTER_PIPELINE
@@ -71,8 +71,8 @@ template <class CellIndex_T, unsigned int dim> double coupling::filtering::Filte
   return runtime;
 }
 
-template <class CellIndex_T, unsigned int dim>
-coupling::filtering::FilterSequence<dim>* coupling::filtering::FilterPipeline<CellIndex_T, dim>::getSequence(const char* sequenceIdentifier) const {
+template <class Container_T, unsigned int dim>
+coupling::filtering::FilterSequence<Container_T, dim>* coupling::filtering::FilterPipeline<Container_T, dim>::getSequence(const char* sequenceIdentifier) const {
   for (auto sequence : _sequences) {
     if (std::strcmp(sequence->getName(), sequenceIdentifier) == 0) {
       return sequence;
@@ -82,8 +82,8 @@ coupling::filtering::FilterSequence<dim>* coupling::filtering::FilterPipeline<Ce
 }
 
 // Private functions of coupling::filtering::FilterPipeline:
-template <class CellIndex_T, unsigned int dim>
-bool coupling::filtering::FilterPipeline<CellIndex_T, dim>::configIsValid(ParseConfiguration::XMLConfiguration& xmlConfig) {
+template <class Container_T, unsigned int dim>
+bool coupling::filtering::FilterPipeline<Container_T, dim>::configIsValid(ParseConfiguration::XMLConfiguration& xmlConfig) {
   // Check main node
   tinyxml2::XMLElement* node = xmlConfig.root->FirstChildElement("filter-pipeline");
   if (!node) {
@@ -133,7 +133,7 @@ bool coupling::filtering::FilterPipeline<CellIndex_T, dim>::configIsValid(ParseC
   return true;
 }
 
-template <class CellIndex_T, unsigned int dim> void coupling::filtering::FilterPipeline<CellIndex_T, dim>::loadSequencesFromXML(tinyxml2::XMLElement* node) {
+template <class Container_T, unsigned int dim> void coupling::filtering::FilterPipeline<Container_T, dim>::loadSequencesFromXML(tinyxml2::XMLElement* node) {
 
   tinyxml2::XMLElement* currSequenceNode = node->FirstChildElement();
 
@@ -191,7 +191,7 @@ template <class CellIndex_T, unsigned int dim> void coupling::filtering::FilterP
     }
 
     // For regular sequences, this holds just one element.
-    std::vector<FilterSequence<dim>*> inputSeqs;
+    std::vector<FilterSequence<Container_T, dim>*> inputSeqs;
 
     // Holds all input cells for this sequence
     std::vector<Container_T> inputCellVector;
@@ -280,7 +280,7 @@ template <class CellIndex_T, unsigned int dim> void coupling::filtering::FilterP
 
     // CREATE SEQUENCE/JUNCTION
     if (inputCount == 1) {
-      _sequences.push_back(new coupling::filtering::FilterSequence<dim>(currSequenceNode->Value(), inputCellVector,
+      _sequences.push_back(new coupling::filtering::FilterSequence<Container_T, dim>(currSequenceNode->Value(), inputCellVector[0],
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                                         _comm,
 #endif
@@ -303,7 +303,7 @@ template <class CellIndex_T, unsigned int dim> void coupling::filtering::FilterP
                                  "only allowed for exactly two inputs!");
       // TODO: currently, the only support asymmetrical junction is one that
       // uses outer cells as secondary input
-      _sequences.push_back(new coupling::filtering::AsymmetricalFilterJunction<dim>(currSequenceNode->Value(), inputCellVector, _outerCells,
+      _sequences.push_back(new coupling::filtering::AsymmetricalFilterJunction<Container_T, dim>(currSequenceNode->Value(), inputCellVector, _outerCells,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                                                     _comm,
 #endif
@@ -316,7 +316,7 @@ template <class CellIndex_T, unsigned int dim> void coupling::filtering::FilterP
       // junctions
     } else { //(symmetrical) Junction = Sequence with 2 or more inputs
       // TODO: move template inputc: currently has 2 hardcoded
-      _sequences.push_back(new coupling::filtering::FilterJunction<dim, 2>(currSequenceNode->Value(), inputCellVector,
+      _sequences.push_back(new coupling::filtering::FilterJunction<Container_T, dim, 2>(currSequenceNode->Value(), inputCellVector,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                                            _comm,
 #endif

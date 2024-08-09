@@ -25,19 +25,19 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim, std::size_t inputc> class FilterJunction;
+template <class Container_T, unsigned int dim, std::size_t inputc> class FilterJunction;
 }
 } // namespace coupling
 
-template <unsigned int dim, std::size_t inputc> class coupling::filtering::FilterJunction : public coupling::filtering::FilterSequence<dim> {
+template <class Container_T, unsigned int dim, std::size_t inputc> class coupling::filtering::FilterJunction : public coupling::filtering::FilterSequence<Container_T, dim> {
 public:
   FilterJunction(const char* name,
-                 const std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector, // concatenation of numberImput input cell vectors
+                 const std::vector<Container_T> inputCellVector, // inputc input cell containers
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                  MPI_Comm comm,
 #endif
                  std::array<bool, 7> filteredValues)
-      : coupling::filtering::FilterSequence<dim>(name, inputCellVector,
+      : coupling::filtering::FilterSequence<Container_T, dim>(name, inputCellVector[0],
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                                                  comm,
 #endif
@@ -45,40 +45,17 @@ public:
     if (inputc == 0)
       throw std::runtime_error("ERROR: Creating FilterJunction with inputc = 0.");
 
+    if (inputc != inputCellVector.size())
+      throw std::runtime_error("ERROR: Creating FilterJunction, wrong number of inputs");
+
 #ifdef DEBUG_FILTER_JUNCTION
     std::cout << PRINT_PREFIX() << "This is a FilterJunction. Number of inputs:" << inputc << std::endl;
 #endif
 
-    // Partition input vector
-    unsigned int partitionSize = coupling::filtering::FilterSequence<dim>::_inputCellVector.size() / inputc;
+    for (unsigned int p = 0; p < inputc; p++) 
+      _inputCellVector_parted[p] = inputCellVector[p];
 
-    for (unsigned int p = 0; p < inputc; p++) {
-      //_inputCellVector
-      _inputCellVector_parted[p] = std::vector<coupling::datastructures::CouplingCell<dim>*>(
-          coupling::filtering::FilterSequence<dim>::_inputCellVector.begin() + (p * partitionSize),
-          coupling::filtering::FilterSequence<dim>::_inputCellVector.begin() + ((p + 1) * partitionSize));
-#ifdef DEBUG_FILTER_JUNCTION
-      std::cout << PRINT_PREFIX() << "Size of _inputCellVector_parted[" << p << "]: " << _inputCellVector_parted[p].size() << std::endl;
-#endif
-
-      //_cellVector1
-      _cellVector1_parted[p] =
-          std::vector<coupling::datastructures::CouplingCell<dim>*>(coupling::filtering::FilterSequence<dim>::_cellVector1.begin() + (p * partitionSize),
-                                                                    coupling::filtering::FilterSequence<dim>::_cellVector1.begin() + ((p + 1) * partitionSize));
-#ifdef DEBUG_FILTER_JUNCTION
-      std::cout << PRINT_PREFIX() << "Size of _cellVector1_parted[" << p << "]: " << _cellVector1_parted[p].size() << std::endl;
-#endif
-
-      //_cellVector2
-      _cellVector2_parted[p] =
-          std::vector<coupling::datastructures::CouplingCell<dim>*>(coupling::filtering::FilterSequence<dim>::_cellVector2.begin() + (p * partitionSize),
-                                                                    coupling::filtering::FilterSequence<dim>::_cellVector2.begin() + ((p + 1) * partitionSize));
-#ifdef DEBUG_FILTER_JUNCTION
-      std::cout << PRINT_PREFIX() << "Size of _cellVector2_parted[" << p << "]: " << _cellVector2_parted[p].size() << std::endl;
-#endif
-    }
-
-    coupling::filtering::FilterSequence<dim>::_isModifiable = false; // Dynamic filters are not yet supported.
+    coupling::filtering::FilterSequence<Container_T, dim>::_isModifiable = false; // Dynamic filters are not yet supported.
   }
 
   /*
@@ -109,37 +86,35 @@ public:
    * The first partition of _cellVector1/2 is the main partition. A junction's
    * default output is always its main partition.
    */
-  const std::vector<coupling::datastructures::CouplingCell<dim>*>& getOutputCellVector(unsigned int outputIndex = 0) const override {
+  const Container_T& getOutputCellVector(unsigned int outputIndex = 0) const override {
     if (outputIndex >= inputc) {
       std::cout << PRINT_PREFIX() << "ERROR: getOutputCellVector: Requested output index(" << outputIndex << ") too high. (partitions: )" << inputc
                 << std::endl;
       exit(EXIT_FAILURE);
     }
 
-    if (coupling::filtering::FilterSequence<dim>::_filters.empty())
+    if (coupling::filtering::FilterSequence<Container_T, dim>::_filters.empty())
       std::cout << PRINT_PREFIX() << "Warning: Accessing cell vectors while _filters is empty." << std::endl;
-    if (coupling::filtering::FilterSequence<dim>::_filters.size() % 2 == 0)
-      return _cellVector1_parted[0];
+    if (coupling::filtering::FilterSequence<Container_T, dim>::_filters.size() % 2 == 0)
+      return this->_cellVector1;
     else
-      return _cellVector2_parted[0];
+      return this->_cellVector2;
   }
 
   void printFilters() override {
-    std::cout << "Junctors in junction " << coupling::filtering::FilterSequence<dim>::_name << ": ";
-    for (auto f : coupling::filtering::FilterSequence<dim>::_filters)
+    std::cout << "Junctors in junction " << coupling::filtering::FilterSequence<Container_T, dim>::_name << ": ";
+    for (auto f : coupling::filtering::FilterSequence<Container_T, dim>::_filters)
       std::cout << f->getType() << " ";
     std::cout << std::endl;
   }
 
   std::string PRINT_PREFIX() const override {
-    return std::string("	FJ(").std::string::append(coupling::filtering::FilterSequence<dim>::_name).std::string::append("): ");
+    return std::string("	FJ(").std::string::append(coupling::filtering::FilterSequence<Container_T, dim>::_name).std::string::append("): ");
   }
 
 private:
   // These must be parted for junction output and junctor in/output.
-  std::array<std::vector<coupling::datastructures::CouplingCell<dim>*>, inputc> _inputCellVector_parted;
-  std::array<std::vector<coupling::datastructures::CouplingCell<dim>*>, inputc> _cellVector1_parted;
-  std::array<std::vector<coupling::datastructures::CouplingCell<dim>*>, inputc> _cellVector2_parted;
+  std::array<Container_T, inputc> _inputCellVector_parted;
 };
 
 // inlcude implementation

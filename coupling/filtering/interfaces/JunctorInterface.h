@@ -9,7 +9,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim, std::size_t inputc, std::size_t outputc> class JunctorInterface;
+template <class Container_T, unsigned int dim, std::size_t inputc, std::size_t outputc> class JunctorInterface;
 }
 } // namespace coupling
 
@@ -25,16 +25,16 @@ template <unsigned int dim, std::size_t inputc, std::size_t outputc> class Junct
  * [0] of the corresponding std::array) input/output data. (cf. lines 35, 67.)
  * @author Felix Maurer
  */
-template <unsigned int dim, std::size_t inputc, std::size_t outputc>
-class coupling::filtering::JunctorInterface : public coupling::filtering::FilterInterface<dim> {
+template <class Container_T, unsigned int dim, std::size_t inputc, std::size_t outputc>
+class coupling::filtering::JunctorInterface : public coupling::filtering::FilterInterface<Container_T, dim> {
 public:
-  JunctorInterface(const std::array<std::vector<coupling::datastructures::CouplingCell<dim>*>, inputc> inputCellVectors,
-                   const std::array<std::vector<coupling::datastructures::CouplingCell<dim>*>, outputc> outputCellVectors,
+  JunctorInterface(const std::array<Container_T, inputc> inputCellVectors,
+                   const std::array<Container_T, outputc> outputCellVectors,
                    const std::array<bool, 7> filteredValues, const char* type)
       : // This assumes the array of cell vectors to be nonempty. Suboptimal.
         // NOTE: Avoid using FI's cell vectors. Use
         // _inputCellVectors/_outputCellVectors instead.
-        coupling::filtering::FilterInterface<dim>(inputCellVectors[0], outputCellVectors[0], filteredValues, type), _inputCellVectors(inputCellVectors),
+        coupling::filtering::FilterInterface<Container_T, dim>(inputCellVectors[0], outputCellVectors[0], filteredValues, type), _inputCellVectors(inputCellVectors),
         _outputCellVectors(outputCellVectors) {
 #ifdef DEBUG_JUNCTOR_INTERFACE
     // check input partition sizes
@@ -46,8 +46,8 @@ public:
 #endif
   }
 
-  void updateCellData(std::vector<coupling::datastructures::CouplingCell<dim>*> new_inputCellVectors[inputc],
-                      std::vector<coupling::datastructures::CouplingCell<dim>*> new_outputCellVectors[outputc],
+  void updateCellData(Container_T new_inputCellVectors[inputc],
+                      Container_T new_outputCellVectors[outputc],
                       std::vector<tarch::la::Vector<dim, unsigned int>>& new_cellIndices) {
     std::cout << "		JI: Updating cell data." << std::endl;
     _inputCellVectors = new_inputCellVectors;
@@ -61,6 +61,6 @@ protected:
   /**
    * Unlike regular filters, junctors allow for multiple input- and output-sets
    */
-  std::array<std::vector<coupling::datastructures::CouplingCell<dim>*>, inputc> _inputCellVectors;
-  std::array<std::vector<coupling::datastructures::CouplingCell<dim>*>, outputc> _outputCellVectors;
+  std::array<Container_T, inputc> _inputCellVectors;
+  std::array<Container_T, outputc> _outputCellVectors;
 };

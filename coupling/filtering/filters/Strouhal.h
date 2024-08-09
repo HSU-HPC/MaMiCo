@@ -11,7 +11,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class Strouhal;
+template <class CellIndex_T, unsigned int dim> class Strouhal;
 }
 } // namespace coupling
 
@@ -23,12 +23,12 @@ template <unsigned int dim> class Strouhal;
  * accurate results.
  * @author Felix Maurer
  */
-template <unsigned int dim> class coupling::filtering::Strouhal : public coupling::filtering::FilterInterfaceReadOnly<dim> {
+template <class CellIndex_T, unsigned int dim> class coupling::filtering::Strouhal : public coupling::filtering::FilterInterfaceReadOnly<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim> {
 public:
-  Strouhal(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
-           const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector,
+  Strouhal(const coupling::datastructures::CellContainer<CellIndex_T, dim>& inputCellVector,
+           const coupling::datastructures::CellContainer<CellIndex_T, dim>& outputCellVector,
            const std::vector<tarch::la::Vector<dim, unsigned int>> cellIndices, std::array<bool, 7> filteredValues, double u, double d)
-      : coupling::filtering::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "STROUHALCPP"), _U(u), _D(d) {
+      : coupling::filtering::FilterInterfaceReadOnly<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim>(inputCellVector, outputCellVector, cellIndices, filteredValues, "STROUHALCPP"), _U(u), _D(d) {
     if (dim < 2) {
       std::cout << "ERROR: Strouhal filter only works for dim >= 2." << std::endl;
       exit(EXIT_FAILURE);

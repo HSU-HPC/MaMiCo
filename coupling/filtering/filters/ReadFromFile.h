@@ -13,7 +13,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class ReadFromFile;
+template <class CellIndex_T, unsigned int dim> class ReadFromFile;
 }
 } // namespace coupling
 
@@ -31,12 +31,12 @@ template <unsigned int dim> class ReadFromFile;
  *
  * @Author Felix Maurer
  */
-template <unsigned int dim> class coupling::filtering::ReadFromFile : public coupling::filtering::FilterInterface<dim> {
+template <class CellIndex_T, unsigned int dim> class coupling::filtering::ReadFromFile : public coupling::filtering::FilterInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim> {
 public:
-  ReadFromFile(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
-               const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues,
+  ReadFromFile(const coupling::datastructures::CellContainer<CellIndex_T, dim>& inputCellVector,
+               const coupling::datastructures::CellContainer<CellIndex_T, dim>& outputCellVector, const std::array<bool, 7> filteredValues,
                std::string location)
-      : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "RFF"), _location(location), _iteration(0) {
+      : coupling::filtering::FilterInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim>(inputCellVector, outputCellVector, filteredValues, "RFF"), _location(location), _iteration(0) {
 #ifdef DEBUG_READ_FROM_FILE
     std::cout << "		RFF: Read from file instance created. Will read from: " << _location << "." << std::endl;
 #endif

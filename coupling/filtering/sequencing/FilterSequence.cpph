@@ -6,13 +6,13 @@
 
 // Member functions of coupling::filtering::FilterSequence
 
-template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) {
+template <class Container_T, unsigned int dim> int coupling::filtering::FilterSequence<Container_T, dim>::loadFiltersFromXML(tinyxml2::XMLElement* sequenceNode) {
   if (!sequenceNode)
     return EXIT_FAILURE;
   tinyxml2::XMLElement* currFilterNode = sequenceNode->FirstChildElement();
 
-  std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector = _inputCellVector;
-  std::vector<coupling::datastructures::CouplingCell<dim>*> outputCellVector = _cellVector2;
+  Container_T inputCellVector = _inputCellVector;
+  Container_T outputCellVector = _cellVector2;
 
 #ifdef DEBUG_FILTER_PIPELINE
   std::cout << PRINT_PREFIX() << "Initializing filter objects." << std::endl;
@@ -216,8 +216,8 @@ template <unsigned int dim> int coupling::filtering::FilterSequence<dim>::loadFi
 }
 
 // TODO: restructure code: reduce code duplication
-template <unsigned int dim>
-void coupling::filtering::FilterSequence<dim>::addFilter(
+template <class Container_T, unsigned int dim>
+void coupling::filtering::FilterSequence<Container_T, dim>::addFilter(
     const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
     const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector,
     int filterIndex // counting starts at 0, -1 is equivalent to EOL
@@ -311,7 +311,7 @@ void coupling::filtering::FilterSequence<dim>::addFilter(
 // Private functions of coupling::filtering::FilterSequence
 
 // TODO: inline in constructor
-template <unsigned int dim> void coupling::filtering::FilterSequence<dim>::initCellVectors() {
+template <class Container_T, unsigned int dim> void coupling::filtering::FilterSequence<Container_T, dim>::initCellVectors() {
   for (auto cell : _inputCellVector) {
     _cellVector1.push_back(new coupling::datastructures::CouplingCell<dim>(*cell));
     _cellVector2.push_back(new coupling::datastructures::CouplingCell<dim>(*cell));

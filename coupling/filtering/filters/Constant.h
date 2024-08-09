@@ -8,7 +8,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class Constant;
+template <class CellIndex_T, unsigned int dim> class Constant;
 }
 } // namespace coupling
 
@@ -20,34 +20,34 @@ template <unsigned int dim> class Constant;
  * @author Felix Maurer
  */
 
-template <unsigned int dim> class coupling::filtering::Constant : public coupling::filtering::FilterInterface<dim> {
+template <class CellIndex_T, unsigned int dim> class coupling::filtering::Constant : public coupling::filtering::FilterInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim> {
 public:
-  Constant(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
-           const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues,
+  Constant(const coupling::datastructures::CellContainer<CellIndex_T, dim>& inputCellVector,
+           const coupling::datastructures::CellContainer<CellIndex_T, dim>& outputCellVector, const std::array<bool, 7> filteredValues,
            const tarch::la::Vector<dim, bool> filteredDims, const double constant)
-      : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "Constant"), _constant(constant),
+      : coupling::filtering::FilterInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim>(inputCellVector, outputCellVector, filteredValues, "Constant"), _constant(constant),
         _filteredDims(filteredDims) {}
 
   void operator()() {
     tarch::la::Vector<dim, double> vec_buf;
     for (unsigned int i = 0; i < this->_inputCells.size(); ++i) {
       // apply to scalars
-      for (auto scalarProperty : FilterInterface<dim>::_scalarAccessFunctionPairs) {
-        (FilterInterface<dim>::_outputCells[i]->*scalarProperty.set)(_constant);
+      for (auto scalarProperty : this->_scalarAccessFunctionPairs) {
+        (this->_outputCells[i]->*scalarProperty.set)(_constant);
       }
 
       // apply to vectors
-      for (auto vectorProperty : FilterInterface<dim>::_vectorAccessFunctionPairs) {
+      for (auto vectorProperty : this->_vectorAccessFunctionPairs) {
         // TODO: perhaps check if _filteredDims == true,..,true before this for
         // performance reasons?
-        vec_buf = (FilterInterface<dim>::_inputCells[i]->*vectorProperty.get)();
+        vec_buf = (this->_inputCells[i]->*vectorProperty.get)();
 
         for (unsigned int d = 0; d < dim; d++) {
           if (_filteredDims[d])
             vec_buf[d] = _constant;
         }
 
-        (FilterInterface<dim>::_outputCells[i]->*vectorProperty.set)(vec_buf);
+        (this->_outputCells[i]->*vectorProperty.set)(vec_buf);
       }
     }
   }

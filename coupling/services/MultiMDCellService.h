@@ -18,6 +18,7 @@ template <class LinkedCell, unsigned int dim> class MultiMDCellService;
 #include "coupling/interface/MDSimulationFactory.h"
 #include "coupling/services/CouplingCellService.h"
 #include "coupling/services/CouplingCellServiceDummy.h"
+#include "coupling/filtering/PMI_FilterPipeline.h"
 
 /** service to couple various MD simulations to a single instance of a
  * macroscopic solver. We currently consider only one layout: global ranks are
@@ -332,7 +333,7 @@ public:
     std::cout << "FP: Now applying post-multi-instance filter pipeline" << std::endl;
 #endif
 
-    // FIXME apply filtering to correct region res += (*_postMultiInstanceFilterPipeline)();
+    res += (*_postMultiInstanceFilterPipeline)();
 
     // store data in couplingCellsFromMacroscopicSolver
     for (unsigned int i = 0; i < size; i++) {
@@ -403,7 +404,7 @@ public:
     std::cout << "FP: Now applying post-multi-instance filter pipeline" << std::endl;
 #endif
 
-    // FIXME apply filtering to correct region res += (*_postMultiInstanceFilterPipeline)();
+    res += (*_postMultiInstanceFilterPipeline)();
 
     // store data in md2macroCouplingCells
     auto itCouplingCells = _couplingCells.begin();
@@ -442,9 +443,8 @@ public:
 
     if (_postMultiInstanceFilterPipeline == nullptr) {
       // Init filter pipeline
-      // FIXME Invalid cell container
-      // _postMultiInstanceFilterPipeline = new coupling::filtering::FilterPipeline<I14, dim>(_couplingCells, coupling::filtering::Scope::postMultiInstance,
-      //                                                                                 _multiMDService, _filterPipelineConfiguration.c_str());
+      _postMultiInstanceFilterPipeline = new coupling::filtering::PMI_FilterPipeline<dim>(_couplingCells,
+                                                                                       _multiMDService, _filterPipelineConfiguration.c_str());
     }
   }
 
@@ -704,7 +704,7 @@ private:
    * Analogon to CouplingCellService's FilterPipeline.
    * Is applied during this->sendFromMD2Macro.
    */
-  coupling::filtering::FilterPipeline<I14, dim>* _postMultiInstanceFilterPipeline;
+  coupling::filtering::PMI_FilterPipeline<dim>* _postMultiInstanceFilterPipeline;
   /* Buffer for copying data from MD to macro */
   coupling::sendrecv::FromMD2Macro<coupling::datastructures::CouplingCell<dim>, dim> _fromMD2Macro;
 };

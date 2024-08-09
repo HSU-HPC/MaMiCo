@@ -12,7 +12,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class FilterInterface;
+template <class Container_T, unsigned int dim> class FilterInterface;
 }
 } // namespace coupling
 
@@ -29,15 +29,15 @@ template <unsigned int dim> class FilterInterface;
  *
  * @author Felix Maurer
  */
-template <unsigned int dim> class coupling::filtering::FilterInterface {
+template <class Container_T, unsigned int dim> class coupling::filtering::FilterInterface {
 public:
   /*
    * Filter constructors are called during instanciation of their corresponding
    * FilterSequence. You can customize parameterization in
    * coupling::FilterSequence::loadFiltersFromXML(...).
    */
-  FilterInterface(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
-                  const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues, const char* type)
+  FilterInterface(const Container_T& inputCellVector,
+                  const Container_T& outputCellVector, const std::array<bool, 7> filteredValues, const char* type)
       :
 
         _inputCells(inputCellVector), _outputCells(outputCellVector), _type(type) {
@@ -97,8 +97,8 @@ public:
    */
   virtual void operator()() = 0;
 
-  void updateCellData(const std::vector<coupling::datastructures::CouplingCell<dim>*>& new_inputCells,
-                      const std::vector<coupling::datastructures::CouplingCell<dim>*>& new_outputCells) {
+  void updateCellData(const Container_T& new_inputCells,
+                      const Container_T& new_outputCells) {
     if (new_inputCells.size() != new_outputCells.size())
       throw std::runtime_error("New input-, output-, and indexing vectors must "
                                "be of identical size.");
@@ -115,29 +115,17 @@ public:
    * Basic Getters/Setters
    */
   const char* getType() const { return _type; }
-  std::vector<coupling::datastructures::CouplingCell<dim>*> getInputCells() const { return _inputCells; }
-  std::vector<coupling::datastructures::CouplingCell<dim>*> getOutputCells() const { return _outputCells; }
+  Container_T getInputCells() const { return _inputCells; }
+  Container_T getOutputCells() const { return _outputCells; }
 
-  using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::local, coupling::indexing::IndexTrait::md2macro,
-                                                    coupling::indexing::IndexTrait::noGhost>;
   /*
    * Advanced Getters/Setters
    */
-  coupling::datastructures::CouplingCell<dim>* getInputCellOfIndex(const CellIndex_T& index) {
-    if (index.get() < _inputCells.size) {
-      return _inputCells[index.get()];
-    } else {
-      std::cout << "Index not found: " << index << std::endl;
-      throw std::runtime_error("FilterInterface: getInputCellofIndex(): Could not find index.");
-    }
+  coupling::datastructures::CouplingCell<dim>* getInputCellOfIndex(const typename Container_T::_CellIndex_T& index) {
+    return _inputCells[index];
   }
-  coupling::datastructures::CouplingCell<dim>* getOutputCellOfIndex(const CellIndex_T& index) {
-    if (index.get() < _outputCells.size) {
-      return _outputCells[index.get()];
-    } else {
-      std::cout << "Index not found: " << index << std::endl;
-      throw std::runtime_error("FilterInterface: getOutputCellofIndex(): Could not find index.");
-    }
+  coupling::datastructures::CouplingCell<dim>* getOutputCellOfIndex(const typename Container_T::_CellIndex_T& index) {
+    return _outputCells[index];
   }
 
   /*
@@ -147,7 +135,7 @@ public:
    * In that case, this was previously getting input from MD but won't be any
    * longer. The newly added filter will provide input for this one instead.
    */
-  void setInputCells(const std::vector<coupling::datastructures::CouplingCell<dim>*>& newInputCells) { _inputCells = newInputCells; }
+  void setInputCells(const Container_T& newInputCells) { _inputCells = newInputCells; }
 
   // Size = number of cells in this filter.
   int getSize() const { return _inputCells.size(); }
@@ -178,8 +166,8 @@ protected:
    *their respective input counterpart, i.e it is not mandatory to have any
    *output.
    */
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _inputCells;
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _outputCells;
+  Container_T _inputCells;
+  Container_T _outputCells;
 
   // scalars getters/setters
   std::vector<ScalarAccessFunctionPair> _scalarAccessFunctionPairs;

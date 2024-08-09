@@ -7,7 +7,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class FilterInterfaceReadOnly;
+template <class Container_T, unsigned int dim> class FilterInterfaceReadOnly;
 }
 } // namespace coupling
 
@@ -19,17 +19,17 @@ template <unsigned int dim> class FilterInterfaceReadOnly;
  * @author Felix Maurer
  */
 
-template <unsigned int dim> class coupling::filtering::FilterInterfaceReadOnly : public coupling::filtering::FilterInterface<dim> {
+template <class Container_T, unsigned int dim> class coupling::filtering::FilterInterfaceReadOnly : public coupling::filtering::FilterInterface<Container_T, dim> {
 public:
-  FilterInterfaceReadOnly(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
-                          const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues,
+  FilterInterfaceReadOnly(const Container_T& inputCellVector,
+                          const Container_T& outputCellVector, const std::array<bool, 7> filteredValues,
                           const char* type)
-      : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, type) {}
+      : coupling::filtering::FilterInterface<Container_T, dim>(inputCellVector, outputCellVector, filteredValues, type) {}
 
 protected:
   /*
    * Copies all filtered data from input to output. You always want to call this
-   * as part of any implementation of coupling::FilterInterface<dim>::operator()
+   * as part of any implementation of coupling::FilterInterface<Container_T, dim>::operator()
    * 	when implementing this interface, that is implementing a read-only
    * filter (e.g WriteToFile, Storuhal) If you would not do that, the successors
    * of the implementing filter in a sequence would get faulty input data.
@@ -40,18 +40,18 @@ protected:
      * of an AsymmetricalFilterJunction, we don't want the filter to produce any
      * output. Then, and only then, the output cells vector will be empty.
      */
-    if (coupling::filtering::FilterInterface<dim>::_outputCells.empty())
+    if (coupling::filtering::FilterInterface<Container_T, dim>::_outputCells.empty())
       return;
 
-    for (unsigned int ci = 0; ci < coupling::filtering::FilterInterface<dim>::_outputCells.size(); ci++) {
-      for (const auto scalarProperty : coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs) {
-        (coupling::filtering::FilterInterface<dim>::_outputCells[ci]->*scalarProperty.set)(
-            (coupling::filtering::FilterInterface<dim>::_inputCells[ci]->*scalarProperty.get)()); // call setter from output cell
+    for (unsigned int ci = 0; ci < coupling::filtering::FilterInterface<Container_T, dim>::_outputCells.size(); ci++) {
+      for (const auto scalarProperty : coupling::filtering::FilterInterface<Container_T, dim>::_scalarAccessFunctionPairs) {
+        (coupling::filtering::FilterInterface<Container_T, dim>::_outputCells[ci]->*scalarProperty.set)(
+            (coupling::filtering::FilterInterface<Container_T, dim>::_inputCells[ci]->*scalarProperty.get)()); // call setter from output cell
                                                                                                   // using getter from input cell.
       }
-      for (const auto vectorProperty : coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs) {
-        (coupling::filtering::FilterInterface<dim>::_outputCells[ci]->*vectorProperty.set)(
-            (coupling::filtering::FilterInterface<dim>::_inputCells[ci]->*vectorProperty.get)()); // call setter from output cell
+      for (const auto vectorProperty : coupling::filtering::FilterInterface<Container_T, dim>::_vectorAccessFunctionPairs) {
+        (coupling::filtering::FilterInterface<Container_T, dim>::_outputCells[ci]->*vectorProperty.set)(
+            (coupling::filtering::FilterInterface<Container_T, dim>::_inputCells[ci]->*vectorProperty.get)()); // call setter from output cell
                                                                                                   // using getter from input cell.
       }
     }

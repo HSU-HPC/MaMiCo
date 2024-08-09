@@ -9,7 +9,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim, coupling::indexing::IndexTrait... scope> class NLM;
+template <class CellIndex_T, unsigned int dim> class NLM; // CellIndex_T = I13 or I15
 }
 } // namespace coupling
 
@@ -21,16 +21,14 @@ template <unsigned int dim, coupling::indexing::IndexTrait... scope> class NLM;
  *  @author Piet Jarmatz
  *
  */
-template <unsigned int dim, coupling::indexing::IndexTrait... scope> class coupling::filtering::NLM : public coupling::filtering::JunctorInterface<dim, 2, 1> {
+template <class CellIndex_T, unsigned int dim> class coupling::filtering::NLM : public coupling::filtering::JunctorInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim, 2, 1> {
 public:
-  using CellIndex_T = coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector, scope..., coupling::indexing::IndexTrait::md2macro,
-                                                    coupling::indexing::IndexTrait::noGhost>;
 
-  NLM(const std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector_unfiltered,
-      const std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector_prefiltered,
-      const std::vector<coupling::datastructures::CouplingCell<dim>*> outputCellVector, const std::array<bool, 7> filteredValues, int tws, double sigsq,
+  NLM(const coupling::datastructures::CellContainer<CellIndex_T, dim> inputCellVector_unfiltered,
+      const coupling::datastructures::CellContainer<CellIndex_T, dim> inputCellVector_prefiltered,
+      const coupling::datastructures::CellContainer<CellIndex_T, dim> outputCellVector, const std::array<bool, 7> filteredValues, int tws, double sigsq,
       double sigsq_rel, double hsq, double hsq_rel, int M = 2, int d = 1)
-      : coupling::filtering::JunctorInterface<dim, 2, 1>({inputCellVector_unfiltered, inputCellVector_prefiltered}, {outputCellVector}, filteredValues, "NLM"),
+      : coupling::filtering::JunctorInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim, 2, 1>({inputCellVector_unfiltered, inputCellVector_prefiltered}, {outputCellVector}, filteredValues, "NLM"),
         _timeWindowSize(tws), _M(M), _d(d), _sigsq(sigsq), _sigsq_rel(sigsq_rel), _hsq(hsq), _hsq_rel(hsq_rel), _cycleCounter(0), _t(0),
         _flowfield(CellIndex_T::numberCellsInDomain, tws), _flowfield_prefiltered(CellIndex_T::numberCellsInDomain, tws),
         _patchfield(CellIndex_T::numberCellsInDomain - tarch::la::Vector<dim, unsigned int>(2), tws), _innerCellIndices() {

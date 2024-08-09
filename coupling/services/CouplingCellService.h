@@ -30,8 +30,7 @@
 #include "coupling/sendrecv/FromMD2Macro.h"
 #include "coupling/sendrecv/FromMacro2MD.h"
 #include "tarch/utils/MultiMDService.h"
-
-#include "coupling/filtering/FilterPipeline.h"
+#include "coupling/filtering/PI_FilterPipeline.h"
 
 namespace coupling {
 namespace services {
@@ -77,7 +76,7 @@ public:
                              "initFiltering for non-Impl object.");
   } /*Note: This is not pure virtual, because some implementations of this
        interface don't have a FilterPipeline. */
-  virtual const coupling::filtering::FilterPipeline<I02, dim>* getFilterPipeline() const {
+  virtual const coupling::filtering::PI_FilterPipeline<dim>* getFilterPipeline() const {
     throw std::runtime_error("CouplingCellService: Error: Called getFilterPipeline() in instance "
                              "without FilterPipeline.");
   } /*Note: This is not pure virtual, because some implementations of this
@@ -244,11 +243,10 @@ public:
    * ~CouplingCellServiceImpl()
    */
   void initFiltering() override {
-    _filterPipeline = new coupling::filtering::FilterPipeline<I02, dim>(_couplingCells, coupling::filtering::Scope::perInstance, _multiMDService,
-                                                                        _filterPipelineConfiguration);
+    _filterPipeline = new coupling::filtering::PI_FilterPipeline<dim>(_couplingCells, _multiMDService, _filterPipelineConfiguration);
   }
 
-  const coupling::filtering::FilterPipeline<I02, dim>* getFilterPipeline() const override { return _filterPipeline; }
+  const coupling::filtering::PI_FilterPipeline<dim>* getFilterPipeline() const override { return _filterPipeline; }
 
   /**
    * Creates a new filter from scratch and appends it to a sequence that is part
@@ -316,7 +314,7 @@ private:
   coupling::datastructures::LinkedCellContainer<LinkedCell, dim> _couplingCells;
 
   /** filter pipeline, used to apply filters in sendFromMD2Macro */
-  coupling::filtering::FilterPipeline<I02, dim>* _filterPipeline;
+  coupling::filtering::PI_FilterPipeline<dim>* _filterPipeline;
 
   /**parameters needed in initFiltering() */
   const char* _filterPipelineConfiguration;

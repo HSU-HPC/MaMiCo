@@ -5,9 +5,9 @@
 // Implementation of SequentialFilter.h
 
 // CONSTRUCTOR
-template <unsigned int dim>
-coupling::filtering::SequentialFilter<dim>::SequentialFilter(coupling::filtering::FilterInterface<dim>* filter, const MPI_Comm comm)
-    : coupling::filtering::FilterInterface<dim>("SEQUENTIALIZED_FILTER"), _filter(filter), _comm(comm), _processingRank(0), // TODO: Make this customizable.
+template <class Container_T, class CellIndex_T, unsigned int dim>
+coupling::filtering::SequentialFilter<Container_T, CellIndex_T, dim>::SequentialFilter(coupling::filtering::FilterInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim>* filter, const MPI_Comm comm)
+    : coupling::filtering::FilterInterface<Container_T, dim>("SEQUENTIALIZED_FILTER"), _filter(filter), _comm(comm), _processingRank(0), // TODO: Make this customizable.
       _cellbuf() {
   MPI_Comm_rank(_comm, &_myRank);
   MPI_Comm_size(_comm, &_commSize);
@@ -55,7 +55,7 @@ coupling::filtering::SequentialFilter<dim>::SequentialFilter(coupling::filtering
 }
 
 // MEMBER FUNCTIONS
-template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::operator()() {
+template <class Container_T, class CellIndex_T, unsigned int dim> void coupling::filtering::SequentialFilter<Container_T, CellIndex_T, dim>::operator()() {
   if (_commSize > 1) {
     if (_processingRank == _myRank) {
       contribute();
@@ -67,7 +67,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::ope
 }
 
 // PRIVATE FUNCTIONS
-template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::contribute() {
+template <class Container_T, class CellIndex_T, unsigned int dim> void coupling::filtering::SequentialFilter<Container_T, CellIndex_T, dim>::contribute() {
   using coupling::indexing::CellIndex;
   using coupling::indexing::IndexTrait;
 
@@ -197,7 +197,7 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::con
   }
 }
 
-template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::process(bool sequential) {
+template <class Container_T, class CellIndex_T, unsigned int dim> void coupling::filtering::SequentialFilter<Container_T, CellIndex_T, dim>::process(bool sequential) {
   if (sequential) {
     _filter->updateCellData(_inputCells_Global, _outputCells_Global);
   }
@@ -251,8 +251,8 @@ template <unsigned int dim> void coupling::filtering::SequentialFilter<dim>::pro
   }
 }
 
-template <unsigned int dim>
-void coupling::filtering::SequentialFilter<dim>::couplingCellToBuffer(std::vector<double>& buf, const coupling::datastructures::CouplingCell<dim>* cell) {
+template <class Container_T, class CellIndex_T, unsigned int dim>
+void coupling::filtering::SequentialFilter<Container_T, CellIndex_T, dim>::couplingCellToBuffer(std::vector<double>& buf, const coupling::datastructures::CouplingCell<dim>* cell) {
   // Resize if buffer is too small to contain cell data
   if (buf.capacity() < 4 + 3 * dim) {
     buf.resize(4 + 3 * dim);
@@ -286,8 +286,8 @@ void coupling::filtering::SequentialFilter<dim>::couplingCellToBuffer(std::vecto
   // std::cout << std::endl;
 }
 
-template <unsigned int dim>
-void coupling::filtering::SequentialFilter<dim>::bufferToCouplingCell(const std::vector<double>& buf, coupling::datastructures::CouplingCell<dim>* cell) {
+template <class Container_T, class CellIndex_T, unsigned int dim>
+void coupling::filtering::SequentialFilter<Container_T, CellIndex_T, dim>::bufferToCouplingCell(const std::vector<double>& buf, coupling::datastructures::CouplingCell<dim>* cell) {
   if (buf.capacity() < 4 + 3 * dim)
     throw std::runtime_error("Buffer too small for cell data!");
 

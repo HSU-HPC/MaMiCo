@@ -13,7 +13,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class WriteToFile;
+template <class CellIndex_T, unsigned int dim> class WriteToFile;
 }
 } // namespace coupling
 
@@ -34,15 +34,15 @@ template <unsigned int dim> class WriteToFile;
  *
  * @author Felix Maurer
  */
-template <unsigned int dim> class coupling::filtering::WriteToFile : public coupling::filtering::FilterInterfaceReadOnly<dim> {
+template <class CellIndex_T, unsigned int dim> class coupling::filtering::WriteToFile : public coupling::filtering::FilterInterfaceReadOnly<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim> {
 public:
-  WriteToFile(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCells,
-              const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCells, const std::array<bool, 7> filteredValues,
+  WriteToFile(const coupling::datastructures::CellContainer<CellIndex_T, dim>& inputCells,
+              const coupling::datastructures::CellContainer<CellIndex_T, dim>& outputCells, const std::array<bool, 7> filteredValues,
               std::string location, // output file location
               bool overwrite = false, int oneCellOnly = -1)
       :
 
-        coupling::filtering::FilterInterfaceReadOnly<dim>(inputCells, outputCells, filteredValues, "WTF"), _location(location), _overwrite(overwrite),
+        coupling::filtering::FilterInterfaceReadOnly<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim>(inputCells, outputCells, filteredValues, "WTF"), _location(location), _overwrite(overwrite),
         _oneCellOnly(oneCellOnly), _iteration(1) {
     if (!_overwrite) {
       _file.open(location);

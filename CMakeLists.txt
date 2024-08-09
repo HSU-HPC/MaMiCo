@@ -524,6 +524,8 @@ set(CLANGFORMAT_SOURCES
   "coupling/MomentumController.h"
   "coupling/filtering/FilterPipeline.cpph"
   "coupling/filtering/FilterPipeline.h"
+  "coupling/filtering/PI_FilterPipeline.h"
+  "coupling/filtering/PMI_FilterPipeline.h"
   "coupling/filtering/SequentialFilter.h"
   "coupling/filtering/sequencing/AsymmetricalFilterJunction.cpph"
   "coupling/filtering/sequencing/FilterJunction.h"

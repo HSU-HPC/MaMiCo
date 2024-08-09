@@ -7,7 +7,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class Copy;
+template <class CellIndex_T, unsigned int dim> class Copy;
 }
 } // namespace coupling
 
@@ -18,14 +18,14 @@ template <unsigned int dim> class Copy;
  * @author Felix Maurer
  */
 
-template <unsigned int dim> class coupling::filtering::Copy : public coupling::filtering::FilterInterfaceReadOnly<dim> {
+template <class CellIndex_T, unsigned int dim> class coupling::filtering::Copy : public coupling::filtering::FilterInterfaceReadOnly<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim> {
 public:
-  Copy(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
-       const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector, const std::array<bool, 7> filteredValues)
-      : coupling::filtering::FilterInterfaceReadOnly<dim>(inputCellVector, outputCellVector, filteredValues, "COPY") {}
+  Copy(const coupling::datastructures::CellContainer<CellIndex_T, dim>& inputCellVector,
+       const coupling::datastructures::CellContainer<CellIndex_T, dim>& outputCellVector, const std::array<bool, 7> filteredValues)
+      : coupling::filtering::FilterInterfaceReadOnly<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim>(inputCellVector, outputCellVector, filteredValues, "COPY") {}
 
   void operator()() {
-    coupling::filtering::FilterInterfaceReadOnly<dim>::copyInputToOutput();
+    coupling::filtering::FilterInterfaceReadOnly<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim>::copyInputToOutput();
     // coupling::filtering::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("COPY");
   }
 };

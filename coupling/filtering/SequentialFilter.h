@@ -16,7 +16,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class SequentialFilter;
+template <class Container_T, class CellIndex_T, unsigned int dim> class SequentialFilter;
 }
 } // namespace coupling
 
@@ -38,9 +38,9 @@ template <unsigned int dim> class SequentialFilter;
  *
  * @author Felix Maurer
  */
-template <unsigned int dim> class coupling::filtering::SequentialFilter : public coupling::filtering::FilterInterface<dim> {
+template <class Container_T, class CellIndex_T, unsigned int dim> class coupling::filtering::SequentialFilter : public coupling::filtering::FilterInterface<Container_T, dim> {
 public:
-  SequentialFilter(coupling::filtering::FilterInterface<dim>* filter, const MPI_Comm comm);
+  SequentialFilter(coupling::filtering::FilterInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim>* filter, const MPI_Comm comm);
 
   ~SequentialFilter() {
     delete _filter;
@@ -76,7 +76,7 @@ private:
   void bufferToCouplingCell(const std::vector<double>& buf, coupling::datastructures::CouplingCell<dim>* cell);
 
   // The sequentialized Filter
-  coupling::filtering::FilterInterface<dim>* _filter;
+  coupling::filtering::FilterInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim>* _filter;
 
   // MPI related stuff
   const MPI_Comm _comm;
@@ -86,8 +86,8 @@ private:
 
   // Globalized variants of cell data structures (i.e spanning across all cells
   // of the global domain). Only the master rank uses these.
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _inputCells_Global;
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _outputCells_Global;
+  coupling::datastructures::CellContainer<I13, dim> _inputCells_Global;
+  coupling::datastructures::CellContainer<I13, dim> _outputCells_Global;
 
   // Used by the processing rank to remember from which rank it received cells
   // located at which global index TODO: use CellIndex?
@@ -97,8 +97,8 @@ private:
   std::vector<double> _cellbuf;
 
   // Used by the processing rank to remember its local domain
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _inputCells_Local;
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _outputCells_Local;
+  Container_T _inputCells_Local;
+  Container_T _outputCells_Local;
 };
 
 #include "SequentialFilter.cpph"

@@ -10,7 +10,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class WriteToFileJunctor;
+template <class CellIndex_T, unsigned int dim> class WriteToFileJunctor;
 }
 } // namespace coupling
 
@@ -21,15 +21,15 @@ template <unsigned int dim> class WriteToFileJunctor;
  *
  * @author Felix Maurer
  */
-template <unsigned int dim> class coupling::filtering::WriteToFileJunctor : public coupling::filtering::AsymmetricalJunctorInterface<dim> {
+template <class CellIndex_T, unsigned int dim> class coupling::filtering::WriteToFileJunctor : public coupling::filtering::AsymmetricalJunctorInterface<CellIndex_T, dim> {
 public:
   WriteToFileJunctor(
       // first cell data set
-      const std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector1,
-      const std::vector<coupling::datastructures::CouplingCell<dim>*> outputCellVector1,
+      const coupling::datastructures::CellContainer<CellIndex_T, dim> inputCellVector1,
+      const coupling::datastructures::CellContainer<CellIndex_T, dim> outputCellVector1,
 
       // second cell data set
-      const std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector2,
+      const coupling::datastructures::CellContainer<CellIndex_T, dim> inputCellVector2,
       // no secondary output cells
 
       //"global" parameters for both WriteToFile instances
@@ -38,7 +38,7 @@ public:
       // WriteToFile-specific parameters. [0] is for the first WriteToFile
       // instance and [1] for the second one respectively.
       std::array<std::string, 2> location, std::array<bool, 2> overwrite = {false}, std::array<int, 2> oneCellOnly = {-1})
-      : coupling::filtering::AsymmetricalJunctorInterface<dim>(inputCellVector1, outputCellVector1, inputCellVector2, filteredValues, "WTF-J") {
+      : coupling::filtering::AsymmetricalJunctorInterface<CellIndex_T, dim>(inputCellVector1, outputCellVector1, inputCellVector2, filteredValues, "WTF-J") {
     // write to file instance covering first cell data set
     coupling::filtering::AsymmetricalJunctorInterface<dim>::_filter1 =
         new coupling::filtering::WriteToFile<dim>(inputCellVector1, outputCellVector1, filteredValues, location[0], overwrite[0], oneCellOnly[0]);

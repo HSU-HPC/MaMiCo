@@ -1,7 +1,7 @@
 // Member functions of coupling::filtering::FilterJunction
 
-template <unsigned int dim, std::size_t inputc>
-int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
+template <class Container_T, unsigned int dim, std::size_t inputc>
+int coupling::filtering::FilterJunction<Container_T, dim, inputc>::loadFiltersFromXML(
     tinyxml2::XMLElement* sequenceNode) { // in our case "junctionNode" would be more precise
   if (!sequenceNode)
     return EXIT_FAILURE;
@@ -9,8 +9,7 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
   // null if junction is empty
   tinyxml2::XMLElement* currJunctorNode = sequenceNode->FirstChildElement();
 
-  std::array<std::vector<coupling::datastructures::CouplingCell<dim>*>, inputc> inputCellVector = _inputCellVector_parted;
-  std::array<std::vector<coupling::datastructures::CouplingCell<dim>*>, inputc> outputCellVector = _cellVector2_parted;
+  std::array<Container_T, inputc> inputCellVector = _inputCellVector_parted;
 #ifdef DEBUG_FILTER_PIPELINE
   std::cout << PRINT_PREFIX() << "Initializing junctor objects." << std::endl;
 #endif
@@ -36,11 +35,9 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
       tarch::configuration::ParseConfiguration::readIntOptional(inputp_unfiltered, currJunctorNode, "input-unfiltered");
       int inputp_prefiltered = 1; // default
       tarch::configuration::ParseConfiguration::readIntOptional(inputp_prefiltered, currJunctorNode, "input-filtered");
-      int outputp = 0; // default
-      tarch::configuration::ParseConfiguration::readIntOptional(outputp, currJunctorNode, "output");
 
       // check for invalid partition indexes
-      for (auto p : {inputp_unfiltered, inputp_prefiltered, outputp}) {
+      for (auto p : {inputp_unfiltered, inputp_prefiltered}) {
         if (p < 0) {
           std::cout << PRINT_PREFIX() << "ERROR: Negative input or output lane index specified in XML:" << p << std::endl;
           return EXIT_FAILURE;
@@ -104,16 +101,16 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
       }
 
       // Instantiation
-      newjunctor = new coupling::filtering::NLM<dim>(inputCellVector[inputp_unfiltered], inputCellVector[inputp_prefiltered], outputCellVector[outputp],
-                                                     coupling::filtering::FilterSequence<dim>::_filteredValues, tws, sigsq, sigsq_rel, hsq, hsq_rel);
+      newjunctor = new coupling::filtering::NLM<dim>(inputCellVector[inputp_unfiltered], inputCellVector[inputp_prefiltered], this->_cellVector2,
+                                                     coupling::filtering::FilterSequence<Container_T, dim>::_filteredValues, tws, sigsq, sigsq_rel, hsq, hsq_rel);
 
       // TODO: generalize this for arbitrary junctors?
       // Swapping for output partition
-      if (firstIteration[outputp]) {
-        inputCellVector[outputp] = _cellVector1_parted[outputp];
-        firstIteration[outputp] = false;
+      if (firstIteration[0]) {
+        inputCellVector[0] = this->_cellVector1;
+        firstIteration[0] = false;
       }
-      inputCellVector[outputp].swap(outputCellVector[outputp]);
+      inputCellVector[0].swap(this->_cellVector2);
     }
     // ###############################################################
 
@@ -123,7 +120,7 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
       return EXIT_FAILURE;
     }
 
-    coupling::filtering::FilterSequence<dim>::_filters.push_back(newjunctor);
+    coupling::filtering::FilterSequence<Container_T, dim>::_filters.push_back(newjunctor);
     currJunctorNode = currJunctorNode->NextSiblingElement();
   }
 

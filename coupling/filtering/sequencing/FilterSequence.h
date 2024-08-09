@@ -44,17 +44,17 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class FilterSequence;
+template <class Container_T, unsigned int dim> class FilterSequence;
 }
 } // namespace coupling
 
-template <unsigned int dim> class coupling::filtering::FilterSequence {
+template <class Container_T, unsigned int dim> class coupling::filtering::FilterSequence {
 public:
   /*
    * Filter Sequences are constructed in
    * coupling::FilterPipeline::loadSequencesFromXML(...).
    */
-  FilterSequence(const char* name, const std::vector<coupling::datastructures::CouplingCell<dim>*> inputCells,
+  FilterSequence(const char* name, Container_T inputCells,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
                  MPI_Comm comm,
 #endif
@@ -97,10 +97,16 @@ public:
                 << (double)std::accumulate(_filterTimes[filter].begin(), _filterTimes[filter].end(), 0) / (double)_timestepsElapsed << std::endl;
     }
 
-    for (auto v1 : _cellVector1)
-      delete v1;
-    for (auto v2 : _cellVector2)
-      delete v2;
+    I01 idx;
+    coupling::datastructures::CouplingCell<3>* cell;
+    for (auto pair : _cellVector1){
+      std::tie(cell, idx) = pair;
+      delete cell;
+    }
+    for (auto pair : _cellVector2){
+      std::tie(cell, idx) = pair;
+      delete cell;
+    }
     for (auto f : _filters)
       delete f;
 #ifdef DEBUG_FILTER_PIPELINE
@@ -163,7 +169,7 @@ public:
   bool isModifiable() { return _isModifiable; }
   void makeUnmodifiable() { _isModifiable = false; }
 
-  std::vector<coupling::filtering::FilterInterface<dim>*> getFilters() { return _filters; }
+  std::vector<coupling::filtering::FilterInterface<Container_T, dim>*> getFilters() { return _filters; }
 
   /*
    * All virtual functions below are redefined in case this sequence is actually
@@ -200,12 +206,12 @@ public:
    * Registers existence of a child sequence, i.e. a sequence using this
    * sequence's output as its input.
    */
-  virtual void addChildSequence(coupling::filtering::FilterSequence<dim>* childSequence) { _childSequences.push_back(childSequence); }
+  virtual void addChildSequence(coupling::filtering::FilterSequence<Container_T, dim>* childSequence) { _childSequences.push_back(childSequence); }
 
   /*
    * Allows changing the input cells after init.
    */
-  virtual void updateInputCellVector(const std::vector<coupling::datastructures::CouplingCell<dim>*> newInputCellVector) {
+  virtual void updateInputCellVector(const Container_T newInputCellVector) {
     _inputCellVector = newInputCellVector; // call copy constructor
 
     // cc this change to this sequence's first vector.
@@ -222,7 +228,7 @@ public:
    * Some sequences have more than one output, thus the optional parameter. Has
    * no effect on a basic FilterSequence.
    */
-  virtual const std::vector<coupling::datastructures::CouplingCell<dim>*>& getOutputCellVector(unsigned int outputIndex = 0) const {
+  virtual const Container_T& getOutputCellVector(unsigned int outputIndex = 0) const {
     if (_filters.empty())
       return _inputCellVector;
 
@@ -278,9 +284,9 @@ private:
 protected:
   const char* _name;
 
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _inputCellVector; // points to (foreign) input vector
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _cellVector1;     // allocated for this sequence only
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _cellVector2;     // allocated for this sequence only
+  Container_T _inputCellVector; // points to (foreign) input vector
+  Container_T _cellVector1;     // allocated for this sequence only
+  Container_T _cellVector2;     // allocated for this sequence only
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm _comm;
@@ -292,17 +298,17 @@ protected:
                       // Filter Pipeline's output
   bool _isModifiable; // true while filters can be added to sequence
 
-  std::vector<coupling::filtering::FilterInterface<dim>*> _filters;
+  std::vector<coupling::filtering::FilterInterface<Container_T, dim>*> _filters;
 
   // stores application times for all filters
-  std::map<coupling::filtering::FilterInterface<dim>*, std::vector<unsigned int>> _filterTimes;
+  std::map<coupling::filtering::FilterInterface<Container_T, dim>*, std::vector<unsigned int>> _filterTimes;
 
   // there must be some other place to get this from
   unsigned int _timestepsElapsed;
 
   // stores pointers to all sequences that use this sequence's output as their
   // input.
-  std::vector<coupling::filtering::FilterSequence<dim>*> _childSequences;
+  std::vector<coupling::filtering::FilterSequence<Container_T, dim>*> _childSequences;
 };
 
 // inlcude implementation

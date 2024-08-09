@@ -8,7 +8,7 @@
 
 // Member functions of POD.h:
 
-template <unsigned int dim> void coupling::filtering::POD<dim>::operator()() {
+template <class CellIndex_T, unsigned int dim> void coupling::filtering::POD<CellIndex_T, dim>::operator()() {
 #ifdef DEBUG_POD
   std::cout << "		POD: Applying filter...";
 #endif
@@ -88,13 +88,13 @@ template <unsigned int dim> void coupling::filtering::POD<dim>::operator()() {
   for (unsigned int index = 0; index < this->_inputCells.size(); index++) {
     // compute and store smoothed result
     Eigen::VectorXd phi_x = _A_T[0] * _data[0].col(_spatialIndex);
-    coupling::filtering::FilterInterface<dim>::_outputCells[index]->setMacroscopicMass((_A[0].row(_t) * phi_x).value());
+    this->_outputCells[index]->setMacroscopicMass((_A[0].row(_t) * phi_x).value());
     tarch::la::Vector<dim, double> mo_smooth;
     for (unsigned int d = 0; d < dim; d++) { // (optimized compiler will unroll this loop)
       phi_x = _A_T[d + 1] * _data[d + 1].col(_spatialIndex);
       mo_smooth[d] = (_A[d + 1].row(_t) * phi_x).value();
     }
-    coupling::filtering::FilterInterface<dim>::_outputCells[index]->setMacroscopicMomentum(mo_smooth);
+    this->_outputCells[index]->setMacroscopicMomentum(mo_smooth);
     _spatialIndex++;
   } // index
   // endProcess: second traversal

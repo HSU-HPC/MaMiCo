@@ -4,8 +4,8 @@
 
 // Member functions of coupling::filtering::AsymmetricalFilterJunction
 
-template <unsigned int dim>
-int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
+template <class Container_T, unsigned int dim>
+int coupling::filtering::AsymmetricalFilterJunction<Container_T, dim>::loadFiltersFromXML(
     tinyxml2::XMLElement* sequenceNode) { // in our case "junctionNode" would be more precise
   if (!sequenceNode)
     return EXIT_FAILURE;
@@ -15,10 +15,10 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
 
   // These four are not to be confused with member variables of similar names.
   // Watch out for the "_" in front of member variables.
-  std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector_primary = coupling::filtering::FilterSequence<dim>::_inputCellVector;
-  std::vector<coupling::datastructures::CouplingCell<dim>*> outputCellVector_primary = coupling::filtering::FilterSequence<dim>::_cellVector2;
+  Container_T inputCellVector_primary = coupling::filtering::FilterSequence<Container_T, dim>::_inputCellVector;
+  Container_T outputCellVector_primary = coupling::filtering::FilterSequence<Container_T, dim>::_cellVector2;
 
-  std::vector<coupling::datastructures::CouplingCell<dim>*> inputCellVector_secondary = _inputCellVector_secondary;
+  Container_T inputCellVector_secondary = _inputCellVector_secondary;
   // Note: To prevent counter intuitive design, secondary output has been
   // disabled, i.e. all junctors in an AFJ take the same secondary input.
   // There
@@ -88,7 +88,7 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
     }
 
     if (firstIteration) {
-      inputCellVector_primary = coupling::filtering::FilterSequence<dim>::_cellVector1;
+      inputCellVector_primary = coupling::filtering::FilterSequence<Container_T, dim>::_cellVector1;
       inputCellVector_secondary = _cellVector1_secondary;
       firstIteration = false;
     }
@@ -98,7 +98,7 @@ int coupling::filtering::AsymmetricalFilterJunction<dim>::loadFiltersFromXML(
     // See comment above regarding secondary output of junctors.
     // inputCellVector_secondary.swap(outputCellVector_secondary);
 
-    coupling::filtering::FilterSequence<dim>::_filters.push_back(newjunctor);
+    coupling::filtering::FilterSequence<Container_T, dim>::_filters.push_back(newjunctor);
     currJunctorNode = currJunctorNode->NextSiblingElement();
   }
 

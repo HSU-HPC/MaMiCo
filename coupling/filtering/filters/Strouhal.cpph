@@ -7,7 +7,7 @@
  */
 
 // Member functions of Strouhal.h:
-template <unsigned int dim> void coupling::filtering::Strouhal<dim>::operator()() {
+template <class CellIndex_T, unsigned int dim> void coupling::filtering::Strouhal<dim>::operator()() {
   double vAvg = 0;
   for (auto cell : coupling::filtering::FilterInterface<dim>::_inputCells) {
     vAvg += cell->getCurrentVelocity()[1];
@@ -29,7 +29,7 @@ template <unsigned int dim> void coupling::filtering::Strouhal<dim>::operator()(
 #define AMP_LOWER_LIMIT 0.5
 
 // Private functions of Strouhal.h:
-template <unsigned int dim> double coupling::filtering::Strouhal<dim>::calculateStrouhalNumber() {
+template <class CellIndex_T, unsigned int dim> double coupling::filtering::Strouhal<dim>::calculateStrouhalNumber() {
   double f = 0;
 
   // TODO: BIG COMMENT GOES HERE

@@ -13,7 +13,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class POD;
+template <class CellIndex_T, unsigned int dim> class POD;
 }
 } // namespace coupling
 
@@ -21,15 +21,15 @@ template <unsigned int dim> class POD;
  *
  *  @author Piet Jarmatz, Felix Maurer
  */
-template <unsigned int dim> class coupling::filtering::POD : public coupling::filtering::FilterInterface<dim> {
+template <class CellIndex_T, unsigned int dim> class coupling::filtering::POD : public coupling::filtering::FilterInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim> {
 public:
-  POD(const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
-      const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector,
+  POD(const coupling::datastructures::CellContainer<CellIndex_T, dim>& inputCellVector,
+      const coupling::datastructures::CellContainer<CellIndex_T, dim>& outputCellVector,
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
       MPI_Comm comm,
 #endif
       const std::array<bool, 7> filteredValues, int tws, int kmax)
-      : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "POD"), _timeWindowSize(tws), _kMax(kmax),
+      : coupling::filtering::FilterInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim>(inputCellVector, outputCellVector, filteredValues, "POD"), _timeWindowSize(tws), _kMax(kmax),
         _cycleCounter(0), _spatialIndex(0), _t(0), _data(NULL), _C(NULL), _A(NULL), _A_T(NULL) {
     int spatialSize = inputCellVector.size();
     _data = new Eigen::MatrixXd[dim + 1]; // separate data matrices for: mass,

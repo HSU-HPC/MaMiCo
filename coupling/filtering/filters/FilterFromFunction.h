@@ -8,7 +8,7 @@
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class FilterFromFunction;
+template <class CellIndex_T, unsigned int dim> class FilterFromFunction;
 }
 } // namespace coupling
 
@@ -22,14 +22,14 @@ template <unsigned int dim> class FilterFromFunction;
  * @author Felix Maurer
  */
 
-template <unsigned int dim> class coupling::filtering::FilterFromFunction : public coupling::filtering::FilterInterface<dim> {
+template <class CellIndex_T, unsigned int dim> class coupling::filtering::FilterFromFunction : public coupling::filtering::FilterInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim> {
 public:
   FilterFromFunction(
-      const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
-      const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector, std::array<bool, 7> filteredValues,
+      const coupling::datastructures::CellContainer<CellIndex_T, dim>& inputCellVector,
+      const coupling::datastructures::CellContainer<CellIndex_T, dim>& outputCellVector, std::array<bool, 7> filteredValues,
       const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
       const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector)
-      : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "FFF"), _applyScalar(applyScalar),
+      : coupling::filtering::FilterInterface<coupling::datastructures::CellContainer<CellIndex_T, dim>, dim>(inputCellVector, outputCellVector, filteredValues, "FFF"), _applyScalar(applyScalar),
         _applyVector(applyVector) {
 
     if (applyScalar == nullptr or applyVector == nullptr)
@@ -59,18 +59,18 @@ public:
     std::vector<double> input_s;
     std::vector<std::array<double, dim>> input_v;
 
-    input_s.reserve(coupling::filtering::FilterInterface<dim>::_inputCells.size());
-    input_v.reserve(coupling::filtering::FilterInterface<dim>::_inputCells.size());
+    input_s.reserve(this->_inputCells.size());
+    input_v.reserve(this->_inputCells.size());
 
     /*
      * SCALAR
      */
-    for (const auto scalarProperty : coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs) {
+    for (const auto scalarProperty : this->_scalarAccessFunctionPairs) {
 
       /*
        * PACK
        */
-      for (auto cell : coupling::filtering::FilterInterface<dim>::_inputCells) {
+      for (auto cell : this->_inputCells) {
         input_s.push_back((cell->*scalarProperty.get)());
       }
 
@@ -92,15 +92,15 @@ public:
       /*
        * UNPACK
        */
-      for (unsigned int i = 0; i < coupling::filtering::FilterInterface<dim>::_inputCells.size(); i++) {
-        (coupling::filtering::FilterInterface<dim>::_outputCells[i]->*scalarProperty.set)(output_s[i]);
+      for (unsigned int i = 0; i < this->_inputCells.size(); i++) {
+        (this->_outputCells[i]->*scalarProperty.set)(output_s[i]);
       }
     }
 
     /*
      * VECTOR
      */
-    for (const auto vectorProperty : coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs) {
+    for (const auto vectorProperty : this->_vectorAccessFunctionPairs) {
 
       // coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("FFF BEFORE
       // ");
@@ -108,7 +108,7 @@ public:
       /*
        * PACK
        */
-      for (auto cell : coupling::filtering::FilterInterface<dim>::_inputCells) {
+      for (auto cell : this->_inputCells) {
         tarch::la::Vector<dim, double> mamico_vec = (cell->*vectorProperty.get)();
         std::array<double, dim> array_vec;
         for (unsigned int d = 0; d < dim; d++)
@@ -132,11 +132,11 @@ public:
       /*
        * UNPACK
        */
-      for (unsigned int i = 0; i < coupling::filtering::FilterInterface<dim>::_inputCells.size(); i++) {
+      for (unsigned int i = 0; i < this->_inputCells.size(); i++) {
         tarch::la::Vector<dim, double> mamico_vec{};
         for (unsigned int d = 0; d < dim; d++)
           mamico_vec[d] = output_v[i][d];
-        (coupling::filtering::FilterInterface<dim>::_outputCells[i]->*vectorProperty.set)(mamico_vec);
+        (this->_outputCells[i]->*vectorProperty.set)(mamico_vec);
       }
 
       // coupling::FilterInterface<dim>::DEBUG_PRINT_CELL_VELOCITY("FFF AFTER

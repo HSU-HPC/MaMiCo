@@ -7,7 +7,7 @@
  */
 
 // Member functions of WriteToFile.h:
-template <unsigned int dim> void coupling::filtering::WriteToFile<dim>::operator()() {
+template <class CellIndex_T, unsigned int dim> void coupling::filtering::WriteToFile<CellIndex_T, dim>::operator()() {
 #ifdef DEBUG_WRITE_TO_FILE
   std::cout << "		WTF: Now writing data to: " << _location;
 #endif
@@ -18,7 +18,7 @@ template <unsigned int dim> void coupling::filtering::WriteToFile<dim>::operator
     _file.open(_location);
   }
 
-  for (unsigned int ic_index = 0; ic_index < coupling::filtering::FilterInterface<dim>::_inputCells.size(); ic_index++) {
+  for (unsigned int ic_index = 0; ic_index < this->_inputCells.size(); ic_index++) {
     // case: only one cell
     if (_oneCellOnly != -1)
       ic_index = (unsigned int)_oneCellOnly;
@@ -26,13 +26,13 @@ template <unsigned int dim> void coupling::filtering::WriteToFile<dim>::operator
     _file << _iteration << " ; ";
 
     // printing all scalar values
-    for (const auto scalarProperty : coupling::filtering::FilterInterface<dim>::_scalarAccessFunctionPairs)
-      _file << (coupling::filtering::FilterInterface<dim>::_inputCells[ic_index]->*scalarProperty.get)() << " ; ";
+    for (const auto scalarProperty : this->_scalarAccessFunctionPairs)
+      _file << (this->_inputCells[ic_index]->*scalarProperty.get)() << " ; ";
 
     // printing all vectorized values
-    for (const auto vectorProperty : coupling::filtering::FilterInterface<dim>::_vectorAccessFunctionPairs)
+    for (const auto vectorProperty : this->_vectorAccessFunctionPairs)
       for (unsigned int d = 0; d < dim; d++)
-        _file << (coupling::filtering::FilterInterface<dim>::_inputCells[ic_index]->*vectorProperty.get)()[d] << " ; ";
+        _file << (this->_inputCells[ic_index]->*vectorProperty.get)()[d] << " ; ";
 
     // case: only one cell
     if (_oneCellOnly != -1)
@@ -45,7 +45,7 @@ template <unsigned int dim> void coupling::filtering::WriteToFile<dim>::operator
   _file << std::endl;
   _file.close();
 
-  coupling::filtering::FilterInterfaceReadOnly<dim>::copyInputToOutput();
+  coupling::filtering::FilterInterfaceReadOnly<CellIndex_T, dim>::copyInputToOutput();
 
   _iteration++;
 #ifdef DEBUG_WRITE_TO_FILE
