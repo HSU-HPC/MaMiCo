@@ -29,8 +29,7 @@ simplemd::moleculemappings::Adios2Writer::Adios2Writer(const simplemd::services:
                                                        MPI_Comm communicator
 #endif
                                                        )
-    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _filename(filename), _timestep(0),
-      _configuration(configuration)
+    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _filename(filename), _timestep(0), _configuration(configuration)
 #if (MD_PARALLEL == MD_YES)
       ,
       _communicator(communicator)
@@ -66,10 +65,9 @@ void simplemd::moleculemappings::Adios2Writer::initAdios2() {
   std::vector<double> adios_epsilon;
   std::array<double, 3> _domainCenter;
 
-  for(int i=0;i<MD_DIM;i++)
-  {
+  for (int i = 0; i < MD_DIM; i++) {
     _domainSize[i] = (float)(_configuration.getDomainConfiguration().getGlobalDomainSize().operator[](i));
-    _domainCenter[i] = (_configuration.getDomainConfiguration().getGlobalDomainSize().operator[](i)/2);
+    _domainCenter[i] = (_configuration.getDomainConfiguration().getGlobalDomainSize().operator[](i) / 2);
     _offset[i] = (float)(_configuration.getDomainConfiguration().getGlobalDomainOffset().operator[](i));
   }
 
@@ -124,7 +122,8 @@ void simplemd::moleculemappings::Adios2Writer::handleMolecule(Molecule& molecule
   _velocitiesy.push_back((float)molecule.getConstVelocity()[1]);
   _positionsz.push_back((float)molecule.getConstPosition()[2]);
   _velocitiesz.push_back((float)molecule.getConstVelocity()[2]);
-  _velocities_abs.push_back((float) sqrt(pow(molecule.getConstVelocity()[0], 2) + pow(molecule.getConstVelocity()[1], 2) + pow(molecule.getConstVelocity()[2], 2)));
+  _velocities_abs.push_back(
+      (float)sqrt(pow(molecule.getConstVelocity()[0], 2) + pow(molecule.getConstVelocity()[1], 2) + pow(molecule.getConstVelocity()[2], 2)));
   _component_id.push_back((uint64_t)0);
   counter++;
 }
@@ -132,7 +131,7 @@ void simplemd::moleculemappings::Adios2Writer::handleMolecule(Molecule& molecule
 void simplemd::moleculemappings::Adios2Writer::endMoleculeIteration() {
 
   std::array<float, 6> global_box = {_offset[0], _offset[1], _offset[2], _domainSize[0] + _offset[0], _domainSize[1] + _offset[1], _domainSize[2] + _offset[2]};
-  
+
   // write data
   _engine->Put<float>(rx_var, _positionsx.data());
   _engine->Put<float>(ry_var, _positionsy.data());
