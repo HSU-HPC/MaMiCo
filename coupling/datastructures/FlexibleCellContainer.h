@@ -22,9 +22,8 @@ template <unsigned int dim> class FlexibleCellContainer;
  *	@brief provides access to coupling cells, which may belong to different indexing domains
  *
  * The FlexibleCellContainer is intended for use in cell domains which do not neatly correspond to a predefined indexing domain. For example, a CellContainer
- *cannot store cells in the macro2md overlap layers, and hence a FlexibleCellContainer is needed. The cells in a FlexibleCellContainer are assumed to be going
- *from one corner to another i.e. a cell is assumed to have a larger global scalar index than all of its preceding cells. Due to the "holes" expected due to the
- *non-contiguous nature of this container, index-based access is not possible or expected.
+ * cannot store cells in the macro2md overlap layers, and hence a FlexibleCellContainer is needed. Due to the "holes" expected due to the
+ * non-contiguous nature of this container, index-based access is not possible or expected.
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  */
 

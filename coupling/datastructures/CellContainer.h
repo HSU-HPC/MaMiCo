@@ -13,14 +13,15 @@ template <class CellIndexT, unsigned int dim> class CellContainer;
 } // namespace coupling
 
 /**
- *	@brief provides access to the coupling cells. Base class for the class coupling::datastructures::LinkedCellContainer
+ * @brief provides access to the coupling cells. Base class for the class coupling::datastructures::LinkedCellContainer
  *
  * The CellContainer is intended to be used for a fixed indexing domain. Once created, it is assumed to hold all cells in that domain. For example, a
- *CellContainer created with template parameter I02 is expected to contain all cells that are accessible by iterating through I02. CellContainers do not capture
- *relevant cells automatically. It is the responsibility of the calling function to initialize and populate the data structure completely before using it. Due
- *to this complete and contiguous nature of the datasctructure, direct indexing is allowed, and the cell container is expected to start at location 0 of the
- *indexing domain it was initialized with. CellContainers contain pointers to coupling cells
- *	@tparam dim Number of dimensions; it can be 1, 2 or 3
+ * CellContainer created with template parameter I02 is expected to contain all cells that are accessible by iterating through I02. CellContainers do not
+ * capture relevant cells automatically. It is the responsibility of the calling function to allocate the cells and populate the container completely before
+ * using it. Due to this complete and contiguous nature of the datastructure, direct indexing is allowed, and the cell container is expected to start at
+ * location 0 of the indexing domain it was initialized with. CellContainers contain pointers to coupling cells, the cells are not owned by the container, hence
+ * the calling function must delete the cells later.
+ * @tparam dim Number of dimensions; it can be 1, 2 or 3
  */
 template <class CellIndexT, unsigned int dim> class coupling::datastructures::CellContainer {
 
