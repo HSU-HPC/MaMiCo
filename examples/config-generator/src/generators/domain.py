@@ -1,16 +1,43 @@
-def apply(partial_xml, get_config_value) -> None:
+from generators.mpi_ranks import get_ranks_xyz
+
+
+def get_md_domain_size(size: int) -> int:
     md_base_size = 30
+    md_domain_size = md_base_size * size
+    if size == 3:
+        md_domain_size = 120  # instead of 90
+    return md_domain_size
+
+
+def validate(get_config_value) -> str:
+    key = __name__.split(".")[-1]
+    size = get_config_value(key)
+    md_domain_size = get_md_domain_size(size)
+    ranks_xyz = get_ranks_xyz(get_config_value)
+
+    for ranks in ranks_xyz:
+        if md_domain_size % ranks != 0:
+            ranks_xyz_fmtd = "\u00d7".join([str(x) for x in ranks_xyz])
+            return f"Cannot decompose MD domain of {md_domain_size}\u00b3 over {ranks_xyz_fmtd} ranks."
+    return None
+
+
+def apply(partial_xml, get_config_value) -> None:
     cfd_base_size = 50
-    domain_offset_xy = (cfd_base_size - md_base_size) / 2  # Centered
     equilibration_steps = 10000
     equilibration_steps_max = 20000
     key = __name__.split(".")[-1]
     size = get_config_value(key)
-    partial_xml.substitute("md-size", md_base_size * size)
-    partial_xml.substitute("cfd-size", cfd_base_size * size)
+    md_domain_size = get_md_domain_size(size)
+    cfd_domain_size = cfd_base_size * size
+    domain_offset_xy = (cfd_domain_size - md_domain_size) / 2  # Centered
+    partial_xml.substitute("md-size", md_domain_size)
+    partial_xml.substitute("cfd-size", cfd_domain_size)
+    use_checkpoint = get_config_value("use_checkpoint")
     partial_xml.substitute(
         "equilibration-steps",
-        min(equilibration_steps_max, equilibration_steps * size),
+        min(equilibration_steps_max, equilibration_steps * size)
+        * (0 if use_checkpoint else 1),
     )
     partial_xml.substitute("domain-offset-x", domain_offset_xy * size)
     partial_xml.substitute("domain-offset-y", domain_offset_xy * size)

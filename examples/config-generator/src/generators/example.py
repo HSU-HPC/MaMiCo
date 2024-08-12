@@ -17,6 +17,21 @@ In the file configuration_template.json, this is equivalent to:
 """
 
 
+def validate(get_config_value) -> str:
+    """Returns an explanation of any invalid configuration for this generator or None.
+
+    Keyword arguments:
+    get_config_value -- A function to get the configuration values by key
+    """
+    # Load the value of the generator from the configuration (Generators may load any other value for validation/substitution)
+    key = __name__.split(".")[-1]
+    value = get_config_value(key)
+    if value == "space":
+        return "Greeting space is not possible due to a lack of large radio telescopes"
+    else:
+        return None
+
+
 def apply(partial_xml, get_config_value) -> None:
     """Applies all substitutions for this generator to the current template.
 

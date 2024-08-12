@@ -1,3 +1,4 @@
+import re
 from xml.dom import minidom
 
 """Utilities for working with XML (templates)."""
@@ -61,5 +62,8 @@ class PartialXml:
         """Returns the current value of the template.
         A RuntimeError occurs if not all placeholders have been substituted."""
         if "{" in self._string:
-            raise RuntimeError("Not all values have been substituted!")
+            not_substituted = list(set(re.findall("{.*}", self._string)))
+            raise RuntimeError(
+                f"Not all values have been substituted: [{', '.join(not_substituted)}]"
+            )
         return format_xml(self._string)

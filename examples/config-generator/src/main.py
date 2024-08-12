@@ -69,6 +69,19 @@ def get_config_value(configs: list, key: str) -> object:
     return ValueError(f'No config with key "{key}" found')
 
 
+def load_generator(generator: str) -> object:
+    """Load a generator module by name. (Process exists with error if the generator does not exist.)
+
+    Keyword arguments:
+    generator -- the filename without extension of the module in the generators folder
+    """
+    try:
+        return importlib.import_module(f"generators.{generator}")
+    except ModuleNotFoundError:
+        print(f'Missing generator "{generator}"', file=sys.stderr)
+        exit(1)
+
+
 def generate(configs: list, filename: str) -> None:
     """Create the configuration by loading the template, applying the generators, and saving the resulting XML file.
 
@@ -79,21 +92,38 @@ def generate(configs: list, filename: str) -> None:
     xml = PartialXml(get_text_file("couette.xml.template"))
     print("Loaded configuration template")
     for config in configs:
-        generator = config["key"]
-        try:
-            generator = importlib.import_module(f"generators.{generator}")
-        except ModuleNotFoundError:
-            print(f'Missing generator "{generator}"', file=sys.stderr)
-            exit(1)
+        generator = load_generator(config["key"])
         generator.apply(xml, lambda k: get_config_value(configs, k))
     with open(filename, "w") as file:
         file.write(xml.get())
     print(f"\nWrote configuration to {filename}")
 
 
+def validate(configs: list) -> str:
+    """validate the configuration using the generators, returning a string of validation erros (empty if valid).
+
+    Keyword arguments:
+    configs -- The list of configurations which to validate using the generators corresponding to the keys
+    """
+    validation_errors = ""
+    for config in configs:
+        generator = load_generator(config["key"])
+        try:
+            validation_error = generator.validate(
+                lambda k: get_config_value(configs, k)
+            )
+        except AttributeError:
+            print(
+                f"FIXME: Could not invoke validation for generator \"{config['key']}\""
+            )
+            continue
+        if validation_error is not None:
+            validation_errors += validation_error + "\n"
+    return validation_errors.strip()
+
+
 def main() -> None:
     os.chdir(Path(__file__).parent)
-    title = "MaMiCo couette.xml Generator\n"
     # 1. Load configuration options
     configs = json.loads(get_text_file("configuration_template.json"))
     # Fill missing labels
@@ -106,17 +136,23 @@ def main() -> None:
 
     while True:
         # 2. Create the application menu
+        title = "MaMiCo couette.xml Generator\n"
         main_menu = []
         for config in configs:
             main_menu.append(config["label"] + "\t" + get_selected(config)["label"])
         # 3. Validate
-        is_valid = True  # TODO
+        validation_errors = validate(configs)
+        is_valid = len(validation_errors.strip()) == 0
         if is_valid:
             main_menu[-1] += "\n"
             main_menu.append("Generate")
+        else:
+            title += "\n" + validation_errors + "\n"
         # 4. Show and the menu
         selected = term.select(
-            main_menu, title=title, pre_selected=-1 if is_valid else None
+            main_menu,
+            title=title,
+            pre_selected=-1 if is_valid else None,
         )
         if selected == -1:
             exit(1)

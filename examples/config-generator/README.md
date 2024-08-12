@@ -21,7 +21,17 @@ This file has the following structure:
       {
         "value": 2,
         "label": "A second option"
-      },
+      }
+    ]
+  },
+  {
+    "key": "another_generator",
+    "options": [
+      {
+        "selected": true,
+        "value": true
+      }
+    ]
   }
 ]
 ```

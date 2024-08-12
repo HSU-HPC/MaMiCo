@@ -22,6 +22,19 @@
     ]
   },
   {
+    "key": "use_checkpoint",
+    "label": "use checkpoint",
+    "options": [
+      {
+        "selected": true,
+        "value": true
+      },
+      {
+        "value": false
+      }
+    ]
+  },
+  {
     "key": "solver_md",
     "label": "MD solver",
     "options": [

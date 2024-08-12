@@ -68,6 +68,7 @@
       compute-macroscopic-quantities-every-timestep="0"
       fix-seed="no"
     ></simulation-configuration>
+    {checkpoint}
     <domain-configuration
       molecules-per-direction="{molecules-per-direction} ; {molecules-per-direction} ; {molecules-per-direction}"
       domain-size="{md-size} ; {md-size} ; {md-size}"

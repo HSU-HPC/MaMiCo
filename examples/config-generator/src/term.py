@@ -22,7 +22,7 @@ def select(
     clear_after -- If true, the terminal will be cleared after displaying the menu
     """
     prompt = f"\nSelect ({1}-{len(options)}): "
-    if pre_selected < 0:
+    if pre_selected is not None and pre_selected < 0:
         pre_selected += len(options)
     while True:
         if clear_before:
