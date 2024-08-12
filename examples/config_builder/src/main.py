@@ -3,13 +3,11 @@
 import importlib
 import json
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
-from generators.utils import get_config_value, get_selected
 import term
-
-import lxml.etree as etree
+from xml_templating import PartialXml
 
 
 def select_option(config: dict) -> None:
@@ -35,36 +33,35 @@ def get_text_file(name: str) -> str:
     return (base_path / "assets" / name).read_text()
 
 
+def get_selected(config: dict) -> object:
+    for option in config["options"]:
+        if "selected" in option and option["selected"]:
+            return option
+    raise ValueError(f'No option selected for config with key "{config["key"]}"')
+
+
+def get_config_value(configs: dict, key: str) -> object:
+    for config in configs:
+        if config["key"] == key:
+            return get_selected(config)["value"]
+    return ValueError(f'No config with key "{key}" found')
+
+
 def generate(configs):
-    class PartialXml:
-        def __init__(self) -> None:
-            self.string = get_text_file("couette.xml.template")
-            print("Loaded configuration template")
-
-        def substitute(self, a: str, b: object) -> None:
-            self.string = self.string.replace(a, str(b))
-
-    xml = PartialXml()
+    xml = PartialXml(get_text_file("couette.xml.template"))
+    print("Loaded configuration template")
     for config in configs:
         generator = config["key"]
         try:
             generator = importlib.import_module(f"generators.{generator}")
         except ModuleNotFoundError:
-            print(f'Skipping missing generator "{generator}"')
-            continue
-        generator.apply(xml, configs)
-    if "{" in xml.string:
-        print("\nWarning: Not all values have been substituted!")
+            print(f'Missing generator "{generator}"', file=sys.stderr)
+            exit(1)
+        generator.apply(xml, lambda k: get_config_value(configs, k))
     output_filename = sys.argv[1]
     with open(output_filename, "w") as file:
-        file.write(xml.string)
-    # Format
-    parsed = etree.parse(output_filename)
-    with open(output_filename, "wb") as file:
-        file.write(etree.tostring(parsed, pretty_print=True))
+        file.write(xml.get())
     print(f"\nWrote configuration to {output_filename}")
-    ranks = get_config_value(configs, "mpi_ranks") * get_config_value(configs, "multi_md")
-    print(f"\nRun simulation using \"mpirun -n {ranks} $MAMICO_PATH/build/couette\"")
 
 
 def main() -> None:
@@ -99,7 +96,13 @@ def main() -> None:
         elif is_valid and selected == len(main_menu) - 1:
             # Generate
             generate(configs)
-            exit()
+            ranks = get_config_value(configs, "mpi_ranks") * get_config_value(
+                configs, "multi_md"
+            )
+            print(
+                f'\nRun simulation using "mpirun -n {ranks} $MAMICO_PATH/build/couette"'
+            )
+            exit(0)
         else:
             # Update configuration
             select_option(configs[selected])

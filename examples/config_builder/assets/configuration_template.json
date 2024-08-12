@@ -7,17 +7,17 @@
         "selected": true,
         "value": 1,
         "label": "small",
-        "description": "MD/CFD domain size = 30/50 cubed"
+        "description": "MD/CFD domain size = 30\u00B3/50\u00B3"
       },
       {
         "value": 2,
         "label": "medium",
-        "description": "MD/CFD domain size = 60/100 cubed"
+        "description": "MD/CFD domain size = 60\u00B3/100\u00B3"
       },
       {
         "value": 3,
         "label": "large",
-        "description": "MD/CFD domain size = 120/100 cubed"
+        "description": "MD/CFD domain size = 120\u00B3/200\u00B3"
       }
     ]
   },
@@ -45,13 +45,16 @@
       },
       {
         "selected": true,
-        "value": "lb"
+        "value": "lb",
+        "label": "lattice Boltzmann"
       },
       {
-        "value": "fd"
+        "value": "fd",
+        "label": "finite difference"
       },
       {
-        "value": "foam"
+        "value": "foam",
+        "label": "OpenFOAM"
       }
     ]
   },
@@ -145,11 +148,11 @@
       },
       {
         "value": "short",
-        "description": "250 * domain size^2 coupling cycles"
+        "description": "250 \u00D7 domain size\u00B2 coupling cycles"
       },
       {
         "value": "normal",
-        "description": "500 * domain size^2 coupling cycles"
+        "description": "500 \u00D7 domain size\u00B2 coupling cycles"
       }
     ]
   },

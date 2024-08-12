@@ -1,9 +1,6 @@
-from generators.utils import get_config_value
-
-
-def apply(partialXml: object, configs: dict) -> None:
+def apply(partial_xml, get_config_value) -> None:
     key = __name__.split(".")[-1]
-    filtering = get_config_value(configs, key)
+    filtering = get_config_value(key)
 
     xml_2d_gaussian = """
 <per-instance output = "gaussXY" >
@@ -21,5 +18,5 @@ def apply(partialXml: object, configs: dict) -> None:
     else:
         raise NotImplementedError(key + " = " + filtering)
 
-    partialXml.substitute("{filtering}", filter_xml)
+    partial_xml.substitute("{filtering}", filter_xml)
     print("Substituted filtering pipeline")

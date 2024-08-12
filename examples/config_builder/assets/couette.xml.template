@@ -35,6 +35,7 @@
       density="0.813037037"
     />
   </couette-test>
+
   <mamico>
     <coupling-cell-configuration
       cell-size="{cell-size} ; {cell-size} ; {cell-size}"
@@ -44,12 +45,11 @@
       write-every-macroscopic-timestep="0"
       macroscopic-filename="CouplingCell_macro"
     />
-    <particle-insertion type="none" maximum-number-of-iterations="100" maximum-number-of-restarts="500" insert-every-timestep="10" tolerance="0.5" />
     <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
     <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" shift-by-timesteps="0.5"/>
-    <boundary-force type="zhou-boundary-force" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes" density="0.81" temperature="1.1" />
     <parallel-topology type="xyz" />
     <thermostat type='outerLayers' number-layers='1' />
+    {boundary-condition-xml}
   </mamico>
 
   <molecular-dynamics>
@@ -68,33 +68,34 @@
       compute-macroscopic-quantities-every-timestep="0"
       fix-seed="no"
     ></simulation-configuration>
-    <!-- TODO <vtk-configuration filename="Molecules" write-every-timestep="{vtk-write-frequency}"></vtk-configuration> -->
-    <!-- <adios2-configuration directory-name="adiosOutput" write-every-timestep="0"></adios2-configuration>
-    <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration> -->
     <domain-configuration
       molecules-per-direction="{molecules-per-direction} ; {molecules-per-direction} ; {molecules-per-direction}"
       domain-size="{md-size} ; {md-size} ; {md-size}"
-      domain-offset="10.0 ; 10.0 ; 2.5"
+      domain-offset="{domain-offset-x} ; {domain-offset-x} ; {domain-offset-z}"
       cutoff-radius="2.2"
       linked-cell-size="2.5 ; 2.5 ; 2.5"
       k_B="1.0"
       block-size="100"
 
-      bottom-south-west="reflecting" bottom-south="reflecting" bottom-south-east="reflecting"
-      bottom-west="reflecting"       bottom="reflecting"       bottom-east="reflecting"
-      bottom-north-west="reflecting" bottom-north="reflecting" bottom-north-east="reflecting"
+      bottom-south-west="{boundary-condition}" bottom-south="{boundary-condition}" bottom-south-east="{boundary-condition}"
+      bottom-west="{boundary-condition}"       bottom="{boundary-condition}"       bottom-east="{boundary-condition}"
+      bottom-north-west="{boundary-condition}" bottom-north="{boundary-condition}" bottom-north-east="{boundary-condition}"
 
-      south-west="reflecting"        south="reflecting"        south-east="reflecting"
-      west="reflecting"                                          east="reflecting"
-      north-west="reflecting"        north="reflecting"        north-east="reflecting"
+      south-west="{boundary-condition}"        south="{boundary-condition}"        south-east="{boundary-condition}"
+      west="{boundary-condition}"                                                  east="{boundary-condition}"
+      north-west="{boundary-condition}"        north="{boundary-condition}"        north-east="{boundary-condition}"
 
-      top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"
-      top-west="reflecting"          top="reflecting"          top-east="reflecting"
-      top-north-west="reflecting"    top-north="reflecting"    top-north-east="reflecting"
-    > </domain-configuration>
-
+      top-south-west="{boundary-condition}"    top-south="{boundary-condition}"    top-south-east="{boundary-condition}"
+      top-west="{boundary-condition}"          top="{boundary-condition}"          top-east="{boundary-condition}"
+      top-north-west="{boundary-condition}"    top-north="{boundary-condition}"    top-north-east="{boundary-condition}"
+    ></domain-configuration>
   </molecular-dynamics>
+
   <filter-pipeline>
-    {filtering}
+    <per-instance output = "md" >
+      {filtering}
+    </per-instance>
+
+    <post-multi-instance output="md"></post-multi-instance>
   </filter-pipeline>
 </scenario-configuration>
