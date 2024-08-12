@@ -1,5 +1,9 @@
 #! /bin/bash
 
+# This helper script launches the main python script of the config generator in a separate virtual environment.
+# Any dependencies are automatically installed.
+# The output of the script is saved to the current working directory.
+
 OUTPUT="$(pwd)/couette.xml"
 
 cd "$(dirname "$0")" || exit

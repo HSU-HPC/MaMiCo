@@ -8,5 +8,5 @@ def apply(partial_xml, get_config_value) -> None:
         ranks /= 2
         ranks = (ranks + 1) % len(ranks_xyz)
     for ranks, ax in zip(ranks_xyz, ["x", "y", "z"]):
-        partial_xml.substitute("{mpi-size-" + ax + "}", ranks)
+        partial_xml.substitute(f"mpi-size-{ax}", ranks)
     print("Substituted MPI size")

@@ -1,5 +1,10 @@
 #! /usr/bin/env python3
 
+"""
+Utility script to generate basic couette.xml configuration for MaMiCo.
+Do NOT run this script directly! Use ../run instead.
+"""
+
 import importlib
 import json
 import os
@@ -11,6 +16,11 @@ from xml_templating import PartialXml
 
 
 def select_option(config: dict) -> None:
+    """Show a terminal menu for a single option of the configuration and apply the selection of the user to the current configurations.
+
+    Keyword arguments:
+    config -- The configuration from all configurations (by reference) which should be updated
+    """
     print(config)
     pre_selected = None
     option_labels = []
@@ -29,25 +39,43 @@ def select_option(config: dict) -> None:
 
 
 def get_text_file(name: str) -> str:
+    """Load the text from a file in the assets folder next to the src folder."""
     base_path = Path().absolute().parent
     return (base_path / "assets" / name).read_text()
 
 
 def get_selected(config: dict) -> object:
+    """Return the selected option for a given configuration. The absence of such an option causes a ValueError.
+
+    Keyword arguments:
+    config -- The configuration from which to look up the selected option
+    """
     for option in config["options"]:
         if "selected" in option and option["selected"]:
             return option
     raise ValueError(f'No option selected for config with key "{config["key"]}"')
 
 
-def get_config_value(configs: dict, key: str) -> object:
+def get_config_value(configs: list, key: str) -> object:
+    """Return the selected value for a given configuration by its key.
+
+    Keyword arguments:
+    configs -- All configurations from which to return the value of the configuration with the specified key
+    key -- The key of the configuration from which to return the value
+    """
     for config in configs:
         if config["key"] == key:
             return get_selected(config)["value"]
     return ValueError(f'No config with key "{key}" found')
 
 
-def generate(configs):
+def generate(configs: list, filename: str) -> None:
+    """Create the configuration by loading the template, applying the generators, and saving the resulting XML file.
+
+    Keyword arguments:
+    configs -- The list of configurations which to apply using the generators corresponding to the keys
+    filename -- The output XML filename
+    """
     xml = PartialXml(get_text_file("couette.xml.template"))
     print("Loaded configuration template")
     for config in configs:
@@ -58,10 +86,9 @@ def generate(configs):
             print(f'Missing generator "{generator}"', file=sys.stderr)
             exit(1)
         generator.apply(xml, lambda k: get_config_value(configs, k))
-    output_filename = sys.argv[1]
-    with open(output_filename, "w") as file:
+    with open(filename, "w") as file:
         file.write(xml.get())
-    print(f"\nWrote configuration to {output_filename}")
+    print(f"\nWrote configuration to {filename}")
 
 
 def main() -> None:
@@ -95,12 +122,12 @@ def main() -> None:
             exit(1)
         elif is_valid and selected == len(main_menu) - 1:
             # Generate
-            generate(configs)
+            generate(configs, sys.argv[1])
             ranks = get_config_value(configs, "mpi_ranks") * get_config_value(
                 configs, "multi_md"
             )
             print(
-                f'\nRun simulation using "mpirun -n {ranks} $MAMICO_PATH/build/couette"'
+                f'\nRun simulation using "mpirun -n {ranks} $MAMICO_DIR/build/couette"'
             )
             exit(0)
         else:

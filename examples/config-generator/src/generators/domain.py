@@ -6,16 +6,16 @@ def apply(partial_xml, get_config_value) -> None:
     equilibration_steps_max = 20000
     key = __name__.split(".")[-1]
     size = get_config_value(key)
-    partial_xml.substitute("{md-size}", md_base_size * size)
-    partial_xml.substitute("{cfd-size}", cfd_base_size * size)
+    partial_xml.substitute("md-size", md_base_size * size)
+    partial_xml.substitute("cfd-size", cfd_base_size * size)
     partial_xml.substitute(
-        "{equilibration-steps}",
+        "equilibration-steps",
         min(equilibration_steps_max, equilibration_steps * size),
     )
-    partial_xml.substitute("{domain-offset-x}", domain_offset_xy * size)
-    partial_xml.substitute("{domain-offset-y}", domain_offset_xy * size)
+    partial_xml.substitute("domain-offset-x", domain_offset_xy * size)
+    partial_xml.substitute("domain-offset-y", domain_offset_xy * size)
     cell_size = get_config_value(key)
-    partial_xml.substitute("{domain-offset-z}", cell_size)
+    partial_xml.substitute("domain-offset-z", cell_size)
     print(
         "Substituted domain size and offset for MD, CFD solver domain size, and MD equilibration steps"
     )

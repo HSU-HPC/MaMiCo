@@ -60,7 +60,8 @@ Optional dependencies are:
 * The build instructions have created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. 
 * An example simulation configuration file can be generated using `config-generator/run` in the [examples](https://github.com/HSU-HPC/MaMiCo/blob/master/examples). 
 * Copy the generated 'couette.xml' file to your build folder. 
-* The available options and features are listed directly in the template file via XML comments, so that you can modify the configuration to suit your needs. **TODO** move this to the wiki
+* The available options and features are explained [here](https://github.com/HSU-HPC/MaMiCo/wiki/couette.xml).  
+(*Deprecated:* Some are also listed directly in the template file via XML comments, so that you can modify the configuration to suit your needs.)
 * Start the simulation by executing (sequential case) `./couette` or e.g. (MPI-parallel) `mpirun -n 8 ./couette`.
 * If you get the error message 'ERROR MoleculeService::MoleculeService: Could not open file CheckpointSimpleMD_10000_reflecting_0.checkpoint!', copy the file of the same name from the 'examples' folder into your build folder.
 * Depending on the configuration, you will obtain various output files in CSV, VTK or other formats. 

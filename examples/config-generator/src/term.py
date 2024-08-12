@@ -1,5 +1,7 @@
 import os
 
+"""Utilities for interactive terminal applications."""
+
 
 def select(
     options: list,
@@ -8,6 +10,17 @@ def select(
     clear_before: bool = True,
     clear_after: bool = True,
 ) -> int:
+    """Displays a single item selection menu in the terminal.
+    This function loops while no valid input has been received.
+    Returns the index of the selected option or -1.
+
+    Keyword arguemnts:
+    options -- A list of options to select from (should be short and about the same length)
+    pre_selected -- The index of the option to pre-select (confirm with enter) or None
+    title -- The title displayed above the menu
+    clear_before -- If true, the terminal will be cleared before displaying the menu
+    clear_after -- If true, the terminal will be cleared after displaying the menu
+    """
     prompt = f"\nSelect ({1}-{len(options)}): "
     if pre_selected < 0:
         pre_selected += len(options)
@@ -37,4 +50,5 @@ def select(
 
 
 def clear() -> None:
+    """Clears all output from the terminal."""
     os.system("cls" if os.name == "nt" else "clear")

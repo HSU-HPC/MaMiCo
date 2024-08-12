@@ -13,7 +13,7 @@ def apply(partial_xml, get_config_value) -> None:
     <boundary-force type="none" west="no" east="no" north="no" south="no" bottom="no" top="no" density="0.81" temperature="1.1"/>
 """.strip()
     else:
-        raise ValueError(f'Invalid boundary condition "{boundary_condition}"')
-    partial_xml.substitute("{boundary-condition}", boundary_condition)
-    partial_xml.substitute("{boundary-condition-xml}", boundary_condition_xml)
+        raise ValueError(f'Invalid boundary condition "boundary_condition"')
+    partial_xml.substitute("boundary-condition", boundary_condition)
+    partial_xml.substitute("boundary-condition-xml", boundary_condition_xml)
     print("Substituted boundary condition")

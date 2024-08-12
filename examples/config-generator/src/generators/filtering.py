@@ -18,5 +18,5 @@ def apply(partial_xml, get_config_value) -> None:
     else:
         raise NotImplementedError(key + " = " + filtering)
 
-    partial_xml.substitute("{filtering}", filter_xml)
+    partial_xml.substitute("filtering", filter_xml)
     print("Substituted filtering pipeline")
