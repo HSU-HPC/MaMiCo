@@ -93,7 +93,13 @@ def generate(configs: list, filename: str) -> None:
     print("Loaded configuration template")
     for config in configs:
         generator = load_generator(config["key"])
-        generator.apply(xml, lambda k: get_config_value(configs, k))
+        # Make output path accessible to generators
+        config_output_filename = [
+            dict(key="output_filename", options=[dict(selected=True, value=filename)])
+        ]
+        generator.apply(
+            xml, lambda k: get_config_value(configs + config_output_filename, k)
+        )
     with open(filename, "w") as file:
         file.write(xml.get())
     print(f"\nWrote configuration to {filename}")
