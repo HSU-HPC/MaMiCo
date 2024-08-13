@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mardyn version="20100525">
+	<loglevel>ERROR</loglevel>
+	<refunits type="SI">
+		<length unit="nm">0.34</length>
+		<mass unit="u">39.948</mass>
+		<energy unit="K">120</energy>
+	</refunits>
+	<simulation type="MD">
+		<integrator type="Leapfrog">
+			<timestep unit="reduced">0.005</timestep>
+		</integrator>
+		<run>
+			<currenttime>0</currenttime>
+			<equilibration>
+				<steps>0</steps>
+			</equilibration>
+			<production>
+				<steps>15000</steps>
+			</production>
+		</run>
+		<ensemble type="NVT">
+			<temperature unit="reduced">1.10</temperature>
+			<domain type="box">
+				<lx>{md-size}</lx>
+				<ly>{md-size}</ly>
+				<lz>{md-size}</lz>
+			</domain>
+			<components>
+				<moleculetype id="1" name="Arbitrary">
+					<site type="LJ126" id="1" >
+						<coords>
+							<x>0.0</x>
+							<y>0.0</y>
+							<z>0.0</z>
+						</coords>
+						<mass>1.0</mass>
+						<sigma>1.0</sigma>
+						<epsilon>1.0</epsilon>
+					</site>
+				</moleculetype>
+			</components>
+			<phasespacepoint>
+				<generator name="MultiObjectGenerator">
+					<objectgenerator>
+						<filler type="GridFiller">
+							<lattice system="cubic" centering="face">
+								<vec id="a">
+									<x>{grid-filler-lattice}</x>
+									<y>0</y>
+									<z>0</z>
+								</vec>
+								<vec id="b">
+									<x>0</x>
+									<y>{grid-filler-lattice}</y>
+									<z>0</z>
+								</vec>
+								<vec id="c">
+									<x>0</x>
+									<y>0</y>
+									<z>{grid-filler-lattice}</z>
+								</vec>
+							</lattice>
+							<basis>
+								<site>
+									<componentid>0</componentid>
+									<coordinate>
+										<x>0.5</x>
+										<y>0.5</y>
+										<z>0.5</z>
+									</coordinate>
+								</site>
+							</basis>
+							<latticeOccupancy>1</latticeOccupancy>
+							<density>0.813037037</density>
+						</filler>
+						<object type="Cuboid">
+							<lower>
+								<x>0</x>
+								<y>0</y>
+								<z>0</z>
+							</lower>
+							<upper>
+								<x>{md-size}</x>
+								<y>{md-size}</y>
+								<z>{md-size}</z>
+							</upper>
+						</object>
+						<velocityAssigner type="MaxwellVelocityDistribution" enableRandomSeed="1"></velocityAssigner>
+					</objectgenerator>
+				</generator>
+			</phasespacepoint>
+		</ensemble>
+		<algorithm>
+			<parallelisation type="DomainDecomposition">
+				<boundaries>
+					<x>{boundary-condition}</x>
+					<y>{boundary-condition}</y>
+					<z>{boundary-condition}</z>
+				</boundaries>
+			</parallelisation>
+			<datastructure type="LinkedCells">
+				<cellsInCutoffRadius>1</cellsInCutoffRadius>
+			</datastructure>
+			<cutoffs type="CenterOfMass">
+				<radiusLJ unit="reduced">2.2</radiusLJ>
+			</cutoffs>
+			<electrostatic type="ReactionField">
+				<epsilon>1.0e+10</epsilon>
+			</electrostatic>
+		</algorithm>
+		<output></output>
+		<plugin name="MamicoCoupling"></plugin>
+	</simulation>
+</mardyn>

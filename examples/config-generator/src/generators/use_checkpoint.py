@@ -29,6 +29,7 @@ def apply(partial_xml, get_config_value) -> None:
             Path(get_config_value("output_filename")).parent
             / "CheckpointSimpleMD.checkpoint"
         )
+        # Avoid reading and writing the contents of the file, because it is rather large
         shutil.copyfile(checkpoint_src_path, checkpoint_dst_path)
         print(
             'Also created file "CheckpointSimpleMD.checkpoint" in the same directory as couette.xml.'

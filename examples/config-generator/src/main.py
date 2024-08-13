@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 import term
+from utils import get_asset_text
 from xml_templating import PartialXml
 
 
@@ -36,12 +37,6 @@ def select_option(config: dict) -> None:
         option_labels, title=config["label"], pre_selected=pre_selected
     )
     config["options"][selected]["selected"] = True
-
-
-def get_text_file(name: str) -> str:
-    """Load the text from a file in the assets folder next to the src folder."""
-    base_path = Path().absolute().parent
-    return (base_path / "assets" / name).read_text()
 
 
 def get_selected(config: dict) -> object:
@@ -89,7 +84,7 @@ def generate(configs: list, filename: str) -> None:
     configs -- The list of configurations which to apply using the generators corresponding to the keys
     filename -- The output XML filename
     """
-    xml = PartialXml(get_text_file("couette.xml.template"))
+    xml = PartialXml(get_asset_text("couette.xml.template"))
     print("Loaded configuration template")
     for config in configs:
         generator = load_generator(config["key"])
@@ -131,7 +126,7 @@ def validate(configs: list) -> str:
 def main() -> None:
     os.chdir(Path(__file__).parent)
     # 1. Load configuration options
-    configs = json.loads(get_text_file("configuration_template.json"))
+    configs = json.loads(get_asset_text("configuration_template.json"))
     # Fill missing labels
     for config in configs:
         if "label" not in config:
