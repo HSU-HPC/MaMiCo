@@ -16,7 +16,7 @@
 				<steps>0</steps>
 			</equilibration>
 			<production>
-				<steps>15000</steps>
+				<steps>0</steps>
 			</production>
 		</run>
 		<ensemble type="NVT">

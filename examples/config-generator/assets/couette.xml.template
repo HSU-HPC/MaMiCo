@@ -47,8 +47,8 @@
     />
     <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
     <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" shift-by-timesteps="0.5"/>
-    <parallel-topology type="xyz" />
-    <thermostat type='outerLayers' number-layers='1' />
+    <parallel-topology type="{parallel-topology-type}" />
+    <thermostat type='{thermostat-type}' number-layers='1' />
     {boundary-condition-xml}
   </mamico>
 
