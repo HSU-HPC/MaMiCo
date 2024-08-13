@@ -93,10 +93,7 @@
   </molecular-dynamics>
 
   <filter-pipeline>
-    <per-instance output = "md" >
-      {filtering}
-    </per-instance>
-
+    {per-instance-filtering}
     <post-multi-instance output="md"></post-multi-instance>
   </filter-pipeline>
 </scenario-configuration>

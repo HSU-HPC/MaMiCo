@@ -142,12 +142,12 @@
         "value": false
       },
       {
-        "value": "nlm",
-        "label": "non-local means"
-      },
-      {
         "value": "gauss",
         "label": "2D gaussian"
+      },
+      {
+        "value": "nlm",
+        "label": "non-local means"
       }
     ]
   },

@@ -115,7 +115,7 @@ def validate(configs: list) -> str:
             )
         except AttributeError:
             print(
-                f"FIXME: Could not invoke validation for generator \"{config['key']}\""
+                f"Could not invoke validation for generator \"{config['key']}\"", file=sys.stderr,
             )
             continue
         if validation_error is not None:

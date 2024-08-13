@@ -1,12 +1,15 @@
 def validate(get_config_value) -> str:
     """MaMiCo config validation:
     The analytical CFD solver does not support two-way coupling.
+    Only the OpenFOAM solver should be used with two-way coupling.
     """
     key = __name__.split(".")[-1]
     solver = get_config_value(key)
     use_2way_coupling = get_config_value("coupling_2way")
     if solver == "analytical" and use_2way_coupling:
-        return f"Cannot use 2-way coupling with analytical CFD solver."
+        return f"Cannot use two-way coupling with analytical CFD solver."
+    if solver != "foam" and use_2way_coupling:
+        return f"OpenFOAM solver should be used for two-way coupling."
     return None
 
 
