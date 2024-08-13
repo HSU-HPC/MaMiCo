@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from generators.cell_size import get_molecules_per_direction
-from generators.domain import get_domain_sizes
+from generators.domain_size import get_domain_sizes
 from utils import get_asset_text
 from xml_templating import PartialXml
 
@@ -15,7 +15,7 @@ def _create_ls1_config(get_config_value) -> None:
     xml.substitute("grid-filler-lattice", grid_filler_lattice)
     boundary_condition = get_config_value("boundary")
     xml.substitute("boundary-condition", boundary_condition)
-    filename = Path(get_config_value("output_filename")).parent / "ls1config.xml"
+    filename = Path(get_config_value("output_dir")) / "ls1config.xml"
     with open(filename, "w") as file:
         file.write(xml.get())
 

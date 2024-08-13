@@ -42,6 +42,8 @@ This file has the following structure:
 
 ### Usage
 1. Navigate to the target directory for the `couette.xml` file (most likely the MaMiCo build folder)
-2. Execute `$MAMICO_DIR/examples/config-generator/run`
+2. Execute `$MAMICO_DIR/examples/config-generator/run`  
+Specific values can be fixed by providing them as a command line argument, e.g. `--override=domain_size=large,use_checkpoint=False,multi_md=2`.  
+The corresponding entries will be removed from the interactive menu. If all configurations are overwritten, the script will run non-interactively. (May be used for automated testing.)
 3. Customize the generator settings and generate the `couette.xml` file
-3. Customize the generated configuration even further according to the [documentation](https://github.com/HSU-HPC/MaMiCo/wiki/couette.xml) (optional)
+4. Customize the generated configuration even further according to the [documentation](https://github.com/HSU-HPC/MaMiCo/wiki/couette.xml) (optional)

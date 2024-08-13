@@ -1,7 +1,10 @@
+from generators.domain_size import get_domain_size
+
+
 def apply(partial_xml, get_config_value) -> None:
     key = __name__.split(".")[-1]
     simulation_type = get_config_value(key)
-    domain_size = get_config_value("domain")
+    domain_size = get_domain_size(get_config_value)
     match simulation_type:
         case "test":
             partial_xml.substitute("coupling-cycles", 50)

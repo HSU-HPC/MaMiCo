@@ -2,19 +2,22 @@ from generators.cell_size import get_cell_size
 from generators.mpi_ranks import get_ranks_xyz
 
 
-def _get_domain_size(get_config_value) -> int:
+def get_domain_size(get_config_value) -> int:
     key = __name__.split(".")[-1]
-    return get_config_value(key)
+    domain_size_name = get_config_value(key)
+    domain_size_names = ["small", "medium", "large"]
+    return domain_size_names.index(domain_size_name) + 1
 
 
 def get_domain_sizes(get_config_value) -> int:
-    size = _get_domain_size(get_config_value)
+    size = get_domain_size(get_config_value)
     md_base_size = 30
     cfd_base_size = 50
     md_domain_size = md_base_size * size
     cfd_domain_size = cfd_base_size * size
     if size == 3:
         md_domain_size = 120  # instead of 90
+        cfd_domain_size = 200  # instead of 150
     return md_domain_size, cfd_domain_size
 
 
@@ -35,7 +38,7 @@ def validate(get_config_value) -> str:
 def apply(partial_xml, get_config_value) -> None:
     equilibration_steps = 10000
     equilibration_steps_max = 20000
-    size = _get_domain_size(get_config_value)
+    size = get_domain_size(get_config_value)
     md_domain_size, cfd_domain_size = get_domain_sizes(get_config_value)
     domain_offset_xy = (cfd_domain_size - md_domain_size) / 2  # Centered
     partial_xml.substitute("md-size", md_domain_size)

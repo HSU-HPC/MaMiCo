@@ -1,6 +1,8 @@
 import shutil
 from pathlib import Path
 
+from generators.domain_size import get_domain_size
+
 
 def validate(get_config_value) -> str:
     """MaMiCo config validation:
@@ -8,7 +10,7 @@ def validate(get_config_value) -> str:
     """
     key = __name__.split(".")[-1]
     use_checkpoint = get_config_value(key)
-    domain_size = get_config_value("domain")
+    domain_size = get_domain_size(get_config_value)
     solver_md = get_config_value("solver_md")
     if use_checkpoint and (domain_size > 1 or solver_md != "md"):
         return f"Example checkpoint file only provided for small Simple MD simulation."
@@ -29,8 +31,7 @@ def apply(partial_xml, get_config_value) -> None:
             / f"CheckpointSimpleMD_10000_{boundary_condition}_0.checkpoint"
         )
         checkpoint_dst_path = (
-            Path(get_config_value("output_filename")).parent
-            / "CheckpointSimpleMD.checkpoint"
+            Path(get_config_value("output_dir")) / "CheckpointSimpleMD.checkpoint"
         )
         # Avoid reading and writing the contents of the file, because it is rather large
         shutil.copyfile(checkpoint_src_path, checkpoint_dst_path)

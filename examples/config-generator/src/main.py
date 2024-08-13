@@ -1,10 +1,11 @@
 #! /usr/bin/env python3
 
 """
-Utility script to generate basic couette.xml configuration for MaMiCo.
+Utility script to generate basic couette.xml configurations for MaMiCo.
 Do NOT run this script directly! Use ../run instead.
 """
 
+import argparse
 import importlib
 import json
 import os
@@ -16,16 +17,47 @@ from utils import get_asset_text
 from xml_templating import PartialXml
 
 
-def select_option(config: dict) -> None:
+def select_option(configs: list, key: str, value: str) -> None:
+    """Select an option based on a serialized key value pair without user input.
+
+    Keyword arguments:
+    configs -- All configurations in which to update the configuration with the specified key
+    key -- The key by which to select the configuration
+    value -- The serialized representation of the value which should be selected
+    """
+    for config in configs:
+        if config["key"] == key:
+            get_selected(config)["selected"] = False
+            for option in config["options"]:
+                if str(option["value"]) == value:
+                    option["selected"] = True
+                    return
+            raise ValueError(
+                f'No option with the value "{value}" exists for the configuration with the key "{key}"'
+            )
+    raise ValueError(f'No configuration with the key "{key}" exists')
+
+
+def select_option_interactive(configs: list, label: str) -> None:
     """Show a terminal menu for a single option of the configuration and apply the selection of the user to the current configurations.
 
     Keyword arguments:
-    config -- The configuration from all configurations (by reference) which should be updated
+    configs -- All configurations in which to update the configuration with the specified label
+    label -- The menu label by which to select the configuration
     """
-    print(config)
+    selected_config = None
+    for config in configs:
+        if config["label"] == label:
+            if selected_config is not None:
+                raise RuntimeError(
+                    f'Ambiguous selection. Multiple configs match the label "{label}"'
+                )
+            else:
+                selected_config = config
+    del config  # Avoid bugs by re-using variable
     pre_selected = None
     option_labels = []
-    for i, option in enumerate(config["options"]):
+    for i, option in enumerate(selected_config["options"]):
         if "selected" in option and option["selected"]:
             pre_selected = i
             option["selected"] = False
@@ -34,9 +66,9 @@ def select_option(config: dict) -> None:
             label += "\t" + option["description"]
         option_labels.append(label)
     selected = term.select(
-        option_labels, title=config["label"], pre_selected=pre_selected
+        option_labels, title=selected_config["label"], pre_selected=pre_selected
     )
-    config["options"][selected]["selected"] = True
+    selected_config["options"][selected]["selected"] = True
 
 
 def get_selected(config: dict) -> object:
@@ -77,27 +109,32 @@ def load_generator(generator: str) -> object:
         exit(1)
 
 
-def generate(configs: list, filename: str) -> None:
+def generate(configs: list, output_dir: str) -> None:
     """Create the configuration by loading the template, applying the generators, and saving the resulting XML file.
+    This function terminates the process.
 
     Keyword arguments:
     configs -- The list of configurations which to apply using the generators corresponding to the keys
-    filename -- The output XML filename
+    output_dir -- The directory where couette.xml and other files will be created
     """
     xml = PartialXml(get_asset_text("couette.xml.template"))
     print("Loaded configuration template")
     for config in configs:
         generator = load_generator(config["key"])
         # Make output path accessible to generators
-        config_output_filename = [
-            dict(key="output_filename", options=[dict(selected=True, value=filename)])
+        config_output_dir = [
+            dict(key="output_dir", options=[dict(selected=True, value=output_dir)])
         ]
-        generator.apply(
-            xml, lambda k: get_config_value(configs + config_output_filename, k)
-        )
-    with open(filename, "w") as file:
+        generator.apply(xml, lambda k: get_config_value(configs + config_output_dir, k))
+    path = output_dir / "couette.xml"
+    with open(path, "w") as file:
         file.write(xml.get())
-    print(f"\nWrote configuration to {filename}")
+    print(f"\nWrote configuration to {path}")
+    ranks = get_config_value(configs, "mpi_ranks") * get_config_value(
+        configs, "multi_md"
+    )
+    print(f'\nRun simulation using "mpirun -n {ranks} $MAMICO_DIR/build/couette"')
+    exit(0)
 
 
 def validate(configs: list) -> str:
@@ -115,7 +152,8 @@ def validate(configs: list) -> str:
             )
         except AttributeError:
             print(
-                f"Could not invoke validation for generator \"{config['key']}\"", file=sys.stderr,
+                f"Could not invoke validation for generator \"{config['key']}\"",
+                file=sys.stderr,
             )
             continue
         if validation_error is not None:
@@ -123,10 +161,76 @@ def validate(configs: list) -> str:
     return validation_errors.strip()
 
 
+def parse_args(argv: dict = sys.argv[1:], configs: list = []) -> object:
+    """Parse the arguments (from the command line) and return them as a dictionary.
+    If the usage should be printed, the program is terminated instead.
+
+    Keyword arguments:
+    argv -- The command line arguments excluding the name of the script itself or the interpreter
+    configs -- All configurations which may be overwritten using command line arguments
+    """
+    # Extract all possible key=value overrides for help text and validation
+    all_override_kvs = set()
+    all_overrides = ""
+    for config in configs:
+        key = config["key"]
+        all_overrides += f"\n\t{key}\t=\t<"
+        for i, option in enumerate(config["options"]):
+            value = str(option["value"])
+            all_override_kvs.add(f"{key}={value}")
+            if i > 0:
+                all_overrides += "|"
+            all_overrides += value
+        all_overrides += ">"
+    # Parse arguments
+    arg_parser = argparse.ArgumentParser(
+        description="A simple utility to generate basic couette.xml configurations for MaMiCo.",
+        epilog="Available overrides:" + all_overrides,
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    arg_parser.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        required=True,
+        help="The directory where couette.xml and other files will be created",
+    )
+    arg_parser.add_argument(
+        "--override",
+        type=str,
+        default="",
+        help="Comma separated list of key-value (key=value) config overrides. (Will be removed from interactive menu)",
+    )
+    # Parse key=value overrides
+    args = arg_parser.parse_args(argv)
+    override = {}
+    for kv in args.override.split(","):
+        if len(kv.strip()) == 0:
+            continue
+        parts = kv.split("=")
+        if len(parts) != 2:
+            arg_parser.error(
+                "The value of --override must be a comma separated list of key-value pairs (key=value)."
+            )
+        k, v = (p.strip() for p in parts)
+        override[k] = v
+    args.override = override
+    # Check if every key=value override is valid
+    for key, value in args.override.items():
+        if f"{key}={value}" not in all_override_kvs:
+            arg_parser.error(f'Invalid override "{key}={value}"')
+    if not Path(args.output).is_dir():
+        arg_parser.error(
+            "The value of --output must be a path to a directory, not a file."
+        )
+    return args
+
+
 def main() -> None:
     os.chdir(Path(__file__).parent)
     # 1. Load configuration options
     configs = json.loads(get_asset_text("configuration_template.json"))
+    args = parse_args(configs=configs)
     # Fill missing labels
     for config in configs:
         if "label" not in config:
@@ -140,36 +244,46 @@ def main() -> None:
         title = "MaMiCo couette.xml Generator\n"
         main_menu = []
         for config in configs:
-            main_menu.append(config["label"] + "\t" + get_selected(config)["label"])
+            # Apply overrides from command line
+            key = config["key"]
+            if key in args.override:
+                select_option(configs, key, args.override[key])
+            else:
+                main_menu.append(config["label"] + "\t" + get_selected(config)["label"])
         # 3. Validate
         validation_errors = validate(configs)
         is_valid = len(validation_errors.strip()) == 0
-        if is_valid:
-            main_menu[-1] += "\n"
-            main_menu.append("Generate")
+        is_interactive = (
+            len(main_menu) > 0
+        )  # Skip interactive mode if there are no options
+        if not is_interactive:
+            if is_valid:
+                generate(configs, args.output)
+            else:
+                print(validation_errors, file=sys.stderr)
+                exit(1)
         else:
-            title += "\n" + validation_errors + "\n"
-        # 4. Show and the menu
-        selected = term.select(
-            main_menu,
-            title=title,
-            pre_selected=-1 if is_valid else None,
-        )
-        if selected == -1:
-            exit(1)
-        elif is_valid and selected == len(main_menu) - 1:
-            # Generate
-            generate(configs, sys.argv[1])
-            ranks = get_config_value(configs, "mpi_ranks") * get_config_value(
-                configs, "multi_md"
+            if is_valid:
+                main_menu[-1] += "\n"
+                main_menu.append("Generate")
+            else:
+                title += "\n" + validation_errors + "\n"
+            # 4. Show and the menu
+            selected = term.select(
+                main_menu,
+                title=title,
+                pre_selected=-1 if is_valid else None,
             )
-            print(
-                f'\nRun simulation using "mpirun -n {ranks} $MAMICO_DIR/build/couette"'
-            )
-            exit(0)
-        else:
-            # Update configuration
-            select_option(configs[selected])
+            if selected == -1:
+                exit(1)
+            elif is_valid and selected == len(main_menu) - 1:
+                # Generate
+                generate(configs, args.output)
+            else:
+                # Update configuration
+                # Remove explanation behind label
+                selected_label = main_menu[selected].split("\t")[0]
+                select_option_interactive(configs, selected_label)
 
 
 if __name__ == "__main__":

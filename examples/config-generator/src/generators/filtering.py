@@ -25,7 +25,7 @@ def apply(partial_xml, get_config_value) -> None:
 """.strip()
 
     if filtering == False:
-        per_instance_filtering_xml = "<per-instance output=\"md\"></per-instance>"
+        per_instance_filtering_xml = '<per-instance output="md"></per-instance>'
     elif filtering == "gauss":
         per_instance_filtering_xml = xml_2d_gaussian
     elif filtering == "nlm":

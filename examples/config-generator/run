@@ -4,7 +4,7 @@
 # Any dependencies are automatically installed.
 # The output of the script is saved to the current working directory.
 
-OUTPUT="$(pwd)/couette.xml"
+OUTPUT="$(pwd)"
 
 cd "$(dirname "$0")" || exit
 
@@ -22,4 +22,4 @@ fi
 source .venv/bin/activate
 
 # Run the config builder
-python3 src/main.py "$OUTPUT"
+python3 src/main.py --output "$OUTPUT" "$@"

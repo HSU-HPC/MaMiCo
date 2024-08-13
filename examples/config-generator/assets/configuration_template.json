@@ -1,22 +1,19 @@
 [
   {
-    "key": "domain",
+    "key": "domain_size",
     "label": "domain size",
     "options": [
       {
         "selected": true,
-        "value": 1,
-        "label": "small",
+        "value": "small",
         "description": "MD/CFD domain size = 30\u00B3/50\u00B3"
       },
       {
-        "value": 2,
-        "label": "medium",
+        "value": "medium",
         "description": "MD/CFD domain size = 60\u00B3/100\u00B3"
       },
       {
-        "value": 3,
-        "label": "large",
+        "value": "large",
         "description": "MD/CFD domain size = 120\u00B3/200\u00B3"
       }
     ]

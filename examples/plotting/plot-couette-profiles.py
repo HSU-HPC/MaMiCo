@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 """
-Simple but versitile script to plot couette flow profiles
+Simple but versatile script to plot couette flow profiles
 
 (Replaces https://github.com/HSU-HPC/MaMiCo/commit/42ad244c75640a692ae1b70d56c7060431fdab0d)
 """
@@ -95,18 +95,18 @@ def parse_args(argv=sys.argv[1:]):
     global args
     arg_parser = argparse.ArgumentParser()
     # Scenario parameters
-    arg_parser.add_argument("--offset", default=2.5)
-    arg_parser.add_argument("--wall-velocity", default=0.5)
-    arg_parser.add_argument("--channel-height", default=50.0)
-    arg_parser.add_argument("--density", default=0.813037037)
-    arg_parser.add_argument("--viscosity", default=2.4)
-    arg_parser.add_argument("--coupling-cells", default=6)
+    arg_parser.add_argument("--offset", default=2.5, type=float)
+    arg_parser.add_argument("--wall-velocity", default=0.5, type=float)
+    arg_parser.add_argument("--channel-height", default=50.0, type=float)
+    arg_parser.add_argument("--density", default=0.813037037, type=float)
+    arg_parser.add_argument("--viscosity", default=2.4, type=float)
+    arg_parser.add_argument("--coupling-cells", default=6, type=int)
     arg_parser.add_argument(
-        "--overlap-size", default=3, help="In number of coupling cells"
+        "--overlap-size", default=3, help="In number of coupling cells", type=int
     )
-    arg_parser.add_argument("--coupling-cell-size", default=2.5)
+    arg_parser.add_argument("--coupling-cell-size", default=2.5, type=float)
     # Script parameters
-    arg_parser.add_argument("--workdir", default=Path(__file__).parent.parent)
+    arg_parser.add_argument("--workdir", default=Path(), type=Path)
     arg_parser.add_argument(
         "--coupling-cycles",
         default="",
