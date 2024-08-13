@@ -1,4 +1,7 @@
 def validate(get_config_value) -> str:
+    """MaMiCo config validation:
+    The analytical CFD solver does not support two-way coupling.
+    """
     key = __name__.split(".")[-1]
     solver = get_config_value(key)
     use_2way_coupling = get_config_value("coupling_2way")

@@ -1,4 +1,7 @@
 def validate(get_config_value) -> str:
+    """MaMiCo config validation:
+    Two way coupling is only stable for up to 50 coupling cycles or if averaging over many (>= 200) MD solvers.
+    """
     key = __name__.split(".")[-1]
     use_2way_coupling = get_config_value(key)
     simulation_type = get_config_value("simulation")

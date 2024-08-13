@@ -3,6 +3,9 @@ from pathlib import Path
 
 
 def validate(get_config_value) -> str:
+    """MaMiCo config validation:
+    A pre-computed checkpoint is (currently) only available for Simple MD with a 30x30x30 domain.
+    """
     key = __name__.split(".")[-1]
     use_checkpoint = get_config_value(key)
     domain_size = get_config_value("domain")

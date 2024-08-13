@@ -19,6 +19,9 @@ def get_domain_sizes(get_config_value) -> int:
 
 
 def validate(get_config_value) -> str:
+    """MaMiCo config validation:
+    For each axis x/y/z the MD domain must be divisible by the corresponding number of MPI ranks along the same axis.
+    """
     md_domain_size, _ = get_domain_sizes(get_config_value)
     ranks_xyz = get_ranks_xyz(get_config_value)
 
