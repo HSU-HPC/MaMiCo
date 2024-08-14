@@ -4,8 +4,6 @@
 #ifndef _MOLECULARDYNAMICS_CONFIGURATIONS_DOMAINDECOMPCONFIGURATION_H_
 #define _MOLECULARDYNAMICS_CONFIGURATIONS_DOMAINDECOMPCONFIGURATION_H_
 
-#define MD_DIM 3 // TODO REMOVE
-
 #include "simplemd/MolecularDynamicsDefinitions.h"
 #include "tarch/configuration/Configuration.h"
 #include "tarch/la/Vector.h"
