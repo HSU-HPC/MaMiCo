@@ -33,7 +33,7 @@ public:
   const int getDomainGridDecompAtDim(int dim) { return _domainGridDecomp[dim]; }
   std::array<int, 3> getDomainGridDecomp() { return _domainGridDecomp; }
 
-  void setSubdomainWeights(std::array<std::vector<unsigned int>, 3> subdomainWeights) { _subdomainWeights = subdomainWeights; }
+  void setSubdomainWeightsAtDim(int dim, std::vector<unsigned int> subdomainWeights) { _subdomainWeights[dim] = subdomainWeights; }
   const std::array <std::vector<unsigned int> ,3> getSubdomainWeights() { return _subdomainWeights; }
 #endif
 

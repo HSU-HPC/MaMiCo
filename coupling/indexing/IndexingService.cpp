@@ -357,15 +357,25 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
       ss << ", total weights for axis " << d << " = " << totalWeight;
       throw std::runtime_error(ss.str());
     }
+
+    if (numberProcesses[d] != subdomainWeights[d].size()) {
+      std::stringstream ss;
+      ss << "IndexingService: initWithCells(): ERROR: Number "
+            "of process not equal to number of subdomain weights given! ";
+      ss << "number of processes = " << globalNumberCouplingCells;
+      ss << ", number of subdomain weights for axis " << d << " = " << subdomainWeights[d].size();
+      throw std::runtime_error(ss.str());
+    }
   }
 
-  // populate the _subdomainOwnership datastructure
+  // populate the _subdomainOwnership datastructure (does not include ghost cells)
   // after populating, can be used for lookup to find processes for specific cell coords
   // ex: if axis 0 has 8 cells, and weights 1,2,1, _subdomainOwnership[0] = {0,0,1,1,1,1,2,2}
   // hence cell 3 will be on x axis coord 1
   for(unsigned int d = 0; d < dim; d++) {
     const int totalWeight = std::reduce(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);
     const int multiplier = globalNumberCouplingCells[d] / totalWeight;
+    _subdomainOwnership[d].clear();
     _subdomainOwnership[d].reserve(globalNumberCouplingCells[d]);
     for(unsigned int i = 0; i < numberProcesses[d]; i++) {
       for(unsigned int j = 0; j < multiplier * subdomainWeights[d][i]; j++) {
@@ -530,7 +540,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
   // IndexConversion
   const auto globalNumberCouplingCells = I08::numberCellsInDomain;
 
-  // start and end coordinates of neighboured cells.
+  // start and end coordinates of neighbouring cells.
   tarch::la::Vector<3, unsigned int> start(0);
   tarch::la::Vector<3, unsigned int> end(0);
   tarch::la::Vector<3, unsigned int> loopIndex(0);
@@ -609,7 +619,12 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingC
 
   tarch::la::Vector<dim, unsigned int> processCoords(0);
   for (unsigned int d = 0; d < dim; d++) {
-    processCoords[d] = _subdomainOwnership[d][globalCellIndex[d] - 1];
+    if(globalCellIndex[d] == 0) 
+      processCoords[d] = _subdomainOwnership[d][0];
+    else if (globalCellIndex[d] == globalNumberCouplingCells[d] + 1)
+      processCoords[d] = _subdomainOwnership[d][_subdomainOwnership[d].size() - 1];
+    else
+      processCoords[d] = _subdomainOwnership[d][globalCellIndex[d] - 1];
   }
   return _parallelTopology->getRank(processCoords, topologyOffset);
 }
