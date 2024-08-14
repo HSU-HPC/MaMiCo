@@ -4,6 +4,8 @@
 # Any dependencies are automatically installed.
 # The output of the script is saved to the current working directory.
 
+set -e
+
 OUTPUT="$(pwd)"
 
 cd "$(dirname "$0")" || exit
@@ -11,7 +13,7 @@ cd "$(dirname "$0")" || exit
 # Create venv and install dependencies if it does not exist
 if [ ! -f ".venv" ]
 then
-    python -m venv .venv
+    python3 -m venv .venv
     # shellcheck source=/dev/null
     source .venv/bin/activate
     pip install -r requirements.txt
