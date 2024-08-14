@@ -37,7 +37,7 @@ This file has the following structure:
 ```
 
 ### Requirements
-- Python 3.10+
+- Python 3.9+
 - Bash
 
 ### Usage
