@@ -75,7 +75,7 @@ public:
     );
   }
 
-  void initWithCells(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights, tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
+  void initWithCells(const tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights, tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
                      tarch::la::Vector<dim, unsigned int> numberProcesses, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
                      unsigned int outerRegion, const unsigned int rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -108,7 +108,7 @@ public:
 #endif
     );
   }
-  void initWithMDSize(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights, const tarch::la::Vector<3, double>& globalMDDomainSize,
+  void initWithMDSize(const tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights, const tarch::la::Vector<3, double>& globalMDDomainSize,
                       const tarch::la::Vector<3, double>& globalMDDomainOffset, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
                       const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,
                       unsigned int outerRegion, unsigned int rank
@@ -252,7 +252,7 @@ private:
   bool _isInitialized = false;
 #endif
   bool _initedWithMDSize = false;
-  tarch::la::Vector<dim, std::vector<unsigned int> > _subdomainOwnership;
+  tarch::la::Vector<dim, std::vector<unsigned int>> _subdomainOwnership;
   tarch::la::Vector<dim, double> _globalMDDomainSize;
   tarch::la::Vector<dim, double> _globalMDDomainOffset;
   tarch::la::Vector<dim, double> _couplingCellSize;

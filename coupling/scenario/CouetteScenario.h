@@ -171,7 +171,10 @@ protected:
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
-
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    auto subdomainWeights = _simpleMDConfig.getDomainDecompConfiguration().getSubdomainWeights();
+    coupling::interface::LS1StaticCommData::getInstance().setSubdomainWeights(subdomainWeights);
+#endif
 #endif
   }
 
@@ -187,16 +190,30 @@ protected:
         _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
 
     // init indexing
-    coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
-        _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
-        _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(),
-        _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
-        (unsigned int)_rank
+    if (_simpleMDConfig.getDomainDecompConfiguration().getDecompType() ==
+        simplemd::configurations::DomainDecompConfiguration::DecompositionType::STATIC_IRREG_RECT_GRID) {
+      coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
+          _simpleMDConfig.getDomainDecompConfiguration().getSubdomainWeights(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
+          _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
+          _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(),
+          _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), (unsigned int)_rank
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-        ,
-        _timeIntegrationService->getPintComm()
+          ,
+          _timeIntegrationService->getPintComm()
 #endif
-    );
+      );
+    } else {
+      coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
+          _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(),
+          _simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(), _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(),
+          _mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+          (unsigned int)_rank
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+          ,
+          _timeIntegrationService->getPintComm()
+#endif
+      );
+    }
 
     // for timing measurements
     _tv.micro = 0;

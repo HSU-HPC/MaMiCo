@@ -13,6 +13,10 @@ class IndexingServiceTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testAllBoundaries);
   CPPUNIT_TEST(testIndexingServiceMustBeInitialized);
   CPPUNIT_TEST(testEdgeCases);
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+  CPPUNIT_TEST(testAllBoundariesRectGrid);
+  CPPUNIT_TEST(testInitExecptionsRectGrid);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -358,8 +362,29 @@ public:
     CPPUNIT_ASSERT_THROW(service.getUniqueRankForCouplingCell({1, 14, 1}, {12}, 0), std::runtime_error);
     CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForCouplingCell({1, 1, 1}, {12}, 0), 0u);
     CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForCouplingCell({7, 1, 1}, {12}, 0), 1u);
-  }
 
+    // weights mismatch
+    tarch::la::Vector<3, std::vector<unsigned int>> subdomainWeights;
+    subdomainWeights[0] = {1, 1};
+    subdomainWeights[1] = {1, 1};
+    subdomainWeights[2] = {1};
+    CPPUNIT_ASSERT_THROW(service.initWithCells(subdomainWeights, {12}, {1, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u), std::runtime_error);
+    CPPUNIT_ASSERT_NO_THROW(service.initWithCells(subdomainWeights, {12}, {2, 2, 1}, coupling::paralleltopology::XYZ, 3, 0u));
+
+    subdomainWeights[0] = {1};
+    subdomainWeights[1] = {1};
+    CPPUNIT_ASSERT_NO_THROW(service.initWithCells(subdomainWeights, {12}, {1, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u));
+    CPPUNIT_ASSERT_THROW(service.initWithCells(subdomainWeights, {12}, {2, 2, 1}, coupling::paralleltopology::XYZ, 3, 0u), std::runtime_error);
+  }
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+  void testAllBoundariesRectGrid() {
+    // Since cppunit is locked to 4 ranks, we have to use weights that work with this
+    // test 1: weights {2,1}{1,2}{1}, 12 cells in each direction
+
+    // auto& service = IndexingService<3>::getInstance();
+  }
+  void testInitExecptionsRectGrid() {}
+#endif // COUPLING_MD_PARALLEL == COUPLING_MD_YES for rectilinear grid test
 private:
   int _size, _rank;
 };
