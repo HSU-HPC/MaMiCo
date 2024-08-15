@@ -52,3 +52,27 @@ def select(
 def clear() -> None:
     """Clears all output from the terminal."""
     os.system("cls" if os.name == "nt" else "clear")
+
+
+def fmt_bold(text: str) -> None:
+    """Returns text formatted to be printed to the terminal in bold font.
+    On windows this has no effect.
+
+    Keyword arguments:
+    text -- The text to be formatted
+    """
+    if os.name == "nt":
+        return text
+    return f"\033[1m{text}\033[0m"
+
+
+def fmt_red(text: str) -> None:
+    """Returns text formatted to be printed to the terminal in red font.
+    On windows this has no effect.
+
+    Keyword arguments:
+    text -- The text to be formatted
+    """
+    if os.name == "nt":
+        return text
+    return f"\033[0;31m{text}\033[0m"

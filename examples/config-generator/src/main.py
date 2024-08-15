@@ -241,7 +241,7 @@ def main() -> None:
 
     while True:
         # 2. Create the application menu
-        title = "MaMiCo couette.xml Generator\n"
+        title = term.fmt_bold("MaMiCo couette.xml Generator\n")
         main_menu = []
         for config in configs:
             # Apply overrides from command line
@@ -265,10 +265,18 @@ def main() -> None:
         else:
             if is_valid:
                 main_menu[-1] += "\n"
-                main_menu.append("Generate")
+                main_menu.append("Generate config file(s)")
             else:
-                title += "\n" + validation_errors + "\n"
+                validation_errors = "\n".join(
+                    [term.fmt_red(s) for s in validation_errors.splitlines()]
+                )
+                title += (
+                    term.fmt_red(term.fmt_bold("\nValidation errors:\n"))
+                    + validation_errors
+                    + "\n"
+                )
             # 4. Show and the menu
+            title += "\n(Press Ctrl+C to quit without generating anything)\n"
             selected = term.select(
                 main_menu,
                 title=title,
