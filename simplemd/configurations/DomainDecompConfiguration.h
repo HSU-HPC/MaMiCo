@@ -54,7 +54,7 @@ private:
   static const std::string STATIC_IRREG_RECT_GRID;
   static const std::string AXES[MD_DIM];
 
-  std::vector<unsigned int> getWeightsFromString(std::string weights) const;
+  std::vector<unsigned int> getWeightsFromString(std::string weights);
 
   DecompositionType _decompType;
   tarch::la::Vector<MD_DIM, std::vector<unsigned int>> _subdomainWeights;

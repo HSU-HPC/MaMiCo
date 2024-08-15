@@ -57,27 +57,34 @@ void simplemd::configurations::DomainDecompConfiguration::parseSubtag(tinyxml2::
       }
       _subdomainWeights[d] = getWeightsFromString(weightsBuf);
     }
-  }
+  } break;
 
   default:
     break;
   }
 }
 
-std::vector<unsigned int> simplemd::configurations::DomainDecompConfiguration::getWeightsFromString(std::string weights) const {
+std::vector<unsigned int> simplemd::configurations::DomainDecompConfiguration::getWeightsFromString(std::string weights) {
   std::vector<unsigned int> result;
   unsigned int temp;
-
-  // replace all semicolons with whitespace
-  std::string::size_type pos = 0;
-  while ((pos = weights.find(";", pos)) != std::string::npos) {
-    weights.replace(pos, 1, " ");
-    pos += 1; // move past the whitespace
-  }
-
   std::stringstream ss(weights);
+  // Taken partially from ls1-mardyn::StaticIrregDomainDecomposition.cpp
+  // Parse the weights, until the stringstream has chars and extraction
+  // doesn't fail, and no EOF or linebreaks etc
   while (ss.good()) {
-    ss >> temp;
+    while (ss.peek() == ';' || ss.peek() == ' ') // skip semicolons and spaces
+      ss.ignore();
+    // Extraction from stream into int type fails if token is not an int
+    // We check for this failure, and additionally check for positive
+    // integer
+    if (!(ss >> temp) || temp <= 0) {
+      std::cout << "Weights (" << weights
+                << ") have a non-natural number! Only integer weights > "
+                   "0 allowed, please check XML file!"
+                << std::endl;
+      _isValid = false;
+      exit(EXIT_FAILURE);
+    }
     result.push_back(temp);
   }
   return result;
