@@ -452,19 +452,18 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
   // init boundaries of all local, non-m2m, GL including indexing types
   {
     for (unsigned int i = 0; i < dim; i++) {
-      const auto backWeight = std::reduce(subdomainWeights[i].begin(), subdomainWeights[i].begin() + coords[i], 0u);
-      const auto totalWeight = std::reduce(subdomainWeights[i].begin() + coords[i], subdomainWeights[i].end(), backWeight);
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "Dim: " << i << " totalWeight: " << totalWeight << " backWeight: " << backWeight << " coords: " << coords[0] << ", " << coords[1] << ", "
-                << coords[2] << std::endl;
-#endif
-      // calculate box bounds from cumulative weights of previous ranks, and the
-      // weight of the current rank
-      boxMin[i] = backWeight * globalNumberCouplingCells[i] / totalWeight;
-      boxMax[i] = boxMin[i] + (subdomainWeights[i][coords[i]] * globalNumberCouplingCells[i] / totalWeight);
+      // calculate box bounds from cell ownership
+      // find the first occurence of owned rank
+      boxMin[i] = std::distance(_subdomainOwnership[i].begin(), std::find(_subdomainOwnership[i].begin(), _subdomainOwnership[i].end(), coords[i]));
+      // find the last occurence, add one to convert reverse iterator to forward
+      boxMax[i] = std::distance(_subdomainOwnership[i].begin(), (std::find(_subdomainOwnership[i].rbegin(), _subdomainOwnership[i].rend(), coords[i]) + 1).base());
     }
+    // _subdomainOwnership does not include ghost, so when we take the first occurence value, it is noGhost
+    // however directly casting it into baseIndex shifts everything left by 1, since baseIndex expects ghost
+    // thus we directly use the BaseIndex cast, and consequently boxMax requires +2 for two ghost layers
+    // the "safer" way to write this would be I08{boxMin} -1 and I08{boxMin} + 1, but the result is the same
     CellIndex<dim, IndexTrait::local>::lowerBoundary = BaseIndex<dim>{boxMin};
-    CellIndex<dim, IndexTrait::local>::upperBoundary = BaseIndex<dim>{boxMax + tarch::la::Vector<dim, int>{1}};
+    CellIndex<dim, IndexTrait::local>::upperBoundary = BaseIndex<dim>{boxMax + tarch::la::Vector<dim, int>{2}};
     CellIndex<dim, IndexTrait::local>::setDomainParameters();
   }
 
