@@ -8,8 +8,6 @@ def validate(get_config_value) -> str:
     use_2way_coupling = get_config_value("coupling_2way")
     if solver == "analytical" and use_2way_coupling:
         return f"Cannot use two-way coupling with analytical CFD solver."
-    if solver != "foam" and use_2way_coupling:
-        return f"OpenFOAM solver should be used for two-way coupling."
     return None
 
 
