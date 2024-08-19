@@ -66,7 +66,7 @@ void simplemd::configurations::DomainDecompConfiguration::parseSubtag(tinyxml2::
 
 std::vector<unsigned int> simplemd::configurations::DomainDecompConfiguration::getWeightsFromString(std::string weights) {
   std::vector<unsigned int> result;
-  unsigned int temp;
+  int temp;
   std::stringstream ss(weights);
   // Taken partially from ls1-mardyn::StaticIrregDomainDecomposition.cpp
   // Parse the weights, until the stringstream has chars and extraction
@@ -85,7 +85,7 @@ std::vector<unsigned int> simplemd::configurations::DomainDecompConfiguration::g
       _isValid = false;
       exit(EXIT_FAILURE);
     }
-    result.push_back(temp);
+    result.push_back((unsigned int)temp);
   }
   return result;
 }
