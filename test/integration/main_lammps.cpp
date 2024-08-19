@@ -5,6 +5,10 @@
 #ifndef _MAIN_CPP_
 #define _MAIN_CPP_
 
+// NOTE: Removed support for 2D
+// #define USE_DIM2
+#define USE_DIM3
+
 #include "test/integration/TestLammps.h"
 #include "test/integration/TestLammpsAddDeleteAtom.h"
 #include "test/integration/TestLammpsCalculateForceEnergy.h"
@@ -29,39 +33,30 @@ int main(int argc, char** argv) {
   int size;
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+// run tests
+#ifdef USE_DIM2
   const bool valid2D = (size == 1) || (size == 4) || (size == 16);
-  const bool valid3D = (size == 1) || (size == 8) || (size == 64);
-
-  // run tests
-  if (valid3D)
-    runTest(new TestLammps<3>(argc, argv, "TestLammps3D"));
-  if (valid2D)
+  if (valid2D) {
     runTest(new TestLammps<2>(argc, argv, "TestLammps2D"));
-
-  if (valid3D)
-    runTest(new TestLammpsMoleculeIterator<3>(argc, argv, "TestLammpsMoleculeIterator3D"));
-  if (valid2D)
     runTest(new TestLammpsMoleculeIterator<2>(argc, argv, "TestLammpsMoleculeIterator2D"));
-
-  if (valid3D)
-    runTest(new TestLammpsAddDeleteAtom<3>(argc, argv, "TestLammpsAddDeleteAtom3D"));
-  if (valid2D)
     runTest(new TestLammpsAddDeleteAtom<2>(argc, argv, "TestLammpsAddDeleteAtom2D"));
-
-  if (valid3D)
-    runTest(new TestLammpsInitialVelocity<3>(argc, argv, "TestLammpsInitialVelocity3D"));
-  if (valid2D)
     runTest(new TestLammpsInitialVelocity<2>(argc, argv, "TestLammpsInitialVelocity2D"));
-
-  if (valid3D)
-    runTest(new TestLammpsGhost<3>(argc, argv, "TestLammpsGhost3D"));
-  if (valid2D)
     runTest(new TestLammpsGhost<2>(argc, argv, "TestLammpsGhost2D"));
-
-  if (valid3D)
-    runTest(new TestLammpsCalculateForceEnergy<3>(argc, argv, "TestLammpsCalculateForceEnergy3D"));
-  if (valid2D)
     runTest(new TestLammpsCalculateForceEnergy<2>(argc, argv, "TestLammpsCalculateForceEnergy2D"));
+  }
+#endif
+#ifdef USE_DIM3
+  const bool valid3D = (size == 1) || (size == 8) || (size == 64);
+  if (valid3D) {
+    runTest(new TestLammps<3>(argc, argv, "TestLammps3D"));
+    runTest(new TestLammpsMoleculeIterator<3>(argc, argv, "TestLammpsMoleculeIterator3D"));
+    runTest(new TestLammpsAddDeleteAtom<3>(argc, argv, "TestLammpsAddDeleteAtom3D"));
+    runTest(new TestLammpsInitialVelocity<3>(argc, argv, "TestLammpsInitialVelocity3D"));
+    runTest(new TestLammpsGhost<3>(argc, argv, "TestLammpsGhost3D"));
+    runTest(new TestLammpsCalculateForceEnergy<3>(argc, argv, "TestLammpsCalculateForceEnergy3D"));
+  }
+#endif
 
   MPI_Finalize();
 

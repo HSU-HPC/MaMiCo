@@ -16,7 +16,7 @@ template <class LinkedCell, unsigned int dim> class ComputeTemperatureMapping;
 } // namespace coupling
 
 /**
- *	@brief This class computes the temperature in a certain (macroscopic)
+ *	@brief This class computes the temperature in a certain (coupling)
  *cell.
  *	@tparam LinkedCell cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
@@ -56,9 +56,8 @@ public:
   /** sums up the velocity fluctuation (from the mean flow velocity) of all
    *particles
    *	@param cell
-   *	@param cellIndex
    */
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     coupling::interface::MoleculeIterator<LinkedCell, dim>* it = _mdSolverInterface->getMoleculeIterator(cell);
     it->begin();
     while (it->continueIteration()) {

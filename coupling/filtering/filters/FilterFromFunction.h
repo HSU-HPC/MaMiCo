@@ -25,8 +25,8 @@ template <unsigned int dim> class FilterFromFunction;
 template <unsigned int dim> class coupling::filtering::FilterFromFunction : public coupling::filtering::FilterInterface<dim> {
 public:
   FilterFromFunction(
-      const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& inputCellVector,
-      const std::vector<coupling::datastructures::MacroscopicCell<dim>*>& outputCellVector, std::array<bool, 7> filteredValues,
+      const std::vector<coupling::datastructures::CouplingCell<dim>*>& inputCellVector,
+      const std::vector<coupling::datastructures::CouplingCell<dim>*>& outputCellVector, std::array<bool, 7> filteredValues,
       const std::function<std::vector<double>(std::vector<double>, std::vector<std::array<unsigned int, dim>>)>* applyScalar,
       const std::function<std::vector<std::array<double, dim>>(std::vector<std::array<double, dim>>, std::vector<std::array<unsigned int, dim>>)>* applyVector)
       : coupling::filtering::FilterInterface<dim>(inputCellVector, outputCellVector, filteredValues, "FFF"), _applyScalar(applyScalar),
@@ -42,7 +42,7 @@ public:
       // interpret position of cell in inputCellVector as linear local
       // md-to-macro index, then convert it to vector
       using coupling::indexing::IndexTrait;
-      mamicoIndex = coupling::indexing::convertToVector<dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost>({i});
+      mamicoIndex = coupling::indexing::convertToVector<dim>(I14{i});
 
       for (unsigned int d = 0; d < dim; d++)
         stlIndex[d] = mamicoIndex[d];

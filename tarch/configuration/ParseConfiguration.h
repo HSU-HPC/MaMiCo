@@ -7,6 +7,7 @@
 #include "tarch/la/Vector.h"
 #include "tarch/tinyxml2/tinyxml2.h"
 #include <cstdlib>
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 
@@ -18,20 +19,54 @@ namespace configuration {
  */
 class ParseConfiguration {
 public:
-  /** parses a xml configuration file, and stores the information in the object
+  /**
+   * Container for the XML configuration for MaMiCo
+   * (Manages the memory of the associated XML document and provides a pointer to the configuration root)
+   */
+  class XMLConfiguration {
+  private:
+    XMLConfiguration(tinyxml2::XMLNode* _root, tinyxml2::XMLError _error) : root(_root), error(_error) {}
+
+  public:
+    /**
+     * Root of the loaded MaMiCo configuration
+     */
+    tinyxml2::XMLNode* const root;
+
+    /**
+     * Status of loading the XML document
+     */
+    tinyxml2::XMLError const error;
+
+    /**
+     * Loads the MaMiCo configuration from a file (with or without XML root node)
+     * @param filename
+     */
+    static XMLConfiguration load(const std::string filename) {
+      tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
+      tinyxml2::XMLError error = doc->LoadFile(filename.c_str());
+      tinyxml2::XMLNode* root = doc->FirstChildElement("scenario-configuration");
+      if (root == NULL) {
+        root = doc;
+        std::cout << "No root node <scenario-configuration> found in configuration file. (Using legacy format without XML root node.)" << std::endl;
+      }
+      return XMLConfiguration(root, error);
+    }
+
+    ~XMLConfiguration() { delete root->GetDocument(); }
+  };
+
+  /** parses an xml configuration file, and stores the information in the object
    *config
    *	@tparam Configuration
    */
   template <class Configuration> static void parseConfiguration(const std::string filename, const std::string topleveltag, Configuration& config) {
-    tinyxml2::XMLDocument conffile;
-    tinyxml2::XMLElement* node = NULL;
-    conffile.LoadFile(filename.c_str());
-    node = conffile.FirstChildElement(topleveltag.c_str());
+    XMLConfiguration xmlConfig = XMLConfiguration::load(filename);
+    tinyxml2::XMLElement* node = xmlConfig.root->FirstChildElement(topleveltag.c_str());
     if (node == NULL) {
-      std::cout << "Could not read input file " << filename << std::endl;
+      std::cout << "Could not read input file " << filename << " (missing or invalid)" << std::endl;
       exit(EXIT_FAILURE);
     }
-
     config.parseSubtag(node);
   }
 
@@ -43,7 +78,7 @@ public:
    */
   static void readDoubleMandatory(double& storage, tinyxml2::XMLElement* node, std::string tag) {
     double value;
-    if (node->QueryDoubleAttribute(tag.c_str(), &value) != tinyxml2::XML_NO_ERROR) {
+    if (node->QueryDoubleAttribute(tag.c_str(), &value) != tinyxml2::XML_SUCCESS) {
       std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     } else {
@@ -79,7 +114,7 @@ public:
    */
   static void readIntMandatory(int& storage, tinyxml2::XMLElement* node, std::string tag) {
     int value;
-    if (node->QueryIntAttribute(tag.c_str(), &value) != tinyxml2::XML_NO_ERROR) {
+    if (node->QueryIntAttribute(tag.c_str(), &value) != tinyxml2::XML_SUCCESS) {
       std::cout << "Error while reading mandatory argument " << tag << " of XML element " << node->Name() << std::endl;
       exit(EXIT_FAILURE);
     } else {

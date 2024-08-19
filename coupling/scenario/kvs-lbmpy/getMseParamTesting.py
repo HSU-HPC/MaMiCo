@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
+import math
+
+import matplotlib.pyplot as mplt
 import numpy as np
 from pandas import read_csv
-import math
-import matplotlib.pyplot as mplt
 
 original_file = 'lbm'
 filtered_files = [ ['unfiltered'],\

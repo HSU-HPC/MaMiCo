@@ -192,12 +192,9 @@ public:
 
   /** @brief applies the values received from the MD-solver within the
    * conntinuum solver
-   *  @param recvBuffer holds the data from the md solver
-   *  @param recvIndice the indices to connect the data from the buffer with
-   * macroscopic cells
-   *  @param indexConversion instance of the indexConversion */
-  void setMDBoundaryValues(std::vector<coupling::datastructures::MacroscopicCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
-                           const coupling::IndexConversion<3>& indexConversion) override {
+   *  @param md2macroBuffer holds the data from the md solver
+   * coupling cells */
+  void setMDBoundaryValues(coupling::datastructures::FlexibleCellContainer<3>& md2macroBuffer) override {
     if (skipRank()) {
       return;
     }
@@ -209,19 +206,20 @@ public:
 #endif
 
     // loop over all received cells
-    const unsigned int size = (unsigned int)recvBuffer.size();
-    for (unsigned int i = 0; i < size; i++) {
+    for (auto pair : md2macroBuffer) {
+      I01 idx;
+      const coupling::datastructures::CouplingCell<3>* couplingCell;
+      std::tie(couplingCell, idx) = pair;
       // determine cell index of this cell in LB domain
-      tarch::la::Vector<3, unsigned int> globalCellCoords = indexConversion.getGlobalVectorCellIndex(recvIndices[i]);
+      tarch::la::Vector<3, unsigned int> globalCellCoords{idx.get()};
       globalCellCoords[0] = (globalCellCoords[0] + _offset[0]) - _coords[0] * _avgDomainSizeX;
       globalCellCoords[1] = (globalCellCoords[1] + _offset[1]) - _coords[1] * _avgDomainSizeY;
       globalCellCoords[2] = (globalCellCoords[2] + _offset[2]) - _coords[2] * _avgDomainSizeZ;
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << indexConversion.getGlobalVectorCellIndex(recvIndices[i]) << ": "
-                << globalCellCoords << std::endl;
+      std::cout << "Process coords: " << _coords << ":  GlobalCellCoords for index " << idx << ": " << globalCellCoords << std::endl;
 #endif
       const int index = get(globalCellCoords[0], globalCellCoords[1], globalCellCoords[2]);
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
       if (_flag[index] != MD_BOUNDARY) {
         std::cout << "ERROR LBCouetteSolver::setMDBoundaryValues(): Cell " << index << " is no MD boundary cell!" << std::endl;
         exit(EXIT_FAILURE);
@@ -232,7 +230,7 @@ public:
       // cell. This interpolation is valid for FLUID-MD_BOUNDARY neighbouring
       // relations only. determine local velocity received from MaMiCo and
       // convert it to LB units; store the velocity in _vel
-      tarch::la::Vector<3, double> localVel((1.0 / recvBuffer[i]->getMacroscopicMass()) * (_dt / _dx) * recvBuffer[i]->getMacroscopicMomentum());
+      tarch::la::Vector<3, double> localVel((1.0 / couplingCell->getMacroscopicMass()) * (_dt / _dx) * couplingCell->getMacroscopicMomentum());
       for (unsigned int d = 0; d < 3; d++) {
         _vel[3 * index + d] = localVel[d];
       }
