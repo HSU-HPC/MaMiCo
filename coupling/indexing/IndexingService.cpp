@@ -461,7 +461,7 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
     // _subdomainOwnership does not include ghost, so when we take the first occurence value, it is noGhost
     // however directly casting it into baseIndex shifts everything left by 1, since baseIndex expects ghost
     // thus we directly use the BaseIndex cast, and consequently boxMax requires +2 for two ghost layers
-    // the "safer" way to write this would be I08{boxMin} -1 and I08{boxMin} + 1, but the result is the same
+    // the "safer" way to write this would be I08{boxMin} -1 and I08{boxMax} + 1, but the result is the same
     CellIndex<dim, IndexTrait::local>::lowerBoundary = BaseIndex<dim>{boxMin};
     CellIndex<dim, IndexTrait::local>::upperBoundary = BaseIndex<dim>{boxMax + tarch::la::Vector<dim, int>{2}};
     CellIndex<dim, IndexTrait::local>::setDomainParameters();
