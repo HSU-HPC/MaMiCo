@@ -1,4 +1,3 @@
 [submodule "ls1-mardyn"]
 	path = ls1
 	url = https://github.com/LouieVoit/ls1-mardyn.git
-	branch = code-refactor-mamico
