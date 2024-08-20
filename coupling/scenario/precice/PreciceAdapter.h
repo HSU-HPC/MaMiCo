@@ -32,6 +32,10 @@ namespace preciceadapter {
  */
 template <unsigned int dim> class coupling::preciceadapter::PreciceAdapter {
 public:
+
+  /**
+   * Create a new preCICE participant in the coupling scheme and read the preCICE config file
+   */
   PreciceAdapter(): _rank(0) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
@@ -43,36 +47,15 @@ public:
     _participant = new precice::Participant("mamico", "../precice-config.xml", _rank, size);
   }
 
+  /**
+   * Call finalize on the participant and delete it
+   */
   virtual ~PreciceAdapter() {
     if (_participant != NULL) {
       _participant->finalize();
       delete _participant;
       _participant = NULL;
     }
-    if (_M2mCellIndices != NULL) {
-      delete[] _M2mCellIndices;
-    }
-    if (_m2MCellIndices != NULL) {
-      delete[] _m2MCellIndices;
-    }
-    deleteBuffer(_M2mCells);
-    deleteBuffer(_m2MCells);
-  }
-
-  std::vector<coupling::datastructures::MacroscopicCell<3>*> getM2mCells() const {
-    return _M2mCells;
-  }
-
-  std::vector<coupling::datastructures::MacroscopicCell<3>*> getm2MCells() const {
-    return _m2MCells;
-  }
-
-  unsigned int* getM2mCellIndices() const {
-    return _M2mCellIndices;
-  }
-
-  unsigned int* getm2MCellIndices() const {
-    return _m2MCellIndices;
   }
 
   void setMeshes(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface, const tarch::la::Vector<3, double> mdDomainOffset, 
@@ -144,6 +127,11 @@ public:
     }
   }
 
+  template <class MY_LINKEDCELL, unsigned int dim>
+  void sendFromMacro2MD(coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>* multiMDCellService) {
+    multiMDCellService->sendFromMacro2MD(_M2mCells);  
+  }
+
   void writeData(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
     std::map<std::string, std::map<std::string, std::vector<double>>>::iterator it1VertexData;
     for (it1VertexData = _m2MVertexData.begin(); it1VertexData != _m2MVertexData.end(); ++it1VertexData) {
@@ -165,6 +153,11 @@ public:
         _participant->writeData(it1VertexData->first, it2VertexData->first, _m2MVertexIndices[it1VertexData->first], it2VertexData->second);
       }
     }
+  }
+
+  template <class MY_LINKEDCELL, unsigned int dim>
+  void sendFromMD2Macro(coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>* multiMDCellService) {
+    multiMDCellService->sendFromMD2Macro(_m2MCells);  
   }
 
 private:
@@ -279,9 +272,7 @@ private:
   std::map<std::string, std::map<int, unsigned int>> _m2MVertexToCell;
   std::map<std::string, std::map<unsigned int, int>> _m2MCellToVertex;
   // macro to micro MaMiCo data containers
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _M2mCells;
-  unsigned int* _M2mCellIndices;
+  coupling::datastructures::FlexibleCellContainer<3> _M2mCells;
   // micro to macro MaMiCo data containers
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _m2MCells;
-  unsigned int* _m2MCellIndices;
+  coupling::datastructures::FlexibleCellContainer<3> _m2MCells;
 };
