@@ -156,11 +156,9 @@ public:
         _instanceHandling->writeCheckpoint("checkpoint_restart_" + rank, 0);
       }
 
-      // Read the data send from CFD to the preCICE M2m vertices and store it in the preCICE adapter M2m coupling cell container
-      _preciceAdapter->readData(_preciceInterface);
-
-      // Send the data stored in the preCICE M2m coupling cell container to the MaMiCo M2m coupling cell container
-      _preciceAdapter->sendFromMacro2MD(_multiMDCellService);
+      // Read the data send from CFD to the preCICE M2m vertices and 
+      // send it to the MaMiCo coupling cell container managed by the multi MD cell service
+      _preciceAdapter->readData(_preciceInterface, _multiMDCellService);
 
 
       if (!scenarioConfig.couetteAnalytical) { // Non-analytical MD solver
@@ -169,7 +167,7 @@ public:
         mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
 
         // Send the data contained in the MaMiCo m2M coupling cell container to the preCICE m2M coupling cell container
-        _preciceAdapter->sendFromMD2Macro(_multiMDCellService);
+        _preciceAdapter->m2MSend<MY_LINKEDCELL, dim>(_multiMDCellService);
 
         // Write csv file if needed
         _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
@@ -271,16 +269,18 @@ private:
     bool twoWayCoupling;
   };
 
-  class PreciceInterface : public coupling::preciceadapter::PreciceInterface<3> {
+  class CouettePreciceInterface : public coupling::preciceadapter::PreciceInterface<3> {
   private:
     const tarch::la::Vector<3, unsigned int> _globalNumberMacroscopicCells;
     const unsigned int _overlap;
-    const double _massCell;
     const std::string _M2mMeshName;
     const std::string _m2MMeshName;
 
+  protected:
+    const double _massCell;
+
   public:
-    PreciceInterface(const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const unsigned int overlap, const double massCell, const bool twoWayCoupling)
+    CouettePreciceInterface(const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const unsigned int overlap, const double massCell, const bool twoWayCoupling)
         : coupling::preciceadapter::PreciceInterface<3>(twoWayCoupling), 
         _globalNumberMacroscopicCells(globalNumberMacroscopicCells), _overlap(overlap), _massCell{massCell},
         _M2mMeshName("mamico-M2m-mesh"), _m2MMeshName("mamico-m2M-mesh") {
@@ -290,7 +290,7 @@ private:
         _m2MMeshName, coupling::preciceadapter::Data{"VelocityMicro", coupling::preciceadapter::DataType::vector});      
     }
 
-    virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+    bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
       bool rcv = true;
       for (unsigned int currentDim = 0; currentDim < 3; currentDim++) {
         rcv &= globalCellIndex[currentDim] >= 1 + (_overlap - 1);
@@ -299,7 +299,7 @@ private:
       return rcv;
     }
 
-    virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+    bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
       bool isGhostCell = false;
       bool isInner = true;
       for (unsigned int currentDim = 0; currentDim < 3; currentDim++) {
@@ -313,19 +313,6 @@ private:
 
     std::vector<unsigned int> getRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) override { return {0}; }
 
-    // std::vector<unsigned int> getSourceRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) override { 
-    //   coupling::indexing::CellIndex<3, coupling::indexing::IndexTrait::vector> cellIndex_v{static_cast<tarch::la::Vector<3,int>>(globalCellIndex)};
-    //   std::vector<unsigned int> ranks = coupling::indexing::IndexingService<3>::getInstance().getRanksForGlobalIndex(cellIndex_v);
-    //   return ranks;
-    // }
-
-    // std::vector<unsigned int> getTargetRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-    //   const unsigned int rank = coupling::indexing::IndexingService<3>::getInstance().getUniqueRankForGlobalIndex(globalCellIndex);
-    //   std::vector<unsigned int> ranks;
-    //   ranks.push_back(rank);
-    //   return ranks; 
-    // }
-
     std::string getMacroscopicToMDSolverMeshName(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
       return _M2mMeshName;
     }
@@ -334,6 +321,16 @@ private:
       return _m2MMeshName;
     }
 
+    virtual void readVectorData(std::string meshName, std::string dataName, coupling::datastructures::MacroscopicCell<3>* const cell, const double vx, const double vy, const double vz) = 0;
+
+    virtual void writeVectorData(std::string meshName, std::string dataName, const coupling::datastructures::MacroscopicCell<3>* const cell, double& vx, double& vy, double& vz) = 0;
+  };
+
+  class NonAnalytical : public CouettePreciceInterface<3> {
+  public:
+    NonAnalytical(const tarch::la::Vector<3, int> globalNumberMacroscopicCells, const unsigned int overlap, const double massCell, const bool twoWayCoupling)
+        : CouettePreciceInterface<3>(globalNumberMacroscopicCells, overlap, massCell, twoWayCoupling) {}
+
     void readVectorData(std::string meshName, std::string dataName, coupling::datastructures::MacroscopicCell<3>* const cell, const double vx, const double vy, const double vz) override {
       tarch::la::Vector<3, double> momentum{vx, vy, vz};
       momentum=momentum*_massCell;
@@ -341,7 +338,7 @@ private:
       cell->setMicroscopicMomentum(momentum);
     }
 
-    void writeVectorData(std::string meshName, std::string dataName, const coupling::datastructures::MacroscopicCell<3>* const cell, double& vx, double& vy, double& vz) {
+    void writeVectorData(std::string meshName, std::string dataName, const coupling::datastructures::MacroscopicCell<3>* const cell, double& vx, double& vy, double& vz) override {
       tarch::la::Vector<3, double> velocity;
       if (cell->getMacroscopicMass() != 0.0) {
         velocity = (1.0 / cell->getMacroscopicMass()) * cell->getMacroscopicMomentum();

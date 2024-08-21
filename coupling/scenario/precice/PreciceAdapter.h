@@ -19,18 +19,18 @@
 #include <sstream>
 
 namespace coupling {
-namespace preciceadapter {
+namespace precice {
   template <unsigned int dim> class PreciceAdapter;
 } // namespace preciceadapter
 } // namespace coupling
 
 /**
- * Adapter for the preCICE library
+ * MaMiCo adapter for the preCICE library
  * 'Vertices' are used in the preCICE context (elements constituting the preCICE mesh)
  * 'Cells' are used in the MaMiCo context (elements consituting the MaMiCo cartesian grid)
- * CellIndexing system should be initialized prior to using this class
+ * Indexing system should be initialized prior to using this class
  */
-template <unsigned int dim> class coupling::preciceadapter::PreciceAdapter {
+template <unsigned int dim> class coupling::precice::PreciceAdapter {
 public:
 
   /**
@@ -58,34 +58,30 @@ public:
     }
   }
 
-  void setMeshes(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface, const tarch::la::Vector<3, double> mdDomainOffset, 
-    const tarch::la::Vector<3, double> macroscopicCellSize) {
-    std::vector<unsigned int> M2mCellIndices;
-    std::vector<unsigned int> m2MCellIndices; 
+  void setMeshes(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
     using namespace coupling::indexing;
-    for (auto cellIndex_v : CellIndex<dim, IndexTrait::vector>()) {
-      tarch::la::Vector<dim, unsigned int> cellIndex_V = static_cast<tarch::la::Vector<dim, unsigned int>>(cellIndex_v.get());
-      if (preciceInterface->sendMacroscopicQuantityToMDSolver(cellIndex_V)) {
-        std::vector<unsigned int> ranks = preciceInterface->getSourceRanks(cellIndex_V);
-        if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) {
-          addCell(preciceInterface->getMacroscopicToMDSolverMeshName(cellIndex_V), cellIndex_V, _M2mVertexCoordinates, _M2mCells, M2mCellIndices, _M2mVertexToCell, _M2mCellToVertex, mdDomainOffset, macroscopicCellSize, preciceInterface->getMacroscopicToMDSolverMeshOffset(cellIndex_V));
-        }
-      }
-      if (preciceInterface->receiveMacroscopicQuantityFromMDSolver(cellIndex_V)) {
-        std::vector<unsigned int> ranks = preciceInterface->getTargetRanks(cellIndex_V);
-        if (std::find(ranks.begin(), ranks.end(), _rank) != ranks.end()) {
-          addCell(preciceInterface->getMDToMacroscopicSolverMeshName(cellIndex_V), cellIndex_V, _m2MVertexCoordinates, _m2MCells, m2MCellIndices, _m2MVertexToCell, _m2MCellToVertex, mdDomainOffset, macroscopicCellSize, preciceInterface->getMDToMacroscopicSolverMeshOffset(cellIndex_V));
+    for (auto idx : I08()) {
+      if (!I12::contains(idx)) {
+        if (tarch::utils::contains(preciceInterface->getSourceRanks(idx), (unsigned int)_rank)) {
+          addCell(idx, _Macro2MDCouplingCells, 
+            preciceInterface->getMacro2MDSolverMeshName(idx), _Macro2MDMeshes, 
+            _Macro2MDVertexToCouplingCell, _Macro2MDCouplingCellToVertex, 
+            preciceInterface->getMacro2MDSolverMeshOffset(idx));
         }
       }
     }
-    _M2mCellIndices = new unsigned int[_M2mCells.size()];
-    std::copy(M2mCellIndices.begin(), M2mCellIndices.end(), _M2mCellIndices);
-    _m2MCellIndices = new unsigned int[_m2MCells.size()];
-    std::copy(m2MCellIndices.begin(), m2MCellIndices.end(), _m2MCellIndices);
-    initializeVectors(_M2mVertexCoordinates, _M2mVertexIndices, _M2mVertexData, preciceInterface);
+    for (auto idx : I12()) {
+      if (tarch::utils::contains(preciceInterface->getTargetRanks(idx), (unsigned int)_rank)) {
+        addCell(idx, _MD2MacroCouplingCells, 
+          preciceInterface->getMD2MacroSolverMeshName(idx), _MD2MacroMeshes, 
+          _MD2MacroVertexToCouplingCell, _MD2MacroCouplingCell,
+          preciceInterface->getMD2MacroSolverMeshOffset(idx));
+      }
+    }
+    setMeshesVertices(_Macro2MDMeshes, _Macro2MDIndices, _Macro2MDData, preciceInterface);
     setMeshTetrahedra(_M2mVertexIndices, M2mCellIndices, _M2mVertexToCell, _M2mCellToVertex);
     if (preciceInterface->twoWayCoupling()) {
-      initializeVectors(_m2MVertexCoordinates, _m2MVertexIndices, _m2MVertexData, preciceInterface);
+      initializeVectors(_MD2MacroMeshes, _MD2MacroIndices, _MD2MacroData, preciceInterface);
       setMeshTetrahedra(_m2MVertexIndices, m2MCellIndices, _m2MVertexToCell, _m2MCellToVertex);
     }
   }
@@ -104,99 +100,118 @@ public:
 
   void advance(const double dt) { _participant->advance(dt); }
 
-  void readData(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
-    std::map<std::string, std::map<std::string, std::vector<double>>>::iterator it1VertexData;
-    for (it1VertexData = _M2mVertexData.begin(); it1VertexData != _M2mVertexData.end(); ++it1VertexData) {
-      std::map<std::string, std::vector<double>>::iterator it2VertexData;
-      for (it2VertexData = it1VertexData->second.begin(); it2VertexData != it1VertexData->second.end(); ++it2VertexData) {
-        _participant->readData(it1VertexData->first, it2VertexData->first, _M2mVertexIndices[it1VertexData->first], 0, it2VertexData->second);
-        Data data = preciceInterface->getData(it1VertexData->first, it2VertexData->first);
-        std::vector<int> vertexIndices = _M2mVertexIndices[it1VertexData->first];
-        for (size_t i = 0; i < vertexIndices.size(); ++i) {
-          coupling::datastructures::MacroscopicCell<dim>* cell = _M2mCells[_M2mVertexToCell[it1VertexData->first][i]];
-          switch (data.type) {
-            case DataType::scalar:
-              preciceInterface->readScalarData(it1VertexData->first, it2VertexData->first, cell, it2VertexData->second[i]);
-              break;
-            case DataType::vector:
-              preciceInterface->readVectorData(it1VertexData->first, it2VertexData->first, cell, it2VertexData->second[i*dim], it2VertexData->second[i*dim+1], it2VertexData->second[i*dim+2]);
-              break; 
-          }
-        }
+  void readData() {
+    for (auto const& [meshName, data] : _Macro2MDData) {
+      for (auto const& [dataName, dataValues] : data) {
+        _participant->readData(meshName, dataName, meshIndices, 0, dataValues);
       }
     }
   }
 
   template <class MY_LINKEDCELL, unsigned int dim>
-  void sendFromMacro2MD(coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>* multiMDCellService) {
-    multiMDCellService->sendFromMacro2MD(_M2mCells);  
+  void sendFromMacro2MD(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface, coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>* multiMDCellService) {
+    for (auto pair : _Macro2MDCouplingCells) { // loop over all the macro to micro coupling cells
+      I01 idx:
+      coupling::datastructures::CouplingCell<3>* couplingCell;
+      std::tie(couplingCell, idx) = pair;
+      // this cell belongs to one macro to micro mesh
+      std::string meshName;
+      unsigned int vertexIndex;
+      std::tie(meshName, vertexIndex) = couplingCellMapping[I00{idx}];
+      for (auto const& [dataName, dataValues] : _Macro2MDData[meshName]) {
+        auto dataDescription = preciceInterface->getDataDescription(meshName, dataName);
+        switch (dataDescription.type) {
+          case DataType::scalar:
+            preciceInterface->readScalarData(meshName, dataName, couplingCell, dataValues[vertexIndex]);
+            break;
+          case DataType::vector:
+            preciceInterface->readVectorData(meshName, dataName, couplingCell, dataValues[vertexIndex*dim], dataValues[vertexIndex*dim+1], dataValues[vertexIndex*dim+2]);
+            break; 
+        }
+      }
+    }
+    multiMDCellService->sendFromMacro2MD(_Macro2MDCouplingCells);
   }
 
-  void writeData(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
-    std::map<std::string, std::map<std::string, std::vector<double>>>::iterator it1VertexData;
-    for (it1VertexData = _m2MVertexData.begin(); it1VertexData != _m2MVertexData.end(); ++it1VertexData) {
-      std::map<std::string, std::vector<double>>::iterator it2VertexData;
-      for (it2VertexData = it1VertexData->second.begin(); it2VertexData != it1VertexData->second.end(); ++it2VertexData) {
-        Data data = preciceInterface->getData(it1VertexData->first, it2VertexData->first);
-        std::vector<int> vertexIndices = _m2MVertexIndices[it1VertexData->first];
-        for (size_t i = 0; i < vertexIndices.size(); ++i) {
-          coupling::datastructures::MacroscopicCell<dim>* cell = _m2MCells[_m2MVertexToCell[it1VertexData->first][i]];
-          switch (data.type) {
-            case DataType::scalar:
-              preciceInterface->writeScalarData(it1VertexData->first, it2VertexData->first, cell, it2VertexData->second[i]);
-              break;
-            case DataType::vector:
-              preciceInterface->writeVectorData(it1VertexData->first, it2VertexData->first, cell, it2VertexData->second[i*dim], it2VertexData->second[i*dim+1], it2VertexData->second[i*dim+2]);
-              break; 
-          }
+  template <class MY_LINKEDCELL, unsigned int dim>
+  void sendFromMD2Macro(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface, coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>* multiMDCellService) {
+    multiMDCellService->sendFromMacro2MD(_MD2MacroCouplingCells);
+    for (auto pair : _MD2MacroCouplingCells) { // loop over all the macro to micro coupling cells
+      I01 idx:
+      coupling::datastructures::CouplingCell<3>* couplingCell;
+      std::tie(couplingCell, idx) = pair;
+      // this cell belongs to one macro to micro mesh
+      std::string meshName;
+      unsigned int vertexIndex;
+      std::tie(meshName, vertexIndex) = couplingCellMapping[I00{idx}];
+      for (auto const& [dataName, dataValues] : _MD2MacroData[meshName]) {
+        auto dataDescription = preciceInterface->getDataDescription(meshName, dataName);
+        switch (dataDescription.type) {
+          case DataType::scalar:
+            preciceInterface->readScalarData(meshName, dataName, couplingCell, dataValues[vertexIndex]);
+            break;
+          case DataType::vector:
+            preciceInterface->readVectorData(meshName, dataName, couplingCell, dataValues[vertexIndex*dim], dataValues[vertexIndex*dim+1], dataValues[vertexIndex*dim+2]);
+            break; 
         }
-        _participant->writeData(it1VertexData->first, it2VertexData->first, _m2MVertexIndices[it1VertexData->first], it2VertexData->second);
       }
     }
   }
 
-  template <class MY_LINKEDCELL, unsigned int dim>
-  void sendFromMD2Macro(coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>* multiMDCellService) {
-    multiMDCellService->sendFromMD2Macro(_m2MCells);  
+
+  void writeData() {
+    for (auto const& [meshName, data] : _MD2MacroData) {
+      for (auto const& [dataName, dataValues] : data) {
+        _participant->writeData(meshName, dataName, meshIndices, 0, dataValues);
+      }
+    }
   }
 
 private:
   /**
-   * add a vertex and a cell in vertexCoordinates map and cells map for this mesh name 
-   * and compute the vertex/cell mapping
-   */ 
-  void addCell(const std::string& meshName, tarch::la::Vector<dim, unsigned int>& cellIndex, std::map<std::string, std::vector<double>>& vertexCoordinates,
-    std::vector<coupling::datastructures::MacroscopicCell<dim>*>& cells, std::vector<unsigned int>& cellIndices,
-    std::map<std::string, std::map<int, unsigned int>>& vertexToCell, std::map<std::string, std::map<unsigned int, int>>& cellToVertex,
-    const tarch::la::Vector<dim, double>& mdDomainOffset, const tarch::la::Vector<3, double>& macroscopicCellSize, 
-    const tarch::la::Vector<dim, double> offset) {
+   * Add a cell with indice idx to the couplingCells container
+   * Compute the coordinates of this cell and add it to the mesh named meshName
+   * There mignt be an offset for this cell, only taken into account for the
+   * calculation of the coordinates
+   */
+  void addCell(I01 idx, coupling::datastructures::FlexibleCellContainer<3>& couplingCells,
+    const std::string& meshName, std::map<std::string, std::vector<double>>& meshes,
+    std::map<std::string, std::map<int, unsigned int>>& vertexToCouplingCell, std::map<std::string, std::map<unsigned int, int>>& couplingCellToVertex,
+    tarch::la::Vector<dim, double> offset) {
+    
+    auto mdDomainOffset = IndexingService::getGlobalMDDomainOffset();
+    auto couplingCellSize = IndexingService::getCouplingCellSize();
+    auto cellMidPoint = idx.getCellMidPoint();
+
+    std::vector<double> coordinates;
     for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
-      vertexCoordinates[meshName].push_back(mdDomainOffset[currentDim] + cellIndex[currentDim] * macroscopicCellSize[currentDim] -
-                              macroscopicCellSize[currentDim] + 0.5 * macroscopicCellSize[currentDim] + offset[currentDim]);
+      // meshes[meshName].push_back(cellMidPoint[currentDim] + offset[currentDim]);
+      coordinates.push_back(cellMidPoint[currentDim] + offset[currentDim]);
     }
-    cells.push_back(new coupling::datastructures::MacroscopicCell<dim>());
-    coupling::indexing::CellIndex<dim, coupling::indexing::IndexTrait::vector> cellIndex_v{static_cast<tarch::la::Vector<dim,int>>(cellIndex)};
-    cellIndices.push_back(coupling::indexing::convertToScalar<dim>(cellIndex_v));
-    vertexToCell[meshName][vertexCoordinates[meshName].size()/dim - 1] = cells.size()-1;
-    cellToVertex[meshName][cells.size()-1] = vertexCoordinates[meshName].size()/dim-1;
+    int index = _participant->setMeshVertex(meshName, coordinates);
+    indices[meshName].push_back(index);
+
+    coupling::datastructures::CouplingCell<3>* couplingCell = new coupling::datastructures::CouplingCell<3>();
+    if (couplingCell == nullptr)
+      throw std::runtime_error(std::string("ERROR PreciceAdater::addCell: couplingCell==NULL!"));
+    couplingCells << std::make_pair(couplingCell, idx);
+
+    vertexToCouplingCell[meshName][meshes[meshName].size()/dim - 1] = cells.size()-1;
+    couplingCellToVertex[meshName][cells.size()-1] = meshes[meshName].size()/dim-1;
   }
 
   /**
-   * initialize the vertex indices and vertex data maps based on the vertex coordinates map
-   * set the participant precice mesh vertices 
+   * For all the given meshes:
+   * - call preCICE method setMeshVertices to calculate the indices of the coordinates of each mesh
+   * - initialize all the vector which will contain all data for each
    */
-  void initializeVectors(std::map<std::string, std::vector<double>>& vertexCoordinates, 
-    std::map<std::string, std::vector<int>>& vertexIndices, std::map<std::string, std::map<std::string, std::vector<double>>>& vertexData,
+  void setMeshesVertices(std::map<std::string, std::vector<double>>& meshes, std::map<std::string, std::map<std::string, std::vector<double>>>& data,
     coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
-    std::map<std::string, std::vector<double>>::iterator itVertexCoordinates;
-    for (itVertexCoordinates = vertexCoordinates.begin(); itVertexCoordinates != vertexCoordinates.end(); ++itVertexCoordinates) {
-      size_t numberOfCoordinates = itVertexCoordinates->second.size();
-      vertexIndices[itVertexCoordinates->first] = std::vector<int>(numberOfCoordinates/dim);
-      _participant->setMeshVertices(itVertexCoordinates->first, itVertexCoordinates->second, vertexIndices[itVertexCoordinates->first]);
-      for (const Data& data : preciceInterface->getData(itVertexCoordinates->first)) {
-        size_t dataSize = numberOfCoordinates;
-        if (data.type == DataType::scalar) dataSize/=dim;
-        vertexData[itVertexCoordinates->first][data.name] = std::vector<double>(dataSize);
+    for (auto const& [meshName, meshCoordinates] : meshes) {
+      size_t dataSize = coordinates.size();
+      for (const DataDescription& dataDescription : preciceInterface->getDataDescription(name)) {
+        if (dataDescription.type == DataType::scalar) dataSize/=dim;
+        data[meshName][data.name] = std::vector<double>(dataSize);
       }
     }
   }
@@ -243,36 +258,26 @@ private:
     }
   }
 
-  void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<dim>*>& buffer) const {
-    for (unsigned int i = 0; i < buffer.size(); i++) {
-      if (buffer[i] != NULL) {
-        delete buffer[i];
-        buffer[i] = NULL;
-      }
-    }
-    buffer.clear();
-  }
-
   // rank of this adapter
   int _rank;
   // pointer to the preCICE participant
   precice::Participant* _participant = nullptr;
   // macro to micro preCICE data containers
-  std::map<std::string, std::vector<int>> _M2mVertexIndices;
-  std::map<std::string, std::vector<double>> _M2mVertexCoordinates;
-  std::map<std::string, std::map<std::string, std::vector<double>>> _M2mVertexData;
+  std::map<std::string, std::vector<double>> _Macro2MDMeshes;
+  std::map<std::string, std::vector<int>> _Macro2MDIndices;
+  std::map<std::string, std::map<std::string, std::vector<double>>> _Macro2MDData;
   // micro to macro preCICE data containers
-  std::map<std::string, std::vector<int>> _m2MVertexIndices;
-  std::map<std::string, std::vector<double>> _m2MVertexCoordinates;
-  std::map<std::string, std::map<std::string, std::vector<double>>> _m2MVertexData;
+  std::map<std::string, std::vector<double>> _MD2MacroMeshes;
+  std::map<std::string, std::vector<int>> _MD2MacroIndices;
+  std::map<std::string, std::map<std::string, std::vector<double>>> _MD2MacroData;
   // macro to micro mapping between vertex arrays and cell array
-  std::map<std::string, std::map<int, unsigned int>> _M2mVertexToCell;
-  std::map<std::string, std::map<unsigned int, int>> _M2mCellToVertex;
+  std::map<std::string, std::map<int, unsigned int>> _Macro2MDVertexToCell;
+  std::map<std::string, std::map<unsigned int, int>> _Macro2MDCouplingCellToVertex;
   // micro to macro mapping between vertex arrays and cell array
-  std::map<std::string, std::map<int, unsigned int>> _m2MVertexToCell;
-  std::map<std::string, std::map<unsigned int, int>> _m2MCellToVertex;
-  // macro to micro MaMiCo data containers
-  coupling::datastructures::FlexibleCellContainer<3> _M2mCells;
-  // micro to macro MaMiCo data containers
-  coupling::datastructures::FlexibleCellContainer<3> _m2MCells;
+  std::map<std::string, std::map<int, unsigned int>> _MD2MacroVertexToCouplingCell;
+  std::map<std::string, std::map<unsigned int, int>> _MD2MacroCouplingCellToVertex;
+  // macro to micro MaMiCo data buffer
+  coupling::datastructures::FlexibleCellContainer<3> _Macro2MDCouplingCells;
+  // micro to macro MaMiCo data buffer
+  coupling::datastructures::FlexibleCellContainer<3> _MD2MacroCouplingCells;
 };
