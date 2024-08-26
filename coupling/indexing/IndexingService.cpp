@@ -456,7 +456,8 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
       // find the first occurence of owned rank
       boxMin[i] = std::distance(_subdomainOwnership[i].begin(), std::find(_subdomainOwnership[i].begin(), _subdomainOwnership[i].end(), coords[i]));
       // find the last occurence, add one to convert reverse iterator to forward
-      boxMax[i] = std::distance(_subdomainOwnership[i].begin(), (std::find(_subdomainOwnership[i].rbegin(), _subdomainOwnership[i].rend(), coords[i]) + 1).base());
+      boxMax[i] =
+          std::distance(_subdomainOwnership[i].begin(), (std::find(_subdomainOwnership[i].rbegin(), _subdomainOwnership[i].rend(), coords[i]) + 1).base());
     }
     // _subdomainOwnership does not include ghost, so when we take the first occurence value, it is noGhost
     // however directly casting it into baseIndex shifts everything left by 1, since baseIndex expects ghost

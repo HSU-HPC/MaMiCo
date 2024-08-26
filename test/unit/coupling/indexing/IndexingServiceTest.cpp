@@ -393,7 +393,7 @@ public:
     // reinit, parallel only test so numberProcesses {2,2,1}
     service.initWithCells(subdomainWeights, {12}, {2, 2, 1}, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
 
-    //recheck globals only once
+    // recheck globals only once
     CPPUNIT_ASSERT_EQUAL(T0::lowerBoundary.get(), V(0, 0, 0));
     CPPUNIT_ASSERT_EQUAL(T0::upperBoundary.get(), V(13, 13, 13));
     CPPUNIT_ASSERT_EQUAL(T0::numberCellsInDomain, Vu(14, 14, 14));
@@ -597,8 +597,6 @@ public:
       }
     }
 
-    
-
     if (_size == 4) {
       if (_rank == 0) {
         CPPUNIT_ASSERT_EQUAL(T14::lowerBoundary.get(), V(4, 4, 4));
@@ -652,7 +650,6 @@ public:
         CPPUNIT_ASSERT_EQUAL(T15::linearNumberCellsInDomain, 30u);
       }
     }
-
   }
   void testInitExecptionsRectGrid() {}
 #endif // COUPLING_MD_PARALLEL == COUPLING_MD_YES for rectilinear grid test
