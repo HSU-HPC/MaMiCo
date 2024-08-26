@@ -638,7 +638,7 @@ public:
       }
     }
 
-    //another test, with weights {1,2}{1}{1,2}, 12 cells in each direction
+    // another test, with weights {1,2}{1}{1,2}, 12 cells in each direction
 
     subdomainWeights[0] = {1, 2};
     subdomainWeights[1] = {1};

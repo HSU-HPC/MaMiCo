@@ -47,14 +47,15 @@ void simplemd::configurations::DomainDecompConfiguration::parseSubtag(tinyxml2::
 
   case DecompositionType::STATIC_IRREG_RECT_GRID: {
     std::string weightsBuf;
-
     for (unsigned int d = 0; d < MD_DIM; d++) {
+      // read in weights for each axis
       tarch::configuration::ParseConfiguration::readStringMandatory(weightsBuf, node, AXES[d]);
       if (weightsBuf.length() == 0) {
         std::cout << "ERROR: empty weights for axis " << AXES[d] << std::endl;
         _isValid = false;
         exit(EXIT_FAILURE);
       }
+      // pass string to helper function
       _subdomainWeights[d] = getWeightsFromString(weightsBuf);
     }
   } break;
@@ -85,6 +86,7 @@ std::vector<unsigned int> simplemd::configurations::DomainDecompConfiguration::g
       _isValid = false;
       exit(EXIT_FAILURE);
     }
+    // add extracted weight to vector
     result.push_back((unsigned int)temp);
   }
   return result;

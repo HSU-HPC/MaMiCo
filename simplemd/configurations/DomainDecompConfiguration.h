@@ -17,11 +17,20 @@ class DomainDecompConfiguration;
 }
 } // namespace simplemd
 
+/** input configuration for specifying domain decomposition type
+ *  @author Amartya Das Sharma
+ */
+
 class simplemd::configurations::DomainDecompConfiguration : public tarch::configuration::Configuration {
 public:
   DomainDecompConfiguration();
   virtual ~DomainDecompConfiguration() {}
 
+  /** enum containing the type of domain decompositions currently supported
+   * DEFAULT : default behaviour, regularly spaced grid
+   * STATIC_IRREG_RECT_GRID : rectilinear grid with weights given to specify subdomain sizes
+   * E.g. x values 1,2,1 define an x axis with subdomain lengths in the 1:2:1 ratio
+   */
   enum class DecompositionType { DEFAULT, STATIC_IRREG_RECT_GRID };
 
   void parseSubtag(tinyxml2::XMLElement* node);
@@ -54,13 +63,19 @@ private:
   static const std::string STATIC_IRREG_RECT_GRID;
   static const std::string AXES[MD_DIM];
 
+  /** helper method to parse input string */
   std::vector<unsigned int> getWeightsFromString(std::string weights);
 
+  /** type of decomposition */
   DecompositionType _decompType;
+
+  /** weights parsed from the XML */
   tarch::la::Vector<MD_DIM, std::vector<unsigned int>> _subdomainWeights;
 
+  /** whether the decomposition-type tag was present or not (since the tag is optional) */
   bool _isDefined;
 
+  /** validity of the config */
   bool _isValid;
 };
 
