@@ -165,6 +165,14 @@ protected:
 
     _cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration(filename);
 
+    if (_cfg.miSolverType != coupling::configurations::CouetteConfig::MicroSolverType::LS1 &&
+        _simpleMDConfig.getDomainDecompConfiguration().getDecompType() ==
+            simplemd::configurations::DomainDecompConfiguration::DecompositionType::STATIC_IRREG_RECT_GRID) {
+      std::cout << "ERROR Currently, only LS1 supports irregular rectilinear domain decomposition! Please change md type to ls1, or decomposition to default!"
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
 #if defined(LS1_MARDYN)
     auto offset = _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset();
     coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
