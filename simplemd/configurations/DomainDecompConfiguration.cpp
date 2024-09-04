@@ -12,7 +12,7 @@ const std::string simplemd::configurations::DomainDecompConfiguration::AXES[MD_D
     = {"x"};
 #elif MD_DIM == 2
     = {"x", "y"};
-#elif MD_DIM == 3
+#else // MD_DIM == 3
     = {"x", "y", "z"};
 #endif
 
