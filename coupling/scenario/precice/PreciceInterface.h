@@ -5,7 +5,7 @@ namespace coupling {
 namespace preciceadapter {
   enum class DataType { scalar, vector };
 
-  struct Data {
+  struct DataDescription {
     std::string name;
     DataType type;
   };
@@ -19,27 +19,27 @@ public:
   /**
    * Constructor
    */
-  PreciceInterface(bool twoWayCoupling) : _twoWayCoupling(twoWayCoupling) {}
+  PreciceInterface(const bool twoWayCoupling) : _twoWayCoupling(twoWayCoupling) {}
 
   /**
    * get the mesh name associated to this cell
    * this mesh is used to couple the macroscopic solver to the MD solver
    * @return mesh name
    */
-  virtual std::string getMacroscopicToMDSolverMeshName(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+  virtual std::string getMacro2MDSolverMeshName(const tarch::la::Vector<dim, unsigned int> globalCellIndex) const = 0;
 
   /**
    * get the mesh name associated to this cell
    * this mesh is used to couple the MD solver to the macroscopic solver
    * @return mesh name
    */
-  virtual std::string getMDToMacroscopicSolverMeshName(tarch::la::Vector<dim, unsigned int> globalCellIndex) = 0;
+  virtual std::string getMD2MacroSolverMeshName(const tarch::la::Vector<dim, unsigned int> globalCellIndex) const = 0;
 
   /**
    * get the mesh off set associated to this cell
    * @return mesh offset
    */
-  virtual tarch::la::Vector<dim, double> getMacroscopicToMDSolverMeshOffset(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
+  virtual tarch::la::Vector<dim, double> getMacro2MDSolverMeshOffset(const tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
     return tarch::la::Vector<3, double>(0.0);
   }
 
@@ -47,66 +47,70 @@ public:
    * get the mesh off set associated to this cell
    * @return mesh offset
    */
-  virtual tarch::la::Vector<dim, double> getMDToMacroscopicSolverMeshOffset(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
+  virtual tarch::la::Vector<dim, double> getMD2MacroSolverMeshOffset(const tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
     return tarch::la::Vector<3, double>(0.0);
   }
 
   /**
    * return true if two way coupling, i.e. macro to md and md to macro, is activated
    */
-  bool twoWayCoupling() {return _twoWayCoupling;} 
+  bool twoWayCoupling() const {return _twoWayCoupling;} 
 
   /**
-   * Add data to this interface
+   * Add a data description description to this interface
    */
-  void addData(std::string meshName, Data data) {
-    _data[meshName][data.name] = data;
+  void addDataDescription(const std::string& meshName, const DataDescription& dataDescription) {
+    _dataDescriptions[meshName][dataDescription.name] = dataDescription;
   }
 
   /**
-   * get a vector of data associated to this mesh
-   * @return std::vector<Data>
+   * get a vector of data descriptions associated to this mesh
+   * @return std::vector<DataDescription>
    */
-  std::vector<Data> getData(std::string meshName) {
-    if (_data.find(meshName) == _data.end()) throw std::runtime_error("PreciceAdapter::getData: no mesh named " + meshName);
-    std::vector<Data> data;
-    for (std::map<std::string, Data>::iterator it = _data[meshName].begin(); it != _data[meshName].end(); ++it) {
-      data.push_back(it->second);
+  std::vector<DataDescription> getDataDescriptions(const std::string meshName) const {
+    if (_dataDescriptions.find(meshName) == _dataDescriptions.end()) throw std::runtime_error("PreciceAdapter::getDataDescriptions: no mesh named " + meshName);
+    std::vector<DataDescription> dataDescriptions;
+    for (auto const& [dataName, dataDescription] : _dataDescriptions.at(meshName)) {
+      dataDescriptions.push_back(dataDescription);
     }
-    return data;
+    return dataDescriptions;
   }
 
   /**
-   * get a data object associated to this mesh and data names
+   * get a data description associated to this mesh and data names
    * @return data
    */
-  Data getData(std::string meshName, std::string dataName) {
-    if (_data.find(meshName) == _data.end()) throw std::runtime_error("PreciceAdapter::getData: no mesh named " + meshName);
-    if (_data[meshName].find(dataName) == _data[meshName].end()) throw std::runtime_error("PreciceAdapter::getData: no data " + dataName + " for mesh " + meshName);
-    return _data[meshName][dataName];
+  DataDescription getDataDescription(const std::string& meshName, const std::string& dataName) const {
+    if (_dataDescriptions.find(meshName) == _dataDescriptions.end()) throw std::runtime_error("PreciceAdapter::getDataDescription: no mesh named " + meshName);
+    if (_dataDescriptions.at(meshName).find(dataName) == _dataDescriptions.at(meshName).end()) throw std::runtime_error("PreciceAdapter::getDataDescription: no data " + dataName + " for mesh " + meshName);
+    return _dataDescriptions.at(meshName).at(dataName);
   }
 
   /**
    * read the vector data sent from the macroscopic solver to precice and update the macroscopic cell
    */
-  virtual void readVectorData(std::string meshName, std::string dataName, coupling::datastructures::MacroscopicCell<dim>* const cell, const double vx, const double vy, const double vz) {}
+  virtual void readVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<dim>* const cell, 
+    const I01& idx, const double& vx, const double& vy, const double& vz) const {}
 
   /**
    * read the scalar data sent from the macroscopic solver to precice and update the macroscopic cell
    */
-  virtual void readScalarData(std::string meshName, std::string dataName, coupling::datastructures::MacroscopicCell<dim>* const cell, const double v) {}
+  virtual void readScalarData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<dim>* const cell,
+  const I01& idx, const double v) const {}
 
   /**
    * write the vector data sent from mamico and update the double values vx, vy and vz
    */
-  virtual void writeVectorData(std::string meshName, std::string dataName, const coupling::datastructures::MacroscopicCell<dim>* const cell, double& vx, double& vy, double& vz) {}
+  virtual void writeVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<dim>* const cell, 
+  const I01& idx, double& vx, double& vy, double& vz) const {}
 
   /**
    * write the scalar data sent from mamico and update the double values vx, vy and vz
    */
-  virtual void writeScalarData(std::string meshName, std::string dataName, const coupling::datastructures::MacroscopicCell<dim>* const cell, double& v) {}
+  virtual void writeScalarData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<dim>* const cell,
+  const I01& idx, double& v) const {}
 
 private:
-  std::map<std::string, std::map<std::string, Data>> _data;
-  bool _twoWayCoupling;
+  std::map<std::string, std::map<std::string, DataDescription>> _dataDescriptions;
+  const bool _twoWayCoupling;
 };

@@ -5,6 +5,9 @@
 #define _MAIN_COUETTE_CPP_
 
 #include "coupling/CouplingMDDefinitions.h"
+#if (BUILD_WITH_PRECICE)
+#include "coupling/scenario/precice/CouetteScenario.h"
+#endif
 #include "coupling/scenario/CouetteScenario.h"
 #include <cstdlib>
 #include <iostream>
@@ -27,6 +30,18 @@ int main(int argc, char* argv[]) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Init(&argc, &argv);
 #endif
+
+  Scenario* scenario;
+#if (BUILD_WITH_PRECICE)
+  if (argc > 1 && argv[1]="preCICE") {  
+    scenario = new coupling::scenario::precice::CouetteScenario();
+  } else {
+    scenario = new CouetteScenario();
+  }
+#else
+  scenario = new CouetteScenario();
+#endif
+  runScenario(scenario);
 
   // run scenarios
   runScenario(new CouetteScenario());
