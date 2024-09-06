@@ -78,6 +78,8 @@ public:
     global_log->set_mpi_output_root(0);
 #endif
 #endif
+
+    // Read the configurations
     std::string xmlConfigurationFilename("config.xml");
     // Read the MD config
     simplemd::configurations::MolecularDynamicsConfiguration mdConfig;
@@ -90,6 +92,7 @@ public:
     // Read specific Couette config
     ScenarioConfig scenarioConfig;
     tarch::configuration::ParseConfiguration::parseConfiguration<ScenarioConfig>(xmlConfigurationFilename, "scenario", scenarioConfig);
+
 #if defined(LS1_MARDYN)
     auto offset = mdConfig.getDomainConfiguration().getGlobalDomainOffset();
     coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
@@ -97,6 +100,7 @@ public:
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
 #endif
+
     _multiMDService = new tarch::utils::MultiMDService<dim>(mdConfig.getMPIConfiguration().getNumberOfProcesses(), scenarioConfig.totalNumberMDSimulations);
 
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(mdConfig, mamicoConfig, *_multiMDService);
@@ -118,7 +122,6 @@ public:
     for (unsigned int d = 0; d < 3; d++) {
       numberCells[d] = floor(domainSize[d] / cellSize[d] + 0.5);
     }
-    const unsigned int overLap = mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap();
     const double densityCell = mdConfig.getDomainConfiguration().getMoleculesPerDirection()[0] *
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[1] *
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
@@ -133,8 +136,12 @@ public:
       _preciceInterface = new Analytical(massCell, scenarioConfig.twoWayCoupling, _couetteSolver);
     }
 
-    // Initialize the indexing service
-    coupling::indexing::IndexingService<dim>::getInstance().initWithCells(mdConfig, mamicoConfig, _preciceInterface, rank);
+    // init indexing
+    coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
+        mdConfig.getDomainConfiguration().getGlobalDomainSize(), mdConfig.getDomainConfiguration().getGlobalDomainOffset(),
+        mdConfig.getMPIConfiguration().getNumberOfProcesses(), mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(),
+        mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+        (unsigned int)rank);
 
     _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(
         _instanceHandling->getMDSolverInterface(), _preciceInterface, mdConfig, mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
@@ -161,8 +168,6 @@ public:
         _instanceHandling->writeCheckpoint("checkpoint_restart_" + rank, 0);
       }
 
-      // Read the data send from CFD to the preCICE Macro2MD vertices and 
-      // send it to the MaMiCo coupling cell container managed by the multi MD cell service
       _preciceAdapter->sendFromMacro2MD(_preciceInterface, _multiMDCellService);
 
       if (!scenarioConfig.couetteAnalytical) { // Non-analytical MD solver
@@ -172,14 +177,11 @@ public:
       } else { // Analytical Couette solver, usefull for debugging
         _couetteSolver->advance(mamico_dt * (cycle + 1));
       }
-      // Send the data contained in the MaMiCo MD2Macro coupling cell container to the preCICE MD2Macro coupling cell container
-        _preciceAdapter->sendFromMD2Macro<MY_LINKEDCELL, dim>(_preciceInterface, _multiMDCellService);
+
+       _preciceAdapter->sendFromMD2Macro(_preciceInterface, _multiMDCellService);
 
       // Write csv file if needed
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
-
-      // Write the data stored in the preCICE MD2Macro coupling cell container to the preCICE MD2Macro vertices 
-      _preciceAdapter->writeData(_preciceInterface);
 
       // Send all data to CFD and advance the preCICE/MaMiCo adapter
       _preciceAdapter->advance(mamico_dt);
@@ -189,8 +191,8 @@ public:
         std::cout << "Reading checkpoint" << std::endl;
       } else {
         cycle++;
-        if (!_preciceAdapter->getMD2MacroCells().empty() && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
-          write2CSV(_preciceAdapter->getMD2MacroCells(), cycle, rank);
+        // if (!_preciceAdapter->getMD2MacroCells().empty() && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
+        //   write2CSV(_preciceAdapter->getMD2MacroCells(), cycle, rank);
       } 
     }
   }
@@ -201,33 +203,33 @@ public:
 
 private:
 
-  void write2CSV(coupling::datastructures::FlexibleCellContainer<3>& MD2MacroCells, int couplingCycle, unsigned int rank) {
-    std::stringstream ss;
-    ss << "results_" << rank << "_" << couplingCycle << ".csv";
-    std::ofstream file(ss.str().c_str());
-    if (!file.is_open()) {
-      exit(EXIT_FAILURE);
-    }
-    file << "i;j;k;x;y;z;v_x;v_y;v_z;T;m" << std::endl;
-    for (auto pair : MD2MacroCells) {
-      I01 idx;
-      if (I12.contains(idx)) {
-        coupling::datastructures::CouplingCell<3>* couplingCell;
-        std::tie(couplingCell, idx) = pair;
-        auto cellMidPoint = idx.getCellMidPoint();
-        tarch::la::Vector<3, double> vel(couplingCell->getMacroscopicMomentum());
-        if (couplingCell->getMacroscopicMass() != 0.0) {
-          vel = (1.0 / couplingCell->getMacroscopicMass()) * vel;
-        }
-        file   << idx.get()[0] << ";" << idx.get()[1] << ";" << idx.get()[2] << ";" 
-               << cellMidPoint[0] << ";" << cellMidPoint[1] << ";" << cellMidPoint[2] << ";" 
-               << vel[0] << ";" << vel[1] << ";" << vel[2] << ";" 
-               << couplingCell->getTemperature() << ";" << couplingCellgetMacroscopicMass();
-        file   << std::endl;
-      }
-    }
-    file.close();
-  }
+  // void write2CSV(coupling::datastructures::FlexibleCellContainer<3>& MD2MacroCells, int couplingCycle, unsigned int rank) {
+  //   std::stringstream ss;
+  //   ss << "results_" << rank << "_" << couplingCycle << ".csv";
+  //   std::ofstream file(ss.str().c_str());
+  //   if (!file.is_open()) {
+  //     exit(EXIT_FAILURE);
+  //   }
+  //   file << "i;j;k;x;y;z;v_x;v_y;v_z;T;m" << std::endl;
+  //   for (auto pair : MD2MacroCells) {
+  //     I01 idx;
+  //     if (I12.contains(idx)) {
+  //       coupling::datastructures::CouplingCell<3>* couplingCell;
+  //       std::tie(couplingCell, idx) = pair;
+  //       auto cellMidPoint = idx.getCellMidPoint();
+  //       tarch::la::Vector<3, double> vel(couplingCell->getMacroscopicMomentum());
+  //       if (couplingCell->getMacroscopicMass() != 0.0) {
+  //         vel = (1.0 / couplingCell->getMacroscopicMass()) * vel;
+  //       }
+  //       file   << idx.get()[0] << ";" << idx.get()[1] << ";" << idx.get()[2] << ";" 
+  //              << cellMidPoint[0] << ";" << cellMidPoint[1] << ";" << cellMidPoint[2] << ";" 
+  //              << vel[0] << ";" << vel[1] << ";" << vel[2] << ";" 
+  //              << couplingCell->getTemperature() << ";" << couplingCellgetMacroscopicMass();
+  //       file   << std::endl;
+  //     }
+  //   }
+  //   file.close();
+  // }
 
   struct ScenarioConfig : public tarch::configuration::Configuration {
     ~ScenarioConfig() {}
@@ -271,11 +273,11 @@ private:
 
   public:
     CouettePreciceInterface(const double massCell, const bool twoWayCoupling)
-        : coupling::preciceadapter::PreciceInterface<3>(twoWayCoupling), _massCell{massCell}, _Macro2MDMeshName("mamico-Macro2MD-mesh"), _MD2MacroMeshName("mamico-MD2Macro-mesh") {
-      coupling::preciceadapter::PreciceInterface<3>::addData(
-        _Macro2MDMeshName, coupling::preciceadapter::Data{"VelocityMacro", coupling::preciceadapter::DataType::vector});
-      coupling::preciceadapter::PreciceInterface<3>::addData(
-        _MD2MacroMeshName, coupling::preciceadapter::Data{"VelocityMD", coupling::preciceadapter::DataType::vector});      
+        : coupling::preciceadapter::PreciceInterface<3>(twoWayCoupling), _Macro2MDMeshName("mamico-Macro2MD-mesh"), _MD2MacroMeshName("mamico-MD2Macro-mesh"), _massCell{massCell} {
+      coupling::preciceadapter::PreciceInterface<3>::addDataDescription(
+        _Macro2MDMeshName, coupling::preciceadapter::DataDescription{"VelocityMacro", coupling::preciceadapter::DataType::vector});
+      coupling::preciceadapter::PreciceInterface<3>::addDataDescription(
+        _MD2MacroMeshName, coupling::preciceadapter::DataDescription{"VelocityMD", coupling::preciceadapter::DataType::vector});      
     }
 
     unsigned int getOuterRegion() override {
@@ -284,20 +286,20 @@ private:
 
     std::vector<unsigned int> getRanks(I01 idx) override { return {0}; }
 
-    std::string getMacro2MDSolverMeshName(tarch::la::Vector<3, unsigned int> globalCellIndex) const override {
+    std::string getMacro2MDSolverMeshName(I01 idx) const override {
       return _Macro2MDMeshName;
     }
 
-    std::string getMD2MacroSolverMeshName(tarch::la::Vector<3, unsigned int> globalCellIndex) const override {
+    std::string getMD2MacroSolverMeshName(I01 idx) const override {
       return _MD2MacroMeshName;
     }
   };
 
   class NonAnalytical : public CouettePreciceInterface {
   public:
-    NonAnalytical(const double massCell, const bool twoWayCoupling): CouettePreciceInterface<3>(massCell, twoWayCoupling) {}
+    NonAnalytical(const double massCell, const bool twoWayCoupling): CouettePreciceInterface(massCell, twoWayCoupling) {}
 
-    void readVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<3>* const cell, 
+    void readVectorData(const std::string& meshName, const std::string& dataName, coupling::datastructures::CouplingCell<3>* const cell, 
     const I01& idx, const double& vx, const double& vy, const double& vz) const override {
       tarch::la::Vector<3, double> momentum{vx, vy, vz};
       momentum=momentum*_massCell;
@@ -318,6 +320,8 @@ private:
   };
 
   class Analytical : public NonAnalytical {
+  private:
+    coupling::solvers::CouetteSolver<3>* _couetteSolver;
   public:
     Analytical(const double massCell, const bool twoWayCoupling, coupling::solvers::CouetteSolver<3>* couetteSolver): 
     NonAnalytical(massCell, twoWayCoupling), _couetteSolver(couetteSolver) {}
@@ -325,10 +329,10 @@ private:
     void writeVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<3>* const cell, 
     const I01& idx, double& vx, double& vy, double& vz) const override {
       auto midPoint = idx.getCellMidPoint();
-      const auto momentum{_massCell * (couetteSolver->getVelocity(cellMidPoint))};
+      const auto momentum{_massCell * (_couetteSolver->getVelocity(midPoint))};
       tarch::la::Vector<3, double> velocity;
-      if (massCell != 0.0) {
-        velocity = (1.0 / massCell) * momentum;
+      if (_massCell != 0.0) {
+        velocity = (1.0 / _massCell) * momentum;
       }
       vx=velocity[0];
       vy=velocity[1];

@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 
   Scenario* scenario;
 #if (BUILD_WITH_PRECICE)
-  if (argc > 1 && argv[1]="preCICE") {  
+  if (argc > 1 && strcmp(argv[1],"preCICE")){  
     scenario = new coupling::scenario::precice::CouetteScenario();
   } else {
     scenario = new CouetteScenario();

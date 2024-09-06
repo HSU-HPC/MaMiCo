@@ -1,5 +1,6 @@
 #pragma once
 #include "coupling/interface/MacroscopicSolverInterface.h"
+#include "coupling/indexing/IndexTypes.h"
 
 namespace coupling {
 namespace preciceadapter {
@@ -26,20 +27,20 @@ public:
    * this mesh is used to couple the macroscopic solver to the MD solver
    * @return mesh name
    */
-  virtual std::string getMacro2MDSolverMeshName(const tarch::la::Vector<dim, unsigned int> globalCellIndex) const = 0;
+  virtual std::string getMacro2MDSolverMeshName(I01 idx) const = 0;
 
   /**
    * get the mesh name associated to this cell
    * this mesh is used to couple the MD solver to the macroscopic solver
    * @return mesh name
    */
-  virtual std::string getMD2MacroSolverMeshName(const tarch::la::Vector<dim, unsigned int> globalCellIndex) const = 0;
+  virtual std::string getMD2MacroSolverMeshName(I01 idx) const = 0;
 
   /**
    * get the mesh off set associated to this cell
    * @return mesh offset
    */
-  virtual tarch::la::Vector<dim, double> getMacro2MDSolverMeshOffset(const tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
+  virtual tarch::la::Vector<dim, double> getMacro2MDSolverMeshOffset(I01 idx) const {
     return tarch::la::Vector<3, double>(0.0);
   }
 
@@ -47,7 +48,7 @@ public:
    * get the mesh off set associated to this cell
    * @return mesh offset
    */
-  virtual tarch::la::Vector<dim, double> getMD2MacroSolverMeshOffset(const tarch::la::Vector<dim, unsigned int> globalCellIndex) const {
+  virtual tarch::la::Vector<dim, double> getMD2MacroSolverMeshOffset(I01 idx) const {
     return tarch::la::Vector<3, double>(0.0);
   }
 
@@ -89,13 +90,13 @@ public:
   /**
    * read the vector data sent from the macroscopic solver to precice and update the macroscopic cell
    */
-  virtual void readVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<dim>* const cell, 
+  virtual void readVectorData(const std::string& meshName, const std::string& dataName, coupling::datastructures::CouplingCell<dim>* const cell, 
     const I01& idx, const double& vx, const double& vy, const double& vz) const {}
 
   /**
    * read the scalar data sent from the macroscopic solver to precice and update the macroscopic cell
    */
-  virtual void readScalarData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<dim>* const cell,
+  virtual void readScalarData(const std::string& meshName, const std::string& dataName, coupling::datastructures::CouplingCell<dim>* const cell,
   const I01& idx, const double v) const {}
 
   /**

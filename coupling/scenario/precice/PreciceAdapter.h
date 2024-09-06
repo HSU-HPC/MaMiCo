@@ -150,7 +150,7 @@ public:
       std::string meshName;
       unsigned int vertexIndex;
       std::tie(meshName, vertexIndex) = _MD2MacroCellMapping[I00{idx}.get()];
-      for (auto const& [dataName, dataValues] : _MD2MacroData[meshName]) {
+      for (auto& [dataName, dataValues] : _MD2MacroData[meshName]) {
         auto dataDescription = preciceInterface->getDataDescription(meshName, dataName);
         switch (dataDescription.type) {
           case DataType::scalar:
@@ -185,14 +185,14 @@ private:
       if (!I12::contains(idx)) {
         if (tarch::utils::contains(preciceInterface->getSourceRanks(idx), (unsigned int)_rank)) {
           addCell(idx, _macro2MDCouplingCells);
-          addMeshVertex(preciceInterface->getMacro2MDSolverMeshName(idx), _macro2MDMeshes, _macro2MDIndices, _macro2MDCellMapping, preciceInterface->getMacro2MDSolverMeshOffset(idx));
+          addMeshVertex(idx, preciceInterface->getMacro2MDSolverMeshName(idx), _macro2MDMeshes, _macro2MDIndices, _macro2MDCellMapping, preciceInterface->getMacro2MDSolverMeshOffset(idx));
         }
       }
     }
     for (auto idx : I12()) {
       if (tarch::utils::contains(preciceInterface->getTargetRanks(idx), (unsigned int)_rank)) {
         addCell(idx, _MD2MacroCouplingCells);
-        addMeshVertex(preciceInterface->getMD2MacroSolverMeshName(idx), _MD2MacroMeshes, _MD2MacroIndices, _MD2MacroCellMapping, preciceInterface->getMD2MacroSolverMeshOffset(idx)); 
+        addMeshVertex(idx, preciceInterface->getMD2MacroSolverMeshName(idx), _MD2MacroMeshes, _MD2MacroIndices, _MD2MacroCellMapping, preciceInterface->getMD2MacroSolverMeshOffset(idx)); 
       }
     }
     initializeData(_macro2MDMeshes, _macro2MDData, preciceInterface);
@@ -238,7 +238,7 @@ private:
     coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
     for (auto const& [meshName, meshCoordinates] : meshes) {
       size_t dataSize = meshCoordinates.size();
-      for (const DataDescription& dataDescription : preciceInterface->getDataDescription(meshName)) {
+      for (const DataDescription& dataDescription : preciceInterface->getDataDescriptions(meshName)) {
         if (dataDescription.type == DataType::scalar) dataSize/=dim;
         data[meshName][dataDescription.name] = std::vector<double>(dataSize);
       }
