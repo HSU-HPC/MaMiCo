@@ -59,9 +59,9 @@ message(STATUS ">> Build with Eigen : " ${BUILD_WITH_EIGEN})
 option(BUILD_WITH_PYBIND11 "Enable the MaMiCo python binding, default is off." OFF)
 message(STATUS ">> Build with pybind11 : " ${BUILD_WITH_PYBIND11})
 if (BUILD_WITH_PYBIND11 AND NOT BUILD_WITH_MPI)
-	message(STATUS ">> Build with pybind11 was enabled but build with MPI was not. Enabling build with MPI.")
-	set(BUILD_WITH_MPI ON CACHE BOOL "Enable the MPI library for parallel build, default is OFF." FORCE)
-	message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
+  message(STATUS ">> Build with pybind11 was enabled but build with MPI was not. Enabling build with MPI.")
+  set(BUILD_WITH_MPI ON CACHE BOOL "Enable the MPI library for parallel build, default is OFF." FORCE)
+  message(STATUS ">> Build with MPI: " ${BUILD_WITH_MPI})
 endif()
 # Enable coupling the OpenFOAM API, default is off
 option(BUILD_WITH_OPENFOAM "Enable coupling the OpenFOAM API, default is off." OFF)
@@ -101,11 +101,11 @@ message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
 # Find dependencies
 #
 if(BUILD_WITH_EIGEN)
-	find_package(Eigen3 REQUIRED NO_MODULE)
+  find_package(Eigen3 REQUIRED NO_MODULE)
 endif()
 
 if(BUILD_WITH_MPI)
-	find_package(MPI REQUIRED)
+  find_package(MPI REQUIRED)
 endif()
 
 if(NOT "${MD_SIM}" STREQUAL "LS1_MARDYN" AND BUILD_WITH_ADIOS2) #ls1 can come bundled with own adios2, hence finding adios2 later for ls1
@@ -114,21 +114,21 @@ if(NOT "${MD_SIM}" STREQUAL "LS1_MARDYN" AND BUILD_WITH_ADIOS2) #ls1 can come bu
 endif()
 
 if(BUILD_WITH_PYBIND11)
-	find_package(Python COMPONENTS Interpreter Development REQUIRED)
-	find_package(pybind11 REQUIRED)
+  find_package(Python COMPONENTS Interpreter Development REQUIRED)
+  find_package(pybind11 REQUIRED)
 endif()
 
 if(BUILD_WITH_OPENFOAM)
-	# Check valid OpenFOAM
-	if(DEFINED ENV{WM_PROJECT_DIR})
-		message(STATUS ">> OpenFOAM found in : " $ENV{WM_PROJECT_DIR})
-	else()
-		message(FATAL_ERROR "The OpenFOAM bashrc is not sourced or OpenFOAM is not installed")
-	endif()
+  # Check valid OpenFOAM
+  if(DEFINED ENV{WM_PROJECT_DIR})
+    message(STATUS ">> OpenFOAM found in : " $ENV{WM_PROJECT_DIR})
+  else()
+    message(FATAL_ERROR "The OpenFOAM bashrc is not sourced or OpenFOAM is not installed")
+  endif()
 endif()
 
 if(BUILD_WITH_PRECICE)
-	find_package(precice REQUIRED)
+  find_package(precice REQUIRED)
 endif()
 
 if(BUILD_WITH_LAMMPS)
@@ -223,7 +223,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
   target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
   target_compile_options(simplemd_interface INTERFACE -Og -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	target_compile_definitions(simplemd_interface INTERFACE MDError)
+  target_compile_definitions(simplemd_interface INTERFACE MDError)
   target_compile_options(simplemd_interface INTERFACE -Og -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
   target_compile_definitions(simplemd_interface INTERFACE MDError)
@@ -251,16 +251,16 @@ endif()
 message(STATUS ">> CMAKE_CXX_COMPILER : " ${CMAKE_CXX_COMPILER})
 message(STATUS ">> CMAKE_CXX_COMPILER_ID : " ${CMAKE_CXX_COMPILER_ID})
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor)
+  target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-	target_compile_options(simplemd_interface INTERFACE -fstrict-aliasing -qpack_semantic=gnu -ipo -align -ansi-alias) #-w
-	target_link_options(simplemd_interface INTERFACE -ipo)
+  target_compile_options(simplemd_interface INTERFACE -fstrict-aliasing -qpack_semantic=gnu -ipo -align -ansi-alias) #-w
+  target_link_options(simplemd_interface INTERFACE -ipo)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
-	target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -mcpu=a64fx)
+  target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -mcpu=a64fx)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	target_compile_options(simplemd_interface INTERFACE -Wall -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -Wno-gnu-array-member-paren-init)
+  target_compile_options(simplemd_interface INTERFACE -Wall -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -Wno-gnu-array-member-paren-init)
 else()
-	message(STATUS ">> Unsupported compiler.")
+  message(STATUS ">> Unsupported compiler.")
 endif()
 
 #
@@ -271,31 +271,31 @@ set(SIMPLE_MD_SOURCES
   "simplemd/MolecularDynamicsSimulation.cpp"
   "simplemd/ProfilePlotter.cpp"
   "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
-	"simplemd/cell-mappings/LennardJonesForceMapping.cpp"
-	"simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.cpp"
-	"simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.cpp"
-	"simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.cpp"
-	"simplemd/cell-mappings/RDFMapping.cpp"
-	"simplemd/configurations/DomainConfiguration.cpp"
-	"simplemd/configurations/ExternalForceConfiguration.cpp"
-	"simplemd/configurations/MolecularDynamicsConfiguration.cpp"
-	"simplemd/configurations/MoleculeConfiguration.cpp"
-	"simplemd/configurations/MPIConfiguration.cpp"
-	"simplemd/configurations/ProfilePlotterConfiguration.cpp"
-	"simplemd/configurations/RDFConfiguration.cpp"
-	"simplemd/configurations/SimulationConfiguration.cpp"
-	"simplemd/configurations/VTKConfiguration.cpp"
+  "simplemd/cell-mappings/LennardJonesForceMapping.cpp"
+  "simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.cpp"
+  "simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.cpp"
+  "simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.cpp"
+  "simplemd/cell-mappings/RDFMapping.cpp"
+  "simplemd/configurations/DomainConfiguration.cpp"
+  "simplemd/configurations/ExternalForceConfiguration.cpp"
+  "simplemd/configurations/MolecularDynamicsConfiguration.cpp"
+  "simplemd/configurations/MoleculeConfiguration.cpp"
+  "simplemd/configurations/MPIConfiguration.cpp"
+  "simplemd/configurations/ProfilePlotterConfiguration.cpp"
+  "simplemd/configurations/RDFConfiguration.cpp"
+  "simplemd/configurations/SimulationConfiguration.cpp"
+  "simplemd/configurations/VTKConfiguration.cpp"
   "simplemd/configurations/DomainDecompConfiguration.cpp"
-	"simplemd/molecule-mappings/UpdateLinkedCellListsMapping.cpp"
-	"simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
-	"simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
-	"simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
-	"simplemd/services/ExternalForceService.cpp"
-	"simplemd/services/LinkedCellService.cpp"
-	"simplemd/services/MolecularPropertiesService.cpp"
-	"simplemd/services/MoleculeService.cpp"
-	"simplemd/services/ParallelAndLocalBufferService.cpp"
-	"simplemd/services/ParallelTopologyService.cpp"
+  "simplemd/molecule-mappings/UpdateLinkedCellListsMapping.cpp"
+  "simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
+  "simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
+  "simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
+  "simplemd/services/ExternalForceService.cpp"
+  "simplemd/services/LinkedCellService.cpp"
+  "simplemd/services/MolecularPropertiesService.cpp"
+  "simplemd/services/MoleculeService.cpp"
+  "simplemd/services/ParallelAndLocalBufferService.cpp"
+  "simplemd/services/ParallelTopologyService.cpp"
   "tarch/tinyxml2/tinyxml2.cpp"
   "tarch/utils/RandomNumberService.cpp"
   "simplemd/configurations/Adios2Configuration.cpp"
@@ -336,8 +336,8 @@ if(BUILD_WITH_MPI)
   endif()
 endif()
 if(BUILD_WITH_EIGEN)
-	target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
-	target_link_libraries(mamico INTERFACE Eigen3::Eigen)
+  target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
+  target_link_libraries(mamico INTERFACE Eigen3::Eigen)
 endif()
 if(BUILD_WITH_ADIOS2)
   target_compile_definitions(mamico INTERFACE BUILD_WITH_ADIOS2)
@@ -358,20 +358,20 @@ if(BUILD_WITH_MPI)
   target_link_libraries(mamico INTERFACE MPI::MPI_CXX)
 endif()
 if(BUILD_WITH_OPENFOAM)
-	target_compile_definitions(mamico INTERFACE BUILD_WITH_OPENFOAM WM_LABEL_SIZE=32 WM_DP NoRepository)
-	target_include_directories(mamico INTERFACE $ENV{FOAM_SRC}/OpenFOAM/lnInclude $ENV{FOAM_SRC}/OSspecific/POSIX/lnInclude $ENV{FOAM_SRC}/finiteVolume/lnInclude $ENV{FOAM_SRC}/meshTools/lnInclude)
-	target_link_directories(mamico INTERFACE $ENV{FOAM_LIBBIN} $ENV{FOAM_LIBBIN}/dummy $ENV{FOAM_LIBBIN}/sys-openmpi)
-	target_link_libraries(mamico INTERFACE OpenFOAM finiteVolume meshTools Pstream surfMesh fileFormats dl m)
+  target_compile_definitions(mamico INTERFACE BUILD_WITH_OPENFOAM WM_LABEL_SIZE=32 WM_DP NoRepository)
+  target_include_directories(mamico INTERFACE $ENV{FOAM_SRC}/OpenFOAM/lnInclude $ENV{FOAM_SRC}/OSspecific/POSIX/lnInclude $ENV{FOAM_SRC}/finiteVolume/lnInclude $ENV{FOAM_SRC}/meshTools/lnInclude)
+  target_link_directories(mamico INTERFACE $ENV{FOAM_LIBBIN} $ENV{FOAM_LIBBIN}/dummy $ENV{FOAM_LIBBIN}/sys-openmpi)
+  target_link_libraries(mamico INTERFACE OpenFOAM finiteVolume meshTools Pstream surfMesh fileFormats dl m)
 endif()
 if(BUILD_WITH_PRECICE)
-	target_compile_definitions(mamico INTERFACE BUILD_WITH_PRECICE)
-	target_link_libraries(mamico INTERFACE precice::precice)
+  target_compile_definitions(mamico INTERFACE BUILD_WITH_PRECICE)
+  target_link_libraries(mamico INTERFACE precice::precice)
 endif()
 if(BUILD_WITH_PINT_DEBUG)
   target_compile_definitions(mamico INTERFACE PINT_DEBUG)
 endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang" )
-	target_compile_options(mamico INTERFACE -Wno-undefined-var-template)
+  target_compile_options(mamico INTERFACE -Wno-undefined-var-template)
 endif()
 # we always link against libsimplemd, even if ${MD_SIM} not SIMPLE_MD, so that we can use the simpleMD configuration
 target_link_libraries(mamico INTERFACE libsimplemd)
@@ -453,13 +453,13 @@ set(MAMICO_SOURCES
 # Couette target
 #
 set(COUETTE_SOURCES
-	${MAMICO_SOURCES}
+  ${MAMICO_SOURCES}
   "coupling/scenario/main_couette.cpp"
 )
 add_executable(couette ${COUETTE_SOURCES})
 set_target_properties(couette PROPERTIES CXX_STANDARD 17)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
-	target_compile_options(couette PRIVATE -std=c++17)
+  target_compile_options(couette PRIVATE -std=c++17)
 endif()
 target_link_libraries(couette PRIVATE mamico)
 
@@ -485,17 +485,17 @@ endif()
 # pybind target
 #
 if(BUILD_WITH_PYBIND11)
-	set(PYBIND_SOURCES11
-		${MAMICO_SOURCES}
-		"coupling/python-binding/mamico.cpp"
-	)
-	pybind11_add_module(mamico_pybind
-		${PYBIND_SOURCES11}
-	)
-	set_target_properties(mamico_pybind PROPERTIES OUTPUT_NAME mamico)
-	target_compile_options(mamico_pybind PRIVATE -fPIC)
-	set_target_properties(mamico_pybind PROPERTIES CXX_STANDARD 17)
-	target_link_libraries(mamico_pybind PRIVATE mamico)
+  set(PYBIND_SOURCES11
+    ${MAMICO_SOURCES}
+    "coupling/python-binding/mamico.cpp"
+  )
+  pybind11_add_module(mamico_pybind
+    ${PYBIND_SOURCES11}
+  )
+  set_target_properties(mamico_pybind PROPERTIES OUTPUT_NAME mamico)
+  target_compile_options(mamico_pybind PRIVATE -fPIC)
+  set_target_properties(mamico_pybind PROPERTIES CXX_STANDARD 17)
+  target_link_libraries(mamico_pybind PRIVATE mamico)
 endif()
 
 #
@@ -817,7 +817,7 @@ add_custom_target(
 # Benchmarks target
 #
 set(BENCHMARKS_SOURCES
-	${MAMICO_SOURCES}
+  ${MAMICO_SOURCES}
   "test/integration/cell_idx_iter_benchmark.cpp"
 )
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
