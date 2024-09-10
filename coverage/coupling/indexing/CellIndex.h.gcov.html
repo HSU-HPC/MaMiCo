@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-09 15:47:48</td>
+            <td class="headerValue">2024-09-10 12:33:06</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">88</td>
@@ -144,7 +144,7 @@
 <a name="82"><span class="lineNum">      82 </span>            : } // namespace indexing</a>
 <a name="83"><span class="lineNum">      83 </span>            : } // namespace coupling</a>
 <a name="84"><span class="lineNum">      84 </span>            : </a>
-<a name="85"><span class="lineNum">      85 </span><span class="lineCov">      20268 : template &lt;unsigned int dim, coupling::indexing::IndexTrait... traits&gt; class coupling::indexing::CellIndex {</span></a>
+<a name="85"><span class="lineNum">      85 </span><span class="lineCov">      20520 : template &lt;unsigned int dim, coupling::indexing::IndexTrait... traits&gt; class coupling::indexing::CellIndex {</span></a>
 <a name="86"><span class="lineNum">      86 </span>            : public:</a>
 <a name="87"><span class="lineNum">      87 </span>            :   /**</a>
 <a name="88"><span class="lineNum">      88 </span>            :    * Check at compile time wether traits... is in proper order, i.e.</a>
@@ -178,7 +178,7 @@
 <a name="116"><span class="lineNum">     116 </span>            :    */</a>
 <a name="117"><span class="lineNum">     117 </span><span class="lineCov">        720 :   CellIndex() = default;</span></a>
 <a name="118"><span class="lineNum">     118 </span><span class="lineCov">    2558004 :   CellIndex(const CellIndex&amp; ci) = default;</span></a>
-<a name="119"><span class="lineNum">     119 </span><span class="lineCov">   15782836 :   explicit CellIndex(const value_T&amp; i) : _index(i) {}</span></a>
+<a name="119"><span class="lineNum">     119 </span><span class="lineCov">   15784992 :   explicit CellIndex(const value_T&amp; i) : _index(i) {}</span></a>
 <a name="120"><span class="lineNum">     120 </span>            : </a>
 <a name="121"><span class="lineNum">     121 </span>            :   /**</a>
 <a name="122"><span class="lineNum">     122 </span>            :    * Conversion function: Convert to CellIndex of same dim but different</a>
@@ -197,7 +197,7 @@
 <a name="135"><span class="lineNum">     135 </span>            :    *</a>
 <a name="136"><span class="lineNum">     136 </span>            :    * @return unsigned integer/vector representation of this index.</a>
 <a name="137"><span class="lineNum">     137 </span>            :    */</a>
-<a name="138"><span class="lineNum">     138 </span><span class="lineCov">   47271320 :   value_T get() const { return _index; } // TODO: why (value_T) cast?</span></a>
+<a name="138"><span class="lineNum">     138 </span><span class="lineCov">   47271912 :   value_T get() const { return _index; } // TODO: why (value_T) cast?</span></a>
 <a name="139"><span class="lineNum">     139 </span>            : </a>
 <a name="140"><span class="lineNum">     140 </span>            :   /**</a>
 <a name="141"><span class="lineNum">     141 </span>            :    * Increments the index by one.</a>
@@ -262,21 +262,21 @@
 <a name="200"><span class="lineNum">     200 </span>            :    * Initialises all static members dependant only on upperBoundary and</a>
 <a name="201"><span class="lineNum">     201 </span>            :    * lowerBoundary</a>
 <a name="202"><span class="lineNum">     202 </span>            :    */</a>
-<a name="203"><span class="lineNum">     203 </span><span class="lineCov">      11776 :   static void setDomainParameters() {</span></a>
-<a name="204"><span class="lineNum">     204 </span><span class="lineCov">     105984 :     auto cellnum = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector&lt;dim, int&gt;{1};</span></a>
-<a name="205"><span class="lineNum">     205 </span><span class="lineCov">      47104 :     for (unsigned int d = 0; d &lt; dim; d++)</span></a>
-<a name="206"><span class="lineNum">     206 </span><span class="lineCov">      70284 :       cellnum[d] = std::max(0, cellnum[d]);</span></a>
-<a name="207"><span class="lineNum">     207 </span><span class="lineCov">      47104 :     numberCellsInDomain = tarch::la::Vector&lt;dim, unsigned int&gt;{cellnum};</span></a>
+<a name="203"><span class="lineNum">     203 </span><span class="lineCov">      12224 :   static void setDomainParameters() {</span></a>
+<a name="204"><span class="lineNum">     204 </span><span class="lineCov">     110016 :     auto cellnum = upperBoundary.get() - lowerBoundary.get() + tarch::la::Vector&lt;dim, int&gt;{1};</span></a>
+<a name="205"><span class="lineNum">     205 </span><span class="lineCov">      48896 :     for (unsigned int d = 0; d &lt; dim; d++)</span></a>
+<a name="206"><span class="lineNum">     206 </span><span class="lineCov">      72972 :       cellnum[d] = std::max(0, cellnum[d]);</span></a>
+<a name="207"><span class="lineNum">     207 </span><span class="lineCov">      48896 :     numberCellsInDomain = tarch::la::Vector&lt;dim, unsigned int&gt;{cellnum};</span></a>
 <a name="208"><span class="lineNum">     208 </span>            : </a>
-<a name="209"><span class="lineNum">     209 </span><span class="lineCov">      11776 :     linearNumberCellsInDomain = 1;</span></a>
-<a name="210"><span class="lineNum">     210 </span><span class="lineCov">      47104 :     for (unsigned int d = 0; d &lt; dim; d++)</span></a>
-<a name="211"><span class="lineNum">     211 </span><span class="lineCov">      35328 :       linearNumberCellsInDomain *= numberCellsInDomain[d];</span></a>
+<a name="209"><span class="lineNum">     209 </span><span class="lineCov">      12224 :     linearNumberCellsInDomain = 1;</span></a>
+<a name="210"><span class="lineNum">     210 </span><span class="lineCov">      48896 :     for (unsigned int d = 0; d &lt; dim; d++)</span></a>
+<a name="211"><span class="lineNum">     211 </span><span class="lineCov">      36672 :       linearNumberCellsInDomain *= numberCellsInDomain[d];</span></a>
 <a name="212"><span class="lineNum">     212 </span>            : </a>
-<a name="213"><span class="lineNum">     213 </span><span class="lineCov">      11776 :     tarch::la::Vector&lt;dim, unsigned int&gt; divFactor{1};</span></a>
-<a name="214"><span class="lineNum">     214 </span><span class="lineCov">      35328 :     for (unsigned int d = 1; d &lt; dim; d++)</span></a>
-<a name="215"><span class="lineNum">     215 </span><span class="lineCov">      23552 :       divFactor[d] = divFactor[d - 1] * (numberCellsInDomain[d - 1]);</span></a>
-<a name="216"><span class="lineNum">     216 </span><span class="lineCov">      11776 :     divisionFactor = divFactor;</span></a>
-<a name="217"><span class="lineNum">     217 </span><span class="lineCov">      11776 :   }</span></a>
+<a name="213"><span class="lineNum">     213 </span><span class="lineCov">      12224 :     tarch::la::Vector&lt;dim, unsigned int&gt; divFactor{1};</span></a>
+<a name="214"><span class="lineNum">     214 </span><span class="lineCov">      36672 :     for (unsigned int d = 1; d &lt; dim; d++)</span></a>
+<a name="215"><span class="lineNum">     215 </span><span class="lineCov">      24448 :       divFactor[d] = divFactor[d - 1] * (numberCellsInDomain[d - 1]);</span></a>
+<a name="216"><span class="lineNum">     216 </span><span class="lineCov">      12224 :     divisionFactor = divFactor;</span></a>
+<a name="217"><span class="lineNum">     217 </span><span class="lineCov">      12224 :   }</span></a>
 <a name="218"><span class="lineNum">     218 </span>            : </a>
 <a name="219"><span class="lineNum">     219 </span>            :   /**</a>
 <a name="220"><span class="lineNum">     220 </span>            :    * Checks if a given index is within the domain between this the lower and</a>

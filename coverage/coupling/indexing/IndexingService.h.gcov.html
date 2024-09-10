@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-09 15:47:48</td>
+            <td class="headerValue">2024-09-10 12:33:06</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">4</td>
@@ -107,14 +107,14 @@
 <a name="45"><span class="lineNum">      45 </span>            :  *</a>
 <a name="46"><span class="lineNum">      46 </span>            :  * @author Felix Maurer</a>
 <a name="47"><span class="lineNum">      47 </span>            :  */</a>
-<a name="48"><span class="lineNum">      48 </span><span class="lineCov">        176 : template &lt;unsigned int dim&gt; class coupling::indexing::IndexingService {</span></a>
+<a name="48"><span class="lineNum">      48 </span><span class="lineCov">        184 : template &lt;unsigned int dim&gt; class coupling::indexing::IndexingService {</span></a>
 <a name="49"><span class="lineNum">      49 </span>            : public:</a>
-<a name="50"><span class="lineNum">      50 </span><span class="lineCov">   14295419 :   static IndexingService&amp; getInstance() {</span></a>
-<a name="51"><span class="lineNum">      51 </span><span class="lineCov">   14295419 :     static IndexingService singleton{};</span></a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineCov">   14295419 :     return singleton;</span></a>
+<a name="50"><span class="lineNum">      50 </span><span class="lineCov">   14295443 :   static IndexingService&amp; getInstance() {</span></a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">   14295627 :     static IndexingService singleton{};</span></a>
+<a name="52"><span class="lineNum">      52 </span><span class="lineCov">   14295443 :     return singleton;</span></a>
 <a name="53"><span class="lineNum">      53 </span>            :   }</a>
 <a name="54"><span class="lineNum">      54 </span>            : </a>
-<a name="55"><span class="lineNum">      55 </span><span class="lineCov">        740 :   void initWithCells(tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberCouplingCells, tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,</span></a>
+<a name="55"><span class="lineNum">      55 </span><span class="lineCov">        748 :   void initWithCells(tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberCouplingCells, tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,</span></a>
 <a name="56"><span class="lineNum">      56 </span>            :                      coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion, const unsigned int rank</a>
 <a name="57"><span class="lineNum">      57 </span>            : #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</a>
 <a name="58"><span class="lineNum">      58 </span>            :                      ,</a>
@@ -122,22 +122,22 @@
 <a name="60"><span class="lineNum">      60 </span>            : #endif</a>
 <a name="61"><span class="lineNum">      61 </span>            :   ) {</a>
 <a name="62"><span class="lineNum">      62 </span>            :     // regular grid</a>
-<a name="63"><span class="lineNum">      63 </span><span class="lineCov">       2960 :     tarch::la::Vector&lt;dim, std::vector&lt;unsigned int&gt;&gt; subdomainWeights;</span></a>
-<a name="64"><span class="lineNum">      64 </span><span class="lineCov">       2960 :     for (unsigned int i = 0; i &lt; dim; i++) {</span></a>
-<a name="65"><span class="lineNum">      65 </span><span class="lineCov">       2220 :       subdomainWeights[i].reserve(numberProcesses[i]);</span></a>
-<a name="66"><span class="lineNum">      66 </span><span class="lineCov">       6092 :       for (unsigned int j = 0; j &lt; numberProcesses[i]; j++) {</span></a>
-<a name="67"><span class="lineNum">      67 </span><span class="lineCov">       3872 :         subdomainWeights[i].push_back(1);</span></a>
+<a name="63"><span class="lineNum">      63 </span><span class="lineCov">       2992 :     tarch::la::Vector&lt;dim, std::vector&lt;unsigned int&gt;&gt; subdomainWeights;</span></a>
+<a name="64"><span class="lineNum">      64 </span><span class="lineCov">       2992 :     for (unsigned int i = 0; i &lt; dim; i++) {</span></a>
+<a name="65"><span class="lineNum">      65 </span><span class="lineCov">       2244 :       subdomainWeights[i].reserve(numberProcesses[i]);</span></a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineCov">       6156 :       for (unsigned int j = 0; j &lt; numberProcesses[i]; j++) {</span></a>
+<a name="67"><span class="lineNum">      67 </span><span class="lineCov">       3912 :         subdomainWeights[i].push_back(1);</span></a>
 <a name="68"><span class="lineNum">      68 </span>            :       }</a>
 <a name="69"><span class="lineNum">      69 </span>            :     }</a>
-<a name="70"><span class="lineNum">      70 </span><span class="lineCov">       1480 :     initWithCells(subdomainWeights, globalNumberCouplingCells, numberProcesses, parallelTopologyType, outerRegion, rank</span></a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineCov">       1496 :     initWithCells(subdomainWeights, globalNumberCouplingCells, numberProcesses, parallelTopologyType, outerRegion, rank</span></a>
 <a name="71"><span class="lineNum">      71 </span>            : #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</a>
 <a name="72"><span class="lineNum">      72 </span>            :                   ,</a>
 <a name="73"><span class="lineNum">      73 </span>            :                   comm</a>
 <a name="74"><span class="lineNum">      74 </span>            : #endif</a>
 <a name="75"><span class="lineNum">      75 </span>            :     );</a>
-<a name="76"><span class="lineNum">      76 </span><span class="lineCov">        736 :   }</span></a>
+<a name="76"><span class="lineNum">      76 </span><span class="lineCov">        744 :   }</span></a>
 <a name="77"><span class="lineNum">      77 </span>            : </a>
-<a name="78"><span class="lineNum">      78 </span>            :   void initWithCells(tarch::la::Vector&lt;dim, std::vector&lt;unsigned int&gt;&gt;&amp; subdomainWeights, tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberCouplingCells,</a>
+<a name="78"><span class="lineNum">      78 </span>            :   void initWithCells(const tarch::la::Vector&lt;dim, std::vector&lt;unsigned int&gt;&gt;&amp; subdomainWeights, tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberCouplingCells,</a>
 <a name="79"><span class="lineNum">      79 </span>            :                      tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,</a>
 <a name="80"><span class="lineNum">      80 </span>            :                      unsigned int outerRegion, const unsigned int rank</a>
 <a name="81"><span class="lineNum">      81 </span>            : #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</a>
@@ -170,7 +170,7 @@
 <a name="108"><span class="lineNum">     108 </span>            : #endif</a>
 <a name="109"><span class="lineNum">     109 </span>            :     );</a>
 <a name="110"><span class="lineNum">     110 </span><span class="lineNoCov">          0 :   }</span></a>
-<a name="111"><span class="lineNum">     111 </span><span class="lineNoCov">          0 :   void initWithMDSize(tarch::la::Vector&lt;dim, std::vector&lt;unsigned int&gt;&gt;&amp; subdomainWeights, const tarch::la::Vector&lt;3, double&gt;&amp; globalMDDomainSize,</span></a>
+<a name="111"><span class="lineNum">     111 </span><span class="lineNoCov">          0 :   void initWithMDSize(const tarch::la::Vector&lt;dim, std::vector&lt;unsigned int&gt;&gt;&amp; subdomainWeights, const tarch::la::Vector&lt;3, double&gt;&amp; globalMDDomainSize,</span></a>
 <a name="112"><span class="lineNum">     112 </span>            :                       const tarch::la::Vector&lt;3, double&gt;&amp; globalMDDomainOffset, const tarch::la::Vector&lt;3, unsigned int&gt;&amp; mdNumberProcesses,</a>
 <a name="113"><span class="lineNum">     113 </span>            :                       const tarch::la::Vector&lt;3, double&gt;&amp; couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType,</a>
 <a name="114"><span class="lineNum">     114 </span>            :                       unsigned int outerRegion, unsigned int rank</a>
@@ -201,9 +201,9 @@
 <a name="139"><span class="lineNum">     139 </span>            :     );</a>
 <a name="140"><span class="lineNum">     140 </span><span class="lineNoCov">          0 :   }</span></a>
 <a name="141"><span class="lineNum">     141 </span>            : </a>
-<a name="142"><span class="lineNum">     142 </span><span class="lineCov">        724 :   void finalize() {</span></a>
+<a name="142"><span class="lineNum">     142 </span><span class="lineCov">        732 :   void finalize() {</span></a>
 <a name="143"><span class="lineNum">     143 </span>            : #if (COUPLING_MD_ERROR == COUPLING_MD_YES)</a>
-<a name="144"><span class="lineNum">     144 </span><span class="lineCov">        724 :     _isInitialized = false;</span></a>
+<a name="144"><span class="lineNum">     144 </span><span class="lineCov">        732 :     _isInitialized = false;</span></a>
 <a name="145"><span class="lineNum">     145 </span>            : #endif</a>
 <a name="146"><span class="lineNum">     146 </span><span class="lineNoCov">          0 :   }</span></a>
 <a name="147"><span class="lineNum">     147 </span>            : </a>
@@ -314,12 +314,13 @@
 <a name="252"><span class="lineNum">     252 </span>            :   bool _isInitialized = false;</a>
 <a name="253"><span class="lineNum">     253 </span>            : #endif</a>
 <a name="254"><span class="lineNum">     254 </span>            :   bool _initedWithMDSize = false;</a>
-<a name="255"><span class="lineNum">     255 </span>            :   tarch::la::Vector&lt;dim, double&gt; _globalMDDomainSize;</a>
-<a name="256"><span class="lineNum">     256 </span>            :   tarch::la::Vector&lt;dim, double&gt; _globalMDDomainOffset;</a>
-<a name="257"><span class="lineNum">     257 </span>            :   tarch::la::Vector&lt;dim, double&gt; _couplingCellSize;</a>
-<a name="258"><span class="lineNum">     258 </span>            :   coupling::paralleltopology::ParallelTopologyType _parallelTopologyType;</a>
-<a name="259"><span class="lineNum">     259 </span>            :   friend IndexingServiceTest;</a>
-<a name="260"><span class="lineNum">     260 </span>            : };</a>
+<a name="255"><span class="lineNum">     255 </span>            :   tarch::la::Vector&lt;dim, std::vector&lt;unsigned int&gt;&gt; _subdomainOwnership;</a>
+<a name="256"><span class="lineNum">     256 </span>            :   tarch::la::Vector&lt;dim, double&gt; _globalMDDomainSize;</a>
+<a name="257"><span class="lineNum">     257 </span>            :   tarch::la::Vector&lt;dim, double&gt; _globalMDDomainOffset;</a>
+<a name="258"><span class="lineNum">     258 </span>            :   tarch::la::Vector&lt;dim, double&gt; _couplingCellSize;</a>
+<a name="259"><span class="lineNum">     259 </span>            :   coupling::paralleltopology::ParallelTopologyType _parallelTopologyType;</a>
+<a name="260"><span class="lineNum">     260 </span>            :   friend IndexingServiceTest;</a>
+<a name="261"><span class="lineNum">     261 </span>            : };</a>
 </pre>
       </td>
     </tr>

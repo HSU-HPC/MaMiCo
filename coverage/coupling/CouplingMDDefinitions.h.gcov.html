@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-09 15:47:48</td>
+            <td class="headerValue">2024-09-10 12:33:06</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">8</td>
@@ -148,12 +148,12 @@
 <a name="86"><span class="lineNum">      86 </span>            :  *  @tparam dim refers to the spacial dimension of the simulation, can be 1, 2,</a>
 <a name="87"><span class="lineNum">      87 </span>            :  * or 3</a>
 <a name="88"><span class="lineNum">      88 </span>            :  *  @returns the division factor for the simulation */</a>
-<a name="89"><span class="lineNum">      89 </span><span class="lineCov">        768 : template &lt;unsigned int dim&gt; tarch::la::Vector&lt;dim, unsigned int&gt; initDivisionFactor(tarch::la::Vector&lt;dim, unsigned int&gt; numberCells) {</span></a>
-<a name="90"><span class="lineNum">      90 </span><span class="lineCov">        768 :   tarch::la::Vector&lt;dim, unsigned int&gt; divFactor(1);</span></a>
-<a name="91"><span class="lineNum">      91 </span><span class="lineCov">       2288 :   for (unsigned int d = 1; d &lt; dim; d++) {</span></a>
-<a name="92"><span class="lineNum">      92 </span><span class="lineCov">       1520 :     divFactor[d] = divFactor[d - 1] * (numberCells[d - 1]);</span></a>
+<a name="89"><span class="lineNum">      89 </span><span class="lineCov">        796 : template &lt;unsigned int dim&gt; tarch::la::Vector&lt;dim, unsigned int&gt; initDivisionFactor(tarch::la::Vector&lt;dim, unsigned int&gt; numberCells) {</span></a>
+<a name="90"><span class="lineNum">      90 </span><span class="lineCov">        796 :   tarch::la::Vector&lt;dim, unsigned int&gt; divFactor(1);</span></a>
+<a name="91"><span class="lineNum">      91 </span><span class="lineCov">       2372 :   for (unsigned int d = 1; d &lt; dim; d++) {</span></a>
+<a name="92"><span class="lineNum">      92 </span><span class="lineCov">       1576 :     divFactor[d] = divFactor[d - 1] * (numberCells[d - 1]);</span></a>
 <a name="93"><span class="lineNum">      93 </span>            :   }</a>
-<a name="94"><span class="lineNum">      94 </span><span class="lineCov">        768 :   return divFactor;</span></a>
+<a name="94"><span class="lineNum">      94 </span><span class="lineCov">        796 :   return divFactor;</span></a>
 <a name="95"><span class="lineNum">      95 </span>            : }</a>
 <a name="96"><span class="lineNum">      96 </span>            : </a>
 <a name="97"><span class="lineNum">      97 </span>            : /** This method is supposed to be only called with member divisionFactor</a>
@@ -167,16 +167,16 @@
 <a name="105"><span class="lineNum">     105 </span>            :  * or 3</a>
 <a name="106"><span class="lineNum">     106 </span>            :  *  @returns the dimensionized index for a given cell */</a>
 <a name="107"><span class="lineNum">     107 </span>            : template &lt;unsigned int dim&gt;</a>
-<a name="108"><span class="lineNum">     108 </span><span class="lineCov">       1072 : tarch::la::Vector&lt;dim, unsigned int&gt; getVectorCellIndex(unsigned int cellIndex, const tarch::la::Vector&lt;dim, unsigned int&gt;&amp; divisionFactor) {</span></a>
-<a name="109"><span class="lineNum">     109 </span><span class="lineCov">       1072 :   tarch::la::Vector&lt;dim, unsigned int&gt; myVector(0);</span></a>
+<a name="108"><span class="lineNum">     108 </span><span class="lineCov">       1100 : tarch::la::Vector&lt;dim, unsigned int&gt; getVectorCellIndex(unsigned int cellIndex, const tarch::la::Vector&lt;dim, unsigned int&gt;&amp; divisionFactor) {</span></a>
+<a name="109"><span class="lineNum">     109 </span><span class="lineCov">       1100 :   tarch::la::Vector&lt;dim, unsigned int&gt; myVector(0);</span></a>
 <a name="110"><span class="lineNum">     110 </span>            :   unsigned int help = cellIndex;</a>
-<a name="111"><span class="lineNum">     111 </span><span class="lineCov">       3160 :   for (int d = dim - 1; d &gt; 0; d--) {</span></a>
-<a name="112"><span class="lineNum">     112 </span><span class="lineCov">       2088 :     myVector[d] = help / divisionFactor[d];</span></a>
-<a name="113"><span class="lineNum">     113 </span><span class="lineCov">       2088 :     help = help - myVector[d] * divisionFactor[d];</span></a>
+<a name="111"><span class="lineNum">     111 </span><span class="lineCov">       3244 :   for (int d = dim - 1; d &gt; 0; d--) {</span></a>
+<a name="112"><span class="lineNum">     112 </span><span class="lineCov">       2144 :     myVector[d] = help / divisionFactor[d];</span></a>
+<a name="113"><span class="lineNum">     113 </span><span class="lineCov">       2144 :     help = help - myVector[d] * divisionFactor[d];</span></a>
 <a name="114"><span class="lineNum">     114 </span>            :   }</a>
-<a name="115"><span class="lineNum">     115 </span><span class="lineCov">       1072 :   myVector[0] = help;</span></a>
+<a name="115"><span class="lineNum">     115 </span><span class="lineCov">       1100 :   myVector[0] = help;</span></a>
 <a name="116"><span class="lineNum">     116 </span>            : </a>
-<a name="117"><span class="lineNum">     117 </span><span class="lineCov">       1072 :   return myVector;</span></a>
+<a name="117"><span class="lineNum">     117 </span><span class="lineCov">       1100 :   return myVector;</span></a>
 <a name="118"><span class="lineNum">     118 </span>            : }</a>
 <a name="119"><span class="lineNum">     119 </span>            : </a>
 <a name="120"><span class="lineNum">     120 </span>            : } // namespace coupling</a>

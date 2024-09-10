@@ -11,11 +11,12 @@ var searchData=
   ['vector_3c_20dim_20_3e_8',['Vector&lt; dim &gt;',['../classtarch_1_1la_1_1Vector.html',1,'tarch::la']]],
   ['vector_3c_20dim_2c_20bool_20_3e_9',['Vector&lt; dim, bool &gt;',['../classtarch_1_1la_1_1Vector.html',1,'tarch::la']]],
   ['vector_3c_20dim_2c_20double_20_3e_10',['Vector&lt; dim, double &gt;',['../classtarch_1_1la_1_1Vector.html',1,'tarch::la']]],
-  ['vector_3c_20dim_2c_20unsigned_20int_20_3e_11',['Vector&lt; dim, unsigned int &gt;',['../classtarch_1_1la_1_1Vector.html',1,'tarch::la']]],
-  ['vectoraccessfunctionpair_12',['VectorAccessFunctionPair',['../structcoupling_1_1filtering_1_1FilterInterface_1_1VectorAccessFunctionPair.html',1,'coupling::filtering::FilterInterface']]],
-  ['velocitygradientrelaxation_13',['VelocityGradientRelaxation',['../classcoupling_1_1VelocityGradientRelaxation.html',1,'coupling']]],
-  ['velocitygradientrelaxationmapping_14',['VelocityGradientRelaxationMapping',['../classcoupling_1_1cellmappings_1_1VelocityGradientRelaxationMapping.html',1,'coupling::cellmappings']]],
-  ['velocitygradientrelaxationtoponly_15',['VelocityGradientRelaxationTopOnly',['../classcoupling_1_1VelocityGradientRelaxationTopOnly.html',1,'coupling']]],
-  ['velocitygradientrelaxationtoponlymapping_16',['VelocityGradientRelaxationTopOnlyMapping',['../classcoupling_1_1cellmappings_1_1VelocityGradientRelaxationTopOnlyMapping.html',1,'coupling::cellmappings']]],
-  ['vtkmoleculeplotter_17',['VTKMoleculePlotter',['../classcoupling_1_1cellmappings_1_1VTKMoleculePlotter.html',1,'coupling::cellmappings']]]
+  ['vector_3c_20dim_2c_20std_3a_3avector_3c_20unsigned_20int_20_3e_20_3e_11',['Vector&lt; dim, std::vector&lt; unsigned int &gt; &gt;',['../classtarch_1_1la_1_1Vector.html',1,'tarch::la']]],
+  ['vector_3c_20dim_2c_20unsigned_20int_20_3e_12',['Vector&lt; dim, unsigned int &gt;',['../classtarch_1_1la_1_1Vector.html',1,'tarch::la']]],
+  ['vectoraccessfunctionpair_13',['VectorAccessFunctionPair',['../structcoupling_1_1filtering_1_1FilterInterface_1_1VectorAccessFunctionPair.html',1,'coupling::filtering::FilterInterface']]],
+  ['velocitygradientrelaxation_14',['VelocityGradientRelaxation',['../classcoupling_1_1VelocityGradientRelaxation.html',1,'coupling']]],
+  ['velocitygradientrelaxationmapping_15',['VelocityGradientRelaxationMapping',['../classcoupling_1_1cellmappings_1_1VelocityGradientRelaxationMapping.html',1,'coupling::cellmappings']]],
+  ['velocitygradientrelaxationtoponly_16',['VelocityGradientRelaxationTopOnly',['../classcoupling_1_1VelocityGradientRelaxationTopOnly.html',1,'coupling']]],
+  ['velocitygradientrelaxationtoponlymapping_17',['VelocityGradientRelaxationTopOnlyMapping',['../classcoupling_1_1cellmappings_1_1VelocityGradientRelaxationTopOnlyMapping.html',1,'coupling::cellmappings']]],
+  ['vtkmoleculeplotter_18',['VTKMoleculePlotter',['../classcoupling_1_1cellmappings_1_1VTKMoleculePlotter.html',1,'coupling::cellmappings']]]
 ];

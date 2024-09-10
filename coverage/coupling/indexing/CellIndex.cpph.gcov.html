@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-09 15:47:48</td>
+            <td class="headerValue">2024-09-10 12:33:06</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">257</td>
@@ -128,9 +128,9 @@
 <a name="66"><span class="lineNum">      66 </span>            : }</a>
 <a name="67"><span class="lineNum">      67 </span>            : </a>
 <a name="68"><span class="lineNum">      68 </span>            : template &lt;unsigned int dim, IndexTrait... traits&gt;</a>
-<a name="69"><span class="lineNum">      69 </span><span class="lineCov">    2274232 : coupling::indexing::CellIndex&lt;dim, traits...&gt; operator-(const CellIndex&lt;dim, traits...&gt;&amp; i1, const CellIndex&lt;dim, traits...&gt;&amp; i2) {</span></a>
+<a name="69"><span class="lineNum">      69 </span><span class="lineCov">    2274260 : coupling::indexing::CellIndex&lt;dim, traits...&gt; operator-(const CellIndex&lt;dim, traits...&gt;&amp; i1, const CellIndex&lt;dim, traits...&gt;&amp; i2) {</span></a>
 <a name="70"><span class="lineNum">      70 </span>            :   if constexpr (std::is_same_v&lt;CellIndex&lt;dim, traits...&gt;, BaseIndex&lt;dim&gt;&gt;)</a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineCov">    9096928 :     return BaseIndex&lt;dim&gt;{i1.get() - i2.get()};</span></a>
+<a name="71"><span class="lineNum">      71 </span><span class="lineCov">    9097040 :     return BaseIndex&lt;dim&gt;{i1.get() - i2.get()};</span></a>
 <a name="72"><span class="lineNum">      72 </span>            :   else</a>
 <a name="73"><span class="lineNum">      73 </span>            :     return BaseIndex&lt;dim&gt;{i1} - BaseIndex&lt;dim&gt;{i2};</a>
 <a name="74"><span class="lineNum">      74 </span>            : }</a>

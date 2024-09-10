@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-08-09 15:47:48</td>
+            <td class="headerValue">2024-09-10 12:33:06</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">6</td>
@@ -94,20 +94,20 @@
 <a name="32"><span class="lineNum">      32 </span>            : template &lt;unsigned int dim&gt; class coupling::paralleltopology::XYZTopology : public coupling::paralleltopology::ParallelTopology&lt;dim&gt; {</a>
 <a name="33"><span class="lineNum">      33 </span>            : public:</a>
 <a name="34"><span class="lineNum">      34 </span>            :   /** Constructor */</a>
-<a name="35"><span class="lineNum">      35 </span><span class="lineCov">        760 :   XYZTopology(tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses)</span></a>
-<a name="36"><span class="lineNum">      36 </span><span class="lineCov">       1520 :       : coupling::paralleltopology::ParallelTopology&lt;dim&gt;(), _numberProcesses(numberProcesses),</span></a>
-<a name="37"><span class="lineNum">      37 </span><span class="lineCov">       1520 :         _divisionFactor4NumberProcesses(coupling::initDivisionFactor&lt;dim&gt;(numberProcesses)) {}</span></a>
+<a name="35"><span class="lineNum">      35 </span><span class="lineCov">        788 :   XYZTopology(tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses)</span></a>
+<a name="36"><span class="lineNum">      36 </span><span class="lineCov">       1576 :       : coupling::paralleltopology::ParallelTopology&lt;dim&gt;(), _numberProcesses(numberProcesses),</span></a>
+<a name="37"><span class="lineNum">      37 </span><span class="lineCov">       1576 :         _divisionFactor4NumberProcesses(coupling::initDivisionFactor&lt;dim&gt;(numberProcesses)) {}</span></a>
 <a name="38"><span class="lineNum">      38 </span>            : </a>
 <a name="39"><span class="lineNum">      39 </span>            :   /** Destructor */</a>
 <a name="40"><span class="lineNum">      40 </span><span class="lineCov">         24 :   virtual ~XYZTopology() {}</span></a>
 <a name="41"><span class="lineNum">      41 </span>            : </a>
-<a name="42"><span class="lineNum">      42 </span><span class="lineCov">        880 :   tarch::la::Vector&lt;dim, unsigned int&gt; getProcessCoordinates(unsigned int rank, unsigned int topologyOffset) const {</span></a>
+<a name="42"><span class="lineNum">      42 </span><span class="lineCov">        908 :   tarch::la::Vector&lt;dim, unsigned int&gt; getProcessCoordinates(unsigned int rank, unsigned int topologyOffset) const {</span></a>
 <a name="43"><span class="lineNum">      43 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
 <a name="44"><span class="lineNum">      44 </span>            :     std::cout &lt;&lt; &quot;Rank=&quot; &lt;&lt; rank</a>
 <a name="45"><span class="lineNum">      45 </span>            :               &lt;&lt; &quot; corresponds to process coordinates=&quot; &lt;&lt; coupling::getVectorCellIndex&lt;dim&gt;(rank - topologyOffset, _divisionFactor4NumberProcesses)</a>
 <a name="46"><span class="lineNum">      46 </span>            :               &lt;&lt; std::endl;</a>
 <a name="47"><span class="lineNum">      47 </span>            : #endif</a>
-<a name="48"><span class="lineNum">      48 </span><span class="lineCov">        880 :     return coupling::getVectorCellIndex&lt;dim&gt;(rank - topologyOffset, _divisionFactor4NumberProcesses);</span></a>
+<a name="48"><span class="lineNum">      48 </span><span class="lineCov">        908 :     return coupling::getVectorCellIndex&lt;dim&gt;(rank - topologyOffset, _divisionFactor4NumberProcesses);</span></a>
 <a name="49"><span class="lineNum">      49 </span>            :   }</a>
 <a name="50"><span class="lineNum">      50 </span>            : </a>
 <a name="51"><span class="lineNum">      51 </span><span class="lineCov">        260 :   unsigned int getRank(tarch::la::Vector&lt;dim, unsigned int&gt; processCoordinates, unsigned int topologyOffset) const {</span></a>
