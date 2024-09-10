@@ -13,6 +13,10 @@ class IndexingServiceTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testAllBoundaries);
   CPPUNIT_TEST(testIndexingServiceMustBeInitialized);
   CPPUNIT_TEST(testEdgeCases);
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+  CPPUNIT_TEST(testAllBoundariesRectGrid);
+  CPPUNIT_TEST(testInitExecptionsRectGrid);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -360,6 +364,553 @@ public:
     CPPUNIT_ASSERT_EQUAL(service.getUniqueRankForCouplingCell({7, 1, 1}, {12}, 0), 1u);
   }
 
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+  void testAllBoundariesRectGrid() {
+    // Since cppunit is locked to 4 ranks, we have to use weights that work with this
+    // copy of master test above, with weights {2,1}{1,2}{1}, 12 cells in each direction
+
+    using V = tarch::la::Vector<3, int>;
+    using Vu = tarch::la::Vector<3, unsigned int>;
+    tarch::la::Vector<3, std::vector<unsigned int>> subdomainWeights;
+    subdomainWeights[0] = {2, 1};
+    subdomainWeights[1] = {1, 2};
+    subdomainWeights[2] = {1};
+    auto& service = IndexingService<3>::getInstance();
+
+    // reinit, parallel only test so numberProcesses {2,2,1}
+    service.initWithCells(subdomainWeights, {12}, {2, 2, 1}, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
+
+    // recheck globals only once
+    CPPUNIT_ASSERT_EQUAL(T0::lowerBoundary.get(), V(0, 0, 0));
+    CPPUNIT_ASSERT_EQUAL(T0::upperBoundary.get(), V(13, 13, 13));
+    CPPUNIT_ASSERT_EQUAL(T0::numberCellsInDomain, Vu(14, 14, 14));
+    CPPUNIT_ASSERT_EQUAL(T0::linearNumberCellsInDomain, 2744u);
+
+    CPPUNIT_ASSERT_EQUAL(T1::lowerBoundary.get(), V(0, 0, 0));
+    CPPUNIT_ASSERT_EQUAL(T1::upperBoundary.get(), V(13, 13, 13));
+    CPPUNIT_ASSERT_EQUAL(T1::numberCellsInDomain, Vu(14, 14, 14));
+    CPPUNIT_ASSERT_EQUAL(T1::linearNumberCellsInDomain, 2744u);
+
+    CPPUNIT_ASSERT_EQUAL(T4::lowerBoundary.get(), V(3, 3, 3));
+    CPPUNIT_ASSERT_EQUAL(T4::upperBoundary.get(), V(10, 10, 10));
+    CPPUNIT_ASSERT_EQUAL(T4::numberCellsInDomain, Vu(8, 8, 8));
+    CPPUNIT_ASSERT_EQUAL(T4::linearNumberCellsInDomain, 512u);
+
+    CPPUNIT_ASSERT_EQUAL(T5::lowerBoundary.get(), V(3, 3, 3));
+    CPPUNIT_ASSERT_EQUAL(T5::upperBoundary.get(), V(10, 10, 10));
+    CPPUNIT_ASSERT_EQUAL(T5::numberCellsInDomain, Vu(8, 8, 8));
+    CPPUNIT_ASSERT_EQUAL(T5::linearNumberCellsInDomain, 512u);
+
+    CPPUNIT_ASSERT_EQUAL(T8::lowerBoundary.get(), V(1, 1, 1));
+    CPPUNIT_ASSERT_EQUAL(T8::upperBoundary.get(), V(12, 12, 12));
+    CPPUNIT_ASSERT_EQUAL(T8::numberCellsInDomain, Vu(12, 12, 12));
+    CPPUNIT_ASSERT_EQUAL(T8::linearNumberCellsInDomain, 1728u);
+
+    CPPUNIT_ASSERT_EQUAL(T9::lowerBoundary.get(), V(1, 1, 1));
+    CPPUNIT_ASSERT_EQUAL(T9::upperBoundary.get(), V(12, 12, 12));
+    CPPUNIT_ASSERT_EQUAL(T9::numberCellsInDomain, Vu(12, 12, 12));
+    CPPUNIT_ASSERT_EQUAL(T9::linearNumberCellsInDomain, 1728u);
+
+    CPPUNIT_ASSERT_EQUAL(T12::lowerBoundary.get(), V(4, 4, 4));
+    CPPUNIT_ASSERT_EQUAL(T12::upperBoundary.get(), V(9, 9, 9));
+    CPPUNIT_ASSERT_EQUAL(T12::numberCellsInDomain, Vu(6, 6, 6));
+    CPPUNIT_ASSERT_EQUAL(T12::linearNumberCellsInDomain, 216u);
+
+    CPPUNIT_ASSERT_EQUAL(T13::lowerBoundary.get(), V(4, 4, 4));
+    CPPUNIT_ASSERT_EQUAL(T13::upperBoundary.get(), V(9, 9, 9));
+    CPPUNIT_ASSERT_EQUAL(T13::numberCellsInDomain, Vu(6, 6, 6));
+    CPPUNIT_ASSERT_EQUAL(T13::linearNumberCellsInDomain, 216u);
+
+    // check locals for this specific breakdown
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T2::lowerBoundary.get(), V(0, 0, 0));
+        CPPUNIT_ASSERT_EQUAL(T2::upperBoundary.get(), V(9, 5, 13));
+        CPPUNIT_ASSERT_EQUAL(T2::numberCellsInDomain, Vu(10, 6, 14));
+        CPPUNIT_ASSERT_EQUAL(T2::linearNumberCellsInDomain, 840u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T2::lowerBoundary.get(), V(8, 0, 0));
+        CPPUNIT_ASSERT_EQUAL(T2::upperBoundary.get(), V(13, 5, 13));
+        CPPUNIT_ASSERT_EQUAL(T2::numberCellsInDomain, Vu(6, 6, 14));
+        CPPUNIT_ASSERT_EQUAL(T2::linearNumberCellsInDomain, 504u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T2::lowerBoundary.get(), V(0, 4, 0));
+        CPPUNIT_ASSERT_EQUAL(T2::upperBoundary.get(), V(9, 13, 13));
+        CPPUNIT_ASSERT_EQUAL(T2::numberCellsInDomain, Vu(10, 10, 14));
+        CPPUNIT_ASSERT_EQUAL(T2::linearNumberCellsInDomain, 1400u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T2::lowerBoundary.get(), V(8, 4, 0));
+        CPPUNIT_ASSERT_EQUAL(T2::upperBoundary.get(), V(13, 13, 13));
+        CPPUNIT_ASSERT_EQUAL(T2::numberCellsInDomain, Vu(6, 10, 14));
+        CPPUNIT_ASSERT_EQUAL(T2::linearNumberCellsInDomain, 840u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T3::lowerBoundary.get(), V(0, 0, 0));
+        CPPUNIT_ASSERT_EQUAL(T3::upperBoundary.get(), V(9, 5, 13));
+        CPPUNIT_ASSERT_EQUAL(T3::numberCellsInDomain, Vu(10, 6, 14));
+        CPPUNIT_ASSERT_EQUAL(T3::linearNumberCellsInDomain, 840u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T3::lowerBoundary.get(), V(8, 0, 0));
+        CPPUNIT_ASSERT_EQUAL(T3::upperBoundary.get(), V(13, 5, 13));
+        CPPUNIT_ASSERT_EQUAL(T3::numberCellsInDomain, Vu(6, 6, 14));
+        CPPUNIT_ASSERT_EQUAL(T3::linearNumberCellsInDomain, 504u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T3::lowerBoundary.get(), V(0, 4, 0));
+        CPPUNIT_ASSERT_EQUAL(T3::upperBoundary.get(), V(9, 13, 13));
+        CPPUNIT_ASSERT_EQUAL(T3::numberCellsInDomain, Vu(10, 10, 14));
+        CPPUNIT_ASSERT_EQUAL(T3::linearNumberCellsInDomain, 1400u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T3::lowerBoundary.get(), V(8, 4, 0));
+        CPPUNIT_ASSERT_EQUAL(T3::upperBoundary.get(), V(13, 13, 13));
+        CPPUNIT_ASSERT_EQUAL(T3::numberCellsInDomain, Vu(6, 10, 14));
+        CPPUNIT_ASSERT_EQUAL(T3::linearNumberCellsInDomain, 840u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T6::lowerBoundary.get(), V(3, 3, 3));
+        CPPUNIT_ASSERT_EQUAL(T6::upperBoundary.get(), V(9, 5, 10));
+        CPPUNIT_ASSERT_EQUAL(T6::numberCellsInDomain, Vu(7, 3, 8));
+        CPPUNIT_ASSERT_EQUAL(T6::linearNumberCellsInDomain, 168u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T6::lowerBoundary.get(), V(8, 3, 3));
+        CPPUNIT_ASSERT_EQUAL(T6::upperBoundary.get(), V(10, 5, 10));
+        CPPUNIT_ASSERT_EQUAL(T6::numberCellsInDomain, Vu(3, 3, 8));
+        CPPUNIT_ASSERT_EQUAL(T6::linearNumberCellsInDomain, 72u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T6::lowerBoundary.get(), V(3, 4, 3));
+        CPPUNIT_ASSERT_EQUAL(T6::upperBoundary.get(), V(9, 10, 10));
+        CPPUNIT_ASSERT_EQUAL(T6::numberCellsInDomain, Vu(7, 7, 8));
+        CPPUNIT_ASSERT_EQUAL(T6::linearNumberCellsInDomain, 392u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T6::lowerBoundary.get(), V(8, 4, 3));
+        CPPUNIT_ASSERT_EQUAL(T6::upperBoundary.get(), V(10, 10, 10));
+        CPPUNIT_ASSERT_EQUAL(T6::numberCellsInDomain, Vu(3, 7, 8));
+        CPPUNIT_ASSERT_EQUAL(T6::linearNumberCellsInDomain, 168u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T7::lowerBoundary.get(), V(3, 3, 3));
+        CPPUNIT_ASSERT_EQUAL(T7::upperBoundary.get(), V(9, 5, 10));
+        CPPUNIT_ASSERT_EQUAL(T7::numberCellsInDomain, Vu(7, 3, 8));
+        CPPUNIT_ASSERT_EQUAL(T7::linearNumberCellsInDomain, 168u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T7::lowerBoundary.get(), V(8, 3, 3));
+        CPPUNIT_ASSERT_EQUAL(T7::upperBoundary.get(), V(10, 5, 10));
+        CPPUNIT_ASSERT_EQUAL(T7::numberCellsInDomain, Vu(3, 3, 8));
+        CPPUNIT_ASSERT_EQUAL(T7::linearNumberCellsInDomain, 72u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T7::lowerBoundary.get(), V(3, 4, 3));
+        CPPUNIT_ASSERT_EQUAL(T7::upperBoundary.get(), V(9, 10, 10));
+        CPPUNIT_ASSERT_EQUAL(T7::numberCellsInDomain, Vu(7, 7, 8));
+        CPPUNIT_ASSERT_EQUAL(T7::linearNumberCellsInDomain, 392u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T7::lowerBoundary.get(), V(8, 4, 3));
+        CPPUNIT_ASSERT_EQUAL(T7::upperBoundary.get(), V(10, 10, 10));
+        CPPUNIT_ASSERT_EQUAL(T7::numberCellsInDomain, Vu(3, 7, 8));
+        CPPUNIT_ASSERT_EQUAL(T7::linearNumberCellsInDomain, 168u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T10::lowerBoundary.get(), V(1, 1, 1));
+        CPPUNIT_ASSERT_EQUAL(T10::upperBoundary.get(), V(8, 4, 12));
+        CPPUNIT_ASSERT_EQUAL(T10::numberCellsInDomain, Vu(8, 4, 12));
+        CPPUNIT_ASSERT_EQUAL(T10::linearNumberCellsInDomain, 384u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T10::lowerBoundary.get(), V(9, 1, 1));
+        CPPUNIT_ASSERT_EQUAL(T10::upperBoundary.get(), V(12, 4, 12));
+        CPPUNIT_ASSERT_EQUAL(T10::numberCellsInDomain, Vu(4, 4, 12));
+        CPPUNIT_ASSERT_EQUAL(T10::linearNumberCellsInDomain, 192u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T10::lowerBoundary.get(), V(1, 5, 1));
+        CPPUNIT_ASSERT_EQUAL(T10::upperBoundary.get(), V(8, 12, 12));
+        CPPUNIT_ASSERT_EQUAL(T10::numberCellsInDomain, Vu(8, 8, 12));
+        CPPUNIT_ASSERT_EQUAL(T10::linearNumberCellsInDomain, 768u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T10::lowerBoundary.get(), V(9, 5, 1));
+        CPPUNIT_ASSERT_EQUAL(T10::upperBoundary.get(), V(12, 12, 12));
+        CPPUNIT_ASSERT_EQUAL(T10::numberCellsInDomain, Vu(4, 8, 12));
+        CPPUNIT_ASSERT_EQUAL(T10::linearNumberCellsInDomain, 384u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T11::lowerBoundary.get(), V(1, 1, 1));
+        CPPUNIT_ASSERT_EQUAL(T11::upperBoundary.get(), V(8, 4, 12));
+        CPPUNIT_ASSERT_EQUAL(T11::numberCellsInDomain, Vu(8, 4, 12));
+        CPPUNIT_ASSERT_EQUAL(T11::linearNumberCellsInDomain, 384u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T11::lowerBoundary.get(), V(9, 1, 1));
+        CPPUNIT_ASSERT_EQUAL(T11::upperBoundary.get(), V(12, 4, 12));
+        CPPUNIT_ASSERT_EQUAL(T11::numberCellsInDomain, Vu(4, 4, 12));
+        CPPUNIT_ASSERT_EQUAL(T11::linearNumberCellsInDomain, 192u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T11::lowerBoundary.get(), V(1, 5, 1));
+        CPPUNIT_ASSERT_EQUAL(T11::upperBoundary.get(), V(8, 12, 12));
+        CPPUNIT_ASSERT_EQUAL(T11::numberCellsInDomain, Vu(8, 8, 12));
+        CPPUNIT_ASSERT_EQUAL(T11::linearNumberCellsInDomain, 768u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T11::lowerBoundary.get(), V(9, 5, 1));
+        CPPUNIT_ASSERT_EQUAL(T11::upperBoundary.get(), V(12, 12, 12));
+        CPPUNIT_ASSERT_EQUAL(T11::numberCellsInDomain, Vu(4, 8, 12));
+        CPPUNIT_ASSERT_EQUAL(T11::linearNumberCellsInDomain, 384u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T14::lowerBoundary.get(), V(4, 4, 4));
+        CPPUNIT_ASSERT_EQUAL(T14::upperBoundary.get(), V(8, 4, 9));
+        CPPUNIT_ASSERT_EQUAL(T14::numberCellsInDomain, Vu(5, 1, 6));
+        CPPUNIT_ASSERT_EQUAL(T14::linearNumberCellsInDomain, 30u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T14::lowerBoundary.get(), V(9, 4, 4));
+        CPPUNIT_ASSERT_EQUAL(T14::upperBoundary.get(), V(9, 4, 9));
+        CPPUNIT_ASSERT_EQUAL(T14::numberCellsInDomain, Vu(1, 1, 6));
+        CPPUNIT_ASSERT_EQUAL(T14::linearNumberCellsInDomain, 6u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T14::lowerBoundary.get(), V(4, 5, 4));
+        CPPUNIT_ASSERT_EQUAL(T14::upperBoundary.get(), V(8, 9, 9));
+        CPPUNIT_ASSERT_EQUAL(T14::numberCellsInDomain, Vu(5, 5, 6));
+        CPPUNIT_ASSERT_EQUAL(T14::linearNumberCellsInDomain, 150u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T14::lowerBoundary.get(), V(9, 5, 4));
+        CPPUNIT_ASSERT_EQUAL(T14::upperBoundary.get(), V(9, 9, 9));
+        CPPUNIT_ASSERT_EQUAL(T14::numberCellsInDomain, Vu(1, 5, 6));
+        CPPUNIT_ASSERT_EQUAL(T14::linearNumberCellsInDomain, 30u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T15::lowerBoundary.get(), V(4, 4, 4));
+        CPPUNIT_ASSERT_EQUAL(T15::upperBoundary.get(), V(8, 4, 9));
+        CPPUNIT_ASSERT_EQUAL(T15::numberCellsInDomain, Vu(5, 1, 6));
+        CPPUNIT_ASSERT_EQUAL(T15::linearNumberCellsInDomain, 30u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T15::lowerBoundary.get(), V(9, 4, 4));
+        CPPUNIT_ASSERT_EQUAL(T15::upperBoundary.get(), V(9, 4, 9));
+        CPPUNIT_ASSERT_EQUAL(T15::numberCellsInDomain, Vu(1, 1, 6));
+        CPPUNIT_ASSERT_EQUAL(T15::linearNumberCellsInDomain, 6u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T15::lowerBoundary.get(), V(4, 5, 4));
+        CPPUNIT_ASSERT_EQUAL(T15::upperBoundary.get(), V(8, 9, 9));
+        CPPUNIT_ASSERT_EQUAL(T15::numberCellsInDomain, Vu(5, 5, 6));
+        CPPUNIT_ASSERT_EQUAL(T15::linearNumberCellsInDomain, 150u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T15::lowerBoundary.get(), V(9, 5, 4));
+        CPPUNIT_ASSERT_EQUAL(T15::upperBoundary.get(), V(9, 9, 9));
+        CPPUNIT_ASSERT_EQUAL(T15::numberCellsInDomain, Vu(1, 5, 6));
+        CPPUNIT_ASSERT_EQUAL(T15::linearNumberCellsInDomain, 30u);
+      }
+    }
+
+    // another test, with weights {1,2}{1}{1,2}, 12 cells in each direction
+
+    subdomainWeights[0] = {1, 2};
+    subdomainWeights[1] = {1};
+    subdomainWeights[2] = {1, 2};
+
+    // reinit, parallel only test so numberProcesses {2,1,2}
+    service.initWithCells(subdomainWeights, {12}, {2, 1, 2}, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
+
+    // check (only for t2) that the values did indeed change
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T2::lowerBoundary.get(), V(0, 0, 0));
+        CPPUNIT_ASSERT(T2::upperBoundary.get() != V(9, 5, 13));
+        CPPUNIT_ASSERT(T2::numberCellsInDomain != Vu(10, 6, 14));
+        CPPUNIT_ASSERT(T2::linearNumberCellsInDomain != 840u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT(T2::lowerBoundary.get() != V(8, 0, 0));
+        CPPUNIT_ASSERT(T2::upperBoundary.get() != V(13, 5, 13));
+        CPPUNIT_ASSERT(T2::numberCellsInDomain != Vu(6, 6, 14));
+        CPPUNIT_ASSERT(T2::linearNumberCellsInDomain != 504u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT(T2::lowerBoundary.get() != V(0, 4, 0));
+        CPPUNIT_ASSERT(T2::upperBoundary.get() != V(9, 13, 13));
+        CPPUNIT_ASSERT(T2::numberCellsInDomain != Vu(10, 10, 14));
+        CPPUNIT_ASSERT(T2::linearNumberCellsInDomain != 1400u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT(T2::lowerBoundary.get() != V(8, 4, 0));
+        CPPUNIT_ASSERT_EQUAL(T2::upperBoundary.get(), V(13, 13, 13));
+        CPPUNIT_ASSERT(T2::numberCellsInDomain != Vu(6, 10, 14));
+        CPPUNIT_ASSERT(T2::linearNumberCellsInDomain != 840u);
+      }
+    }
+
+    // check locals for this specific breakdown
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T2::lowerBoundary.get(), V(0, 0, 0));
+        CPPUNIT_ASSERT_EQUAL(T2::upperBoundary.get(), V(5, 13, 5));
+        CPPUNIT_ASSERT_EQUAL(T2::numberCellsInDomain, Vu(6, 14, 6));
+        CPPUNIT_ASSERT_EQUAL(T2::linearNumberCellsInDomain, 504u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T2::lowerBoundary.get(), V(4, 0, 0));
+        CPPUNIT_ASSERT_EQUAL(T2::upperBoundary.get(), V(13, 13, 5));
+        CPPUNIT_ASSERT_EQUAL(T2::numberCellsInDomain, Vu(10, 14, 6));
+        CPPUNIT_ASSERT_EQUAL(T2::linearNumberCellsInDomain, 840u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T2::lowerBoundary.get(), V(0, 0, 4));
+        CPPUNIT_ASSERT_EQUAL(T2::upperBoundary.get(), V(5, 13, 13));
+        CPPUNIT_ASSERT_EQUAL(T2::numberCellsInDomain, Vu(6, 14, 10));
+        CPPUNIT_ASSERT_EQUAL(T2::linearNumberCellsInDomain, 840u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T2::lowerBoundary.get(), V(4, 0, 4));
+        CPPUNIT_ASSERT_EQUAL(T2::upperBoundary.get(), V(13, 13, 13));
+        CPPUNIT_ASSERT_EQUAL(T2::numberCellsInDomain, Vu(10, 14, 10));
+        CPPUNIT_ASSERT_EQUAL(T2::linearNumberCellsInDomain, 1400u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T3::lowerBoundary.get(), V(0, 0, 0));
+        CPPUNIT_ASSERT_EQUAL(T3::upperBoundary.get(), V(5, 13, 5));
+        CPPUNIT_ASSERT_EQUAL(T3::numberCellsInDomain, Vu(6, 14, 6));
+        CPPUNIT_ASSERT_EQUAL(T3::linearNumberCellsInDomain, 504u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T3::lowerBoundary.get(), V(4, 0, 0));
+        CPPUNIT_ASSERT_EQUAL(T3::upperBoundary.get(), V(13, 13, 5));
+        CPPUNIT_ASSERT_EQUAL(T3::numberCellsInDomain, Vu(10, 14, 6));
+        CPPUNIT_ASSERT_EQUAL(T3::linearNumberCellsInDomain, 840u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T3::lowerBoundary.get(), V(0, 0, 4));
+        CPPUNIT_ASSERT_EQUAL(T3::upperBoundary.get(), V(5, 13, 13));
+        CPPUNIT_ASSERT_EQUAL(T3::numberCellsInDomain, Vu(6, 14, 10));
+        CPPUNIT_ASSERT_EQUAL(T3::linearNumberCellsInDomain, 840u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T3::lowerBoundary.get(), V(4, 0, 4));
+        CPPUNIT_ASSERT_EQUAL(T3::upperBoundary.get(), V(13, 13, 13));
+        CPPUNIT_ASSERT_EQUAL(T3::numberCellsInDomain, Vu(10, 14, 10));
+        CPPUNIT_ASSERT_EQUAL(T3::linearNumberCellsInDomain, 1400u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T6::lowerBoundary.get(), V(3, 3, 3));
+        CPPUNIT_ASSERT_EQUAL(T6::upperBoundary.get(), V(5, 10, 5));
+        CPPUNIT_ASSERT_EQUAL(T6::numberCellsInDomain, Vu(3, 8, 3));
+        CPPUNIT_ASSERT_EQUAL(T6::linearNumberCellsInDomain, 72u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T6::lowerBoundary.get(), V(4, 3, 3));
+        CPPUNIT_ASSERT_EQUAL(T6::upperBoundary.get(), V(10, 10, 5));
+        CPPUNIT_ASSERT_EQUAL(T6::numberCellsInDomain, Vu(7, 8, 3));
+        CPPUNIT_ASSERT_EQUAL(T6::linearNumberCellsInDomain, 168u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T6::lowerBoundary.get(), V(3, 3, 4));
+        CPPUNIT_ASSERT_EQUAL(T6::upperBoundary.get(), V(5, 10, 10));
+        CPPUNIT_ASSERT_EQUAL(T6::numberCellsInDomain, Vu(3, 8, 7));
+        CPPUNIT_ASSERT_EQUAL(T6::linearNumberCellsInDomain, 168u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T6::lowerBoundary.get(), V(4, 3, 4));
+        CPPUNIT_ASSERT_EQUAL(T6::upperBoundary.get(), V(10, 10, 10));
+        CPPUNIT_ASSERT_EQUAL(T6::numberCellsInDomain, Vu(7, 8, 7));
+        CPPUNIT_ASSERT_EQUAL(T6::linearNumberCellsInDomain, 392u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T7::lowerBoundary.get(), V(3, 3, 3));
+        CPPUNIT_ASSERT_EQUAL(T7::upperBoundary.get(), V(5, 10, 5));
+        CPPUNIT_ASSERT_EQUAL(T7::numberCellsInDomain, Vu(3, 8, 3));
+        CPPUNIT_ASSERT_EQUAL(T7::linearNumberCellsInDomain, 72u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T7::lowerBoundary.get(), V(4, 3, 3));
+        CPPUNIT_ASSERT_EQUAL(T7::upperBoundary.get(), V(10, 10, 5));
+        CPPUNIT_ASSERT_EQUAL(T7::numberCellsInDomain, Vu(7, 8, 3));
+        CPPUNIT_ASSERT_EQUAL(T7::linearNumberCellsInDomain, 168u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T7::lowerBoundary.get(), V(3, 3, 4));
+        CPPUNIT_ASSERT_EQUAL(T7::upperBoundary.get(), V(5, 10, 10));
+        CPPUNIT_ASSERT_EQUAL(T7::numberCellsInDomain, Vu(3, 8, 7));
+        CPPUNIT_ASSERT_EQUAL(T7::linearNumberCellsInDomain, 168u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T7::lowerBoundary.get(), V(4, 3, 4));
+        CPPUNIT_ASSERT_EQUAL(T7::upperBoundary.get(), V(10, 10, 10));
+        CPPUNIT_ASSERT_EQUAL(T7::numberCellsInDomain, Vu(7, 8, 7));
+        CPPUNIT_ASSERT_EQUAL(T7::linearNumberCellsInDomain, 392u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T10::lowerBoundary.get(), V(1, 1, 1));
+        CPPUNIT_ASSERT_EQUAL(T10::upperBoundary.get(), V(4, 12, 4));
+        CPPUNIT_ASSERT_EQUAL(T10::numberCellsInDomain, Vu(4, 12, 4));
+        CPPUNIT_ASSERT_EQUAL(T10::linearNumberCellsInDomain, 192u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T10::lowerBoundary.get(), V(5, 1, 1));
+        CPPUNIT_ASSERT_EQUAL(T10::upperBoundary.get(), V(12, 12, 4));
+        CPPUNIT_ASSERT_EQUAL(T10::numberCellsInDomain, Vu(8, 12, 4));
+        CPPUNIT_ASSERT_EQUAL(T10::linearNumberCellsInDomain, 384u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T10::lowerBoundary.get(), V(1, 1, 5));
+        CPPUNIT_ASSERT_EQUAL(T10::upperBoundary.get(), V(4, 12, 12));
+        CPPUNIT_ASSERT_EQUAL(T10::numberCellsInDomain, Vu(4, 12, 8));
+        CPPUNIT_ASSERT_EQUAL(T10::linearNumberCellsInDomain, 384u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T10::lowerBoundary.get(), V(5, 1, 5));
+        CPPUNIT_ASSERT_EQUAL(T10::upperBoundary.get(), V(12, 12, 12));
+        CPPUNIT_ASSERT_EQUAL(T10::numberCellsInDomain, Vu(8, 12, 8));
+        CPPUNIT_ASSERT_EQUAL(T10::linearNumberCellsInDomain, 768u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T11::lowerBoundary.get(), V(1, 1, 1));
+        CPPUNIT_ASSERT_EQUAL(T11::upperBoundary.get(), V(4, 12, 4));
+        CPPUNIT_ASSERT_EQUAL(T11::numberCellsInDomain, Vu(4, 12, 4));
+        CPPUNIT_ASSERT_EQUAL(T11::linearNumberCellsInDomain, 192u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T11::lowerBoundary.get(), V(5, 1, 1));
+        CPPUNIT_ASSERT_EQUAL(T11::upperBoundary.get(), V(12, 12, 4));
+        CPPUNIT_ASSERT_EQUAL(T11::numberCellsInDomain, Vu(8, 12, 4));
+        CPPUNIT_ASSERT_EQUAL(T11::linearNumberCellsInDomain, 384u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T11::lowerBoundary.get(), V(1, 1, 5));
+        CPPUNIT_ASSERT_EQUAL(T11::upperBoundary.get(), V(4, 12, 12));
+        CPPUNIT_ASSERT_EQUAL(T11::numberCellsInDomain, Vu(4, 12, 8));
+        CPPUNIT_ASSERT_EQUAL(T11::linearNumberCellsInDomain, 384u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T11::lowerBoundary.get(), V(5, 1, 5));
+        CPPUNIT_ASSERT_EQUAL(T11::upperBoundary.get(), V(12, 12, 12));
+        CPPUNIT_ASSERT_EQUAL(T11::numberCellsInDomain, Vu(8, 12, 8));
+        CPPUNIT_ASSERT_EQUAL(T11::linearNumberCellsInDomain, 768u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T14::lowerBoundary.get(), V(4, 4, 4));
+        CPPUNIT_ASSERT_EQUAL(T14::upperBoundary.get(), V(4, 9, 4));
+        CPPUNIT_ASSERT_EQUAL(T14::numberCellsInDomain, Vu(1, 6, 1));
+        CPPUNIT_ASSERT_EQUAL(T14::linearNumberCellsInDomain, 6u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T14::lowerBoundary.get(), V(5, 4, 4));
+        CPPUNIT_ASSERT_EQUAL(T14::upperBoundary.get(), V(9, 9, 4));
+        CPPUNIT_ASSERT_EQUAL(T14::numberCellsInDomain, Vu(5, 6, 1));
+        CPPUNIT_ASSERT_EQUAL(T14::linearNumberCellsInDomain, 30u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T14::lowerBoundary.get(), V(4, 4, 5));
+        CPPUNIT_ASSERT_EQUAL(T14::upperBoundary.get(), V(4, 9, 9));
+        CPPUNIT_ASSERT_EQUAL(T14::numberCellsInDomain, Vu(1, 6, 5));
+        CPPUNIT_ASSERT_EQUAL(T14::linearNumberCellsInDomain, 30u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T14::lowerBoundary.get(), V(5, 4, 5));
+        CPPUNIT_ASSERT_EQUAL(T14::upperBoundary.get(), V(9, 9, 9));
+        CPPUNIT_ASSERT_EQUAL(T14::numberCellsInDomain, Vu(5, 6, 5));
+        CPPUNIT_ASSERT_EQUAL(T14::linearNumberCellsInDomain, 150u);
+      }
+    }
+
+    if (_size == 4) {
+      if (_rank == 0) {
+        CPPUNIT_ASSERT_EQUAL(T15::lowerBoundary.get(), V(4, 4, 4));
+        CPPUNIT_ASSERT_EQUAL(T15::upperBoundary.get(), V(4, 9, 4));
+        CPPUNIT_ASSERT_EQUAL(T15::numberCellsInDomain, Vu(1, 6, 1));
+        CPPUNIT_ASSERT_EQUAL(T15::linearNumberCellsInDomain, 6u);
+      }
+      if (_rank == 1) {
+        CPPUNIT_ASSERT_EQUAL(T15::lowerBoundary.get(), V(5, 4, 4));
+        CPPUNIT_ASSERT_EQUAL(T15::upperBoundary.get(), V(9, 9, 4));
+        CPPUNIT_ASSERT_EQUAL(T15::numberCellsInDomain, Vu(5, 6, 1));
+        CPPUNIT_ASSERT_EQUAL(T15::linearNumberCellsInDomain, 30u);
+      }
+      if (_rank == 2) {
+        CPPUNIT_ASSERT_EQUAL(T15::lowerBoundary.get(), V(4, 4, 5));
+        CPPUNIT_ASSERT_EQUAL(T15::upperBoundary.get(), V(4, 9, 9));
+        CPPUNIT_ASSERT_EQUAL(T15::numberCellsInDomain, Vu(1, 6, 5));
+        CPPUNIT_ASSERT_EQUAL(T15::linearNumberCellsInDomain, 30u);
+      }
+      if (_rank == 3) {
+        CPPUNIT_ASSERT_EQUAL(T15::lowerBoundary.get(), V(5, 4, 5));
+        CPPUNIT_ASSERT_EQUAL(T15::upperBoundary.get(), V(9, 9, 9));
+        CPPUNIT_ASSERT_EQUAL(T15::numberCellsInDomain, Vu(5, 6, 5));
+        CPPUNIT_ASSERT_EQUAL(T15::linearNumberCellsInDomain, 150u);
+      }
+    }
+  }
+
+  void testInitExecptionsRectGrid() {
+    // weights mismatch
+    auto& service = IndexingService<3>::getInstance();
+    tarch::la::Vector<3, std::vector<unsigned int>> subdomainWeights;
+    subdomainWeights[0] = {1, 1};
+    subdomainWeights[1] = {1, 1};
+    subdomainWeights[2] = {1};
+    CPPUNIT_ASSERT_THROW(service.initWithCells(subdomainWeights, {12}, {1, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u), std::runtime_error);
+    CPPUNIT_ASSERT_NO_THROW(service.initWithCells(subdomainWeights, {12}, {2, 2, 1}, coupling::paralleltopology::XYZ, 3, 0u));
+    CPPUNIT_ASSERT_THROW(service.initWithCells(subdomainWeights, {13}, {2, 2, 1}, coupling::paralleltopology::XYZ, 3, 0u), std::runtime_error);
+
+    subdomainWeights[0] = {1};
+    subdomainWeights[1] = {1};
+    CPPUNIT_ASSERT_NO_THROW(service.initWithCells(subdomainWeights, {12}, {1, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u));
+    CPPUNIT_ASSERT_THROW(service.initWithCells(subdomainWeights, {12}, {2, 2, 1}, coupling::paralleltopology::XYZ, 3, 0u), std::runtime_error);
+    CPPUNIT_ASSERT_NO_THROW(service.initWithCells(subdomainWeights, {13}, {1, 1, 1}, coupling::paralleltopology::XYZ, 3, 0u));
+  }
+#endif // COUPLING_MD_PARALLEL == COUPLING_MD_YES for rectilinear grid test
 private:
   int _size, _rank;
 };

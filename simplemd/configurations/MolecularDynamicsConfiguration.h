@@ -8,6 +8,7 @@
 #include "simplemd/configurations/Adios2Configuration.h"
 #include "simplemd/configurations/CheckpointConfiguration.h"
 #include "simplemd/configurations/DomainConfiguration.h"
+#include "simplemd/configurations/DomainDecompConfiguration.h"
 #include "simplemd/configurations/ExternalForceConfiguration.h"
 #include "simplemd/configurations/MPIConfiguration.h"
 #include "simplemd/configurations/MoleculeConfiguration.h"
@@ -72,6 +73,8 @@ public:
 
   const simplemd::configurations::CheckpointConfiguration& getCheckpointConfiguration() const { return _checkpointConfiguration; }
 
+  const simplemd::configurations::DomainDecompConfiguration& getDomainDecompConfiguration() const { return _domainDecompConfiguration; }
+
   const std::vector<simplemd::configurations::ProfilePlotterConfiguration>& getProfilePlotterConfigurations() const { return _profilePlotterConfigurations; }
 
   const std::vector<simplemd::configurations::ExternalForceConfiguration>& getExternalForceConfigurations() const { return _externalForceConfigurations; }
@@ -85,6 +88,7 @@ private:
   simplemd::configurations::SimulationConfiguration _simulationConfiguration;
   simplemd::configurations::RDFConfiguration _rdfConfiguration;
   simplemd::configurations::CheckpointConfiguration _checkpointConfiguration;
+  simplemd::configurations::DomainDecompConfiguration _domainDecompConfiguration;
   std::vector<simplemd::configurations::ProfilePlotterConfiguration> _profilePlotterConfigurations;
   std::vector<simplemd::configurations::ExternalForceConfiguration> _externalForceConfigurations;
 };
