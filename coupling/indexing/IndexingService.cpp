@@ -373,11 +373,14 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
   // ex: if axis 0 has 8 cells, and weights 1,2,1, _subdomainOwnership[0] = {0,0,1,1,1,1,2,2}
   // hence cell 3 will be on x axis coord 1
   for (unsigned int d = 0; d < dim; d++) {
+    // with weights 1,2,1, totalWeight = 4
     const int totalWeight = std::reduce(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);
+    // with 8 cells on an axis and totalWeight = 4, multiplier = 2, thus weight 1 will have 2 cells
     const int multiplier = globalNumberCouplingCells[d] / totalWeight;
     _subdomainOwnership[d].clear();
     _subdomainOwnership[d].reserve(globalNumberCouplingCells[d]);
     for (unsigned int i = 0; i < numberProcesses[d]; i++) {
+      // push in the appropriate number of coords into the lookup table
       for (unsigned int j = 0; j < multiplier * subdomainWeights[d][i]; j++) {
         _subdomainOwnership[d].push_back(i);
       }
@@ -448,9 +451,9 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
 
   const unsigned int topologyOffset = (_rank / _scalarNumberProcesses) * _scalarNumberProcesses;
   auto coords = _parallelTopology->getProcessCoordinates(_rank, topologyOffset);
-  tarch::la::Vector<3, int> boxMin, boxMax;
   // init boundaries of all local, non-m2m, GL including indexing types
   {
+    tarch::la::Vector<3, int> boxMin, boxMax;
     for (unsigned int i = 0; i < dim; i++) {
       // calculate box bounds from cell ownership
       // find the first occurence of owned rank
@@ -619,11 +622,14 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingC
 
   tarch::la::Vector<dim, unsigned int> processCoords(0);
   for (unsigned int d = 0; d < dim; d++) {
-    if (globalCellIndex[d] == 0)
+    // the passed index includes ghost cells, while _subdomainOwnership is noGhost
+    // thus, we have two edge cases (the two ghost cells, number 0 and size-1)
+    // we handle these two cases first, and then use the lookup table for everything else
+    if (globalCellIndex[d] == 0) // first ghost, return first coord in this axis (usually 0)
       processCoords[d] = _subdomainOwnership[d][0];
-    else if (globalCellIndex[d] == globalNumberCouplingCells[d] + 1)
+    else if (globalCellIndex[d] == globalNumberCouplingCells[d] + 1) //last ghost, return last coord
       processCoords[d] = _subdomainOwnership[d][_subdomainOwnership[d].size() - 1];
-    else
+    else // all internal cells
       processCoords[d] = _subdomainOwnership[d][globalCellIndex[d] - 1];
   }
   return _parallelTopology->getRank(processCoords, topologyOffset);
