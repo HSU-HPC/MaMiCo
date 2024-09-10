@@ -315,7 +315,7 @@ template <> const char I15::TNAME[] = "CellIndex<3, vector, local, md2macro, noG
 
 // delegated init, this does the main work
 template <unsigned int dim>
-void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights,
+void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Vector<dim, std::vector<unsigned int>>& subdomainWeights,
                                                              tarch::la::Vector<dim, unsigned int> globalNumberCouplingCells,
                                                              tarch::la::Vector<dim, unsigned int> numberProcesses,
                                                              coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
@@ -356,6 +356,34 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
       ss << "globalNumberCouplingCells = " << globalNumberCouplingCells;
       ss << ", total weights for axis " << d << " = " << totalWeight;
       throw std::runtime_error(ss.str());
+    }
+
+    if (numberProcesses[d] != subdomainWeights[d].size()) {
+      std::stringstream ss;
+      ss << "IndexingService: initWithCells(): ERROR: Number "
+            "of process not equal to number of subdomain weights given! ";
+      ss << "number of processes for axis " << d << " = " << numberProcesses[d];
+      ss << ", number of subdomain weights for axis " << d << " = " << subdomainWeights[d].size();
+      throw std::runtime_error(ss.str());
+    }
+  }
+
+  // populate the _subdomainOwnership datastructure (does not include ghost cells)
+  // after populating, can be used for lookup to find processes for specific cell coords
+  // ex: if axis 0 has 8 cells, and weights 1,2,1, _subdomainOwnership[0] = {0,0,1,1,1,1,2,2}
+  // hence cell 3 will be on x axis coord 1
+  for (unsigned int d = 0; d < dim; d++) {
+    // with weights 1,2,1, totalWeight = 4
+    const int totalWeight = std::reduce(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);
+    // with 8 cells on an axis and totalWeight = 4, multiplier = 2, thus weight 1 will have 2 cells
+    const int multiplier = globalNumberCouplingCells[d] / totalWeight;
+    _subdomainOwnership[d].clear();
+    _subdomainOwnership[d].reserve(globalNumberCouplingCells[d]);
+    for (unsigned int i = 0; i < numberProcesses[d]; i++) {
+      // push in the appropriate number of coords into the lookup table
+      for (unsigned int j = 0; j < multiplier * subdomainWeights[d][i]; j++) {
+        _subdomainOwnership[d].push_back(i);
+      }
     }
   }
 
@@ -423,23 +451,23 @@ void coupling::indexing::IndexingService<dim>::initWithCells(tarch::la::Vector<d
 
   const unsigned int topologyOffset = (_rank / _scalarNumberProcesses) * _scalarNumberProcesses;
   auto coords = _parallelTopology->getProcessCoordinates(_rank, topologyOffset);
-  tarch::la::Vector<3, int> boxMin, boxMax;
   // init boundaries of all local, non-m2m, GL including indexing types
   {
+    tarch::la::Vector<3, int> boxMin, boxMax;
     for (unsigned int i = 0; i < dim; i++) {
-      const auto backWeight = std::reduce(subdomainWeights[i].begin(), subdomainWeights[i].begin() + coords[i], 0u);
-      const auto totalWeight = std::reduce(subdomainWeights[i].begin() + coords[i], subdomainWeights[i].end(), backWeight);
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "Dim: " << i << " totalWeight: " << totalWeight << " backWeight: " << backWeight << " coords: " << coords[0] << ", " << coords[1] << ", "
-                << coords[2] << std::endl;
-#endif
-      // calculate box bounds from cumulative weights of previous ranks, and the
-      // weight of the current rank
-      boxMin[i] = backWeight * globalNumberCouplingCells[i] / totalWeight;
-      boxMax[i] = boxMin[i] + (subdomainWeights[i][coords[i]] * globalNumberCouplingCells[i] / totalWeight);
+      // calculate box bounds from cell ownership
+      // find the first occurence of owned rank
+      boxMin[i] = std::distance(_subdomainOwnership[i].begin(), std::find(_subdomainOwnership[i].begin(), _subdomainOwnership[i].end(), coords[i]));
+      // find the last occurence, add one to convert reverse iterator to forward
+      boxMax[i] =
+          std::distance(_subdomainOwnership[i].begin(), (std::find(_subdomainOwnership[i].rbegin(), _subdomainOwnership[i].rend(), coords[i]) + 1).base());
     }
+    // _subdomainOwnership does not include ghost, so when we take the first occurence value, it is noGhost
+    // however directly casting it into baseIndex shifts everything left by 1, since baseIndex expects ghost
+    // thus we directly use the BaseIndex cast, and consequently boxMax requires +2 for two ghost layers
+    // the "safer" way to write this would be I08{boxMin} -1 and I08{boxMax} + 1, but the result is the same
     CellIndex<dim, IndexTrait::local>::lowerBoundary = BaseIndex<dim>{boxMin};
-    CellIndex<dim, IndexTrait::local>::upperBoundary = BaseIndex<dim>{boxMax + tarch::la::Vector<dim, int>{1}};
+    CellIndex<dim, IndexTrait::local>::upperBoundary = BaseIndex<dim>{boxMax + tarch::la::Vector<dim, int>{2}};
     CellIndex<dim, IndexTrait::local>::setDomainParameters();
   }
 
@@ -515,12 +543,12 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
   // IndexConversion
   const auto globalNumberCouplingCells = I08::numberCellsInDomain;
 
-  // start and end coordinates of neighboured cells.
+  // start and end coordinates of neighbouring cells.
   tarch::la::Vector<3, unsigned int> start(0);
   tarch::la::Vector<3, unsigned int> end(0);
   tarch::la::Vector<3, unsigned int> loopIndex(0);
 
-  // determine up to 3^dim neighboured cells in the surrounding of
+  // determine up to 3^dim neighbouring cells in the surrounding of
   // globalCellIndex; reduce this number if globalCellIndex lies on the global
   // boundary
   for (unsigned int d = 0; d < dim; d++) {
@@ -577,7 +605,6 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingC
                                                                                     const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells,
                                                                                     unsigned int topologyOffset) const {
   // vector containing avg number of macro cells, not counting global GL.
-  tarch::la::Vector<dim, unsigned int> averageLocalNumberCouplingCells{0};
   for (unsigned int d = 0; d < dim; d++) {
     if (globalCellIndex[d] >= globalNumberCouplingCells[d] + 2) { // greater or equal to the total global number incl GL (+2)
       using namespace std::string_literals;
@@ -591,22 +618,19 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingC
       ss << ", numberProcesses = " << _numberProcesses;
       throw std::runtime_error(ss.str());
     }
-    averageLocalNumberCouplingCells[d] = globalNumberCouplingCells[d] / _numberProcesses[d];
   }
 
   tarch::la::Vector<dim, unsigned int> processCoords(0);
   for (unsigned int d = 0; d < dim; d++) {
-    // special case: cell in first section
-    if (globalCellIndex[d] < averageLocalNumberCouplingCells[d] + 1) {
-      processCoords[d] = 0;
-      // special case: cell in last section
-    } else if (globalCellIndex[d] > averageLocalNumberCouplingCells[d] * (_numberProcesses[d] - 1)) {
-      processCoords[d] = _numberProcesses[d] - 1;
-      // all other cases
-    } else {
-      // remove ghost layer contribution from vector index (...-1)
-      processCoords[d] = (globalCellIndex[d] - 1) / averageLocalNumberCouplingCells[d];
-    }
+    // the passed index includes ghost cells, while _subdomainOwnership is noGhost
+    // thus, we have two edge cases (the two ghost cells, number 0 and size-1)
+    // we handle these two cases first, and then use the lookup table for everything else
+    if (globalCellIndex[d] == 0) // first ghost, return first coord in this axis (usually 0)
+      processCoords[d] = _subdomainOwnership[d][0];
+    else if (globalCellIndex[d] == globalNumberCouplingCells[d] + 1) //last ghost, return last coord
+      processCoords[d] = _subdomainOwnership[d][_subdomainOwnership[d].size() - 1];
+    else // all internal cells
+      processCoords[d] = _subdomainOwnership[d][globalCellIndex[d] - 1];
   }
   return _parallelTopology->getRank(processCoords, topologyOffset);
 }
