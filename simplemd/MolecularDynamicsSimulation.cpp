@@ -27,7 +27,6 @@ double simplemd::MolecularDynamicsSimulation::getNumberDensity(unsigned int numb
 // TODO: fix duplicate copy-paste code in both versions of initServices
 void simplemd::MolecularDynamicsSimulation::initServices() {
   // set vtk file stem and checkpoint filestem -> only one MD simulation runs
-  std::cout << "initServices" << std::endl;
   _localMDSimulation = 0;
   _vtkFilestem = _configuration.getVTKConfiguration().getFilename();
   _checkpointFilestem = _configuration.getCheckpointConfiguration().getFilename();
@@ -96,7 +95,6 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
         _configuration.getMoleculeConfiguration().getMass(), _configuration.getMoleculeConfiguration().getEpsilon(),
         _configuration.getMoleculeConfiguration().getSigma(), _configuration.getDomainConfiguration().getCutoffRadius(),
         _configuration.getDomainConfiguration().getKB());
-    std::cout << "@@@@9;" << _molecularPropertiesService->getMolecularProperties().getSigma();
     if (_molecularPropertiesService == NULL) {
       std::cout << "ERROR MolecularDynamicsSimulation::initServices(): "
                    "_molecularPropertiesService==NULL!"
