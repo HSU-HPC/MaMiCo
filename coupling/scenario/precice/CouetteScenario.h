@@ -191,8 +191,8 @@ public:
         std::cout << "Reading checkpoint" << std::endl;
       } else {
         cycle++;
-        // if (!_preciceAdapter->getMD2MacroCells().empty() && scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
-        //   write2CSV(_preciceAdapter->getMD2MacroCells(), cycle, rank);
+        if (scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
+          _preciceAdapter->write2csv(cycle);
       } 
     }
   }
@@ -202,35 +202,6 @@ public:
   coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { throw std::runtime_error("not supported yet"); }
 
 private:
-
-  // void write2CSV(coupling::datastructures::FlexibleCellContainer<3>& MD2MacroCells, int couplingCycle, unsigned int rank) {
-  //   std::stringstream ss;
-  //   ss << "results_" << rank << "_" << couplingCycle << ".csv";
-  //   std::ofstream file(ss.str().c_str());
-  //   if (!file.is_open()) {
-  //     exit(EXIT_FAILURE);
-  //   }
-  //   file << "i;j;k;x;y;z;v_x;v_y;v_z;T;m" << std::endl;
-  //   for (auto pair : MD2MacroCells) {
-  //     I01 idx;
-  //     if (I12.contains(idx)) {
-  //       coupling::datastructures::CouplingCell<3>* couplingCell;
-  //       std::tie(couplingCell, idx) = pair;
-  //       auto cellMidPoint = idx.getCellMidPoint();
-  //       tarch::la::Vector<3, double> vel(couplingCell->getMacroscopicMomentum());
-  //       if (couplingCell->getMacroscopicMass() != 0.0) {
-  //         vel = (1.0 / couplingCell->getMacroscopicMass()) * vel;
-  //       }
-  //       file   << idx.get()[0] << ";" << idx.get()[1] << ";" << idx.get()[2] << ";" 
-  //              << cellMidPoint[0] << ";" << cellMidPoint[1] << ";" << cellMidPoint[2] << ";" 
-  //              << vel[0] << ";" << vel[1] << ";" << vel[2] << ";" 
-  //              << couplingCell->getTemperature() << ";" << couplingCellgetMacroscopicMass();
-  //       file   << std::endl;
-  //     }
-  //   }
-  //   file.close();
-  // }
-
   struct ScenarioConfig : public tarch::configuration::Configuration {
     ~ScenarioConfig() {}
 
