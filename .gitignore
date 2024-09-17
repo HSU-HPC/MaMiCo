@@ -24,5 +24,12 @@ coupling/scenario/kvs-lbmpy/*.ini
 *.dot
 docs/
 *.checkpoint
+.vscode/launch.json
+*.ova
+*.bp.tar.gz
+*.bp
+*.txt
 /runcouette
 /runkvs
+# Symbolic link to LAMMPS source files
+/lammps

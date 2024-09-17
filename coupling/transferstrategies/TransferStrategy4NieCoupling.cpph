@@ -5,11 +5,11 @@
 
 template <class LinkedCell, unsigned int dim>
 coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::TransferStrategy4NieCoupling(
-    coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, const coupling::IndexConversion<dim>& indexConversion,
-    unsigned int numberMDSteps, double shiftTimestep, tarch::la::Vector<2 * dim, bool> massFluxBoundary)
-    : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion), _massMapping(mdSolverInterface),
-      _momentumMapping(mdSolverInterface), _oldSolution(NULL), _newSolution(NULL), _numberMDSteps(numberMDSteps), _shiftTimestep(shiftTimestep),
-      _numberLocalCells(getLocalNumberMacroscopicCells(indexConversion)), _excessMass(NULL), _massFluxBoundary(massFluxBoundary) {
+    coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberMDSteps, double shiftTimestep,
+    tarch::la::Vector<2 * dim, bool> massFluxBoundary)
+    : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface), _massMapping(mdSolverInterface), _momentumMapping(mdSolverInterface),
+      _oldSolution(NULL), _newSolution(NULL), _numberMDSteps(numberMDSteps), _shiftTimestep(shiftTimestep), _numberLocalCells(I02::linearNumberCellsInDomain),
+      _excessMass(NULL), _massFluxBoundary(massFluxBoundary) {
   // allocate arrays for old and new solution (required for linear time
   // interpolation) and init. them with zero vectors
   _oldSolution = new tarch::la::Vector<dim, double>[_numberLocalCells];
@@ -29,8 +29,7 @@ coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::Tra
   }
 }
 
-template <class LinkedCell, unsigned int dim>
-coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::~TransferStrategy4NieCoupling<LinkedCell, dim>() {
+template <class LinkedCell, unsigned int dim> coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::~TransferStrategy4NieCoupling() {
   // delete arrays
   if (_oldSolution != NULL) {
     delete[] _oldSolution;
@@ -47,7 +46,7 @@ coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::~Tr
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::beginProcessInnerMacroscopicCellsBeforeReceivingMacroscopicSolverData() {
+void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::beginProcessInnerCouplingCellsBeforeReceivingMacroscopicSolverData() {
   // reset time counter (always counts from 0 to _numberMDSteps)
   _timestepCounter = 0;
   //_totalMass=0;
@@ -59,20 +58,20 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::processInnerCouplingCellBeforeReceivingMacroscopicSolverData(
+    coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) {
   // backup old mass that could not be inserted into cells
-  _excessMass[index] = cell.getMicroscopicMass();
+  _excessMass[index.get()] = cell.getMicroscopicMass();
 
   // TODO: remove temporary debug output
-  // if(_excessMass[index] > 0) std::cout << "TransferStrategy4NieCoupling:
-  // _excessMass[" << index << "]: " << _excessMass[index] << std::endl;
+  // if(_excessMass[index.get()] > 0) std::cout << "TransferStrategy4NieCoupling:
+  // _excessMass[" << index << "]: " << _excessMass[index.get()] << std::endl;
   // TODO: make threshold customizable
   // const unsigned int threshold = 3;
-  /*if(_excessMass[index] > threshold) {
+  /*if(_excessMass[index.get()] > threshold) {
         std::cout << "TransferStrategy4NieCoupling: ERROR: Excess mass above
   threshold (= " << threshold << "): _excessMass[" << index << "] = " <<
-  _excessMass[index] << std::endl; exit(EXIT_FAILURE);
+  _excessMass[index.get()] << std::endl; exit(EXIT_FAILURE);
   }*/
 
   // reset cell-mass (would be overwritten anyway; but just to be on safe side)
@@ -80,28 +79,25 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::processInnerMacroscopicCellAfterReceivingMacroscopicSolverData(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::processInnerCouplingCellAfterReceivingMacroscopicSolverData(
+    coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) {
 
   // convert momentum to velocity values for cont->MD transfer
   if (cell.getMicroscopicMass() == 0.0) {
     cell.setMicroscopicMomentum(tarch::la::Vector<dim, double>(0.0));
   } else {
     cell.setMicroscopicMomentum((1.0 / cell.getMicroscopicMass()) * cell.getMicroscopicMomentum());
-#if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Obtain reference velocity " << cell.getMicroscopicMomentum() << " in cell " << index << std::endl;
-#endif
   }
 
   // write velocity value to new solution array and interpolate first solution
   // (= value of old solution)
-  _newSolution[index] = cell.getMicroscopicMomentum();
-  cell.setMicroscopicMomentum((1.0 - _shiftTimestep) * _oldSolution[index] + _shiftTimestep * _newSolution[index]);
+  _newSolution[index.get()] = cell.getMicroscopicMomentum();
+  cell.setMicroscopicMomentum((1.0 - _shiftTimestep) * _oldSolution[index.get()] + _shiftTimestep * _newSolution[index.get()]);
 
-  const tarch::la::Vector<dim, double> velocity = (0.5 - _shiftTimestep) * _oldSolution[index] + (_shiftTimestep + 0.5) * _newSolution[index];
+  const tarch::la::Vector<dim, double> velocity = (0.5 - _shiftTimestep) * _oldSolution[index.get()] + (_shiftTimestep + 0.5) * _newSolution[index.get()];
 
   // for mass transfer: compute mass flux if required and add excess mass
-  const double massFlux = computeMassFlux(cell.getMicroscopicMass(), velocity, index) + _excessMass[index];
+  const double massFlux = computeMassFlux(cell.getMicroscopicMass(), velocity, index) + _excessMass[index.get()];
   cell.setMicroscopicMass(massFlux);
 
   // reset macroscopic solver values (from averaging)
@@ -112,14 +108,14 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>
 // template<class LinkedCell,unsigned int dim>
 // void
 // coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
-// beginProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
+// beginProcessInnerCouplingCellsBeforeSendingMDSolverData(){
 // }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::processInnerMacroscopicCellBeforeSendingMDSolverData(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::processInnerCouplingCellBeforeSendingMDSolverData(
+    coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-  std::cout << "processInnerMacroscopicCellBeforeSendingMDSolverData(): Data "
+  std::cout << "processInnerCouplingCellBeforeSendingMDSolverData(): Data "
                "before averaging from cell "
             << index << "Mass: " << cell.getMacroscopicMass() << " , momentum: " << cell.getMacroscopicMomentum() << std::endl;
 #endif
@@ -136,7 +132,7 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>
   }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
   std::cout << "Time step counter=" << _timestepCounter << std::endl;
-  std::cout << "processInnerMacroscopicCellBeforeSendingMDSolverData(): Data "
+  std::cout << "processInnerCouplingCellBeforeSendingMDSolverData(): Data "
                "from cell "
             << index << "Mass: " << cell.getMacroscopicMass() << " , momentum: " << cell.getMacroscopicMomentum() << std::endl;
 #endif
@@ -149,20 +145,20 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>
 // template<class LinkedCell,unsigned int dim>
 // void
 // coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell,dim>::
-// endProcessInnerMacroscopicCellsBeforeSendingMDSolverData(){
+// endProcessInnerCouplingCellsBeforeSendingMDSolverData(){
 // std::cout << "Avg massFluxBoundary MD density: " <<
 // _totalMass/(_cellCount*15.625) << std::endl;
 //}
 
 template <class LinkedCell, unsigned int dim>
-void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::beginProcessInnerMacroscopicCellsAfterMDTimestep() {
+void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::beginProcessInnerCouplingCellsAfterMDTimestep() {
   // increment time step counter
   _timestepCounter++;
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::processInnerMacroscopicCellAfterMDTimestep(
-    coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell, const unsigned int& index) {
+void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::processInnerCouplingCellAfterMDTimestep(
+    coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) {
   // sampling: add up mass and momentum in macroscopic buffers
   cell.iterateConstCells(_massMapping);
   const double mass = _massMapping.getMass();
@@ -182,39 +178,22 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>
   if (factor < _shiftTimestep || factor > 1.0 + _shiftTimestep) {
     std::cout << "ERROR "
                  "coupling::transferstrategies::TransferStrategy4NieCoupling<"
-                 "LinkedCell,dim>::processInnerMacroscopicCellAfterMDTimestep(."
+                 "LinkedCell,dim>::processInnerCouplingCellAfterMDTimestep(."
                  ".): factor out of range!"
               << std::endl;
     exit(EXIT_FAILURE);
   }
 #endif
-  const tarch::la::Vector<dim, double> velocity = (1.0 - factor) * _oldSolution[index] + factor * _newSolution[index];
+  const tarch::la::Vector<dim, double> velocity = (1.0 - factor) * _oldSolution[index.get()] + factor * _newSolution[index.get()];
   cell.setMicroscopicMomentum(velocity);
-}
-
-template <class LinkedCell, unsigned int dim>
-unsigned int coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::getLocalNumberMacroscopicCells(
-    const coupling::IndexConversion<dim>& indexConversion) const {
-  const tarch::la::Vector<dim, unsigned int> localCells(indexConversion.getLocalNumberMacroscopicCells() + tarch::la::Vector<dim, unsigned int>(2));
-  unsigned int num = localCells[0];
-  for (unsigned int d = 1; d < dim; d++) {
-    num = num * localCells[d];
-  }
-  return num;
 }
 
 template <class LinkedCell, unsigned int dim>
 double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::computeMassFlux(const double& mass,
                                                                                                     const tarch::la::Vector<dim, double>& velocity,
-                                                                                                    const unsigned int index) {
-  const tarch::la::Vector<dim, unsigned int> globalIndex(
-      coupling::transferstrategies::TransferStrategy<LinkedCell, dim>::_indexConversion.convertLocalToGlobalVectorCellIndex(
-          coupling::transferstrategies::TransferStrategy<LinkedCell, dim>::_indexConversion.getLocalVectorCellIndex(index)));
-  const tarch::la::Vector<dim, unsigned int> globalNumberCells(
-      coupling::transferstrategies::TransferStrategy<LinkedCell, dim>::_indexConversion.getGlobalNumberMacroscopicCells());
-
+                                                                                                    const I01 index) {
   // meshsize and volume of cell
-  const tarch::la::Vector<dim, double> meshsize(coupling::transferstrategies::TransferStrategy<LinkedCell, dim>::_indexConversion.getMacroscopicCellSize());
+  const tarch::la::Vector<dim, double> meshsize(IDXS.getCouplingCellSize());
   double volume = 1.0;
   for (unsigned int d = 0; d < dim; d++) {
     volume = volume * meshsize[d];
@@ -232,9 +211,9 @@ double coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, di
   tarch::la::Vector<dim, int> n(0);
   for (unsigned int d = 0; d < dim; d++) {
     // compute normal vector (pointing inwards MD domain)
-    if ((globalIndex[d] == 1) && _massFluxBoundary[2 * d]) {
+    if ((index.get()[d] == 1) && _massFluxBoundary[2 * d]) {
       n[d] = 1; /*_totalMass+=mass;_cellCount++;*/
-    } else if ((globalIndex[d] == globalNumberCells[d]) && _massFluxBoundary[2 * d + 1]) {
+    } else if ((index.get()[d] == (int)I09::numberCellsInDomain[d]) && _massFluxBoundary[2 * d + 1]) {
       n[d] = -1; /*_totalMass+=mass;_cellCount++;*/
     }
   }

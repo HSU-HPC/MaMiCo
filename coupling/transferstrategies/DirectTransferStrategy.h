@@ -28,21 +28,19 @@ template <class LinkedCell, unsigned int dim>
 class coupling::transferstrategies::DirectTransferStrategy : public coupling::transferstrategies::TransferStrategy<LinkedCell, dim> {
 public:
   /** @brief a simple constructor
-   *  @param mdSolverInterface interface for the md solver
-   *  @param indexConversion an instance of the indexConversion */
-  DirectTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                         const coupling::IndexConversion<dim>& indexConversion)
-      : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface, indexConversion), _massMapping(mdSolverInterface),
+   *  @param mdSolverInterface interface for the md solver*/
+  DirectTransferStrategy(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface)
+      : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface), _massMapping(mdSolverInterface),
         _momentumMapping(mdSolverInterface) {}
 
   /** @brief a dummy destructor*/
   virtual ~DirectTransferStrategy() {}
 
   /** @brief the microscopicMass and -Momentum are set to 0
-   *  @param cell macroscopic cell to process
-   *  @param index index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                               const unsigned int& index) {
+   *  @param cell coupling cell to process
+   *  @param index index of the coupling cell */
+  void processInnerCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    I02 index) override {
     // reset quantities
     const tarch::la::Vector<dim, double> zero(0.0);
     cell.setMicroscopicMass(0.0);
@@ -50,10 +48,10 @@ public:
   }
 
   /** @brief the microscopicMass and -Momentum are set to 0
-   *  @param cell macroscopic cell to process
-   *  @param index index of the macroscopic cell */
-  virtual void processOuterMacroscopicCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                               const unsigned int& index) {
+   *  @param cell coupling cell to process
+   *  @param index index of the coupling cell */
+  void processOuterCouplingCellBeforeReceivingMacroscopicSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell,
+                                                                    I02 index) override {
     // reset quantities
     const tarch::la::Vector<dim, double> zero(0.0);
     cell.setMicroscopicMass(0.0);
@@ -62,10 +60,9 @@ public:
 
   /** @brief the mass and momentum is evaluated for the cell and written to the
    * macroscopic quantities
-   *  @param cell macroscopic cell to process
-   *  @param index index of the macroscopic cell */
-  virtual void processInnerMacroscopicCellBeforeSendingMDSolverData(coupling::datastructures::MacroscopicCellWithLinkedCells<LinkedCell, dim>& cell,
-                                                                    const unsigned int& index) {
+   *  @param cell coupling cell to process
+   *  @param index index of the coupling cell */
+  void processInnerCouplingCellBeforeSendingMDSolverData(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 index) override {
     cell.iterateConstCells(_massMapping);
     cell.iterateConstCells(_momentumMapping);
     cell.setMacroscopicMass(_massMapping.getMass());

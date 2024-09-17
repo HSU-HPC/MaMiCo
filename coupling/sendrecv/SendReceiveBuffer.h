@@ -20,7 +20,7 @@
 
 namespace coupling {
 namespace sendrecv {
-template <class MacroscopicCell, unsigned int dim> class SendReceiveBuffer;
+template <class Cell_T, unsigned int dim> class SendReceiveBuffer;
 }
 } // namespace coupling
 
@@ -28,11 +28,11 @@ template <class MacroscopicCell, unsigned int dim> class SendReceiveBuffer;
  *implementations. The access to the buffers is prescribed by the DataExchange
  *object.
  *	@brief generic class for send-/ receive methodology.
- *	@tparam MacroscopicCell cell type
+ *	@tparam Cell_T cell type
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  *  @author Philipp Neumann
  */
-template <class MacroscopicCell, unsigned int dim> class coupling::sendrecv::SendReceiveBuffer {
+template <class Cell_T, unsigned int dim> class coupling::sendrecv::SendReceiveBuffer {
 public:
   /** Constructor */
   SendReceiveBuffer();
@@ -43,87 +43,71 @@ protected:
   /** @brief deletes the buffers */
   void deleteBuffers();
 
-  /** @brief fills all information that needs to be sent from a macroscopic cell
+  /** @brief fills all information that needs to be sent from a coupling cell
    * into the send-buffer.
    * 	@param dataExchange
-   * 	@param cell
-   * 	@param globalVectorIndex
+   * 	@param cells
    */
-  void writeToSendBuffer(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange, const MacroscopicCell& cell,
-                         tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  template <class Container_T> void writeToSendBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
-  /** @brief fills all information that needs to be broadcast from a macroscopic cell
+  /** @brief fills all information that needs to be broadcast from a coupling cell
    * into the broadcast-buffer.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param cell
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void writeToBcastBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
-                          const MacroscopicCell& cell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void writeToBcastBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Cell_T& cell, I01 idx);
 
-  /** @brief fills all information that needs to be reduced to a macroscopic cell
+  /** @brief fills all information that needs to be reduced to a coupling cell
    * into the reduce-buffer.
-   * 	@param indexConversion
    * 	@param dataExchange
    * 	@param cell
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void writeToReduceBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
-                           const MacroscopicCell& cell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void writeToReduceBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Cell_T& cell, I01 idx);
 
   /** reads the information from the receive-buffer and fills it into a
-   * macroscopic cell.
+   * coupling cell.
    * 	@param dataExchange
-   * 	@param macroscopicCell
-   * 	@param globalVectorIndex
+   * 	@param couplingCell
+   * 	@param idx
    */
-  void readFromReceiveBuffer(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange, MacroscopicCell& macroscopicCell,
-                             tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  template <class Container_T> void readFromReceiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, const Container_T& cells);
 
-  void readFromCollectiveBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
-                                MacroscopicCell& macroscopicCell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void readFromCollectiveBuffer(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, Cell_T& couplingCell, I01 idx);
 
   /** reads the information from the reduce-buffer and fills it into a
-   * macroscopic cell.
-   * 	@param indexConversion
+   * coupling cell.
    * 	@param dataExchange
-   * 	@param macroscopicCell
-   * 	@param globalVectorIndex
+   * 	@param couplingCell
+   * 	@param idx
    */
-  void readFromReduceBuffer(const coupling::IndexConversion<dim>& indexConversion, coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
-                            MacroscopicCell& macroscopicCell, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, Cell_T& couplingCell, I01 idx);
 
   /** according to rule by dataExchange, the receive buffers are allocated. This
-   * function adds a contribution for the cell at globalVectorIndex.
+   * function adds a contribution for the cell at idx.
    * 	@param dataExchange
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange, tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void allocateReceiveBuffers(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx);
 
   /** Allocates buffer for receiving in the context of the broadcast operation
-   * 	@param indexConversion
    * 	@param dataExchange
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void allocateBcastBufferForReceiving(const coupling::IndexConversion<dim>& indexConversion,
-                                       coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
-                                       tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void allocateBcastBufferForReceiving(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx);
 
   /** Allocates buffer for receiving in the context of the reduce operation
-   * 	@param indexConversion
    * 	@param dataExchange
-   * 	@param globalVectorIndex
+   * 	@param idx
    */
-  void allocateReduceBufferForReceiving(const coupling::IndexConversion<dim>& indexConversion,
-                                        coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange,
-                                        tarch::la::Vector<dim, unsigned int> globalVectorIndex);
+  void allocateReduceBufferForReceiving(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange, I01 idx);
 
   /** triggers the MPI-sending on the respective buffers. No sending for
    * information transfer from/ to this rank.
    * 	@param dataExchange
    */
-  void triggerSending(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange);
+  void triggerSending(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange);
 
   /** triggers the MPI-broadcast on the respective buffers.
    * 	@param rank
@@ -134,7 +118,7 @@ protected:
    * information from/to this rank.
    * 	@param dataExchange
    */
-  void triggerReceiving(coupling::sendrecv::DataExchange<MacroscopicCell, dim>& dataExchange);
+  void triggerReceiving(coupling::sendrecv::DataExchange<Cell_T, dim>& dataExchange);
 
   /** triggers the MPI-reduce on the respective buffers.
    * 	@param rank

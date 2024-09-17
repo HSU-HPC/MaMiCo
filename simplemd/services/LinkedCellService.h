@@ -408,7 +408,7 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
               a.handleCellPair(_cells[coordsCell1Buffer], _cells[coordsCell2Buffer], coordsCell1Buffer, coordsCell2Buffer);
             }
           } // j
-        }   // x
+        } // x
 #if (MD_DIM > 1)
       } // y
 #endif

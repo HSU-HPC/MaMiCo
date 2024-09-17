@@ -49,13 +49,11 @@ public:
    * @param parallelTopologyService parallel topology service
    * @param moleculeService molecule service
    * @param filename name for Adios2 output directory
-   * @param offset local domain offset
    * @param configuration molecular dynamics configuration
    * @param communicator MPI communicator in parallel case
    */
   Adios2Writer(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::services::MoleculeService& moleculeService,
-               const std::string& filename, tarch::la::Vector<MD_DIM, double> offset,
-               const simplemd::configurations::MolecularDynamicsConfiguration& configuration
+               const std::string& filename, const simplemd::configurations::MolecularDynamicsConfiguration& configuration
 #if (MD_PARALLEL == MD_YES)
                ,
                MPI_Comm communicator = MPI_COMM_WORLD
@@ -88,8 +86,6 @@ private:
   std::string _filename;
   /** current timestep */
   unsigned int _timestep;
-  /** domain offset*/
-  tarch::la::Vector<MD_DIM, double> _offset;
   /** molecular dynamics simulation*/
   const simplemd::configurations::MolecularDynamicsConfiguration& _configuration;
 
@@ -101,8 +97,10 @@ private:
   /** number of MPI-threads */
   int _numberProcesses;
 
-  /** center of global domain */
-  std::array<double, 3> _domainCenter;
+  /** global domain size*/
+  std::array<float, 3> _domainSize;
+  /** global domain offset */
+  std::array<float, 3> _offset;
 
   /** file stream */
   std::ofstream _file;
@@ -114,6 +112,7 @@ private:
   adios2::Variable<float> vx_var;
   adios2::Variable<float> vy_var;
   adios2::Variable<float> vz_var;
+  adios2::Variable<float> v_abs_var;
   adios2::Variable<float> global_box_var;
   adios2::Variable<uint64_t> component_id_var;
   adios2::Variable<double> time_var;
@@ -129,6 +128,7 @@ private:
   std::vector<float> _velocitiesx;
   std::vector<float> _velocitiesy;
   std::vector<float> _velocitiesz;
+  std::vector<float> _velocities_abs;
 
   /** stores the information whether a particle is fixed in space */
   std::stringstream _fix;

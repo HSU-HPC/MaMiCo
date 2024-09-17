@@ -12,11 +12,14 @@
 #include "coupling/filtering/sequencing/AsymmetricalFilterJunction.h"
 #include "coupling/filtering/sequencing/FilterJunction.h"
 #include "coupling/filtering/sequencing/FilterSequence.h"
+#include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/tinyxml2/tinyxml2.h"
+
+using tarch::configuration::ParseConfiguration;
 
 namespace coupling {
 namespace filtering {
-template <unsigned int dim> class FilterPipeline;
+template <class CellIndex_T, unsigned int dim> class FilterPipeline;
 
 /*
  * Used as member of FilterPipeline. Displays where that FP is used.
@@ -38,9 +41,9 @@ enum class Scope { perInstance, postMultiInstance };
  *
  * @author Felix Maurer
  */
-template <unsigned int dim> class coupling::filtering::FilterPipeline {
+template <class CellIndex_T, unsigned int dim> class coupling::filtering::FilterPipeline {
 public:
-  FilterPipeline(std::vector<coupling::datastructures::MacroscopicCell<dim>*> inputCells, const coupling::filtering::Scope scope,
+  FilterPipeline(const coupling::datastructures::CellContainer<CellIndex_T, dim> inputCells, const coupling::filtering::Scope scope,
                  const tarch::utils::MultiMDService<dim>& multiMDService, const char* cfgpath);
 
   ~FilterPipeline() {
@@ -57,8 +60,10 @@ public:
    * Applies each FilterSequence in order of their appearance in the config
    * file. Ouput of the specified output-FilterSequence will be written to
    * _md2MacroCells.
+   *
+   * @returns The runtime of the filter pipeline in usec.
    */
-  void operator()();
+  double operator()();
 
   /*
    * Getters for FilterSequences.
@@ -79,7 +84,7 @@ private:
   /*
    * Detects errors in XML config file.
    */
-  bool configIsValid(tinyxml2::XMLDocument& cfgfile);
+  bool configIsValid(ParseConfiguration::XMLConfiguration& xmlConfig);
 
   /*
    * Interprets configuration of sequences and intializes them. Parameters
@@ -94,13 +99,13 @@ private:
   /*
    * Input cells within the local, md2macro, ghost layer excluding domain
    */
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _md2MacroCells;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _md2MacroCells;
   /*
    * Input cells that do not match the criteria to be in _md2MacroCells.
    */
-  std::vector<coupling::datastructures::MacroscopicCell<dim>*> _outerCells;
+  std::vector<coupling::datastructures::CouplingCell<dim>*> _outerCells;
 
-  tinyxml2::XMLDocument _config;
+  ParseConfiguration::XMLConfiguration _config;
 
   /*
    * Scope in which this FilterPipeline is applied. Cf. coupling::Scope

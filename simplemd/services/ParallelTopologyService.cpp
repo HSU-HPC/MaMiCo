@@ -959,8 +959,8 @@ tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> simplemd::s
           counter++;
         }
       } // x
-    }   // y
-  }     // z
+    } // y
+  } // z
 #endif
   return localBoundary;
 }

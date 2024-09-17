@@ -31,36 +31,34 @@ template <unsigned int dim> class ZYXTopology;
 template <unsigned int dim> class coupling::paralleltopology::ZYXTopology : public coupling::paralleltopology::ParallelTopology<dim> {
 public:
   /** Constructor */
-  ZYXTopology(tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int topologyOffset)
+  ZYXTopology(tarch::la::Vector<dim, unsigned int> numberProcesses)
       : coupling::paralleltopology::ParallelTopology<dim>(), _numberProcesses(numberProcesses),
-        _divisionFactor4NumberProcesses(initDivisionFactor(numberProcesses)), _topologyOffset(topologyOffset) {}
+        _divisionFactor4NumberProcesses(initDivisionFactor(numberProcesses)) {}
 
   /** Destructor */
   virtual ~ZYXTopology() {}
 
-  tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const {
+  tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank, unsigned int topologyOffset) const {
     tarch::la::Vector<dim, unsigned int> processCoordinates(0);
-    unsigned int help = rank - _topologyOffset;
+    unsigned int help = rank - topologyOffset;
     for (unsigned int d = 0; d < dim; d++) {
       processCoordinates[d] = help / _divisionFactor4NumberProcesses[d];
       help = help - processCoordinates[d] * _divisionFactor4NumberProcesses[d];
     }
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-std::cout << "Rank=" << rank
-              << " corresponds to process coordinates=" << processCoordinates
-              << std::endl;
+    std::cout << "Rank=" << rank << " corresponds to process coordinates=" << processCoordinates << std::endl;
 #endif
     return processCoordinates;
   }
 
   /** computes the rank as shown above, see second formula of class definition
    */
-  unsigned int getRank(tarch::la::Vector<dim, unsigned int> processCoordinates) const {
+  unsigned int getRank(tarch::la::Vector<dim, unsigned int> processCoordinates, unsigned int topologyOffset) const {
     unsigned int rank = processCoordinates[0];
     for (unsigned int d = 1; d < dim; d++) {
       rank = rank * _numberProcesses[d] + processCoordinates[d];
     }
-    return rank + _topologyOffset;
+    return rank + topologyOffset;
   }
 
 private:
@@ -78,6 +76,5 @@ private:
   const tarch::la::Vector<dim, unsigned int> _numberProcesses;
   /* division factor */
   const tarch::la::Vector<dim, unsigned int> _divisionFactor4NumberProcesses;
-  const unsigned int _topologyOffset;
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_PARALLELTOPOLOGY_ZYXTOPOLOGY_H_

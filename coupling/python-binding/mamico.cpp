@@ -19,6 +19,7 @@
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "tarch/configuration/ParseConfiguration.h"
 #include "tarch/utils/MultiMDService.h"
+#include "tarch/utils/Utils.h"
 
 // for debugging purposes only
 #include <iostream>
@@ -195,25 +196,15 @@ int initMPI() {
 
 class CouplingBuffer {
 public:
-  CouplingBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroscopicSolverInterface,
-                 unsigned int rank, unsigned int outerRegion)
-      : _sendBuffer(), _globalCellIndices4SendBuffer(), _recvBuffer(), _globalCellIndices4RecvBuffer(), _idcv(indexConversion), _outerRegion(outerRegion) {
-    allocateSendBuffer(indexConversion, macroscopicSolverInterface, rank);
-    allocateRecvBuffer(indexConversion, macroscopicSolverInterface, rank);
+  CouplingBuffer(coupling::interface::MacroscopicSolverInterface<3>& macroscopicSolverInterface, unsigned int rank, unsigned int outerRegion)
+      : _macro2MDBuffer(), _md2macroBuffer(), _outerRegion(outerRegion) {
+    allocateMacro2MDBuffer(macroscopicSolverInterface, rank);
+    allocateMD2macroBuffer(macroscopicSolverInterface, rank);
   }
 
   ~CouplingBuffer() {
-    // free buffers/arrays
-    deleteBuffer(_sendBuffer);
-    if (_globalCellIndices4SendBuffer != NULL) {
-      delete[] _globalCellIndices4SendBuffer;
-      _globalCellIndices4SendBuffer = NULL;
-    }
-    deleteBuffer(_recvBuffer);
-    if (_globalCellIndices4RecvBuffer != NULL) {
-      delete[] _globalCellIndices4RecvBuffer;
-      _globalCellIndices4RecvBuffer = NULL;
-    }
+    deleteBuffer(_macro2MDBuffer);
+    deleteBuffer(_md2macroBuffer);
   }
 
   void recv2CSV(const std::string filename) const {
@@ -222,30 +213,28 @@ public:
       throw std::runtime_error("Could not open file " + filename);
     // loop over received cells; read macroscopic mass+momentum buffers and
     // write cell index, mass and velocity to one line in the csv-file
-    const unsigned int numCellsRecv = _recvBuffer.size();
-    for (unsigned int i = 0; i < numCellsRecv; i++) {
-      tarch::la::Vector<3, double> vel(_recvBuffer[i]->getMacroscopicMomentum());
-      if (_recvBuffer[i]->getMacroscopicMass() != 0.0) {
-        vel = (1.0 / _recvBuffer[i]->getMacroscopicMass()) * vel;
+    I01 idx;
+    coupling::datastructures::CouplingCell<3>* cell;
+    for (auto pair : _md2macroBuffer) {
+      std::tie(cell, idx) = pair;
+      tarch::la::Vector<3, double> vel(cell->getMacroscopicMomentum());
+      if (cell->getMacroscopicMass() != 0.0) {
+        vel = (1.0 / cell->getMacroscopicMass()) * vel;
       }
-      const tarch::la::Vector<3, unsigned int> counter(_idcv.getGlobalVectorCellIndex(_globalCellIndices4RecvBuffer[i]));
-      file << counter[0] << " ; " << counter[1] << " ; " << counter[2] << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; "
-           << _recvBuffer[i]->getMacroscopicMass() << ";";
+      file << idx << " ; " << vel[0] << " ; " << vel[1] << " ; " << vel[2] << " ; " << cell->getMacroscopicMass() << ";";
       file << std::endl;
     }
     file.close();
   }
 
   void store2send(const double cellmass, py::array_t<double> velocity, py::array_t<double> density) {
-    const unsigned int size = _sendBuffer.size();
-
     // Some sanity checks to see if dimension and shape of
     // velocity and density numpy arrays actually match sendBuffer
     if (velocity.ndim() != 4)
       throw std::runtime_error("velocity.ndim() != 4");
     if (density.ndim() != 3)
       throw std::runtime_error("density.ndim() != 3");
-    auto numcells = _idcv.getGlobalNumberMacroscopicCells();
+    auto numcells = I09::numberCellsInDomain;
     for (unsigned int d = 0; d < 3; d++) {
       if (velocity.shape(d) != numcells[d])
         throw std::runtime_error("velocity.shape(" + std::to_string(d) + ") should be " + std::to_string(numcells[d]) + " but is " +
@@ -262,38 +251,41 @@ public:
     auto velocity_raw = velocity.unchecked<4>();
     auto density_raw = density.unchecked<3>();
 
-    for (unsigned int i = 0; i < size; i++) {
-      const tarch::la::Vector<3, unsigned int> globalIndex(_idcv.getGlobalVectorCellIndex(_globalCellIndices4SendBuffer[i]) -
-                                                           tarch::la::Vector<3, unsigned int>(1));
+    I01 idx;
+    coupling::datastructures::CouplingCell<3>* cell;
+    for (auto pair : _macro2MDBuffer) {
+      std::tie(cell, idx) = pair;
+      const tarch::la::Vector<3, unsigned int> globalIndex{idx.get()};
       double mass = cellmass * density_raw(globalIndex[0], globalIndex[1], globalIndex[2]);
 
       const tarch::la::Vector<3, double> momentum(mass * velocity_raw(globalIndex[0], globalIndex[1], globalIndex[2], 0),
                                                   mass * velocity_raw(globalIndex[0], globalIndex[1], globalIndex[2], 1),
                                                   mass * velocity_raw(globalIndex[0], globalIndex[1], globalIndex[2], 2));
 
-      _sendBuffer[i]->setMicroscopicMass(mass);
-      _sendBuffer[i]->setMicroscopicMomentum(momentum);
+      cell->setMicroscopicMass(mass);
+      cell->setMicroscopicMomentum(momentum);
     }
   }
 
   py::array_t<double>* loadRecvVelocity() {
-    auto numcells = _idcv.getGlobalNumberMacroscopicCells() - tarch::la::Vector<3, unsigned int>(2 * _outerRegion);
+    auto numcells = I09::numberCellsInDomain - tarch::la::Vector<3, unsigned int>(2 * _outerRegion);
     std::vector<unsigned int> shape = {numcells[0], numcells[1], numcells[2], 3};
     py::array_t<double>* res = new py::array_t<double>(shape);
 
-    const unsigned int numCellsRecv = _recvBuffer.size();
-    if (numcells[0] * numcells[1] * numcells[2] != numCellsRecv)
-      throw std::runtime_error("Unexpected _recvBuffer.size()");
+    if (numcells[0] * numcells[1] * numcells[2] != _md2macroBuffer.size())
+      throw std::runtime_error("Unexpected _md2macroBuffer.size()");
 
     auto res_raw = res->mutable_unchecked<4>();
 
-    for (unsigned int i = 0; i < numCellsRecv; i++) {
-      tarch::la::Vector<3, double> vel(_recvBuffer[i]->getMacroscopicMomentum());
-      if (_recvBuffer[i]->getMacroscopicMass() != 0.0) {
-        vel = (1.0 / _recvBuffer[i]->getMacroscopicMass()) * vel;
+    I01 idx_global;
+    coupling::datastructures::CouplingCell<3>* cell;
+    for (auto pair : _md2macroBuffer) {
+      std::tie(cell, idx_global) = pair;
+      tarch::la::Vector<3, double> vel(cell->getMacroscopicMomentum());
+      if (cell->getMacroscopicMass() != 0.0) {
+        vel = (1.0 / cell->getMacroscopicMass()) * vel;
       }
-      const tarch::la::Vector<3, unsigned int> idx(_idcv.getGlobalVectorCellIndex(_globalCellIndices4RecvBuffer[i]) -
-                                                   tarch::la::Vector<3, unsigned int>(_outerRegion + 1));
+      const tarch::la::Vector<3, unsigned int> idx{I05{idx_global}.get()};
       res_raw(idx[0], idx[1], idx[2], 0) = vel[0];
       res_raw(idx[0], idx[1], idx[2], 1) = vel[1];
       res_raw(idx[0], idx[1], idx[2], 2) = vel[2];
@@ -303,137 +295,71 @@ public:
   }
 
   py::array_t<double>* loadRecvDensity(double cellmass) {
-    auto numcells = _idcv.getGlobalNumberMacroscopicCells() - tarch::la::Vector<3, unsigned int>(2 * _outerRegion);
+    auto numcells = I09::numberCellsInDomain - tarch::la::Vector<3, unsigned int>(2 * _outerRegion);
     std::vector<unsigned int> shape = {numcells[0], numcells[1], numcells[2]};
     py::array_t<double>* res = new py::array_t<double>(shape);
 
-    const unsigned int numCellsRecv = _recvBuffer.size();
+    const unsigned int numCellsRecv = _md2macroBuffer.size();
     if (numcells[0] * numcells[1] * numcells[2] != numCellsRecv)
-      throw std::runtime_error("Unexpected _recvBuffer.size()");
+      throw std::runtime_error("Unexpected _md2macroBuffer.size()");
 
     auto res_raw = res->mutable_unchecked<3>();
 
-    for (unsigned int i = 0; i < numCellsRecv; i++) {
-      const tarch::la::Vector<3, unsigned int> idx(_idcv.getGlobalVectorCellIndex(_globalCellIndices4RecvBuffer[i]) -
-                                                   tarch::la::Vector<3, unsigned int>(_outerRegion + 1));
-      res_raw(idx[0], idx[1], idx[2]) = _recvBuffer[i]->getMacroscopicMass() / cellmass;
+    I01 idx_global;
+    coupling::datastructures::CouplingCell<3>* cell;
+    for (auto pair : _md2macroBuffer) {
+      std::tie(cell, idx_global) = pair;
+      const tarch::la::Vector<3, unsigned int> idx{I05{idx_global}.get()};
+      res_raw(idx[0], idx[1], idx[2]) = cell->getMacroscopicMass() / cellmass;
     }
 
     return res;
   }
 
-  std::vector<coupling::datastructures::MacroscopicCell<3>*> _sendBuffer;
-  unsigned int* _globalCellIndices4SendBuffer;
-  std::vector<coupling::datastructures::MacroscopicCell<3>*> _recvBuffer;
-  unsigned int* _globalCellIndices4RecvBuffer;
+  coupling::datastructures::FlexibleCellContainer<3> _macro2MDBuffer;
+  coupling::datastructures::FlexibleCellContainer<3> _md2macroBuffer;
 
 private:
-  const coupling::IndexConversion<3>& _idcv;
   const unsigned int _outerRegion; // defines an offset of cells which is
                                    // considered to be the outer region
 
-  void allocateSendBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroscopicSolverInterface,
-                          unsigned int rank) {
-    // determine global number of cells
-    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
-    const unsigned int num = cells[0] * cells[1] * cells[2];
-
-    // delete all potential entries of sendBuffer
-    deleteBuffer(_sendBuffer);
-
-    // count number of cells to be sent from this process; therefore, loop over
-    // all global macroscopic cells...
-    unsigned int numCellsSent = 0;
-    for (unsigned int i = 0; i < num; i++) {
-      // ... and find out, if the current cell should be send to MD from this
-      // solver process
-      if (macroscopicSolverInterface.sendMacroscopicQuantityToMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
-        std::vector<unsigned int> ranks = macroscopicSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == rank);
-        }
-        if (containsThisRank) {
-          numCellsSent++;
+  /**
+   *  @brief allocates the send buffer (with values for all coupling cells).
+   *  @param couetteSolverInterface interface for the continuum solver */
+  void allocateMacro2MDBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi, int rank) {
+    deleteBuffer(_macro2MDBuffer);
+    for (auto idx : I08()) {
+      if (!I12::contains(idx)) {
+        if (tarch::utils::contains(msi.getSourceRanks(idx), (unsigned int)rank)) {
+          coupling::datastructures::CouplingCell<3>* couplingCell = new coupling::datastructures::CouplingCell<3>();
+          _macro2MDBuffer << std::make_pair(couplingCell, idx);
+          if (couplingCell == nullptr)
+            throw std::runtime_error(std::string("ERROR mamico.cpp::allocateMacro2MDBuffer: couplingCells==NULL!"));
         }
       }
     }
-
-    // allocate array for cell indices
-    unsigned int* indices = new unsigned int[numCellsSent];
-
-    // allocate sendBuffer and initialise all entries, incl. indices
-    for (unsigned int i = 0; i < num; i++) {
-      if (macroscopicSolverInterface.sendMacroscopicQuantityToMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
-        std::vector<unsigned int> ranks = macroscopicSolverInterface.getSourceRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == rank);
-        }
-        if (containsThisRank) {
-          _sendBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
-          indices[_sendBuffer.size() - 1] = i;
-        }
-      }
-    }
-    _globalCellIndices4SendBuffer = indices;
   }
 
-  void allocateRecvBuffer(const coupling::IndexConversion<3>& indexConversion, coupling::interface::MacroscopicSolverInterface<3>& macroscopicSolverInterface,
-                          unsigned int rank) {
-
-    // determine global number of cells
-    const tarch::la::Vector<3, unsigned int> cells(indexConversion.getGlobalNumberMacroscopicCells() + tarch::la::Vector<3, unsigned int>(2));
-    const unsigned int num = cells[0] * cells[1] * cells[2];
-
-    // delete all potential entries of sendBuffer
-    deleteBuffer(_recvBuffer);
-
-    // determine number of cells that should be received
-    unsigned int numCellsRecv = 0;
-    for (unsigned int i = 0; i < num; i++) {
-      if (macroscopicSolverInterface.receiveMacroscopicQuantityFromMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
-        std::vector<unsigned int> ranks = macroscopicSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == rank);
-        }
-        if (containsThisRank) {
-          numCellsRecv++;
-        }
+  /** allocates the recv-buffer. This buffer contains all global inner coupling cells, but only on rank 0. On all other ranks, no cells are stored and a NULL
+   * ptr is returned */
+  void allocateMD2macroBuffer(coupling::interface::MacroscopicSolverInterface<3>& msi, int rank) {
+    deleteBuffer(_md2macroBuffer);
+    for (auto idx : I12()) {
+      if (tarch::utils::contains(msi.getTargetRanks(idx), (unsigned int)rank)) {
+        coupling::datastructures::CouplingCell<3>* couplingCell = new coupling::datastructures::CouplingCell<3>();
+        _md2macroBuffer << std::make_pair(couplingCell, idx);
+        if (couplingCell == nullptr)
+          throw std::runtime_error(std::string("ERROR CouetteScenario::allocateMacro2mdBuffer: couplingCell==NULL!"));
       }
     }
-    // allocate array for cell indices
-    unsigned int* indices = new unsigned int[numCellsRecv];
-
-    // allocate recvBuffer and initialise all entries, incl. indices
-    for (unsigned int i = 0; i < num; i++) {
-      if (macroscopicSolverInterface.receiveMacroscopicQuantityFromMDSolver(indexConversion.getGlobalVectorCellIndex(i))) {
-        std::vector<unsigned int> ranks = macroscopicSolverInterface.getTargetRanks(indexConversion.getGlobalVectorCellIndex(i));
-        bool containsThisRank = false;
-        for (unsigned int k = 0; k < ranks.size(); k++) {
-          containsThisRank = containsThisRank || (ranks[k] == rank);
-        }
-        if (containsThisRank) {
-          _recvBuffer.push_back(new coupling::datastructures::MacroscopicCell<3>());
-          // set linearized index
-          indices[_recvBuffer.size() - 1] = i;
-        }
-      }
-    }
-    _globalCellIndices4RecvBuffer = indices;
   }
 
   /** deletes the buffer */
-  void deleteBuffer(std::vector<coupling::datastructures::MacroscopicCell<3>*>& buffer) {
+  void deleteBuffer(coupling::datastructures::FlexibleCellContainer<3>& buffer) {
     // delete all potential entries of buffer
-    for (unsigned int i = 0; i < buffer.size(); i++) {
-      if (buffer[i] != NULL) {
-        delete buffer[i];
-        buffer[i] = NULL;
-      }
-    }
-    buffer.clear();
+    for (auto pair : buffer)
+      if (pair.first != NULL)
+        delete pair.first;
   }
 };
 
@@ -461,9 +387,13 @@ PYBIND11_MODULE(mamico, mamico) {
   utils.def("finalizeMPI", &MPI_Finalize, "Calls MPI_Finalize");
   utils.def(
       "initIndexing",
-      [](const simplemd::configurations::MolecularDynamicsConfiguration& simpleMDConfig, const coupling::configurations::MaMiCoConfiguration<3>& mamicoConfig,
-         coupling::interface::MacroscopicSolverInterface<3>* msi,
-         const unsigned int rank) { return coupling::indexing::IndexingService<3>::getInstance().init(simpleMDConfig, mamicoConfig, msi, rank); },
+      [](const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
+         const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
+         const unsigned int rank) {
+        const unsigned int dim = 3;
+        return IDXS.initWithMDSize(globalMDDomainSize, tarch::la::Vector<3, double>{0, 0, 0}, mdNumberProcesses, couplingCellSize, parallelTopologyType,
+                                   outerRegion, rank);
+      },
       "Calls init of the IndexingService singleton object");
   ///////////////////////////////////////////////////////////////////////////////////
   // Bindings for all simplemd configuration classes and getter functions
@@ -480,6 +410,7 @@ PYBIND11_MODULE(mamico, mamico) {
       .def("getMoleculeConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getMoleculeConfiguration, py::return_value_policy::reference)
       .def("getMPIConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getMPIConfiguration, py::return_value_policy::reference)
       .def("getVTKConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getVTKConfiguration, py::return_value_policy::reference)
+      .def("getADIOS2Configuration", &simplemd::configurations::MolecularDynamicsConfiguration::getAdios2Configuration, py::return_value_policy::reference)
       .def("getSimulationConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getSimulationConfiguration,
            py::return_value_policy::reference)
       .def("getRDFConfiguration", &simplemd::configurations::MolecularDynamicsConfiguration::getRDFConfiguration, py::return_value_policy::reference)
@@ -516,6 +447,10 @@ PYBIND11_MODULE(mamico, mamico) {
   py::class_<simplemd::configurations::VTKConfiguration>(configuration, "VTKConfiguration")
       .def("getFilename", &simplemd::configurations::VTKConfiguration::getFilename)
       .def("getWriteEveryTimestep", &simplemd::configurations::VTKConfiguration::getWriteEveryTimestep);
+
+  py::class_<simplemd::configurations::Adios2Configuration>(configuration, "Adios2Configuration")
+      .def("getFilename", &simplemd::configurations::Adios2Configuration::getFilename)
+      .def("getWriteEveryTimestep", &simplemd::configurations::Adios2Configuration::getWriteEveryTimestep);
 
   py::class_<simplemd::configurations::SimulationConfiguration>(configuration, "SimulationConfiguration")
       .def("getDt", &simplemd::configurations::SimulationConfiguration::getDt)
@@ -554,8 +489,7 @@ PYBIND11_MODULE(mamico, mamico) {
       .def("__repr__",
            [](const coupling::configurations::MaMiCoConfiguration<3>& c) { return "<MaMiCoConfiguration read from XML tag \"" + c.getTag() + "\">"; })
       .def("isValid", &coupling::configurations::MaMiCoConfiguration<3>::isValid)
-      .def("getMacroscopicCellConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getMacroscopicCellConfiguration,
-           py::return_value_policy::reference)
+      .def("getCouplingCellConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getCouplingCellConfiguration, py::return_value_policy::reference)
       .def("getParticleInsertionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getParticleInsertionConfiguration,
            py::return_value_policy::reference)
       .def("getMomentumInsertionConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getMomentumInsertionConfiguration,
@@ -568,13 +502,13 @@ PYBIND11_MODULE(mamico, mamico) {
            py::return_value_policy::reference)
       .def("getThermostatConfiguration", &coupling::configurations::MaMiCoConfiguration<3>::getThermostatConfiguration, py::return_value_policy::reference);
 
-  py::class_<coupling::configurations::MacroscopicCellConfiguration<3>>(configuration, "MacroscopicCellConfiguration")
-      .def("getMacroscopicCellSize", &coupling::configurations::MacroscopicCellConfiguration<3>::getMacroscopicCellSize)
-      .def("getNumberLinkedCellsPerMacroscopicCell", &coupling::configurations::MacroscopicCellConfiguration<3>::getNumberLinkedCellsPerMacroscopicCell)
-      .def("getWriteEveryMicroscopicTimestep", &coupling::configurations::MacroscopicCellConfiguration<3>::getWriteEveryMicroscopicTimestep)
-      .def("getMicroscopicFilename", &coupling::configurations::MacroscopicCellConfiguration<3>::getMicroscopicFilename)
-      .def("getWriteEveryMacroscopicTimestep", &coupling::configurations::MacroscopicCellConfiguration<3>::getWriteEveryMacroscopicTimestep)
-      .def("getMacroscopicFilename", &coupling::configurations::MacroscopicCellConfiguration<3>::getMacroscopicFilename);
+  py::class_<coupling::configurations::CouplingCellConfiguration<3>>(configuration, "CouplingCellConfiguration")
+      .def("getCouplingCellSize", &coupling::configurations::CouplingCellConfiguration<3>::getCouplingCellSize)
+      .def("getNumberLinkedCellsPerCouplingCell", &coupling::configurations::CouplingCellConfiguration<3>::getNumberLinkedCellsPerCouplingCell)
+      .def("getWriteEveryMicroscopicTimestep", &coupling::configurations::CouplingCellConfiguration<3>::getWriteEveryMicroscopicTimestep)
+      .def("getMicroscopicFilename", &coupling::configurations::CouplingCellConfiguration<3>::getMicroscopicFilename)
+      .def("getWriteEveryMacroscopicTimestep", &coupling::configurations::CouplingCellConfiguration<3>::getWriteEveryMacroscopicTimestep)
+      .def("getMacroscopicFilename", &coupling::configurations::CouplingCellConfiguration<3>::getMacroscopicFilename);
 
   py::class_<coupling::configurations::ParticleInsertionConfiguration>(configuration, "ParticleInsertionConfiguration")
       .def("getParticleInsertionType", &coupling::configurations::ParticleInsertionConfiguration::getParticleInsertionType);
@@ -616,16 +550,15 @@ PYBIND11_MODULE(mamico, mamico) {
       .def("switchOffCoupling", &coupling::interface::MDSimulation::switchOffCoupling)
       .def("switchOnCoupling", &coupling::interface::MDSimulation::switchOnCoupling)
       .def("simulateTimesteps", &coupling::interface::MDSimulation::simulateTimesteps, "numberTimesteps"_a = 1, "firstTimestep"_a)
-      .def("setMacroscopicCellService", &coupling::interface::MDSimulation::setMacroscopicCellService)
+      .def("setCouplingCellService", &coupling::interface::MDSimulation::setCouplingCellService)
       .def("shutdown", &coupling::interface::MDSimulation::shutdown);
 
-  py::class_<coupling::services::MacroscopicCellService<3>>(services, "MacroscopicCellService")
-      .def("computeAndStoreTemperature", &coupling::services::MacroscopicCellService<3>::computeAndStoreTemperature)
-      .def("getIndexConversion", &coupling::services::MacroscopicCellService<3>::getIndexConversion, py::return_value_policy::reference)
-      .def("plotEveryMacroscopicTimestep", &coupling::services::MacroscopicCellService<3>::plotEveryMacroscopicTimestep)
+  py::class_<coupling::services::CouplingCellService<3>>(services, "CouplingCellService")
+      .def("computeAndStoreTemperature", &coupling::services::CouplingCellService<3>::computeAndStoreTemperature)
+      .def("plotEveryMacroscopicTimestep", &coupling::services::CouplingCellService<3>::plotEveryMacroscopicTimestep)
       .def(
           "addFilterToSequence",
-          [](coupling::services::MacroscopicCellService<3>* service, const char* filter_sequence, int filter_index,
+          [](coupling::services::CouplingCellService<3>* service, const char* filter_sequence, int filter_index,
              // use of std::optional is neccessary because pybind11 doesnt
              // support implicit None conversion for STL datatypes
              std::optional<std::function<py::array_t<double>(py::array_t<double>)>> scalar_filter_func,
@@ -650,7 +583,6 @@ PYBIND11_MODULE(mamico, mamico) {
       "getMDSimulation",
       [](const simplemd::configurations::MolecularDynamicsConfiguration& c1, const coupling::configurations::MaMiCoConfiguration<3>& c2, void* comm) {
 #if defined(LS1_MARDYN)
-        assert((c2.getMacroscopicCellConfiguration().getNumberLinkedCellsPerMacroscopicCell() == tarch::la::Vector<3, unsigned int>(1)));
         auto offset = c1.getDomainConfiguration().getGlobalDomainOffset();
         coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
         coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
@@ -694,8 +626,8 @@ PYBIND11_MODULE(mamico, mamico) {
   //		return
   // coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL,3>::getInstance().getMDSolverInterface();
   //	}, py::return_value_policy::reference );
-  coupling.def("setMacroscopicCellService", [](coupling::services::MacroscopicCellService<3>* service) {
-    coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setMacroscopicCellService(service);
+  coupling.def("setCouplingCellService", [](coupling::services::CouplingCellService<3>* service) {
+    coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, 3>::getInstance().setCouplingCellService(service);
   });
 
   py::class_<coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>>(services, "MultiMDCellService")
@@ -709,18 +641,15 @@ PYBIND11_MODULE(mamico, mamico) {
            }),
            "mdSolverInterfaces"_a, "macroscopicSolverInterface"_a, "simpleMDConfig"_a, "rank"_a = 0, "totalNumberMDSimulations"_a = 1, "mamicoConfig"_a,
            "xmlConfigFilename"_a, "multiMDService"_a)
-      .def("getMacroscopicCellService", &coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>::getMacroscopicCellService,
-           py::return_value_policy::reference)
-      .def("sendFromMacro2MD", [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service,
-                                  CouplingBuffer& buf) { service.sendFromMacro2MD(buf._sendBuffer, buf._globalCellIndices4SendBuffer); })
-      .def("sendFromMD2Macro", [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service,
-                                  CouplingBuffer& buf) { service.sendFromMD2Macro(buf._recvBuffer, buf._globalCellIndices4RecvBuffer); })
+      .def("getCouplingCellService", &coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>::getCouplingCellService, py::return_value_policy::reference)
+      .def("sendFromMacro2MD",
+           [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service, CouplingBuffer& buf) { service.sendFromMacro2MD(buf._macro2MDBuffer); })
+      .def("sendFromMD2Macro",
+           [](coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>& service, CouplingBuffer& buf) { service.sendFromMD2Macro(buf._md2macroBuffer); })
       .def("constructFilterPipelines", &coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>::constructFilterPipelines);
 
-  py::class_<coupling::IndexConversion<3>>(coupling, "IndexConversion");
-
   py::class_<CouplingBuffer>(coupling, "Buffer")
-      .def(py::init<const coupling::IndexConversion<3>&, coupling::interface::MacroscopicSolverInterface<3>&, unsigned int, unsigned int>())
+      .def(py::init<coupling::interface::MacroscopicSolverInterface<3>&, unsigned int, unsigned int>())
       .def("recv2CSV", &CouplingBuffer::recv2CSV)
       .def("store2send", &CouplingBuffer::store2send)
       .def("loadRecvVelocity", &CouplingBuffer::loadRecvVelocity, py::return_value_policy::take_ownership)
