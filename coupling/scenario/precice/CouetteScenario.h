@@ -145,6 +145,8 @@ public:
 
     _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(
         _instanceHandling->getMDSolverInterface(), _preciceInterface, mdConfig, mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
+    // init filtering for all md instances
+    _multiMDCellService->constructFilterPipelines();
     
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, dim>::getInstance().setMacroscopicSolverInterface(_preciceInterface);
 
@@ -236,19 +238,19 @@ private:
 
   class CouettePreciceInterface : public coupling::preciceadapter::PreciceInterface<3> {
   private:
-    const std::string _Macro2MDMeshName;
-    const std::string _MD2MacroMeshName;
+    const std::string _macro2MDMeshName;
+    const std::string _MD2macroMeshName;
 
   protected:
     const double _massCell;
 
   public:
     CouettePreciceInterface(const double massCell, const bool twoWayCoupling)
-        : coupling::preciceadapter::PreciceInterface<3>(twoWayCoupling), _Macro2MDMeshName("mamico-Macro2MD-mesh"), _MD2MacroMeshName("mamico-MD2Macro-mesh"), _massCell{massCell} {
+        : coupling::preciceadapter::PreciceInterface<3>(twoWayCoupling), _macro2MDMeshName("mamico-macro2MD-mesh"), _MD2macroMeshName("mamico-MD2macro-mesh"), _massCell{massCell} {
       coupling::preciceadapter::PreciceInterface<3>::addDataDescription(
-        _Macro2MDMeshName, coupling::preciceadapter::DataDescription{"VelocityMacro", coupling::preciceadapter::DataType::vector});
+        _macro2MDMeshName, coupling::preciceadapter::DataDescription{"VelocityMacro", coupling::preciceadapter::DataType::vector});
       coupling::preciceadapter::PreciceInterface<3>::addDataDescription(
-        _MD2MacroMeshName, coupling::preciceadapter::DataDescription{"VelocityMD", coupling::preciceadapter::DataType::vector});      
+        _MD2macroMeshName, coupling::preciceadapter::DataDescription{"VelocityMicro", coupling::preciceadapter::DataType::vector});      
     }
 
     unsigned int getOuterRegion() override {
@@ -258,11 +260,28 @@ private:
     std::vector<unsigned int> getRanks(I01 idx) override { return {0}; }
 
     std::string getMacro2MDSolverMeshName(I01 idx) const override {
-      return _Macro2MDMeshName;
+      return _macro2MDMeshName;
     }
 
     std::string getMD2MacroSolverMeshName(I01 idx) const override {
-      return _MD2MacroMeshName;
+      return _MD2macroMeshName;
+    }
+
+    bool isMacro2MD(I01 idx) const override {
+      return (I08::contains(idx) && !I12::contains(idx));
+    }
+
+    bool isMD2Macro(I01 idx) const override {
+      return (I08::contains(idx));
+    }
+
+    bool contains(std::string meshName, I01 idx) const override {
+      if (meshName == _macro2MDMeshName) {
+        return isMacro2MD(idx);
+      } else if (meshName == _MD2macroMeshName) {
+        return isMD2Macro(idx);
+      }
+      return false;
     }
   };
 

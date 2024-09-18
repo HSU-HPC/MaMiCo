@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 
   Scenario* scenario;
 #if (BUILD_WITH_PRECICE)
-  if (argc > 1 && strcmp(argv[1],"preCICE")){  
+  if (argc > 1 && strcmp(argv[1],"preCICE")==0){  
     scenario = new coupling::scenario::precice::CouetteScenario();
   } else {
     scenario = new CouetteScenario();
@@ -42,9 +42,6 @@ int main(int argc, char* argv[]) {
   scenario = new CouetteScenario();
 #endif
   runScenario(scenario);
-
-  // run scenarios
-  runScenario(new CouetteScenario());
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Finalize();

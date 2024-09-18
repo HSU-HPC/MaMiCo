@@ -22,6 +22,10 @@ public:
    */
   PreciceInterface(const bool twoWayCoupling) : _twoWayCoupling(twoWayCoupling) {}
 
+  virtual bool isMacro2MD(I01 idx) const = 0;
+
+  virtual bool isMD2Macro(I01 idx) const = 0;
+
   /**
    * get the mesh name associated to this cell
    * this mesh is used to couple the macroscopic solver to the MD solver
@@ -56,6 +60,8 @@ public:
    * return true if two way coupling, i.e. macro to md and md to macro, is activated
    */
   bool twoWayCoupling() const {return _twoWayCoupling;} 
+
+  virtual bool contains(std::string meshName, I01 idx) const = 0;
 
   /**
    * Add a data description description to this interface
