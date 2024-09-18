@@ -39,20 +39,24 @@ void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::reduceFromMD2Macro(std::vect
 }
 
 template <class Cell_T, unsigned int dim>
+template <class Container_T>
 void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::writeToReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
-                                                                        const Local_Container_T& cells) {
-  for (auto idx : I10())
-    coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToReduceBuffer(dataExchange, cells[idx], idx);
+                                                                        const Container_T& cells) {
+  for (auto pair : cells) {
+    auto cell = pair.first;
+    auto idx = pair.second;
+    if (!I10().contains(idx))
+      continue; // TODO is this really needed?
+    coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::writeToReduceBuffer(dataExchange, *cell, idx);
+  }
 }
 
 template <class Cell_T, unsigned int dim>
 template <class Container_T>
 void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::allocateReduceBufferForReceiving(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
                                                                                      const Container_T& cells) {
-  I01* idx;
-  Cell_T* cell;
   for (auto pair : cells) {
-    std::tie(cell, idx) = pair;
+    auto idx = pair.second;
     coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::allocateReduceBufferForReceiving(dataExchange, idx);
   }
 }
@@ -61,10 +65,9 @@ template <class Cell_T, unsigned int dim>
 template <class Container_T>
 void coupling::sendrecv::FromMD2Macro<Cell_T, dim>::readFromReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange,
                                                                          const Container_T& cells) {
-  I01* idx;
-  Cell_T* cell;
   for (auto pair : cells) {
-    std::tie(cell, idx) = pair;
+    auto cell = *pair.first;
+    auto idx = pair.second;
     coupling::sendrecv::SendReceiveBuffer<Cell_T, dim>::readFromReduceBuffer(dataExchange, cell, idx);
   }
 }

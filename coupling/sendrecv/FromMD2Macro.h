@@ -91,7 +91,7 @@ private:
    * 	@param dataExchange
    * 	@param cells
    */
-  void writeToReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Local_Container_T& cells);
+  template <class Container_T> void writeToReduceBuffer(coupling::sendrecv::DataExchangeFromMD2Macro<dim>& dataExchange, const Container_T& cells);
 
   /** allocates the receive buffers for the macroscopic solver. Since we do not
    * know anything about the macroscopic solver, we only have a list of global
