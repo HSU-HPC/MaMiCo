@@ -79,7 +79,6 @@ protected:
 
 #if BUILD_WITH_ADIOS2
   simplemd::moleculemappings::Adios2Writer* _Adios2Writer;
-  std::string _Adios2Filestem;
 #endif
 
   // cell mappings

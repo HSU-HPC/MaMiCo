@@ -22,14 +22,14 @@ uint64_t offset;
 int counter = 0;
 
 simplemd::moleculemappings::Adios2Writer::Adios2Writer(const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                                       const simplemd::services::MoleculeService& moleculeService, const std::string& filename,
+                                                       const simplemd::services::MoleculeService& moleculeService,
                                                        const simplemd::configurations::MolecularDynamicsConfiguration& configuration
 #if (MD_PARALLEL == MD_YES)
                                                        ,
                                                        MPI_Comm communicator
 #endif
                                                        )
-    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _filename(filename), _timestep(0), _configuration(configuration)
+    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _timestep(0), _configuration(configuration)
 #if (MD_PARALLEL == MD_YES)
       ,
       _communicator(communicator)
