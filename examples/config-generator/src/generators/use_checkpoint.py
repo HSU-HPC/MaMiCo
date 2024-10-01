@@ -2,6 +2,7 @@ import shutil
 from pathlib import Path
 
 from generators.domain_size import get_domain_size
+from utils import check_if_replacing
 
 
 def validate(get_config_value) -> str:
@@ -33,6 +34,7 @@ def apply(partial_xml, get_config_value) -> None:
         checkpoint_dst_path = (
             Path(get_config_value("output_dir")) / "CheckpointSimpleMD.checkpoint"
         )
+        check_if_replacing(checkpoint_dst_path, get_config_value)
         # Avoid reading and writing the contents of the file, because it is rather large
         shutil.copyfile(checkpoint_src_path, checkpoint_dst_path)
         print(

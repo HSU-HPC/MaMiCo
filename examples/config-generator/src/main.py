@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 import term
-from utils import get_asset_text
+from utils import check_if_replacing, get_asset_text
 from xml_templating import PartialXml
 
 
@@ -109,24 +109,32 @@ def load_generator(generator: str) -> object:
         exit(1)
 
 
-def generate(configs: list, output_dir: str) -> None:
+def generate(configs: list, output_dir: str, replace_existing: bool) -> None:
     """Create the configuration by loading the template, applying the generators, and saving the resulting XML file.
     This function terminates the process.
 
     Keyword arguments:
     configs -- The list of configurations which to apply using the generators corresponding to the keys
     output_dir -- The directory where couette.xml and other files will be created
+    replace_existing -- If False and an output file already exists, an error is thrown
     """
     xml = PartialXml(get_asset_text("couette.xml.template"))
     print("Loaded configuration template")
+    # Make output path accessible to generators and consider existing files
+    config_output = [
+        # Pre-selected configs with only one option
+        dict(key="output_dir", options=[dict(selected=True, value=output_dir)]),
+        dict(
+            key="replace_existing",
+            options=[dict(selected=True, value=replace_existing)],
+        ),
+    ]
+    _get_config_value = lambda k: get_config_value(configs + config_output, k)
     for config in configs:
         generator = load_generator(config["key"])
-        # Make output path accessible to generators
-        config_output_dir = [
-            dict(key="output_dir", options=[dict(selected=True, value=output_dir)])
-        ]
-        generator.apply(xml, lambda k: get_config_value(configs + config_output_dir, k))
+        generator.apply(xml, _get_config_value)
     path = output_dir / "couette.xml"
+    check_if_replacing(path, _get_config_value)
     with open(path, "w") as file:
         file.write(xml.get())
     print(f"\nWrote configuration to {path}")
@@ -184,7 +192,11 @@ def parse_args(argv: dict = sys.argv[1:], configs: list = []) -> object:
         all_overrides += ">"
     # Parse arguments
     arg_parser = argparse.ArgumentParser(
-        description="A simple utility to generate basic couette.xml configurations for MaMiCo.",
+        prog=Path(__file__).parent.parent.name + "/run",
+        description="""A simple interactive command line utility to generate basic couette.xml configurations for MaMiCo.
+
+If all options are provided through the command line, the script is executed non-interactively.
+(This may be useful for generating configurations in an automated testing environment.)""",
         epilog="Available overrides:" + all_overrides,
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -196,6 +208,13 @@ def parse_args(argv: dict = sys.argv[1:], configs: list = []) -> object:
         help="The directory where couette.xml and other files will be created",
     )
     arg_parser.add_argument(
+        "-r",
+        "--replace-existing",
+        action="store_true",
+        help="Replace couette.xml and other files if they exist",
+    )
+    arg_parser.add_argument(
+        "-O",
         "--override",
         type=str,
         default="",
@@ -286,7 +305,7 @@ def main() -> None:
                 exit(1)
             elif is_valid and selected == len(main_menu) - 1:
                 # Generate
-                generate(configs, args.output)
+                generate(configs, args.output, args.replace_existing)
             else:
                 # Update configuration
                 # Remove explanation behind label

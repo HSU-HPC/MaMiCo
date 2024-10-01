@@ -1,4 +1,6 @@
 **/__pycache__
 .venv
+# Generated config files
+*.xml
 !requirements.txt
 !assets/*
