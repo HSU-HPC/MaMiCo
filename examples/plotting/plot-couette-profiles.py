@@ -99,7 +99,7 @@ def parse_args(argv=sys.argv[1:]):
     arg_parser.add_argument("--wall-velocity", default=0.5, type=float)
     arg_parser.add_argument("--channel-height", default=50.0, type=float)
     arg_parser.add_argument("--density", default=0.813037037, type=float)
-    arg_parser.add_argument("--viscosity", default=2.4, type=float)
+    arg_parser.add_argument("--viscosity", default=2.14, type=float)
     arg_parser.add_argument("--coupling-cells", default=6, type=int)
     arg_parser.add_argument(
         "--overlap-size", default=3, help="In number of coupling cells", type=int
