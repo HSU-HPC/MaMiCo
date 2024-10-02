@@ -5,6 +5,26 @@ from pathlib import Path
 import term
 
 
+def get_domain_size(get_config_value) -> int:
+    """Return the domain size as an ordinal integer where 1=small, 2=medium, and 3=large.
+
+    Keyword arguments:
+    get_config_value -- A function to get the configuration values by key
+    """
+    domain_size_name = get_config_value("domain_size")
+    domain_size_names = ["small", "medium", "large"]
+    return domain_size_names.index(domain_size_name) + 1
+
+
+def get_cell_size(get_config_value) -> float:
+    """Return the cell size.
+
+    Keyword arguments:
+    get_config_value -- A function to get the configuration values by key
+    """
+    return get_config_value("cell_size")
+
+
 def check_if_replacing(path: Path, get_config_value) -> None:
     """Exit with an error if a would be replaced and this is not requested explicitly.
 

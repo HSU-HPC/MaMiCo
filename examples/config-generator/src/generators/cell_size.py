@@ -1,14 +1,13 @@
+from utils import get_cell_size, get_domain_size
+
 # Other values scale linearly with cell size
 _default_cell_size = 2.5
 
 
-def get_cell_size(get_config_value) -> float:
-    key = __name__.split(".")[-1]
-    return get_config_value(key)
-
-
 def get_molecules_per_direction(get_config_value) -> float:
-    return 28 * get_cell_size(get_config_value) / _default_cell_size
+    domain_size = get_domain_size(get_config_value)
+    cell_size = get_cell_size(get_config_value)
+    return 28 * domain_size * cell_size / _default_cell_size
 
 
 def apply(partial_xml, get_config_value) -> None:

@@ -1,12 +1,5 @@
-from generators.cell_size import get_cell_size
 from generators.mpi_ranks import get_ranks_xyz
-
-
-def get_domain_size(get_config_value) -> int:
-    key = __name__.split(".")[-1]
-    domain_size_name = get_config_value(key)
-    domain_size_names = ["small", "medium", "large"]
-    return domain_size_names.index(domain_size_name) + 1
+from utils import get_cell_size, get_domain_size
 
 
 def get_domain_sizes(get_config_value) -> int:
@@ -41,6 +34,9 @@ def apply(partial_xml, get_config_value) -> None:
     size = get_domain_size(get_config_value)
     md_domain_size, cfd_domain_size = get_domain_sizes(get_config_value)
     domain_offset_xy = (cfd_domain_size - md_domain_size) / 2  # Centered
+    print(
+        f"Domain sizes: {md_domain_size}/{cfd_domain_size}, centered at {domain_offset_xy}"
+    )  # FIXME remove debug code
     partial_xml.substitute("md-size", md_domain_size)
     partial_xml.substitute("cfd-size", cfd_domain_size)
     use_checkpoint = get_config_value("use_checkpoint")
@@ -49,8 +45,8 @@ def apply(partial_xml, get_config_value) -> None:
         min(equilibration_steps_max, equilibration_steps * size)
         * (0 if use_checkpoint else 1),
     )
-    partial_xml.substitute("domain-offset-x", domain_offset_xy * size)
-    partial_xml.substitute("domain-offset-y", domain_offset_xy * size)
+    partial_xml.substitute("domain-offset-x", domain_offset_xy)
+    partial_xml.substitute("domain-offset-y", domain_offset_xy)
     cell_size = get_cell_size(get_config_value)
     partial_xml.substitute("domain-offset-z", cell_size)
     print(
