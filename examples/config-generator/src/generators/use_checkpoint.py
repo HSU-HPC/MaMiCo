@@ -22,7 +22,9 @@ def apply(partial_xml, get_config_value) -> None:
     key = __name__.split(".")[-1]
     use_checkpoint = get_config_value(key)
     checkpoint_xml = '<checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>'
-    partial_xml.substitute("checkpoint", checkpoint_xml if use_checkpoint else "")
+    partial_xml.substitute("checkpoint-out", checkpoint_xml if use_checkpoint else "")
+    checkpoint_key = 'init-from-sequential-checkpoint="CheckpointSimpleMD"'
+    partial_xml.substitute("checkpoint-in", checkpoint_key if use_checkpoint else "")
     print("Substituted loading checkpoint")
     if use_checkpoint:
         boundary_condition = get_config_value("boundary")

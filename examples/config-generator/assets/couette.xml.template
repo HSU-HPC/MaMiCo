@@ -68,8 +68,10 @@
       compute-macroscopic-quantities-every-timestep="0"
       fix-seed="no"
     ></simulation-configuration>
-    {checkpoint}
+    <!-- Change frequency (MD time steps) to output checkpoints -->
+    {checkpoint-out}
     <domain-configuration
+      {checkpoint-in}
       molecules-per-direction="{molecules-per-direction} ; {molecules-per-direction} ; {molecules-per-direction}"
       domain-size="{md-size} ; {md-size} ; {md-size}"
       domain-offset="{domain-offset-x} ; {domain-offset-x} ; {domain-offset-z}"
