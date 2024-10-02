@@ -16,6 +16,8 @@ import term
 from utils import check_if_replacing, get_asset_text
 from xml_templating import PartialXml
 
+bin_name = Path(__file__).parent.parent.name + "/run"
+cache_path = Path(__file__).parent.parent / ".cache"
 
 def select_option(configs: list, key: str, value: str) -> None:
     """Select an option based on a serialized key value pair without user input.
@@ -108,6 +110,21 @@ def load_generator(generator: str) -> object:
         print(f'Missing generator "{generator}"', file=sys.stderr)
         exit(1)
 
+def get_cmdline(configs: list):
+    """Returns the command line which (re-)generates the current configuration non-interactively
+    
+    Keyword arguments:
+    configs -- The list of configurations which to apply using the generators corresponding to the keys
+    """
+    all_overrides = []
+    for config in configs:
+        key = config["key"]
+        for option in config["options"]:
+            value = str(option["value"])
+            if "selected" in option and option["selected"]:
+                all_overrides.append(f"{key}={value}")
+                break
+    return f"{bin_name} -r --override \"{','.join(all_overrides)}\""
 
 def generate(configs: list, output_dir: str, replace_existing: bool) -> None:
     """Create the configuration by loading the template, applying the generators, and saving the resulting XML file.
@@ -141,6 +158,7 @@ def generate(configs: list, output_dir: str, replace_existing: bool) -> None:
     ranks = get_config_value(configs, "mpi_ranks") * get_config_value(
         configs, "multi_md"
     )
+    print("\nRe-generate using:", get_cmdline(configs), sep="\n")
     print(f'\nRun simulation using "mpirun -n {ranks} $MAMICO_DIR/build/couette"')
     exit(0)
 
@@ -192,7 +210,7 @@ def parse_args(argv: dict = sys.argv[1:], configs: list = []) -> object:
         all_overrides += ">"
     # Parse arguments
     arg_parser = argparse.ArgumentParser(
-        prog=Path(__file__).parent.parent.name + "/run",
+        prog=bin_name,
         description="""A simple interactive command line utility to generate basic couette.xml configurations for MaMiCo.
 
 If all options are provided through the command line, the script is executed non-interactively.
@@ -244,11 +262,18 @@ If all options are provided through the command line, the script is executed non
         )
     return args
 
+def load_config_cache_or_template() -> list:
+    """Load the configs either from an existing cache file or from the template."""
+    try:
+        return json.loads(cache_path.read_text())
+    except:
+        # Fall back to loading the template (cache corrupted or does not exist)
+        return json.loads(get_asset_text("configuration_template.json"))
 
 def main() -> None:
     os.chdir(Path(__file__).parent)
     # 1. Load configuration options
-    configs = json.loads(get_asset_text("configuration_template.json"))
+    configs = load_config_cache_or_template()
     args = parse_args(configs=configs)
     # Fill missing labels
     for config in configs:
@@ -269,6 +294,8 @@ def main() -> None:
                 select_option(configs, key, args.override[key])
             else:
                 main_menu.append(config["label"] + "\t" + get_selected(config)["label"])
+        # Update cache
+        cache_path.write_text(json.dumps(configs, indent=3))
         # 3. Validate
         validation_errors = validate(configs)
         is_valid = len(validation_errors.strip()) == 0
@@ -277,7 +304,7 @@ def main() -> None:
         )  # Skip interactive mode if there are no options
         if not is_interactive:
             if is_valid:
-                generate(configs, args.output)
+                generate(configs, args.output, args.replace_existing)
             else:
                 print(validation_errors, file=sys.stderr)
                 exit(1)

@@ -1,6 +1,7 @@
 **/__pycache__
 .venv
-# Generated config files
+# Generated config files and cache
 *.xml
+.cache
 !requirements.txt
 !assets/*

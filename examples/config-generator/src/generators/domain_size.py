@@ -34,9 +34,6 @@ def apply(partial_xml, get_config_value) -> None:
     size = get_domain_size(get_config_value)
     md_domain_size, cfd_domain_size = get_domain_sizes(get_config_value)
     domain_offset_xy = (cfd_domain_size - md_domain_size) / 2  # Centered
-    print(
-        f"Domain sizes: {md_domain_size}/{cfd_domain_size}, centered at {domain_offset_xy}"
-    )  # FIXME remove debug code
     partial_xml.substitute("md-size", md_domain_size)
     partial_xml.substitute("cfd-size", cfd_domain_size)
     use_checkpoint = get_config_value("use_checkpoint")
