@@ -13,11 +13,8 @@ import sys
 from pathlib import Path
 
 import term
-from utils import check_if_replacing, get_asset_text
+from utils import check_if_replacing, get_asset_text, get_bin_name
 from xml_templating import PartialXml
-
-bin_name = Path(__file__).parent.parent.name + "/run"
-cache_path = Path(__file__).parent.parent / ".cache"
 
 
 def select_option(configs: list, key: str, value: str) -> None:
@@ -126,7 +123,7 @@ def get_cmdline(configs: list):
             if "selected" in option and option["selected"]:
                 all_overrides.append(f"{key}={value}")
                 break
-    return f"{bin_name} -r --override \"{','.join(all_overrides)}\""
+    return f"{get_bin_name()} -r --override \"{','.join(all_overrides)}\""
 
 
 def generate(configs: list, output_dir: str, replace_existing: bool) -> None:
@@ -213,7 +210,7 @@ def parse_args(argv: dict = sys.argv[1:], configs: list = []) -> object:
         all_overrides += ">"
     # Parse arguments
     arg_parser = argparse.ArgumentParser(
-        prog=bin_name,
+        prog=get_bin_name(),
         description="""A simple interactive command line utility to generate basic couette.xml configurations for MaMiCo.
 
 If all options are provided through the command line, the script is executed non-interactively.
@@ -269,7 +266,8 @@ If all options are provided through the command line, the script is executed non
 def load_config_cache_or_template() -> list:
     """Load the configs either from an existing cache file or from the template."""
     try:
-        return json.loads(cache_path.read_text())
+        output_dir = parse_args().output  # Get the output directory before args are actually parsed
+        return json.loads((output_dir / ".cache").read_text())
     except:
         # Fall back to loading the template (cache corrupted or does not exist)
         return json.loads(get_asset_text("configuration_template.json"))
@@ -300,7 +298,7 @@ def main() -> None:
             else:
                 main_menu.append(config["label"] + "\t" + get_selected(config)["label"])
         # Update cache
-        cache_path.write_text(json.dumps(configs, indent=3))
+        (args.output / ".cache").write_text(json.dumps(configs, indent=3))
         # 3. Validate
         validation_errors = validate(configs)
         is_valid = len(validation_errors.strip()) == 0

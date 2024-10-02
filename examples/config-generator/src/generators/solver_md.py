@@ -6,7 +6,7 @@ from utils import check_if_replacing, get_asset_text
 from xml_templating import PartialXml
 
 
-def _create_ls1_config(get_config_value) -> None:
+def _create_ls1_config(get_config_value) -> Path:
     xml = PartialXml(get_asset_text("ls1config.xml.template"))
     md_domain_size, _ = get_domain_sizes(get_config_value)
     xml.substitute("md-size", md_domain_size)
@@ -19,6 +19,7 @@ def _create_ls1_config(get_config_value) -> None:
     check_if_replacing(path, get_config_value)
     with open(path, "w") as file:
         file.write(xml.get())
+    return path
 
 
 def apply(partial_xml, get_config_value) -> None:
@@ -33,5 +34,5 @@ def apply(partial_xml, get_config_value) -> None:
     partial_xml.substitute("parallel-topology-type", parallel_topology_type)
     print("Substituted MD solver and wall velocity")
     if solver == "ls1":
-        _create_ls1_config(get_config_value)
-        print('Also created file "ls1config.xml" in the same directory as couette.xml.')
+        path = _create_ls1_config(get_config_value)
+        print(f"Also created file {path}")

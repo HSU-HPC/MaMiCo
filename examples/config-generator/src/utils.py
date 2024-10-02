@@ -16,6 +16,11 @@ def get_domain_size(get_config_value) -> int:
     return domain_size_names.index(domain_size_name) + 1
 
 
+def get_bin_name() -> str:
+    """Return a meaningful name for the main executable"""
+    return Path(__file__).parent.parent.name + "/run"
+
+
 def check_if_replacing(path: Path, get_config_value) -> None:
     """Exit with an error if a would be replaced and this is not requested explicitly.
 
@@ -26,7 +31,7 @@ def check_if_replacing(path: Path, get_config_value) -> None:
     if not get_config_value("replace_existing") and path.exists():
         print(
             term.fmt_red(
-                f"The file {path} already exists.\nUse --replace-existing to overwrite it!"
+                f"The file {path} already exists.\nOverwrite it explicitly! ({get_bin_name()} --replace-existing)"
             )
         )
         exit(1)

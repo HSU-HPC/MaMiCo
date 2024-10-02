@@ -1,4 +1,15 @@
-from utils import get_domain_size
+import shutil
+from pathlib import Path
+
+from utils import check_if_replacing, get_domain_size
+
+
+def _create_foam_setup(get_config_value) -> Path:
+    src_path = Path(__file__).parent.parent.parent / "assets" / f"FoamSetup.template"
+    dst_path = Path(get_config_value("output_dir")) / "FoamSetup"
+    check_if_replacing(dst_path, get_config_value)
+    shutil.copytree(src_path, dst_path)
+    return dst_path
 
 
 def validate(get_config_value) -> str:
@@ -21,5 +32,12 @@ def apply(partial_xml, get_config_value) -> None:
     solver = get_config_value(key)
     partial_xml.substitute("cfd-solver", solver)
     print("Substituted CFD solver")
+    foam_setup = ""
     if solver == "foam":
-        print('TODO: Please update "foam-setup-directory" in the generated file!')
+        path = _create_foam_setup(get_config_value)
+        print(f"Also created files under {path}")
+        output_dir = get_config_value("output_dir")
+        foam_setup = (
+            f'foam-setup-directory="{output_dir}"\n' + 'foam-setup-folder="FoamSetup"'
+        )
+    partial_xml.substitute("foam-setup", foam_setup)

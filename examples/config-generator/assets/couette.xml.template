@@ -23,8 +23,7 @@
       number-of-processes="1 ; 1 ; 1"
       plot-every-timestep="0"
       init-advance-cycles="0"
-      foam-setup-directory="path/to/FoamSetup/parent/foler"
-      foam-setup-folder="FoamSetup"
+      {foam-setup}
       boundaries-with-MD="0; 0; 0; 0; 0; 0; 1; 1; 1; 1; 1; 1"
     />
     <microscopic-solver
@@ -69,9 +68,9 @@
       fix-seed="no"
     ></simulation-configuration>
     <!-- Change frequency (MD time steps) to output checkpoints -->
-    {checkpoint-out}
+    <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
     <domain-configuration
-      {checkpoint-in}
+      {checkpoint}
       molecules-per-direction="{molecules-per-direction} ; {molecules-per-direction} ; {molecules-per-direction}"
       domain-size="{md-size} ; {md-size} ; {md-size}"
       domain-offset="{domain-offset-x} ; {domain-offset-x} ; {domain-offset-z}"
