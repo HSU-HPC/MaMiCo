@@ -1,4 +1,4 @@
-from utils import get_cell_size, get_domain_size
+from utils import get_domain_size
 
 # Other values scale linearly with cell size
 _default_cell_size = 2.5
@@ -6,12 +6,12 @@ _default_cell_size = 2.5
 
 def get_molecules_per_direction(get_config_value) -> float:
     domain_size = get_domain_size(get_config_value)
-    cell_size = get_cell_size(get_config_value)
+    cell_size = get_config_value("cell_size")
     return 28 * domain_size * cell_size / _default_cell_size
 
 
 def apply(partial_xml, get_config_value) -> None:
-    cell_size = get_cell_size(get_config_value)
+    cell_size = get_config_value("cell_size")
     timesteps_per_coupling_cycle = 50 * cell_size / _default_cell_size
     linked_cells_per_coupling_cell = 1 * cell_size / _default_cell_size
     molecules_per_direction = get_molecules_per_direction(get_config_value)

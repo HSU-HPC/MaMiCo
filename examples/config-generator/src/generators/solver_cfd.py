@@ -1,3 +1,6 @@
+from utils import get_domain_size
+
+
 def validate(get_config_value) -> str:
     """MaMiCo config validation:
     The analytical CFD solver does not support two-way coupling.
@@ -6,6 +9,8 @@ def validate(get_config_value) -> str:
     key = __name__.split(".")[-1]
     solver = get_config_value(key)
     use_2way_coupling = get_config_value("coupling_2way")
+    if solver == "foam" and get_domain_size(get_config_value) != 2:
+        return f"OpenFOAM can only be used with the medium domain size."
     if solver == "analytical" and use_2way_coupling:
         return f"Cannot use two-way coupling with analytical CFD solver."
     return None

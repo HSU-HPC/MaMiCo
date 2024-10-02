@@ -19,6 +19,7 @@ from xml_templating import PartialXml
 bin_name = Path(__file__).parent.parent.name + "/run"
 cache_path = Path(__file__).parent.parent / ".cache"
 
+
 def select_option(configs: list, key: str, value: str) -> None:
     """Select an option based on a serialized key value pair without user input.
 
@@ -110,9 +111,10 @@ def load_generator(generator: str) -> object:
         print(f'Missing generator "{generator}"', file=sys.stderr)
         exit(1)
 
+
 def get_cmdline(configs: list):
     """Returns the command line which (re-)generates the current configuration non-interactively
-    
+
     Keyword arguments:
     configs -- The list of configurations which to apply using the generators corresponding to the keys
     """
@@ -125,6 +127,7 @@ def get_cmdline(configs: list):
                 all_overrides.append(f"{key}={value}")
                 break
     return f"{bin_name} -r --override \"{','.join(all_overrides)}\""
+
 
 def generate(configs: list, output_dir: str, replace_existing: bool) -> None:
     """Create the configuration by loading the template, applying the generators, and saving the resulting XML file.
@@ -262,6 +265,7 @@ If all options are provided through the command line, the script is executed non
         )
     return args
 
+
 def load_config_cache_or_template() -> list:
     """Load the configs either from an existing cache file or from the template."""
     try:
@@ -269,6 +273,7 @@ def load_config_cache_or_template() -> list:
     except:
         # Fall back to loading the template (cache corrupted or does not exist)
         return json.loads(get_asset_text("configuration_template.json"))
+
 
 def main() -> None:
     os.chdir(Path(__file__).parent)

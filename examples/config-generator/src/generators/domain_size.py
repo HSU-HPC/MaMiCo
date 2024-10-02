@@ -1,5 +1,5 @@
 from generators.mpi_ranks import get_ranks_xyz
-from utils import get_cell_size, get_domain_size
+from utils import get_domain_size
 
 
 def get_domain_sizes(get_config_value) -> int:
@@ -44,7 +44,7 @@ def apply(partial_xml, get_config_value) -> None:
     )
     partial_xml.substitute("domain-offset-x", domain_offset_xy)
     partial_xml.substitute("domain-offset-y", domain_offset_xy)
-    cell_size = get_cell_size(get_config_value)
+    cell_size = get_config_value("cell_size")
     partial_xml.substitute("domain-offset-z", cell_size)
     print(
         "Substituted domain size and offset for MD, CFD solver domain size, and MD equilibration steps"
