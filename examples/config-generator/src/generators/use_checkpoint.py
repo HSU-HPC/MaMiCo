@@ -32,7 +32,7 @@ def apply(partial_xml, get_config_value) -> None:
             / f"CheckpointSimpleMD_10000_{boundary_condition}_0.checkpoint"
         )
         checkpoint_dst_path = (
-            Path(get_config_value("output_dir")) / "CheckpointSimpleMD.checkpoint"
+            Path(get_config_value("output_dir")) / "CheckpointSimpleMD_0.checkpoint"
         )
         check_if_replacing(checkpoint_dst_path, get_config_value)
         # Avoid reading and writing the contents of the file, because it is rather large

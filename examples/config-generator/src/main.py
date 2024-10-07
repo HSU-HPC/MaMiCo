@@ -266,7 +266,9 @@ If all options are provided through the command line, the script is executed non
 def load_config_cache_or_template() -> list:
     """Load the configs either from an existing cache file or from the template."""
     try:
-        output_dir = parse_args().output  # Get the output directory before args are actually parsed
+        output_dir = (
+            parse_args().output
+        )  # Get the output directory before args are actually parsed
         return json.loads((output_dir / ".cache").read_text())
     except:
         # Fall back to loading the template (cache corrupted or does not exist)
