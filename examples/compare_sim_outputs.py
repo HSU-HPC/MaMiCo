@@ -9,7 +9,6 @@ Why? Allows for easy comparison of the simulation output between different imple
 
 __author__ = "Ruben"
 
-import os
 import subprocess
 import sys
 from pathlib import Path
