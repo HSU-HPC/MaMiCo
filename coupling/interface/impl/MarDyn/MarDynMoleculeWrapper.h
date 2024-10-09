@@ -104,7 +104,7 @@ public:
       LinkedCells *c = (LinkedCells *)mdSim->getMolecules();
       for (int d = 0; d < 3; d++) {
         cellLength[d] = (c->cellLength())[d];
-        haloBoundingBoxMin[d] = c->getBoundingBoxMin(d) - c->get_halo_L(d);
+        haloBoundingBoxMin[d] = c->getBoundingBoxMin(d) - c->getHaloWidthForDimension(d);
       }
       for (int d = 0; d < 3; d++)
         cellIndexVector[d] = (int)floor((myPosition[d] - haloBoundingBoxMin[d]) / cellLength[d]);
