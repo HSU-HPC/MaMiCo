@@ -162,10 +162,12 @@ public:
         }
       }
     }
-    for (auto const& [meshName, data] : _MD2MacroData) {
-      for (auto const& [dataName, value] : data) {
-        std::vector<double> dataValues = value;
-        _participant->writeData(meshName, dataName, _MD2MacroIndices[meshName], dataValues);
+    if (preciceInterface->twoWayCoupling()) {
+      for (auto const& [meshName, data] : _MD2MacroData) {
+        for (auto const& [dataName, value] : data) {
+          std::vector<double> dataValues = value;
+          _participant->writeData(meshName, dataName, _MD2MacroIndices[meshName], dataValues);
+        }
       }
     }
   }
@@ -176,24 +178,22 @@ public:
   void write2csv(int couplingCycle) {
     if (_MD2MacroCouplingCells.size() > 0) {
       std::stringstream ss;
-      ss << "results_" << _rank << "_" << couplingCycle << ".csv";
+      ss << "CouetteAvgMultiMDCells_0_" << _rank << "_" << couplingCycle << ".csv";
       std::ofstream file(ss.str().c_str());
       if (!file.is_open()) {
         exit(EXIT_FAILURE);
       }
-      file << "i;j;k;x;y;z;v_x;v_y;v_z;T;m" << std::endl;
+      file << "I01_x,I01_y,I01_z,vel_x,vel_y,vel_z,mass" << std::endl;
       for (auto pair : _MD2MacroCouplingCells) {
         I01 idx;
         coupling::datastructures::CouplingCell<3>* couplingCell;
         std::tie(couplingCell, idx) = pair;
-        auto cellMidPoint = idx.getCellMidPoint();
         tarch::la::Vector<3, double> vel(couplingCell->getMacroscopicMomentum());
         if (couplingCell->getMacroscopicMass() != 0.0)
           vel = (1.0 / couplingCell->getMacroscopicMass()) * vel;
-        file   << idx.get()[0] << ";" << idx.get()[1] << ";" << idx.get()[2] << ";" 
-               << cellMidPoint[0] << ";" << cellMidPoint[1] << ";" << cellMidPoint[2] << ";" 
-               << vel[0] << ";" << vel[1] << ";" << vel[2] << ";" 
-               << couplingCell->getTemperature() << ";" << couplingCell->getMacroscopicMass();
+        file   << idx.get()[0] << "," << idx.get()[1] << "," << idx.get()[2] << ","
+               << vel[0] << "," << vel[1] << "," << vel[2] << "," 
+               << couplingCell->getMacroscopicMass();
         file   << std::endl;
       }
       file.close();
@@ -221,7 +221,8 @@ private:
       if (preciceInterface->isMD2Macro(idx)) {
         if (tarch::utils::contains(preciceInterface->getTargetRanks(idx), (unsigned int)_rank)) {
           addCell(idx, _MD2MacroCouplingCells);
-          addMeshVertex(idx, preciceInterface->getMD2MacroSolverMeshName(idx), _MD2MacroMeshes, _MD2MacroIndices, _MD2MacroCellMapping, preciceInterface->getMD2MacroSolverMeshOffset(idx)); 
+          if (preciceInterface->twoWayCoupling())
+            addMeshVertex(idx, preciceInterface->getMD2MacroSolverMeshName(idx), _MD2MacroMeshes, _MD2MacroIndices, _MD2MacroCellMapping, preciceInterface->getMD2MacroSolverMeshOffset(idx)); 
         }    
       }
     }
