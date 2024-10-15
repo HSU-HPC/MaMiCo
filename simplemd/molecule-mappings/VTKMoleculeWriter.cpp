@@ -78,10 +78,11 @@ void simplemd::moleculemappings::VTKMoleculeWriter::endMoleculeIteration() {
         << std::endl
         << _velocities.str() << std::endl
         << std::endl
-        /*<< _forces.str() << std::endl
-        << _fix.str() << std::endl
-        << _id.str() << std::endl
-        << std::endl*/;
+      /*<< _forces.str() << std::endl
+      << _fix.str() << std::endl
+      << _id.str() << std::endl
+      << std::endl*/
+      ;
   _positions.str("");
   _forces.str("");
   _velocities.str("");
