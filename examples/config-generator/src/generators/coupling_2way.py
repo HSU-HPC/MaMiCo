@@ -6,8 +6,12 @@ def validate(get_config_value) -> str:
     use_2way_coupling = get_config_value(key)
     simulation_type = get_config_value("simulation")
     num_md_sims = get_config_value("multi_md")
-    if use_2way_coupling and simulation_type != "test" and num_md_sims < 200:
-        return f"Too many coupling cycles or too few MD instances for 2-way coupling."
+    if get_config_value("filtering") == False:
+        min_md_sims = 200
+    else:
+        min_md_sims = 20
+    if use_2way_coupling and simulation_type != "test" and num_md_sims < min_md_sims:
+        return f"Too many coupling cycles or too few MD instances or insufficient filtering for 2-way coupling."
     return None
 
 
