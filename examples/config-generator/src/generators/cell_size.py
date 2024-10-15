@@ -6,8 +6,10 @@ _default_cell_size = 2.5
 
 def get_molecules_per_direction(get_config_value) -> float:
     domain_size = get_domain_size(get_config_value)
-    cell_size = get_config_value("cell_size")
-    return 28 * domain_size * cell_size / _default_cell_size
+    size_factor = domain_size
+    if domain_size == 3:
+        size_factor = 4
+    return 28 * size_factor
 
 
 def apply(partial_xml, get_config_value) -> None:
