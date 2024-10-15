@@ -260,7 +260,7 @@ public:
       LinkedCells* cells = (LinkedCells*)_mySimulation->getMolecules();
       for (int d = 0; d < 3; d++) {
         cellLength[d] = (cells->cellLength())[d];
-        haloBoundingBoxMin[d] = cells->getBoundingBoxMin(d) - cells->get_halo_L(d);
+        haloBoundingBoxMin[d] = cells->getBoundingBoxMin(d) - cells->getHaloWidthForDimension(d);
       }
     } else {
       std::cout << "ERROR (MarDynSolverInterface): Container type is not "
