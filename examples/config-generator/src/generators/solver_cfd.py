@@ -24,6 +24,10 @@ def validate(get_config_value) -> str:
         return f"OpenFOAM can only be used with the medium domain size."
     if solver == "analytical" and use_2way_coupling:
         return f"Cannot use two-way coupling with analytical CFD solver."
+    if solver == "lb" and get_config_value("simulation") != "test" and use_2way_coupling:
+        return f"Two-way coupling is not stable with LBCouette solver for more than a quick test."
+    if solver == "fd" and get_config_value("simulation") != "test" and use_2way_coupling:
+        return f"Two-way coupling is not stable with FDCouette solver for more than a quick test."
     return None
 
 
