@@ -31,18 +31,18 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">25</td>
-            <td class="headerCovTableEntry">56</td>
-            <td class="headerCovTableEntryLo">44.6 %</td>
+            <td class="headerCovTableEntry">29</td>
+            <td class="headerCovTableEntry">64</td>
+            <td class="headerCovTableEntryLo">45.3 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-10-15 14:47:32</td>
+            <td class="headerValue">2024-10-15 15:25:26</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">9</td>
-            <td class="headerCovTableEntry">13</td>
-            <td class="headerCovTableEntryLo">69.2 %</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntryLo">73.3 %</td>
           </tr>
           <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -198,20 +198,36 @@
 <a name="136"><span class="lineNum">     136 </span>            :   // function particularly needed to init MD solver interface -&gt; should only be</a>
 <a name="137"><span class="lineNum">     137 </span>            :   // called from factory</a>
 <a name="138"><span class="lineNum">     138 </span><span class="lineCov">         12 :   simplemd::BoundaryTreatment&amp; getBoundaryTreatment() { return *_boundaryTreatment; }</span></a>
-<a name="139"><span class="lineNum">     139 </span><span class="lineCov">         12 :   simplemd::services::ParallelTopologyService&amp; getParallelTopologyService() { return *_parallelTopologyService; }</span></a>
-<a name="140"><span class="lineNum">     140 </span><span class="lineCov">          4 :   simplemd::services::MoleculeService&amp; getMoleculeService() { return *_moleculeService; }</span></a>
-<a name="141"><span class="lineNum">     141 </span><span class="lineCov">         12 :   simplemd::services::LinkedCellService&amp; getLinkedCellService() { return *_linkedCellService; }</span></a>
-<a name="142"><span class="lineNum">     142 </span><span class="lineCov">         12 :   const simplemd::services::MolecularPropertiesService&amp; getMolecularPropertiesService() { return *_molecularPropertiesService; }</span></a>
-<a name="143"><span class="lineNum">     143 </span>            : </a>
-<a name="144"><span class="lineNum">     144 </span>            : private:</a>
-<a name="145"><span class="lineNum">     145 </span>            :   /** @brief the coupling cell service for the coupled md simulation  */</a>
-<a name="146"><span class="lineNum">     146 </span>            :   coupling::services::CouplingCellService&lt;MD_DIM&gt;* _couplingCellService;</a>
-<a name="147"><span class="lineNum">     147 </span>            :   /** @brief bool holding the current state of the coupling: true - coupled</a>
-<a name="148"><span class="lineNum">     148 </span>            :    * simulation and false - independent md simulation */</a>
-<a name="149"><span class="lineNum">     149 </span>            :   bool _couplingSwitchedOn;</a>
-<a name="150"><span class="lineNum">     150 </span>            : };</a>
-<a name="151"><span class="lineNum">     151 </span>            : } // namespace interface</a>
-<a name="152"><span class="lineNum">     152 </span>            : } // namespace coupling</a>
+<a name="139"><span class="lineNum">     139 </span><span class="lineCov">         28 :   simplemd::services::ParallelTopologyService&amp; getParallelTopologyService() { return *_parallelTopologyService; }</span></a>
+<a name="140"><span class="lineNum">     140 </span><span class="lineCov">         16 :   simplemd::services::MoleculeService&amp; getMoleculeService() {</span></a>
+<a name="141"><span class="lineNum">     141 </span>            :     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)</a>
+<a name="142"><span class="lineNum">     142 </span><span class="lineCov">         16 :     if(_moleculeService == NULL){</span></a>
+<a name="143"><span class="lineNum">     143 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt;&quot;ERROR coupling::interface::MDSimulation::getMoleculeService(): _moleculeService == NULL &quot; &lt;&lt; std::endl;</span></a>
+<a name="144"><span class="lineNum">     144 </span><span class="lineNoCov">          0 :       exit(1);</span></a>
+<a name="145"><span class="lineNum">     145 </span>            :     }</a>
+<a name="146"><span class="lineNum">     146 </span>            :     #endif</a>
+<a name="147"><span class="lineNum">     147 </span><span class="lineCov">         16 :     return *_moleculeService;</span></a>
+<a name="148"><span class="lineNum">     148 </span>            :   }</a>
+<a name="149"><span class="lineNum">     149 </span><span class="lineCov">         12 :   simplemd::services::LinkedCellService&amp; getLinkedCellService() { return *_linkedCellService; }</span></a>
+<a name="150"><span class="lineNum">     150 </span><span class="lineCov">         12 :   const simplemd::services::MolecularPropertiesService&amp; getMolecularPropertiesService() {</span></a>
+<a name="151"><span class="lineNum">     151 </span>            :     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)</a>
+<a name="152"><span class="lineNum">     152 </span><span class="lineCov">         12 :     if(_molecularPropertiesService == NULL){</span></a>
+<a name="153"><span class="lineNum">     153 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt;&quot;ERROR coupling::interface::MDSimulation::getMolecularPropertiesService(): _molecularPropertiesService == NULL &quot; &lt;&lt; std::endl;</span></a>
+<a name="154"><span class="lineNum">     154 </span><span class="lineNoCov">          0 :       exit(1);</span></a>
+<a name="155"><span class="lineNum">     155 </span>            :     }</a>
+<a name="156"><span class="lineNum">     156 </span>            :     #endif</a>
+<a name="157"><span class="lineNum">     157 </span><span class="lineCov">         12 :     return *_molecularPropertiesService;</span></a>
+<a name="158"><span class="lineNum">     158 </span>            :   }</a>
+<a name="159"><span class="lineNum">     159 </span>            : </a>
+<a name="160"><span class="lineNum">     160 </span>            : private:</a>
+<a name="161"><span class="lineNum">     161 </span>            :   /** @brief the coupling cell service for the coupled md simulation  */</a>
+<a name="162"><span class="lineNum">     162 </span>            :   coupling::services::CouplingCellService&lt;MD_DIM&gt;* _couplingCellService;</a>
+<a name="163"><span class="lineNum">     163 </span>            :   /** @brief bool holding the current state of the coupling: true - coupled</a>
+<a name="164"><span class="lineNum">     164 </span>            :    * simulation and false - independent md simulation */</a>
+<a name="165"><span class="lineNum">     165 </span>            :   bool _couplingSwitchedOn;</a>
+<a name="166"><span class="lineNum">     166 </span>            : };</a>
+<a name="167"><span class="lineNum">     167 </span>            : } // namespace interface</a>
+<a name="168"><span class="lineNum">     168 </span>            : } // namespace coupling</a>
 </pre>
       </td>
     </tr>

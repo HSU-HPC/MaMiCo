@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2024-10-15 14:47:32</td>
+            <td class="headerValue">2024-10-15 15:25:26</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">3</td>
@@ -689,7 +689,7 @@
 <a name="627"><span class="lineNum">     627 </span>            :     // we handle these two cases first, and then use the lookup table for everything else</a>
 <a name="628"><span class="lineNum">     628 </span><span class="lineCov">        348 :     if (globalCellIndex[d] == 0) // first ghost, return first coord in this axis (usually 0)</span></a>
 <a name="629"><span class="lineNum">     629 </span><span class="lineCov">        108 :       processCoords[d] = _subdomainOwnership[d][0];</span></a>
-<a name="630"><span class="lineNum">     630 </span><span class="lineCov">        240 :     else if (globalCellIndex[d] == globalNumberCouplingCells[d] + 1) //last ghost, return last coord</span></a>
+<a name="630"><span class="lineNum">     630 </span><span class="lineCov">        240 :     else if (globalCellIndex[d] == globalNumberCouplingCells[d] + 1) // last ghost, return last coord</span></a>
 <a name="631"><span class="lineNum">     631 </span><span class="lineNoCov">          0 :       processCoords[d] = _subdomainOwnership[d][_subdomainOwnership[d].size() - 1];</span></a>
 <a name="632"><span class="lineNum">     632 </span>            :     else // all internal cells</a>
 <a name="633"><span class="lineNum">     633 </span><span class="lineCov">        240 :       processCoords[d] = _subdomainOwnership[d][globalCellIndex[d] - 1];</span></a>
