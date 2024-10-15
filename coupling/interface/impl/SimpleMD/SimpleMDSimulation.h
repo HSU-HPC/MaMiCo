@@ -137,9 +137,25 @@ public:
   // called from factory
   simplemd::BoundaryTreatment& getBoundaryTreatment() { return *_boundaryTreatment; }
   simplemd::services::ParallelTopologyService& getParallelTopologyService() { return *_parallelTopologyService; }
-  simplemd::services::MoleculeService& getMoleculeService() { return *_moleculeService; }
+  simplemd::services::MoleculeService& getMoleculeService() {
+    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if(_moleculeService == NULL){
+      std::cout <<"ERROR coupling::interface::MDSimulation::getMoleculeService(): _moleculeService == NULL " << std::endl;
+      exit(1);
+    }
+    #endif
+    return *_moleculeService;
+  }
   simplemd::services::LinkedCellService& getLinkedCellService() { return *_linkedCellService; }
-  const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() { return *_molecularPropertiesService; }
+  const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() {
+    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if(_molecularPropertiesService == NULL){
+      std::cout <<"ERROR coupling::interface::MDSimulation::getMolecularPropertiesService(): _molecularPropertiesService == NULL " << std::endl;
+      exit(1);
+    }
+    #endif
+    return *_molecularPropertiesService;
+  }
 
 private:
   /** @brief the coupling cell service for the coupled md simulation  */

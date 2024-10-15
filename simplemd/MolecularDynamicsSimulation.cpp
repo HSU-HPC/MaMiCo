@@ -29,9 +29,6 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
   // set vtk file stem and checkpoint filestem -> only one MD simulation runs
   _localMDSimulation = 0;
   _vtkFilestem = _configuration.getVTKConfiguration().getFilename();
-#if BUILD_WITH_ADIOS2
-  _Adios2Filestem = _configuration.getAdios2Configuration().getFilename();
-#endif
   _checkpointFilestem = _configuration.getCheckpointConfiguration().getFilename();
   // initialise local variable with global information first (they are adapted
   // later on)
@@ -175,7 +172,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     }
 
 #if BUILD_WITH_ADIOS2
-    _Adios2Writer = new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _Adios2Filestem, _configuration
+    _Adios2Writer = new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _configuration
 #if (MD_PARALLEL == MD_YES)
                                                                  ,
                                                                  MPI_COMM_WORLD
@@ -261,11 +258,6 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
   filestems << _configuration.getCheckpointConfiguration().getFilename() << "_" << localMDSimulation << "_";
   _checkpointFilestem = filestems.str();
   filestems.str("");
-#if BUILD_WITH_ADIOS2
-  filestems << _configuration.getAdios2Configuration().getFilename() << "_" << localMDSimulation << "_";
-  _Adios2Filestem = filestems.str();
-  filestems.str("");
-#endif
   // initialise local variable with global information first (they are adapted
   // later on)
   tarch::la::Vector<MD_DIM, double> localDomainSize(_configuration.getDomainConfiguration().getGlobalDomainSize());
@@ -409,7 +401,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     }
 
 #if BUILD_WITH_ADIOS2
-    _Adios2Writer = new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _Adios2Filestem, _configuration
+    _Adios2Writer = new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _configuration
 #if (MD_PARALLEL == MD_YES)
                                                                  ,
                                                                  multiMDService.getLocalCommunicator()
