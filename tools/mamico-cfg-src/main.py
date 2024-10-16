@@ -2,7 +2,7 @@
 
 """
 Utility script to generate basic couette.xml configurations for MaMiCo.
-Do NOT run this script directly! Use ../run instead.
+Do NOT run this script directly! Use ../mamico-cfg instead.
 """
 
 import argparse
