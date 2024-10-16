@@ -27,7 +27,7 @@ def apply(partial_xml, get_config_value) -> None:
     if use_checkpoint:
         boundary_condition = get_config_value("boundary")
         checkpoint_src_path = (
-            Path(__file__).parent.parent.parent
+            Path(__file__).parent.parent
             / "assets"
             / f"CheckpointSimpleMD_10000_{boundary_condition}_0.checkpoint"
         )

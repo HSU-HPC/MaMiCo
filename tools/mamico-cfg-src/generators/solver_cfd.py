@@ -5,7 +5,7 @@ from utils import check_if_replacing, get_domain_size
 
 
 def _create_foam_setup(get_config_value) -> Path:
-    src_path = Path(__file__).parent.parent.parent / "assets" / f"FoamSetup.template"
+    src_path = Path(__file__).parent.parent / "assets" / f"FoamSetup.template"
     dst_path = Path(get_config_value("output_dir")) / "FoamSetup"
     check_if_replacing(dst_path, get_config_value)
     shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
