@@ -18,7 +18,7 @@ def get_domain_size(get_config_value) -> int:
 
 def get_bin_name() -> str:
     """Return a meaningful name for the main executable"""
-    return Path(__file__).parent.parent.name + "/run"
+    return "mamico-cfg"
 
 
 def check_if_replacing(path: Path, get_config_value) -> None:
@@ -43,5 +43,5 @@ def get_asset_text(name: str) -> str:
     Keyword arguments:
     name -- The filename of the asset in the src folder including extension
     """
-    base_path = Path().absolute().parent
+    base_path = Path().absolute()
     return (base_path / "assets" / name).read_text()

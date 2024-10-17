@@ -5,7 +5,7 @@ from utils import check_if_replacing, get_domain_size
 
 
 def _create_foam_setup(get_config_value) -> Path:
-    src_path = Path(__file__).parent.parent.parent / "assets" / f"FoamSetup.template"
+    src_path = Path(__file__).parent.parent / "assets" / f"FoamSetup.template"
     dst_path = Path(get_config_value("output_dir")) / "FoamSetup"
     check_if_replacing(dst_path, get_config_value)
     shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
@@ -24,9 +24,17 @@ def validate(get_config_value) -> str:
         return f"OpenFOAM can only be used with the medium domain size."
     if solver == "analytical" and use_2way_coupling:
         return f"Cannot use two-way coupling with analytical CFD solver."
-    if solver == "lb" and get_config_value("simulation") != "test" and use_2way_coupling:
+    if (
+        solver == "lb"
+        and get_config_value("simulation") != "test"
+        and use_2way_coupling
+    ):
         return f"Two-way coupling is not stable with LBCouette solver for more than a quick test."
-    if solver == "fd" and get_config_value("simulation") != "test" and use_2way_coupling:
+    if (
+        solver == "fd"
+        and get_config_value("simulation") != "test"
+        and use_2way_coupling
+    ):
         return f"Two-way coupling is not stable with FDCouette solver for more than a quick test."
     return None
 

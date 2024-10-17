@@ -2,7 +2,7 @@
 
 """
 Utility script to generate basic couette.xml configurations for MaMiCo.
-Do NOT run this script directly! Use ../run instead.
+Do NOT run this script directly! Use ../mamico-cfg instead.
 """
 
 import argparse
@@ -123,7 +123,7 @@ def get_cmdline(configs: list):
             if "selected" in option and option["selected"]:
                 all_overrides.append(f"{key}={value}")
                 break
-    return f"{get_bin_name()} -r --override \"{','.join(all_overrides)}\""
+    return f"{get_bin_name()} -r -O \"{','.join(all_overrides)}\""
 
 
 def generate(configs: list, output_dir: str, replace_existing: bool) -> None:
@@ -177,10 +177,11 @@ def validate(configs: list) -> str:
                 lambda k: get_config_value(configs, k)
             )
         except AttributeError:
-            print(
-                f"Could not invoke validation for generator \"{config['key']}\"",
-                file=sys.stderr,
-            )
+            # Debugging only
+            # print(
+            #     f"Could not invoke validation for generator \"{config['key']}\"",
+            #     file=sys.stderr,
+            # )
             continue
         if validation_error is not None:
             validation_errors += validation_error + "\n"
@@ -238,6 +239,12 @@ If all options are provided through the command line, the script is executed non
         default="",
         help="Comma separated list of key-value (key=value) config overrides. (Will be removed from interactive menu)",
     )
+    arg_parser.add_argument(
+        "-d",
+        "--default",
+        action="store_true",
+        help="Use default values or .cache for all configs not set using -O/--override",
+    )
     # Parse key=value overrides
     args = arg_parser.parse_args(argv)
     override = {}
@@ -253,9 +260,12 @@ If all options are provided through the command line, the script is executed non
         override[k] = v
     args.override = override
     # Check if every key=value override is valid
-    for key, value in args.override.items():
-        if f"{key}={value}" not in all_override_kvs:
-            arg_parser.error(f'Invalid override "{key}={value}"')
+    if (
+        len(configs) > 0
+    ):  # Initially (when the configs have not been loaded from the JSON file), it is not possible to validate overrides
+        for key, value in args.override.items():
+            if f"{key}={value}" not in all_override_kvs:
+                arg_parser.error(f'Invalid override "{key}={value}"')
     if not Path(args.output).is_dir():
         arg_parser.error(
             "The value of --output must be a path to a directory, not a file."
@@ -304,14 +314,14 @@ def main() -> None:
         # 3. Validate
         validation_errors = validate(configs)
         is_valid = len(validation_errors.strip()) == 0
-        is_interactive = (
+        is_interactive = not args.default and (
             len(main_menu) > 0
         )  # Skip interactive mode if there are no options
         if not is_interactive:
             if is_valid:
                 generate(configs, args.output, args.replace_existing)
             else:
-                print(validation_errors, file=sys.stderr)
+                print("Error:", validation_errors, file=sys.stderr)
                 exit(1)
         else:
             if is_valid:
