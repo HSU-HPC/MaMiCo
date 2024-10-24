@@ -109,11 +109,15 @@ public:
    * MaMiCo coupling cells
    */
   void sendFromMacro2MD(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface, coupling::services::MultiMDCellService<LinkedCell, dim>* multiMDCellService) {
-    for (auto const& [meshName, data] : _macro2MDData) {
-      for (auto& [dataName, value] : data) {
+    for (auto& meshData : _macro2MDData) {
+      std::string meshName = meshData.first;
+      std::map<std::string, std::vector<double>> meshValues = meshData.second;
+      for (auto& dataValues : meshValues) {
         // need this cast from Tuple_element to std::vector, don't get why yet
-        std::vector<double> dataValues = value;
-        _participant->readData(meshName, dataName, _macro2MDIndices[meshName], 0, dataValues);
+        // std::vector<double> dataValues = value;
+        std::string dataName = dataValues.first;
+        std::vector<double> values = dataValues.second;
+        _participant->readData(meshName, dataName, _macro2MDIndices[meshName], 0, values);
       }
     }
     for (auto pair : _macro2MDCouplingCells) { // loop over all the macro to micro coupling cells
@@ -163,10 +167,13 @@ public:
       }
     }
     if (preciceInterface->twoWayCoupling()) {
-      for (auto const& [meshName, data] : _MD2MacroData) {
-        for (auto const& [dataName, value] : data) {
-          std::vector<double> dataValues = value;
-          _participant->writeData(meshName, dataName, _MD2MacroIndices[meshName], dataValues);
+      for (auto const& meshData : _MD2MacroData) {
+        const std::string meshName = meshData.first;
+        const std::map<std::string, std::vector<double>> meshValues = meshData.second;
+        for (auto const& dataValues : meshValues) {
+          const std::string dataName = dataValues.first;
+          const std::vector<double> values = dataValues.second;
+          _participant->writeData(meshName, dataName, _MD2MacroIndices[meshName], values);
         }
       }
     }
@@ -268,8 +275,10 @@ private:
    */
   void initializeData(const std::map<std::string, std::vector<double>>& meshes, std::map<std::string, std::map<std::string, std::vector<double>>>& data,
     const coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
-    for (auto const& [meshName, meshCoordinates] : meshes) {
-      size_t dataSize = meshCoordinates.size();
+    for (auto& meshCoordinates : meshes) {
+      const std::string meshName = meshCoordinates.first;
+      const std::vector<double> coordinates = meshCoordinates.second;
+      size_t dataSize = coordinates.size();
       for (const DataDescription& dataDescription : preciceInterface->getDataDescriptions(meshName)) {
         if (dataDescription.type == DataType::scalar) dataSize/=dim;
         data[meshName][dataDescription.name] = std::vector<double>(dataSize);
