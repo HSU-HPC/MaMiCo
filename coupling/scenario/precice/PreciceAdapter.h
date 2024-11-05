@@ -110,17 +110,11 @@ public:
    */
   void sendFromMacro2MD(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface, coupling::services::MultiMDCellService<LinkedCell, dim>* multiMDCellService) {
     for (auto& meshData : _macro2MDData) {
-      std::string meshName = meshData.first;
-      std::map<std::string, std::vector<double>> meshValues = meshData.second;
-      for (auto& dataValues : meshValues) {
-        // need this cast from Tuple_element to std::vector, don't get why yet
-        // std::vector<double> dataValues = value;
-        std::string dataName = dataValues.first;
-        std::vector<double> values = dataValues.second;
-        _participant->readData(meshName, dataName, _macro2MDIndices[meshName], 0, values);
+      for (auto& dataValues : meshData.second) {
+        _participant->readData(meshData.first, dataValues.first, _macro2MDIndices[meshData.first], 0, dataValues.second);
       }
     }
-    for (auto pair : _macro2MDCouplingCells) { // loop over all the macro to micro coupling cells
+    for (auto& pair : _macro2MDCouplingCells) { // loop over all the macro to micro coupling cells
       I01 idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;
       std::tie(couplingCell, idx) = pair;
@@ -129,14 +123,15 @@ public:
       std::string meshName;
       unsigned int vertexIndex;
       std::tie(meshName, vertexIndex) = _macro2MDCellMapping[I00{idx}.get()];
-      for (auto const& [dataName, dataValues] : _macro2MDData[meshName]) {
-        auto dataDescription = preciceInterface->getDataDescription(meshName, dataName);
+      for (auto const& dataValues : _macro2MDData[meshName]) {
+        auto dataDescription = preciceInterface->getDataDescription(meshName, dataValues.first);
         switch (dataDescription.type) {
           case DataType::scalar:
-            preciceInterface->readScalarData(meshName, dataName, couplingCell, idx, dataValues[vertexIndex]);
+            preciceInterface->readScalarData(meshName, dataValues.first, couplingCell, idx, dataValues.second[vertexIndex]);
             break;
           case DataType::vector:
-            preciceInterface->readVectorData(meshName, dataName, couplingCell, idx, dataValues[vertexIndex*dim], dataValues[vertexIndex*dim+1], dataValues[vertexIndex*dim+2]);
+            preciceInterface->readVectorData(meshName, dataValues.first, couplingCell, idx, 
+              dataValues.second[vertexIndex*dim], dataValues.second[vertexIndex*dim+1], dataValues.second[vertexIndex*dim+2]);
             break; 
         }
       }
