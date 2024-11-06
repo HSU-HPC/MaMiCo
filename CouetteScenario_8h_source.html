@@ -162,7 +162,7 @@ $(function(){ initResizable(false); });
 <div class="foldopen" id="foldopen00091" data-start="{" data-end="}">
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno"><a class="line" href="classCouetteScenario.html#a796800f74f7e0e69ad33d736ba3939f5">   91</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classCouetteScenario.html#a796800f74f7e0e69ad33d736ba3939f5">init</a>()<span class="keyword"> override </span>{</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">#if defined(LS1_MARDYN)</span></div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    global_log = <span class="keyword">new</span> Log::Logger(Log::Error); <span class="comment">// Info</span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    Log::global_log = std::make_unique&lt;Log::Logger&gt;(Log::Error);; <span class="comment">//Log::Info</span></div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="preprocessor">#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</span></div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    global_log-&gt;set_mpi_output_root(0);</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="preprocessor">#endif</span></div>
