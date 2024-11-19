@@ -36,7 +36,9 @@ public:
   /**
    * Create a new preCICE participant in the coupling scheme and read the preCICE config file
    */
-  PreciceAdapter(): _rank(0) {
+  PreciceAdapter(coupling::preciceadapter::PreciceInterface* preciceInterface): _preciceInterface(preciceInterface), _rank(0) {
+    if (_preciceInterface == nullptr)
+      throw new std::runtime_error("PreciceAdapter: preCICE interface == nullptr")
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
 #endif
@@ -103,17 +105,35 @@ public:
   void advance(const double dt) { _participant->advance(dt); }
 
   /**
-   * Read ´the data received from other participants of the coupling
-   * and store it in the data buffers
-   * Send the data stored in the data buffers to
-   * MaMiCo coupling cells
+   * Call the participant readData, send the values stored in the data buffer to the participant
    */
-  void sendFromMacro2MD(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface, coupling::services::MultiMDCellService<LinkedCell, dim>* multiMDCellService) {
+  void readData() {
     for (auto& meshData : _macro2MDData) {
       for (auto& dataValues : meshData.second) {
         _participant->readData(meshData.first, dataValues.first, _macro2MDIndices[meshData.first], 0, dataValues.second);
       }
     }
+  }
+
+  /**
+   * Call the participant writeData, store the values in the data buffer
+   */
+  void writeData() {
+    for (auto const& meshData : _MD2MacroData) {
+      for (auto const& dataValues : meshData.second) {
+        const std::string dataName = dataValues.first;
+        _participant->writeData(meshData.first, dataValues.first, _MD2MacroIndices[meshData.first], dataValues.second);
+      }
+    }
+  }
+
+  /**
+   * Read ´the data received from other participants of the coupling
+   * and store it in the data buffers
+   * Send the data stored in the data buffers to
+   * MaMiCo coupling cells
+   */
+  void sendFromMacro2MD(coupling::services::MultiMDCellService<LinkedCell, dim>* multiMDCellService) {
     for (auto& pair : _macro2MDCouplingCells) { // loop over all the macro to micro coupling cells
       I01 idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;
@@ -161,17 +181,6 @@ public:
         }
       }
     }
-    if (preciceInterface->twoWayCoupling()) {
-      for (auto const& meshData : _MD2MacroData) {
-        const std::string meshName = meshData.first;
-        const std::map<std::string, std::vector<double>> meshValues = meshData.second;
-        for (auto const& dataValues : meshValues) {
-          const std::string dataName = dataValues.first;
-          const std::vector<double> values = dataValues.second;
-          _participant->writeData(meshName, dataName, _MD2MacroIndices[meshName], values);
-        }
-      }
-    }
   }
 
   /**
@@ -211,27 +220,34 @@ private:
    * between this preCICE adapter and the other participant preCICE
    * adapter (adapter for a CFD solver)
    */
-  void initializeMeshes(coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
+  void initialize() {
     using namespace coupling::indexing;
     for (auto idx : I01()) {
       if (preciceInterface->isMacro2MD(idx)) {
         if (tarch::utils::contains(preciceInterface->getSourceRanks(idx), (unsigned int)_rank)) {
           addCell(idx, _macro2MDCouplingCells);
-          addMeshVertex(idx, preciceInterface->getMacro2MDSolverMeshName(idx), _macro2MDMeshes, _macro2MDIndices, _macro2MDCellMapping, preciceInterface->getMacro2MDSolverMeshOffset(idx));
+          std::string meshName = preciceInterface->getMacro2MDSolverMeshName(idx);
+          std::vector<double> coordinates = addVertex(idx, meshName, _macro2MDMeshes,
+            _preciceInterface->getMacro2MDSolverMeshOffset(idx));
+          int index = setMeshVertex(meshName, _macro2MDIndices)
+          setCellMappint(idx, meshName, _macro2MDCellMapping);
         }
       } 
       if (preciceInterface->isMD2Macro(idx)) {
         if (tarch::utils::contains(preciceInterface->getTargetRanks(idx), (unsigned int)_rank)) {
           addCell(idx, _MD2MacroCouplingCells);
-          if (preciceInterface->twoWayCoupling())
-            addMeshVertex(idx, preciceInterface->getMD2MacroSolverMeshName(idx), _MD2MacroMeshes, _MD2MacroIndices, _MD2MacroCellMapping, preciceInterface->getMD2MacroSolverMeshOffset(idx)); 
+          std::string meshName = preciceInterface->getMD2MacroSolverMeshName(idx);
+          std::vector<double> coordinates = addVertex(idx, meshName, _MD2MacroMeshes,
+            _preciceInterface->getMacro2MDSolverMeshOffset(idx));
+          int index = setMeshVertex(meshName, _MD2MacroIndices)
+          setCellMappint(idx, meshName, _MD2MacroCellMapping); 
         }    
       }
     }
     initializeData(_macro2MDMeshes, _macro2MDData, preciceInterface);
     setMeshTetrahedra(_macro2MDCouplingCells, _macro2MDCellMapping, preciceInterface);
+    initializeData(_MD2MacroMeshes, _MD2MacroData, preciceInterface);
     if (preciceInterface->twoWayCoupling()) {
-      initializeData(_MD2MacroMeshes, _MD2MacroData, preciceInterface);
       setMeshTetrahedra(_MD2MacroCouplingCells, _MD2MacroCellMapping, preciceInterface);
     }
   }
@@ -249,9 +265,7 @@ private:
   /**
    * Add a mesh vertex, calls preCICE setMeshVertex method
    */
-  void addMeshVertex(const I01& idx, const std::string& meshName, std::map<std::string, std::vector<double>>& meshes, 
-    std::map<std::string, std::vector<int>>& indices,
-    std::map<unsigned int, std::pair<std::string, int>>& cellMapping, const tarch::la::Vector<dim, double>& offset) {
+  std::vector<double> addVertex(const I01& idx, const std::string& meshName, std::map<std::string, std::vector<double>>& meshes, const tarch::la::Vector<dim, double>& offset) {
     auto cellMidPoint = idx.getCellMidPoint();
     std::vector<double> coordinates;
     for (unsigned int currentDim = 0; currentDim < dim; currentDim++) {
@@ -259,8 +273,23 @@ private:
       meshes[meshName].push_back(coordinate);
       coordinates.push_back(coordinate);
     }
-    int index = _participant->setMeshVertex(meshName, coordinates);
+    return coordinates;
+  }
+
+  /**
+   * Call the participant setMeshVertex method and add the returned index in the indices map
+   */
+  int setMeshVertex(std::string meshName, std::vector<double>, std::map<std::string, std::vector<int>>& indices) {
+    int index = -1;
+    if (preciceInterface->twoWayCoupling()) index = _participant->setMeshVertex(meshName, coordinates);
     indices[meshName].push_back(index);
+    return intex;
+  }
+
+  /**
+   * Compute the cell mapping between the MaMico index and the participant index for this coupling cell
+   */
+  void setCellMapping(const I01& idx, int index, std::string meshName, std::pair<std::string, int>>& cellMapping) {
     cellMapping[I00{idx}.get()] = std::make_pair(meshName, index);
   }
 
@@ -268,13 +297,12 @@ private:
    * For all the given meshes, initialize data buffers used to communicate data with 
    * the other participant preCICE adapter
    */
-  void initializeData(const std::map<std::string, std::vector<double>>& meshes, std::map<std::string, std::map<std::string, std::vector<double>>>& data,
-    const coupling::preciceadapter::PreciceInterface<dim>* preciceInterface) {
+  void initializeData(const std::map<std::string, std::vector<double>>& meshes, std::map<std::string, std::map<std::string, std::vector<double>>>& data) {
     for (auto& meshCoordinates : meshes) {
       const std::string meshName = meshCoordinates.first;
       const std::vector<double> coordinates = meshCoordinates.second;
       size_t dataSize = coordinates.size();
-      for (const DataDescription& dataDescription : preciceInterface->getDataDescriptions(meshName)) {
+      for (const DataDescription& dataDescription : _preciceInterface->getDataDescriptions(meshName)) {
         if (dataDescription.type == DataType::scalar) dataSize/=dim;
         data[meshName][dataDescription.name] = std::vector<double>(dataSize);
       }
@@ -326,6 +354,7 @@ private:
   int _rank;
   // pointer to the preCICE participant
   precice::Participant* _participant = nullptr;
+  coupling::preciceadapter::PreciceInterface* _preciceInterface = nullptr;
   // macro to micro preCICE data containers
   std::map<std::string, std::vector<double>> _macro2MDMeshes;
   std::map<std::string, std::vector<int>> _macro2MDIndices;
