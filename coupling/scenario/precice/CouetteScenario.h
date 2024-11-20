@@ -128,13 +128,7 @@ public:
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
 
     // Create the preCICE interface to enable communication between MaMiCo and preCICE
-    if (!scenarioConfig.couetteAnalytical) { 
-      _preciceInterface = new NonAnalytical(massCell, scenarioConfig.twoWayCoupling);
-    } else {
-      coupling::solvers::CouetteSolver<3>* _couetteSolver =
-            new coupling::solvers::CouetteSolver<3>(scenarioConfig.channelHeight, scenarioConfig.wallVelocity, scenarioConfig.kinematicViscosity);
-      _preciceInterface = new Analytical(massCell, scenarioConfig.twoWayCoupling, _couetteSolver);
-    }
+    _preciceInterface = new CouettePreciceInterface(massCell, scenarioConfig.twoWayCoupling); 
 
     // init indexing
     coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
@@ -157,8 +151,8 @@ public:
     // Create the MaMiCo/preCICE adapter and initialie it, i.e.:
     //  - create and communicate the preCICE vertices corresponding to the MaMiCo cartesian grid
     //  - create the CouplingCellContainers used as buffer for communication between MaMiCo and preCICE
-    _preciceAdapter = new coupling::preciceadapter::PreciceAdapter<MY_LINKEDCELL, dim>();
-    _preciceAdapter->initialize(_preciceInterface);
+    _preciceAdapter = new coupling::preciceadapter::PreciceAdapter<MY_LINKEDCELL, dim>(_preciceInterface);
+    _preciceAdapter->initialize();
 
     // Start the preCICE solving until the coupling is on going, i.e. until the final time is reached
     double mamico_dt = mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * mdConfig.getSimulationConfiguration().getDt();
@@ -170,17 +164,14 @@ public:
         _instanceHandling->writeCheckpoint("checkpoint_restart_" + rank, 0);
       }
 
-      _preciceAdapter->sendFromMacro2MD(_preciceInterface, _multiMDCellService);
+      _preciceAdapter->readData();
+      _preciceAdapter->sendFromMacro2MD(_multiMDCellService);
 
-      if (!scenarioConfig.couetteAnalytical) { // Non-analytical MD solver
-        // Subcycle MD solving by a number of timesteps given in the config file
-        _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
-        mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
-      } else { // Analytical Couette solver, usefull for debugging
-        _couetteSolver->advance(mamico_dt * (cycle + 1));
-      }
-
-       _preciceAdapter->sendFromMD2Macro(_preciceInterface, _multiMDCellService);
+      // Subcycle MD solving by a number of timesteps given in the config file
+      _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
+      mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
+      _preciceAdapter->sendFromMD2Macro(_multiMDCellService);
+      if (_preciceInterface->twoWayCoupling()) _preciceAdapter->writeData();
 
       // Write csv file if needed
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
@@ -215,10 +206,6 @@ private:
       tarch::configuration::ParseConfiguration::readDoubleMandatory(temp, subtag, "temperature");
       tarch::configuration::ParseConfiguration::readIntMandatory(equSteps, subtag, "equilibration-steps");
       tarch::configuration::ParseConfiguration::readIntMandatory(totalNumberMDSimulations, subtag, "number-md-simulations");
-      tarch::configuration::ParseConfiguration::readBoolOptional(couetteAnalytical, subtag, "couette-analytical");
-      tarch::configuration::ParseConfiguration::readDoubleOptional(channelHeight, subtag, "channel-height");
-      tarch::configuration::ParseConfiguration::readDoubleOptional(wallVelocity, subtag, "wall-velocity");
-      tarch::configuration::ParseConfiguration::readDoubleOptional(kinematicViscosity, subtag, "kinematic-viscosity");
     };
 
     std::string getTag() const override { return "scenario"; };
@@ -229,10 +216,6 @@ private:
     int equSteps;
     double temp;
     int totalNumberMDSimulations;
-    bool couetteAnalytical = false;
-    double channelHeight;
-    double wallVelocity;
-    double kinematicViscosity;
     bool twoWayCoupling;
   };
 
@@ -283,11 +266,6 @@ private:
       }
       return false;
     }
-  };
-
-  class NonAnalytical : public CouettePreciceInterface {
-  public:
-    NonAnalytical(const double massCell, const bool twoWayCoupling): CouettePreciceInterface(massCell, twoWayCoupling) {}
 
     void readVectorData(const std::string& meshName, const std::string& dataName, coupling::datastructures::CouplingCell<3>* const cell, 
     const I01& idx, const double& vx, const double& vy, const double& vz) const override {
@@ -309,31 +287,9 @@ private:
     }
   };
 
-  class Analytical : public NonAnalytical {
-  private:
-    coupling::solvers::CouetteSolver<3>* _couetteSolver;
-  public:
-    Analytical(const double massCell, const bool twoWayCoupling, coupling::solvers::CouetteSolver<3>* couetteSolver): 
-    NonAnalytical(massCell, twoWayCoupling), _couetteSolver(couetteSolver) {}
-
-    void writeVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<3>* const cell, 
-    const I01& idx, double& vx, double& vy, double& vz) const override {
-      auto midPoint = idx.getCellMidPoint();
-      const auto momentum{_massCell * (_couetteSolver->getVelocity(midPoint))};
-      tarch::la::Vector<3, double> velocity;
-      if (_massCell != 0.0) {
-        velocity = (1.0 / _massCell) * momentum;
-      }
-      vx=velocity[0];
-      vy=velocity[1];
-      vz=velocity[2];
-    }
-  };
-
   coupling::preciceadapter::PreciceAdapter<MY_LINKEDCELL, 3>* _preciceAdapter;
   coupling::preciceadapter::PreciceInterface<3>* _preciceInterface;
   coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
   tarch::utils::MultiMDService<3>* _multiMDService;
   coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;
-  coupling::solvers::CouetteSolver<3>* _couetteSolver;
 };
