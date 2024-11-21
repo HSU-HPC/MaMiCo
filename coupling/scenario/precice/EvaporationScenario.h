@@ -76,7 +76,7 @@ public:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
-    Log::global_log = std::make_unique<Log::Logger>(Log::Error);; //Log::Info
+    Log::global_log = std::make_unique<Log::Logger>(Log::Error); //Log::Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     global_log->set_mpi_output_root(0);
 #endif
@@ -167,6 +167,7 @@ public:
     }
     int updateFrequency = mettDeamonFeedrateDirector->getUpdateFreq();
     _preciceInterface->updateFeedrate(mettDeamonFeedrateDirector->getInitFeedrate());
+    dynamic_cast<EvaporationPreciceInterface*>(_preciceInterface)->updateFeedrate(0.0);
    
     while (_preciceAdapter->isCouplingOngoing()) {
       // In case of implicit coupling scheme, it might be required to save the current state
@@ -248,19 +249,19 @@ private:
       return _M2mMeshName;
     }
 
-    bool isMD2MacroLiquid(I01 idx) {
+    bool isMD2MacroLiquid(I01 idx) const {
       return idx.get()[1] == 4;
     }
 
-    bool isMD2MacroVapor(I01 idx) {
-      return idx.get()[1] - 1 == IndexingService.getInstance().getGlobalMDDomainSize()[1];
+    bool isMD2MacroVapor(I01 idx) const {
+      return idx.get()[1] - 1 == coupling::indexing::IndexingService<3>::getInstance().getGlobalMDDomainSize()[1];
     }
 
     std::string getMD2MacroSolverMeshName(I01 idx) const override {
       std::string meshName;
       if (isMD2MacroLiquid(idx)) {
         meshName = _m2MLMeshName;
-      } else if (isMD2MacroVapor(globalCellIndex)) {
+      } else if (isMD2MacroVapor(idx)) {
         meshName = _m2MVMeshName;
       } 
       return meshName;
@@ -275,14 +276,15 @@ private:
     }
 
     bool contains(std::string meshName, I01 idx) const override {
+      bool contained = false;
       if (meshName == _M2mMeshName) {
-        return isMacro2MD(idx);
+        contained = isMacro2MD(idx);
       } else if (meshName == _m2MLMeshName) {
-        return isMD2MacroLiquid(idx);
+        contained = isMD2MacroLiquid(idx);
       } else if (meshName == _m2MVMeshName) {
-        return isMD2MacroVapor(idx)
+        contained = isMD2MacroVapor(idx);
       }
-      return false;
+      return contained;
     }
 
     void readVectorData(const std::string& meshName, const std::string& dataName, coupling::datastructures::CouplingCell<3>* const cell, 
