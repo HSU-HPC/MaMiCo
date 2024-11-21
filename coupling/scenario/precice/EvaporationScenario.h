@@ -166,7 +166,7 @@ public:
         mettDeamonFeedrateDirector = dynamic_cast<MettDeamonFeedrateDirector*>(pit);
     }
     int updateFrequency = mettDeamonFeedrateDirector->getUpdateFreq();
-    _preciceInterface->updateFeedrate(mettDeamonFeedrateDirector->getInitFeedrate());
+    dynamic_cast<EvaporationPreciceInterface*>(_preciceInterface)->updateFeedrate(mettDeamonFeedrateDirector->getInitFeedrate());
     dynamic_cast<EvaporationPreciceInterface*>(_preciceInterface)->updateFeedrate(0.0);
    
     while (_preciceAdapter->isCouplingOngoing()) {
