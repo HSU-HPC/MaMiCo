@@ -7,6 +7,7 @@
 #include "coupling/CouplingMDDefinitions.h"
 #if (BUILD_WITH_PRECICE)
 #include "coupling/scenario/precice/CouetteScenario.h"
+#include "coupling/scenario/precice/EvaporationScenario.h"
 #endif
 #include "coupling/scenario/CouetteScenario.h"
 #include <cstdlib>
@@ -33,8 +34,12 @@ int main(int argc, char* argv[]) {
 
   Scenario* scenario;
 #if (BUILD_WITH_PRECICE)
-  if (argc > 1 && strcmp(argv[1],"preCICE")==0){  
-    scenario = new coupling::scenario::precice::CouetteScenario();
+  if (argc > 1) {
+    if (strcmp(argv[1],"preCICE_Couette")==0) {
+      scenario = new coupling::scenario::precice::CouetteScenario();
+    } else if (strcmp(argv[1],"preCICE_Evaporation")==0) {
+      scenario = new coupling::scenario::precice::EvaporationScenario();
+    }  
   } else {
     scenario = new CouetteScenario();
   }

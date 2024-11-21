@@ -22,9 +22,19 @@ public:
    */
   PreciceInterface(const bool twoWayCoupling) : _twoWayCoupling(twoWayCoupling) {}
 
-  virtual bool isMacro2MD(I01 idx) const = 0;
+  /**
+   * Return true if the coupling cell with index idx is a macro to MD coupling cell
+   */
+  virtual bool isMacro2MD(I01 idx) const {
+    return (I08::contains(idx) && !I12::contains(idx));
+  }
 
-  virtual bool isMD2Macro(I01 idx) const = 0;
+  /**
+   * Return true if the coupling cell with index idx is a MD to macro coupling cell
+   */
+  virtual bool isMD2Macro(I01 idx) const {
+    return (I12::contains(idx));
+  }
 
   /**
    * get the mesh name associated to this cell
@@ -61,6 +71,9 @@ public:
    */
   bool twoWayCoupling() const {return _twoWayCoupling;} 
 
+  /**
+   * Return true if the coupling cell with index idx belongs to the mesh named meshName
+   */
   virtual bool contains(std::string meshName, I01 idx) const = 0;
 
   /**

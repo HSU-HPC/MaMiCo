@@ -254,14 +254,6 @@ private:
       return _MD2macroMeshName;
     }
 
-    bool isMacro2MD(I01 idx) const override {
-      return (I08::contains(idx) && !I12::contains(idx));
-    }
-
-    bool isMD2Macro(I01 idx) const override {
-      return (I12::contains(idx));
-    }
-
     bool contains(std::string meshName, I01 idx) const override {
       if (meshName == _macro2MDMeshName) {
         return isMacro2MD(idx);
@@ -279,7 +271,7 @@ private:
       cell->setMicroscopicMomentum(momentum);
     }
 
-    virtual void writeVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<3>* const cell, 
+    void writeVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<3>* const cell, 
     const I01& idx, double& vx, double& vy, double& vz) const override {
       tarch::la::Vector<3, double> velocity;
       if (cell->getMacroscopicMass() != 0.0) {

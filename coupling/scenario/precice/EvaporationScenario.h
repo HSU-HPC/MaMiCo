@@ -4,10 +4,8 @@
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSimulationFactory.h"
-#include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
 #include "coupling/scenario/Scenario.h"
 #include "coupling/services/MultiMDCellService.h"
-#include "coupling/solvers/CouetteSolver.h"
 #include "coupling/solvers/CouetteSolverInterface.h"
 #include "coupling/scenario/precice/PreciceAdapter.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
@@ -69,16 +67,18 @@ public:
   }
 
   void run() override {
+    #if !defined(LS1_MARDYN)
+    throw new std::runtime_error("EvaporationScenario requires LS1 MD solver");
+    #endif
+
     const unsigned int dim = 3;
     int rank;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
-#if defined(LS1_MARDYN)
     global_log = new Log::Logger(Log::Info); // Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     global_log->set_mpi_output_root(0);
-#endif
 #endif
 
     // Read the configurations
@@ -95,13 +95,11 @@ public:
     ScenarioConfig scenarioConfig;
     tarch::configuration::ParseConfiguration::parseConfiguration<ScenarioConfig>(xmlConfigurationFilename, "scenario", scenarioConfig);
 
-#if defined(LS1_MARDYN)
     auto offset = mdConfig.getDomainConfiguration().getGlobalDomainOffset();
     coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
-#endif
 
     _multiMDService = new tarch::utils::MultiMDService<dim>(mdConfig.getMPIConfiguration().getNumberOfProcesses(), scenarioConfig.totalNumberMDSimulations);
 
@@ -160,7 +158,6 @@ public:
     double mamico_dt = mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * mdConfig.getSimulationConfiguration().getDt();
     int cycle = 0;
 
-#if defined(LS1_MARDYN)
     MettDeamonFeedrateDirector* mettDeamonFeedrateDirector = nullptr;
     std::list<PluginBase*>& plugins = *(global_simulation->getPluginList() );
     for (auto&& pit:plugins) {
@@ -170,7 +167,6 @@ public:
     }
     int updateFrequency = mettDeamonFeedrateDirector->getUpdateFreq();
     _preciceInterface->updateFeedrate(mettDeamonFeedrateDirector->getInitFeedrate());
-#endif
    
     while (_preciceAdapter->isCouplingOngoing()) {
       // In case of implicit coupling scheme, it might be required to save the current state
@@ -185,13 +181,12 @@ public:
       // Subcycle MD solving by a number of timesteps given in the config file
       _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
       mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
-      #if defined(LS1_MARDYN)
       if (mdStepCounter % updateFrequency == 0) {
         double feedrate = mettDeamonFeedrateDirector->getFeedrate();
         _preciceInterface->updateFeedrate(mettDeamonFeedrateDirector->getFeedrate());
         if (rank==0) std::cout << "updating CFD feedrate given by MDFD :" << feedrate << std::endl;
       }
-#endif
+
       _preciceAdapter->sendFromMD2Macro(_multiMDCellService);
       _preciceAdapter->writeData();
 
@@ -226,51 +221,23 @@ private:
     double _feedrate;
 
   public:
-    PreciceInterface(const double massCell, const bool twoWayCoupling)
-        : coupling::preciceadapter::PreciceInterface<3>(twoWayCoupling), 
+    PreciceInterface(const double massCell)
+        : coupling::preciceadapter::PreciceInterface<3>(true), 
         _massCell{massCell}, 
-        _M2mMeshName("mamico-M2m-mesh"), _m2MLMeshName("mamico-m2ML-mesh"), _m2MVMeshName("mamico-m2MV-mesh") {
-          // macro to micro
+        _M2mMeshName("mamico-M2m-mesh"), _m2MLMeshName("mamico-m2ML-mesh"), _m2MVMeshName("mamico-m2MV-mesh"), _feedrate(0.0) {
+        // macro to micro
+        coupling::preciceadapter::PreciceInterface<3>::addDataDescription(
+      _M2mMeshName, coupling::preciceadapter::DataDescription{"VelocityMacro", coupling::preciceadapter::DataType::vector});
+        // micro to macro in the liquid
           coupling::preciceadapter::PreciceInterface<3>::addDataDescription(
-        _M2mMeshName, coupling::preciceadapter::DataDescription{"VelocityMacro", coupling::preciceadapter::DataType::vector});
-          // micro to macro in the liquid
+      _m2MLMeshName, coupling::preciceadapter::DataDescription{"VelocityMicro", coupling::preciceadapter::DataType::vector});
+          // micro to macro vapor to liquid
             coupling::preciceadapter::PreciceInterface<3>::addDataDescription(
-        _m2MLMeshName, coupling::preciceadapter::DataDescription{"VelocityMicro", coupling::preciceadapter::DataType::vector});
-            // micro to macro vapor to liquid
-              coupling::preciceadapter::PreciceInterface<3>::addDataDescription(
-        _m2MVMeshName, coupling::preciceadapter::DataDescription{"VelocityMicro", coupling::preciceadapter::DataType::vector});      
-
-        }
-
-    bool isLiquid(tarch::la::Vector<3, unsigned int> globalCellIndex) {
-      return (globalCellIndex[1] == 3 || globalCellIndex[1] == 4);
-    }
-
-    bool isVapor(tarch::la::Vector<3, unsigned int> globalCellIndex) {
-      return (globalCellIndex[1] == this->_globalNumberMacroscopicCells[1]);
+      _m2MVMeshName, coupling::preciceadapter::DataDescription{"VelocityMicro", coupling::preciceadapter::DataType::vector});      
     }
 
     void updateFeedrate(double feedrate) { _feedrate = feedrate; }
 
-    bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-      bool isGhostCell = false;
-      for (unsigned int currentDim = 0; currentDim < 3; currentDim++) {
-        isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
-        isGhostCell |= globalCellIndex[currentDim] < 1;
-      }
-      return !isGhostCell && (isVapor(globalCellIndex) || isLiquid(globalCellIndex));
-    }
-
-    bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
-      bool isGhostCell = false;
-      for (unsigned int currentDim = 0; currentDim < 3; currentDim++) {
-        isGhostCell |= globalCellIndex[currentDim] > this->_globalNumberMacroscopicCells[currentDim];
-        isGhostCell |= globalCellIndex[currentDim] < 1;
-      }
-      return !isGhostCell && (globalCellIndex[1] == 1 || globalCellIndex[1] == 2 || globalCellIndex[1] == 3);
-    }
-
-    ########################################################
     unsigned int getOuterRegion() override {
       return 3;
     }
@@ -278,85 +245,56 @@ private:
     std::vector<unsigned int> getRanks(I01 idx) override { return {0}; }
 
     std::string getMacro2MDSolverMeshName(I01 idx) const override {
-      return _macro2MDMeshName;
-    }
-
-    std::string getMD2MacroSolverMeshName(I01 idx) const override {
-      return _MD2macroMeshName;
-    }
-
-    bool isMacro2MD(I01 idx) const override {
-      return (I08::contains(idx) && !I12::contains(idx));
-    }
-
-    bool isMD2Macro(I01 idx) const override {
-      return (I12::contains(idx));
-    }
-
-    bool contains(std::string meshName, I01 idx) const override {
-      if (meshName == _macro2MDMeshName) {
-        return isMacro2MD(idx);
-      } else if (meshName == _MD2macroMeshName) {
-        return isMD2Macro(idx);
-      }
-      return false;
-    }
-    ################################################################
-
-    std::vector<unsigned int> getRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) override { return {0}; }
-
-    std::vector<unsigned int> getSourceRanks(tarch::la::Vector<3, unsigned int> globalCellIndex) override { 
-      std::vector<unsigned int> ranks;
-      int size = 1;
-  #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-      MPI_Comm_size(MPI_COMM_WORLD, &size);
-  #endif
-      for (int i = 0; i < size; i++)
-      {
-        ranks.push_back(i);
-      }
-      
-      return ranks;
-    }
-
-    std::string getMacroscopicToMDSolverMeshName(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
       return _M2mMeshName;
     }
 
-    std::string getMDToMacroscopicSolverMeshName(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+    bool isMD2MacroLiquid(I01 idx) {
+      return idx.get()[1] == 4;
+    }
+
+    bool isMD2MacroVapor(I01 idx) {
+      return idx.get()[1] - 1 == IndexingService.getInstance().getGlobalMDDomainSize()[1];
+    }
+
+    std::string getMD2MacroSolverMeshName(I01 idx) const override {
       std::string meshName;
-      if (isLiquid(globalCellIndex)) {
+      if (isMD2MacroLiquid(idx)) {
         meshName = _m2MLMeshName;
-      } else if (isVapor(globalCellIndex)) {
+      } else if (isMD2MacroVapor(globalCellIndex)) {
         meshName = _m2MVMeshName;
-      } else {
-        std::cout << "PreciceInterface::getMDToMacroscopicSolverMeshName: wrong cell index " << globalCellIndex << std::endl;
-        exit(EXIT_FAILURE);
-      }
+      } 
       return meshName;
     }
 
-    tarch::la::Vector<3, double> getMDToMacroscopicSolverMeshOffset(tarch::la::Vector<3, unsigned int> globalCellIndex) override {
+    tarch::la::Vector<3, double> getMD2MacroSolverMeshOffset(I01 idx) override {
       tarch::la::Vector<3, double> offset;
-      if (isVapor(globalCellIndex)) {
+      if (isMD2MacroVapor(idx)) {
         offset = tarch::la::Vector<3,double>{0, /*MD size*/-115/*CFD size*/-15/*half a mamico cell*/+1.25, 0};
-      } else if (isLiquid(globalCellIndex)) {
-        offset = tarch::la::Vector<3, double>{0.0};
-      } else {
-        std::cout << "PreciceInterface::getMDToMacroscopicSolverMeshOffset: wrong cell index" << std::endl;
-        exit(EXIT_FAILURE);
       }
       return offset;
     }
 
-    void readVectorData(std::string meshName, std::string dataName, coupling::datastructures::MacroscopicCell<3>* const cell, const double vx, const double vy, const double vz) override {
+    bool contains(std::string meshName, I01 idx) const override {
+      if (meshName == _M2mMeshName) {
+        return isMacro2MD(idx);
+      } else if (meshName == _m2MLMeshName) {
+        return isMD2MacroLiquid(idx);
+      } else if (meshName == _m2MVMeshName) {
+        return isMD2MacroVapor(idx)
+      }
+      return false;
+    }
+
+    void readVectorData(const std::string& meshName, const std::string& dataName, coupling::datastructures::CouplingCell<3>* const cell, 
+    const I01& idx, const double& vx, const double& vy, const double& vz) const override {
       tarch::la::Vector<3, double> momentum{vx, vy, vz};
       momentum=momentum*_massCell;
       cell->setMicroscopicMass(_massCell);
       cell->setMicroscopicMomentum(momentum);
     }
 
-    void writeVectorData(std::string meshName, std::string dataName, const coupling::datastructures::MacroscopicCell<3>* const cell, double& vx, double& vy, double& vz) {
+    virtual void writeVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<3>* const cell, 
+    const I01& idx, double& vx, double& vy, double& vz) const override {
       if (meshName == _m2MLMeshName) {
         tarch::la::Vector<3, double> velocity;
         if (cell->getMacroscopicMass() != 0.0) {
@@ -369,9 +307,6 @@ private:
         vx = 0.0;
         vy = _feedrate;
         vz = 0.0;
-      } else {
-        std::cout << "PreciceInterface::readData: incorrect mesh name " << meshName << " or data name " << dataName << std::endl;
-        exit(EXIT_FAILURE);
       }
     }
   };
@@ -400,7 +335,7 @@ private:
   };
 
   coupling::preciceadapter::PreciceAdapter<3>* _preciceAdapter;
-  PreciceInterface* _preciceInterface;
+  PreciceInterface<3>* _preciceInterface;
   coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
   tarch::utils::MultiMDService<3>* _multiMDService;
   coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;
