@@ -76,7 +76,7 @@ public:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
-    global_log = new Log::Logger(Log::Info); // Info
+    Log::global_log = std::make_unique<Log::Logger>(Log::Error);; //Log::Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     global_log->set_mpi_output_root(0);
 #endif
@@ -128,7 +128,7 @@ public:
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
 
     // Create the preCICE interface to enable communication between MaMiCo and preCICE
-    _preciceInterface = new CouettePreciceInterface(massCell, scenarioConfig.twoWayCoupling); 
+    _preciceInterface = new EvaporationPreciceInterface(massCell); 
 
     // init indexing
     coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
@@ -212,7 +212,7 @@ public:
   coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { throw std::runtime_error("not supported yet"); }
 
 private:
-  class PreciceInterface : public coupling::preciceadapter::PreciceInterface<3> {
+  class EvaporationPreciceInterface : public coupling::preciceadapter::PreciceInterface<3> {
   private:
     const double _massCell;
     const std::string _M2mMeshName;
@@ -221,7 +221,7 @@ private:
     double _feedrate;
 
   public:
-    PreciceInterface(const double massCell)
+    EvaporationPreciceInterface(const double massCell)
         : coupling::preciceadapter::PreciceInterface<3>(true), 
         _massCell{massCell}, 
         _M2mMeshName("mamico-M2m-mesh"), _m2MLMeshName("mamico-m2ML-mesh"), _m2MVMeshName("mamico-m2MV-mesh"), _feedrate(0.0) {
@@ -266,7 +266,7 @@ private:
       return meshName;
     }
 
-    tarch::la::Vector<3, double> getMD2MacroSolverMeshOffset(I01 idx) override {
+    tarch::la::Vector<3, double> getMD2MacroSolverMeshOffset(I01 idx) const override {
       tarch::la::Vector<3, double> offset;
       if (isMD2MacroVapor(idx)) {
         offset = tarch::la::Vector<3,double>{0, /*MD size*/-115/*CFD size*/-15/*half a mamico cell*/+1.25, 0};
@@ -334,8 +334,8 @@ private:
     int totalNumberMDSimulations;
   };
 
-  coupling::preciceadapter::PreciceAdapter<3>* _preciceAdapter;
-  PreciceInterface<3>* _preciceInterface;
+  coupling::preciceadapter::PreciceAdapter<MY_LINKEDCELL, 3>* _preciceAdapter;
+  coupling::preciceadapter::PreciceInterface<3>* _preciceInterface;
   coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
   tarch::utils::MultiMDService<3>* _multiMDService;
   coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;

@@ -55,7 +55,7 @@ public:
    * @return mesh offset
    */
   virtual tarch::la::Vector<dim, double> getMacro2MDSolverMeshOffset(I01 idx) const {
-    return tarch::la::Vector<3, double>(0.0);
+    return tarch::la::Vector<dim, double>(0.0);
   }
 
   /**
@@ -63,7 +63,7 @@ public:
    * @return mesh offset
    */
   virtual tarch::la::Vector<dim, double> getMD2MacroSolverMeshOffset(I01 idx) const {
-    return tarch::la::Vector<3, double>(0.0);
+    return tarch::la::Vector<dim, double>(0.0);
   }
 
   /**

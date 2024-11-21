@@ -77,7 +77,7 @@ public:
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
 #if defined(LS1_MARDYN)
-    global_log = new Log::Logger(Log::Info); // Info
+    Log::global_log = std::make_unique<Log::Logger>(Log::Error); //Log::Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     global_log->set_mpi_output_root(0);
 #endif
@@ -227,8 +227,6 @@ private:
   private:
     const std::string _macro2MDMeshName;
     const std::string _MD2macroMeshName;
-
-  protected:
     const double _massCell;
 
   public:
