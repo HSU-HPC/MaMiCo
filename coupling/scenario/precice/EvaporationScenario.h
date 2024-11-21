@@ -184,7 +184,7 @@ public:
       mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
       if (mdStepCounter % updateFrequency == 0) {
         double feedrate = mettDeamonFeedrateDirector->getFeedrate();
-        _preciceInterface->updateFeedrate(mettDeamonFeedrateDirector->getFeedrate());
+        dynamic_cast<EvaporationPreciceInterface*>(_preciceInterface)->updateFeedrate(mettDeamonFeedrateDirector->getFeedrate());
         if (rank==0) std::cout << "updating CFD feedrate given by MDFD :" << feedrate << std::endl;
       }
 
