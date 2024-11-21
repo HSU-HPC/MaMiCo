@@ -257,6 +257,10 @@ private:
       return idx.get()[1] - 1 == coupling::indexing::IndexingService<3>::getInstance().getGlobalMDDomainSize()[1];
     }
 
+    bool isMD2Macro(I01 idx) const override {
+      return (isMD2MacroLiquid(idx) || isMD2MacroVapor(idx));
+    }
+
     std::string getMD2MacroSolverMeshName(I01 idx) const override {
       std::string meshName;
       if (isMD2MacroLiquid(idx)) {
