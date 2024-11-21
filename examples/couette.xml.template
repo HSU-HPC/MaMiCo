@@ -48,7 +48,7 @@
     -->
     <coupling
       coupling-cycles="50"
-      two-way-coupling="yes"
+      two-way-coupling="no"
       send-from-md-to-macro="yes"
       filter-init-cycles="0"
       write-csv-every-timestep="2"

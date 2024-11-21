@@ -1,0 +1,8 @@
+**/__pycache__
+.venv
+# Generated config files and cache
+*.xml
+.cache
+# Except other (text) files, such as templates
+!requirements.txt
+!assets/*

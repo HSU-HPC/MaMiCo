@@ -53,7 +53,7 @@ public:
    * @param communicator MPI communicator in parallel case
    */
   Adios2Writer(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::services::MoleculeService& moleculeService,
-               const std::string& filename, const simplemd::configurations::MolecularDynamicsConfiguration& configuration
+               const simplemd::configurations::MolecularDynamicsConfiguration& configuration
 #if (MD_PARALLEL == MD_YES)
                ,
                MPI_Comm communicator = MPI_COMM_WORLD
@@ -82,8 +82,6 @@ public:
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
   const simplemd::services::MoleculeService& _moleculeService;
-  /** filename */
-  std::string _filename;
   /** current timestep */
   unsigned int _timestep;
   /** molecular dynamics simulation*/

@@ -33,8 +33,12 @@ public:
   const int getDomainGridDecompAtDim(int dim) { return _domainGridDecomp[dim]; }
   std::array<int, 3> getDomainGridDecomp() { return _domainGridDecomp; }
 
-  void setSubdomainWeights(std::array<std::vector<unsigned int>, 3> subdomainWeights) { _subdomainWeights = subdomainWeights; }
-  const std::array <std::vector<unsigned int> ,3> getSubdomainWeights() { return _subdomainWeights; }
+  void setSubdomainWeights(tarch::la::Vector<3, std::vector<unsigned int>> const& subdomainWeights) {
+    for (int d = 0; d < 3; d++) {
+      _subdomainWeights[d] = subdomainWeights[d];
+    }
+  }
+  const std::array<std::vector<unsigned int>, 3> getSubdomainWeights() { return _subdomainWeights; }
 #endif
 
 private:
@@ -44,7 +48,7 @@ private:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm _localComm;
   std::array<int, 3> _domainGridDecomp;
-  std::array<std::vector<unsigned int> ,3 >_subdomainWeights;
+  std::array<std::vector<unsigned int>, 3> _subdomainWeights;
 #endif
 };
 } // namespace interface

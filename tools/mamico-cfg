@@ -1,0 +1,31 @@
+#! /bin/bash
+
+# This helper script launches the main python script of the config generator in a separate virtual environment.
+# Any dependencies are automatically installed.
+# The output of the script is saved to the current working directory.
+
+set -e
+
+OUTPUT="$(pwd)"
+
+cd "$(dirname "$0")/mamico-cfg-src" || exit
+
+# NOTE:
+# Currently the config generator does not have any dependencies
+# Therefore, no virtual environment needs to be created and activated
+#
+# # Create venv and install dependencies if it does not exist
+# if [ ! -f ".venv" ]
+# then
+#     python3 -m venv .venv
+#     # shellcheck source=/dev/null
+#     source .venv/bin/activate
+#     pip install -r requirements.txt
+# fi
+# 
+# # Activate venv (in case not active already)
+# # shellcheck source=/dev/null
+# source .venv/bin/activate
+
+# Run the config generator
+python3 main.py --output "$OUTPUT" "$@"

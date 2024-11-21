@@ -180,15 +180,8 @@ public:
 #endif
 
     coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell);
-    IDXS.initWithMDSize(
-      interface.getGlobalMDDomainSize(), 
-      interface.getGlobalMDDomainOffset(), 
-      numberProcesses, 
-      couplingCellSize,
-      coupling::paralleltopology::ZYX, 
-      3, 
-      (unsigned int)rank
-      );
+    IDXS.initWithMDSize(interface.getGlobalMDDomainSize(), interface.getGlobalMDDomainOffset(), numberProcesses, couplingCellSize,
+                        coupling::paralleltopology::ZYX, 3, (unsigned int)rank);
 
     // first: try to get ghost cell, make sure there is error
     CPPUNIT_ASSERT_THROW(interface.getLinkedCell(I00{0}, {1, 1, 1}, {2, 2, 2}), std::runtime_error);
@@ -208,9 +201,9 @@ public:
                 tarch::la::Vector<3, double> actualStart = {
                     // hacked for 2x2x1
                     ((coupX - 1) * couplingCellSize[0]) + (linkX * couplingCellSize[0] / linkedCellsPerCouplingCell[0] +
-                                                          ((rank / numberProcesses[0]) * couplingCellSize[0] * globalNumberCells[0] / numberProcesses[0])),
+                                                           ((rank / numberProcesses[0]) * couplingCellSize[0] * globalNumberCells[0] / numberProcesses[0])),
                     ((coupY - 1) * couplingCellSize[1]) + (linkY * couplingCellSize[1] / linkedCellsPerCouplingCell[1] +
-                                                          ((rank % numberProcesses[0]) * couplingCellSize[1] * globalNumberCells[1] / numberProcesses[1])),
+                                                           ((rank % numberProcesses[0]) * couplingCellSize[1] * globalNumberCells[1] / numberProcesses[1])),
                     ((coupZ - 1) * couplingCellSize[2]) + (linkZ * couplingCellSize[2] / linkedCellsPerCouplingCell[2])};
                 tarch::la::Vector<3, double> actualEnd = {actualStart[0] + couplingCellSize[0] / linkedCellsPerCouplingCell[0],
                                                           actualStart[1] + couplingCellSize[1] / linkedCellsPerCouplingCell[1],
@@ -246,15 +239,8 @@ public:
       numberProcesses[i] = _domainGridDecomposition[i];
 #endif
     coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell);
-    IDXS.initWithMDSize(
-      interface.getGlobalMDDomainSize(), 
-      interface.getGlobalMDDomainOffset(), 
-      numberProcesses, 
-      couplingCellSize,
-      coupling::paralleltopology::ZYX, 
-      3, 
-      (unsigned int)rank
-      );
+    IDXS.initWithMDSize(interface.getGlobalMDDomainSize(), interface.getGlobalMDDomainOffset(), numberProcesses, couplingCellSize,
+                        coupling::paralleltopology::ZYX, 3, (unsigned int)rank);
 
     // first: try to get ghost cell, make sure there is error
     CPPUNIT_ASSERT_THROW(interface.getLinkedCell(I00{0}, {1, 1, 1}, {2, 2, 2}), std::runtime_error);
@@ -272,9 +258,9 @@ public:
                 double actualStart[3] = {
                     // hacked for 2x2x1
                     ((coupX - 1) * couplingCellSize[0]) + (linkX * couplingCellSize[0] / linkedCellsPerCouplingCell[0] +
-                                                          ((rank / numberProcesses[0]) * couplingCellSize[0] * globalNumberCells[0] / numberProcesses[0])),
+                                                           ((rank / numberProcesses[0]) * couplingCellSize[0] * globalNumberCells[0] / numberProcesses[0])),
                     ((coupY - 1) * couplingCellSize[1]) + (linkY * couplingCellSize[1] / linkedCellsPerCouplingCell[1] +
-                                                          ((rank % numberProcesses[0]) * couplingCellSize[1] * globalNumberCells[1] / numberProcesses[1])),
+                                                           ((rank % numberProcesses[0]) * couplingCellSize[1] * globalNumberCells[1] / numberProcesses[1])),
                     ((coupZ - 1) * couplingCellSize[2]) + (linkZ * couplingCellSize[2] / linkedCellsPerCouplingCell[2])};
                 double actualEnd[3] = {actualStart[0] + couplingCellSize[0] / linkedCellsPerCouplingCell[0],
                                        actualStart[1] + couplingCellSize[1] / linkedCellsPerCouplingCell[1],
