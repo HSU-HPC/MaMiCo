@@ -182,7 +182,7 @@ int initMPI() {
   delete[] argv;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #if defined(LS1_MARDYN)
-  Log::global_log = std::make_unique<Log::Logger>(Log::Error); //Log::Info
+  Log::global_log = std::make_unique<Log::Logger>(Log::Error); // Log::Info
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   global_log->set_mpi_output_root(0);
 #endif
