@@ -67,8 +67,9 @@
       compute-macroscopic-quantities-every-timestep="0"
       fix-seed="no"
     ></simulation-configuration>
-    <!-- Change frequency (MD time steps) to output checkpoints -->
+    <!-- Change frequency (MD time steps) to output checkpoints/VTK -->
     <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
+    <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
     <domain-configuration
       {checkpoint}
       molecules-per-direction="{molecules-per-direction} ; {molecules-per-direction} ; {molecules-per-direction}"
