@@ -12,6 +12,11 @@ def apply(partial_xml, get_config_value) -> None:
 <particle-insertion type="none" />
     <boundary-force type="none" west="no" east="no" north="no" south="no" bottom="no" top="no" density="0.81" temperature="1.1"/>
 """.strip()
+    elif boundary_condition == "XY-periodic":
+        boundary_condition_xml = """
+<particle-insertion type="none" />
+    <boundary-force type="zhou-boundary-force" west="no" east="no" north="no" south="no" bottom="yes" top="yes" density="0.81" temperature="1.1" />
+""".strip()
     else:
         raise ValueError(f'Invalid boundary condition "boundary_condition"')
     partial_xml.substitute("boundary-condition", boundary_condition)
