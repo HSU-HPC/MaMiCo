@@ -84,13 +84,13 @@
       bottom-west="{boundary-condition}"       bottom="{boundary-condition}"       bottom-east="{boundary-condition}"
       bottom-north-west="{boundary-condition}" bottom-north="{boundary-condition}" bottom-north-east="{boundary-condition}"
 
-      south-west="{boundary-condition}"        south="{boundary-condition}"        south-east="{boundary-condition}"
-      west="{boundary-condition}"                                                  east="{boundary-condition}"
-      north-west="{boundary-condition}"        north="{boundary-condition}"        north-east="{boundary-condition}"
+      south-west="{boundary-condition-XY}"     south="{boundary-condition-XY}"     south-east="{boundary-condition-XY}"
+      west="{boundary-condition-XY}"                                               east="{boundary-condition-XY}"
+      north-west="{boundary-condition-XY}"     north="{boundary-condition-XY}"     north-east="{boundary-condition-XY}"
 
       top-south-west="{boundary-condition}"    top-south="{boundary-condition}"    top-south-east="{boundary-condition}"
       top-west="{boundary-condition}"          top="{boundary-condition}"          top-east="{boundary-condition}"
-      top-north-west="{boundary-condition}"    top-north="{boundary-condition}"    top-north-east="{boundary-condition}"
+      top-north-west="{boundary-condition}"    top-north="{boundary-condition}"    top-north-east="{boundary-condition}"      
     ></domain-configuration>
   </molecular-dynamics>
 
