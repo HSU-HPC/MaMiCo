@@ -126,7 +126,7 @@ public:
       unsigned int rank,                                                                                 // current rank
       const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,    // configuration for particle
                                                                                                          // insertion
-      const coupling::configurations::MomentumInsertionConfiguration& momentumInsertionConfiguration,    // configuration for momentum
+      const coupling::configurations::MomentumInsertionConfiguration<dim>& momentumInsertionConfiguration,    // configuration for momentum
                                                                                                          // insertion
       const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,       // configuration for boundary forces
       const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration, // configuration for transfer strategy
@@ -146,7 +146,7 @@ public:
       unsigned int rank,                                                                                 // current rank
       const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,    // configuration for particle
                                                                                                          // insertion
-      const coupling::configurations::MomentumInsertionConfiguration& momentumInsertionConfiguration,    // configuration for momentum
+      const coupling::configurations::MomentumInsertionConfiguration<dim>& momentumInsertionConfiguration,    // configuration for momentum
                                                                                                          // insertion
       const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,       // configuration for boundary forces
       const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration, // configuration for transfer strategy
@@ -324,7 +324,7 @@ private:
 
   /** needed for insertion of momentum */
   coupling::MomentumInsertion<LinkedCell, dim>* _momentumInsertion;
-  coupling::configurations::MomentumInsertionConfiguration::MomentumInsertionType _momentumInsertionType;
+  typename coupling::configurations::MomentumInsertionConfiguration<dim>::MomentumInsertionType _momentumInsertionType;
   /** needed for insertion of particles, e.g. USHER */
   coupling::ParticleInsertion<LinkedCell, dim>* _particleInsertion;
   const tarch::la::Vector<dim, unsigned int> _numberLinkedCellsPerCouplingCell;

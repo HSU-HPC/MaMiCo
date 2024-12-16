@@ -11,7 +11,7 @@ coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::CouplingCellServic
     unsigned int ID, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface,
     coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface, tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
     const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,
-    const coupling::configurations::MomentumInsertionConfiguration& momentumInsertionConfiguration,
+    const coupling::configurations::MomentumInsertionConfiguration<dim>& momentumInsertionConfiguration,
     const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,
     const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,
     const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
@@ -24,7 +24,7 @@ coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::CouplingCellServic
       _deFromMacro2MD(_macroscopicSolverInterface, topologyOffset, ID), _deFromMD2Macro(_macroscopicSolverInterface, topologyOffset, ID),
       _couplingCells(couplingCellConfiguration.getNumberLinkedCellsPerCouplingCell(), mdSolverInterface), _filterPipeline(nullptr),
       _filterPipelineConfiguration(filterPipelineConfiguration), _multiMDService(multiMDService),
-      _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(mdSolverInterface, _couplingCells.getLinkedCellContainer(),
+      _momentumInsertion(momentumInsertionConfiguration.template interpreteConfiguration<LinkedCell>(mdSolverInterface, _couplingCells.getLinkedCellContainer(),
                                                                                                  numberMDTimestepsPerCouplingCycle)),
       _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
       _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(mdSolverInterface)),
@@ -172,7 +172,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 }
 
 template <class LinkedCell, unsigned int dim> void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::distributeMomentum(unsigned int t) {
-  if (_momentumInsertionType == coupling::configurations::MomentumInsertionConfiguration::NO_INSERTION) {
+  if (_momentumInsertionType == coupling::configurations::MomentumInsertionConfiguration<dim>::NO_INSERTION) {
     return;
   }
 

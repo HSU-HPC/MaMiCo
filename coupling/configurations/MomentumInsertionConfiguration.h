@@ -17,7 +17,7 @@
 
 namespace coupling {
 namespace configurations {
-class MomentumInsertionConfiguration;
+template <unsigned int dim> class MomentumInsertionConfiguration;
 }
 } // namespace coupling
 
@@ -28,7 +28,7 @@ class NieTest;
  *	@brief momentum insertion configuration. friend class: NieTest
  *  @author Philipp Neumann
  */
-class coupling::configurations::MomentumInsertionConfiguration : public tarch::configuration::Configuration {
+template <unsigned int dim> class coupling::configurations::MomentumInsertionConfiguration : public tarch::configuration::Configuration {
 public:
   // for testing: give access to variables; will only be used in the read-sense
   friend class ::NieTest;
@@ -46,7 +46,7 @@ public:
   };
 
   /** Constructor, initializes the class  */
-  MomentumInsertionConfiguration() : _insertionType(ADDITIVE_MOMENTUM_INSERTION), _isValid(true) {}
+  MomentumInsertionConfiguration() : _insertionType(ADDITIVE_MOMENTUM_INSERTION), _boundaries(true), _isValid(true) {}
 
   /** Destructor */
   virtual ~MomentumInsertionConfiguration() {}
@@ -118,6 +118,10 @@ public:
       }
       _outerOverlap = (unsigned int)buf;
     }
+    const std::string boundaries[6] = {"west", "east", "south", "north", "bottom", "top"};
+    for (unsigned int d = 0; d < 2 * dim; d++) {
+      tarch::configuration::ParseConfiguration::readBoolOptional(_boundaries[d], node, boundaries[d]);
+    }
   }
 
   /** Returns name of xml tag that is associated to the configuration.
@@ -153,7 +157,7 @@ public:
    * 	@param numberMDTimestepsPerCouplingCycle
    * 	@return momentum insertion config
    */
-  template <class LinkedCell, unsigned int dim>
+  template <class LinkedCell>
   MomentumInsertion<LinkedCell, dim>* interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
                                                               const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells,
                                                               unsigned int numberMDTimestepsPerCouplingCycle) const {
@@ -168,21 +172,24 @@ public:
     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION_TOPONLY) {
       return new coupling::VelocityGradientRelaxationTopOnly<LinkedCell, dim>(_velocityRelaxationFactor, mdSolverInterface, couplingCells);
     } else if (_insertionType == NIE_VELOCITY_IMPOSITION) {
-      return new coupling::NieVelocityImposition<LinkedCell, dim>(mdSolverInterface, _outerOverlap, _innerOverlap);
+      return new coupling::NieVelocityImposition<LinkedCell, dim>(mdSolverInterface, _outerOverlap, _innerOverlap, _boundaries);
     }
     return NULL;
   }
 
-protected:
-  MomentumInsertionConfiguration(MomentumInsertionType insertionType) : _insertionType(insertionType), _isValid(true) {}
-
 private:
   MomentumInsertionType _insertionType;
-  double _velocityRelaxationFactor; // required by velocity relaxation schemes
-  unsigned int _innerOverlap;       // innermost layer of overlap cells (required by
-                                    // nie velocity imposition)
-  unsigned int _outerOverlap;       // outermost layer of overlap cells (required by
-                                    // nie velocity imposition)
+  // required by velocity relaxation schemes
+  double _velocityRelaxationFactor;
+  // innermost layer of overlap cells (required by
+  // nie velocity imposition)
+  unsigned int _innerOverlap;
+  // outermost layer of overlap cells (required by
+  // nie velocity imposition)
+  unsigned int _outerOverlap;
+  // specify on which boundary the velocity
+  // will be imposed to the layer of cells
+  tarch::la::Vector<2*dim, bool> _boundaries; 
   bool _isValid;
 };
 
