@@ -249,12 +249,16 @@ private:
       return _M2mMeshName;
     }
 
+    // bool isMacro2MD(I01 idx) const override {
+    //   return (I08::contains(idx) && !I12::contains(idx) && idx.get()[1] < 4);
+    // }
+
     bool isMD2MacroLiquid(I01 idx) const {
-      return idx.get()[1] == 4;
+	    return (I12::contains(idx) && I13{idx}.get()[1] == 0);
     }
 
     bool isMD2MacroVapor(I01 idx) const {
-      return idx.get()[1] - 1 == coupling::indexing::IndexingService<3>::getInstance().getGlobalMDDomainSize()[1];
+      return (I12::contains(idx) && I13{idx}.get()[1] == (int)I13::numberCellsInDomain[1]-1);
     }
 
     bool isMD2Macro(I01 idx) const override {
