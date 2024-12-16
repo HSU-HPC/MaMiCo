@@ -29,8 +29,8 @@ public:
    *  @param outermostLayer the index of the outermost cell layer
    *  @param innermostLayer the index of the innermost cell layer */
   NieVelocityImposition(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, const unsigned int& outermostLayer,
-                        const unsigned int& innermostLayer)
-      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _outermostLayer(outermostLayer), _innermostLayer(innermostLayer) {}
+                        const unsigned int& innermostLayer, const tarch::la::Vector<2*dim, bool>& boundaries)
+      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _outermostLayer(outermostLayer), _innermostLayer(innermostLayer), _boundaries(boundaries) {}
 
   /** @brief a simple destructor */
   virtual ~NieVelocityImposition() {}
@@ -75,21 +75,27 @@ private:
    * cell to check
    *  @returns a bool, that indicates if the given cell index is located in the
    * imposition layer (true) or not (false) */
-  bool isInsideImpositionLayer(I01 globalCellIndex) const {
+  bool isInsideImpositionLayer(I01 globalCellIndex) const { 
     bool inner = true;
-    tarch::la::Vector<dim, unsigned int> globalIndexUnsigned{globalCellIndex.get()};
-    for (unsigned int d = 0; d < dim; d++)
-      inner = inner && (globalIndexUnsigned[d] > _innermostLayer && globalIndexUnsigned[d] < 1 + I09::numberCellsInDomain[d] - _innermostLayer);
     bool outer = false;
-    for (unsigned int d = 0; d < dim; d++)
+    bool boundary = false;
+    tarch::la::Vector<dim, unsigned int> globalIndexUnsigned{globalCellIndex.get()};
+    for (unsigned int d = 0; d < dim; d++) {
+      inner = inner && (globalIndexUnsigned[d] > _innermostLayer && globalIndexUnsigned[d] < 1 + I09::numberCellsInDomain[d] - _innermostLayer);
       outer = outer || (globalIndexUnsigned[d] < _outermostLayer || globalIndexUnsigned[d] > 1 + I09::numberCellsInDomain[d] - _outermostLayer);
-    return !inner && !outer;
+      boundary = boundary || (globalCellIndex.get()[d] == 1 && !_boundaries[2 * d]) 
+        || (globalCellIndex.get()[d] == (int)I09::numberCellsInDomain[d] && !_boundaries[2 * d + 1]);
+
+    }
+    return !inner && !outer && !boundary;
   }
 
   /** @brief the index of the outermost cell layer*/
   const unsigned int _outermostLayer;
   /** @brief the index of the innermost cell layer*/
   const unsigned int _innermostLayer;
+  /** @brief boundaries to consider for velocity impostion*/
+  const tarch::la::Vector<2*dim, bool> _boundaries;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_VELOCITYGRADIENTRELAXATION_H_
