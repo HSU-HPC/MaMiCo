@@ -18,15 +18,13 @@
 #endif
 #include <random>
 #include <sys/time.h>
-
-#if defined(LS1_MARDYN)
 #include "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #include "utils/Logger.h"
 #include "plugins/NEMD/MettDeamonFeedrateDirector.h"
 #include "plugins/PluginBase.h"
+
 using Log::global_log;
-#endif
 
 namespace coupling {
 namespace scenario {
@@ -67,10 +65,6 @@ public:
   }
 
   void run() override {
-    #if !defined(LS1_MARDYN)
-    throw new std::runtime_error("EvaporationScenario requires LS1 MD solver");
-    #endif
-
     const unsigned int dim = 3;
     int rank;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -81,17 +75,13 @@ public:
     global_log->set_mpi_output_root(0);
 #endif
 
-    // Read the configurations
     std::string xmlConfigurationFilename("config.xml");
-    // Read the MD config
     simplemd::configurations::MolecularDynamicsConfiguration mdConfig;
     tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(xmlConfigurationFilename,
                                                                                                                            "molecular-dynamics", mdConfig);
-    // Read the MaMiCo config
     coupling::configurations::MaMiCoConfiguration<3> mamicoConfig;
     tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<dim>>(xmlConfigurationFilename, "mamico",
                                                                                                                      mamicoConfig);
-    // Read specific Couette config
     ScenarioConfig scenarioConfig;
     tarch::configuration::ParseConfiguration::parseConfiguration<ScenarioConfig>(xmlConfigurationFilename, "scenario", scenarioConfig);
 
@@ -105,7 +95,6 @@ public:
 
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(mdConfig, mamicoConfig, *_multiMDService);
 
-    // MD equilibration steps
     unsigned int mdStepCounter = 0;
     _instanceHandling->switchOffCoupling();
     _instanceHandling->equilibrate(scenarioConfig.equSteps, mdStepCounter);
@@ -114,7 +103,6 @@ public:
 
     _instanceHandling->setMDSolverInterface();
 
-    // Initialize domain and physical parameters
     const tarch::la::Vector<3, double> domainOffset{mdConfig.getDomainConfiguration().getGlobalDomainOffset()};
     const tarch::la::Vector<3, double> cellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
     const tarch::la::Vector<dim, double> domainSize{mdConfig.getDomainConfiguration().getGlobalDomainSize()};
@@ -127,10 +115,8 @@ public:
                                mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
 
-    // Create the preCICE interface to enable communication between MaMiCo and preCICE
     _preciceInterface = new EvaporationPreciceInterface(massCell); 
 
-    // init indexing
     coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
         mdConfig.getDomainConfiguration().getGlobalDomainSize(), mdConfig.getDomainConfiguration().getGlobalDomainOffset(),
         mdConfig.getMPIConfiguration().getNumberOfProcesses(), mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(),
@@ -139,7 +125,6 @@ public:
 
     _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(
         _instanceHandling->getMDSolverInterface(), _preciceInterface, mdConfig, mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
-    // init filtering for all md instances
     _multiMDCellService->constructFilterPipelines();
     
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, dim>::getInstance().setMacroscopicSolverInterface(_preciceInterface);
@@ -148,13 +133,9 @@ public:
 
     _multiMDCellService->computeAndStoreTemperature(scenarioConfig.temp);
 
-    // Create the MaMiCo/preCICE adapter and initialie it, i.e.:
-    //  - create and communicate the preCICE vertices corresponding to the MaMiCo cartesian grid
-    //  - create the CouplingCellContainers used as buffer for communication between MaMiCo and preCICE
     _preciceAdapter = new coupling::preciceadapter::PreciceAdapter<MY_LINKEDCELL, dim>(_preciceInterface);
     _preciceAdapter->initialize();
 
-    // Start the preCICE solving until the coupling is on going, i.e. until the final time is reached
     double mamico_dt = mdConfig.getSimulationConfiguration().getNumberOfTimesteps() * mdConfig.getSimulationConfiguration().getDt();
     int cycle = 0;
 
@@ -170,16 +151,10 @@ public:
     dynamic_cast<EvaporationPreciceInterface*>(_preciceInterface)->updateFeedrate(0.0);
    
     while (_preciceAdapter->isCouplingOngoing()) {
-      // In case of implicit coupling scheme, it might be required to save the current state
-      if (_preciceAdapter->requiresWritingCheckpoint()) {
-        std::cout << "Writing checkpoint" << std::endl;
-        _instanceHandling->writeCheckpoint("checkpoint_restart_" + rank, 0);
-      }
 
       _preciceAdapter->readData();
       _preciceAdapter->sendFromMacro2MD(_multiMDCellService);
 
-      // Subcycle MD solving by a number of timesteps given in the config file
       _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
       mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
       if (mdStepCounter % updateFrequency == 0) {
@@ -191,20 +166,13 @@ public:
       _preciceAdapter->sendFromMD2Macro(_multiMDCellService);
       _preciceAdapter->writeData();
 
-      // Write csv file if needed
       _multiMDCellService->plotEveryMacroscopicTimestep(cycle);
 
-      // Send all data to CFD and advance the preCICE/MaMiCo adapter
       _preciceAdapter->advance(mamico_dt);
-
-      // In case of implicit coupling scheme, it might be required to restart the coupling cycle
-      if (_preciceAdapter->requiresReadingCheckpoint()) {
-        std::cout << "Reading checkpoint" << std::endl;
-      } else {
-        cycle++;
-        if (scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
-          _preciceAdapter->write2csv(cycle);
-      } 
+      
+      cycle++;
+      if (scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
+        _preciceAdapter->write2csv(cycle);
     }
   }
 
