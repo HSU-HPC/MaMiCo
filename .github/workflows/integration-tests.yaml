@@ -1,0 +1,78 @@
+name: Integration Testing
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  extract-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.get-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: get-matrix
+        name: Extract all test configurations from a text file
+        run: |
+          test/integration/gh-act/get-test-cases-matrix.py >> $GITHUB_OUTPUT
+
+  build-executable:
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        md-solver: [md] # TODO add ls1 (does not work ATM)
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use cached LAMMPS/OpenFOAM
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            build/LAMMPS
+            build/openfoam
+          key: 3rd-party-solvers
+      - name: Build couette executable
+        run: ./tools/build-couette.py -s ${{ matrix.md-solver }}
+      - name: Cache LAMMPS/OpenFOAM
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            build/LAMMPS
+            build/openfoam
+          key: 3rd-party-solvers
+      - uses: actions/upload-artifact@v4
+        with:
+          name: couette-${{ matrix.md-solver }}
+          path: build
+
+  run-tests:
+    needs: [extract-tests, build-executable]
+    if: "always()" # Only SOME couette binaries might have failed to build
+    runs-on: self-hosted
+    strategy:
+      matrix: ${{ fromJson(needs.extract-tests.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: couette-${{ matrix.solver_md }}
+          path: build
+      - name: Generate the test configuration
+        run: |
+          mkdir test_tmp && cd $_
+          O="domain_size=${{ matrix.domain_size }}"
+          O="$O,use_checkpoint=${{ matrix.use_checkpoint }}"
+          O="$O,solver_md=${{ matrix.solver_md }}"
+          O="$O,solver_cfd=${{ matrix.solver_cfd }}"
+          O="$O,mpi_ranks=${{ matrix.mpi_ranks }}"
+          O="$O,cell_size=${{ matrix.cell_size }}"
+          O="$O,boundary=${{ matrix.boundary }}"
+          O="$O,coupling_2way=${{ matrix.coupling_2way }}"
+          O="$O,filtering=${{ matrix.filtering }}"
+          O="$O,simulation=${{ matrix.simulation }}"
+          O="$O,multi_md=${{ matrix.multi_md }}"
+          ../tools/mamico-cfg -O $O
+      - name: Run the couette executable with the generated configuration
+        run: cd test_tmp && srun -n ${{ matrix.mpi_ranks }} ../build/couette
+      - name: Assess couette profile
+        run: echo TODO
