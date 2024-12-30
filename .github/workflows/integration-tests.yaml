@@ -18,7 +18,7 @@ jobs:
           test/integration/gh-act/get-test-cases-matrix.py >> $GITHUB_OUTPUT
 
   build-executable:
-    runs-on: self-hosted
+    runs-on: test-cluster
     strategy:
       matrix:
         md-solver: [md] # TODO add ls1 (does not work ATM)
@@ -42,24 +42,24 @@ jobs:
           key: 3rd-party-solvers
       - uses: actions/upload-artifact@v4
         with:
-          name: couette-${{ matrix.md-solver }}
+          name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.solver_md }}
           path: build
 
   run-tests:
     needs: [extract-tests, build-executable]
     if: "always()" # Only SOME couette binaries might have failed to build
-    runs-on: self-hosted
+    runs-on: test-cluster
     strategy:
       matrix: ${{ fromJson(needs.extract-tests.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: couette-${{ matrix.solver_md }}
+          name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.solver_md }}
           path: build
-      - name: Generate the test configuration
+      - name: Generate the test configuration for ${{ matrix.case }}
         run: |
-          mkdir test_tmp && cd $_
+          mkdir test_${{ matrix.case }} && cd $_
           O="domain_size=${{ matrix.domain_size }}"
           O="$O,use_checkpoint=${{ matrix.use_checkpoint }}"
           O="$O,solver_md=${{ matrix.solver_md }}"
@@ -73,6 +73,10 @@ jobs:
           O="$O,multi_md=${{ matrix.multi_md }}"
           ../tools/mamico-cfg -O $O
       - name: Run the couette executable with the generated configuration
-        run: cd test_tmp && srun -n ${{ matrix.mpi_ranks }} ../build/couette
+        run: cd test_${{ matrix.case }} && srun -n ${{ matrix.mpi_ranks }} ../build/couette
       - name: Assess couette profile
-        run: echo TODO
+        run: ./tools/assess-couette-flow-profile.py test_${{ matrix.case }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.multi_md }}
+          path: test_${{ matrix.case }}
