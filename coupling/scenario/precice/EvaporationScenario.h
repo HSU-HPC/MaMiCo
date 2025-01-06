@@ -159,7 +159,7 @@ public:
       mdStepCounter += mdConfig.getSimulationConfiguration().getNumberOfTimesteps();
       if (mdStepCounter % updateFrequency == 0) {
         double feedrate = mettDeamonFeedrateDirector->getFeedrate();
-        dynamic_cast<EvaporationPreciceInterface*>(_preciceInterface)->updateFeedrate(mettDeamonFeedrateDirector->getFeedrate());
+        dynamic_cast<EvaporationPreciceInterface*>(_preciceInterface)->updateFeedrate(feedrate);
         if (rank==0) std::cout << "updating CFD feedrate given by MDFD :" << feedrate << std::endl;
       }
 
@@ -229,9 +229,9 @@ private:
       return (I12::contains(idx) && I13{idx}.get()[1] == (int)I13::numberCellsInDomain[1]-1);
     }
 
-    bool isMD2Macro(I01 idx) const override {
-      return (isMD2MacroLiquid(idx) || isMD2MacroVapor(idx));
-    }
+    // bool isMD2Macro(I01 idx) const override {
+    //   return (isMD2MacroLiquid(idx) || isMD2MacroVapor(idx));
+    // }
 
     std::string getMD2MacroSolverMeshName(I01 idx) const override {
       std::string meshName;
@@ -239,14 +239,14 @@ private:
         meshName = _m2MLMeshName;
       } else if (isMD2MacroVapor(idx)) {
         meshName = _m2MVMeshName;
-      } 
+      }
       return meshName;
     }
 
     tarch::la::Vector<3, double> getMD2MacroSolverMeshOffset(I01 idx) const override {
       tarch::la::Vector<3, double> offset;
       if (isMD2MacroVapor(idx)) {
-        offset = tarch::la::Vector<3,double>{0, /*MD size*/-115/*CFD size*/-15/*half a mamico cell*/+1.25, 0};
+        offset = tarch::la::Vector<3,double>{0, /*MD size*/-320/*CFD size*/-10/*half a mamico cell*/+1.25, 0};
       }
       return offset;
     }

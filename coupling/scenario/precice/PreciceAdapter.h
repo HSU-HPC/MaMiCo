@@ -225,23 +225,29 @@ private:
     for (auto idx : I01()) {
       if (_preciceInterface->isMacro2MD(idx)) {
         if (tarch::utils::contains(_preciceInterface->getSourceRanks(idx), (unsigned int)_rank)) {
+          // std::cout << "Maro2MD:" << idx << std::endl;
           addCell(idx, _macro2MDCouplingCells);
           std::string meshName = _preciceInterface->getMacro2MDSolverMeshName(idx);
-          std::vector<double> coordinates = addVertex(idx, meshName, _macro2MDMeshes,
-            _preciceInterface->getMacro2MDSolverMeshOffset(idx));
-          int index = setMeshVertex(meshName, coordinates, _macro2MDIndices);
-          setCellMapping(idx, index, meshName, _macro2MDCellMapping);
+          if (!meshName.empty()) {
+            std::vector<double> coordinates = addVertex(idx, meshName, _macro2MDMeshes,
+              _preciceInterface->getMacro2MDSolverMeshOffset(idx));
+            int index = setMeshVertex(meshName, coordinates, _macro2MDIndices);
+            setCellMapping(idx, index, meshName, _macro2MDCellMapping);
+          }
         }
       } 
       if (_preciceInterface->isMD2Macro(idx)) {
         if (tarch::utils::contains(_preciceInterface->getTargetRanks(idx), (unsigned int)_rank)) {
+          // std::cout << "MD2Macro:" << idx << std::endl;
           addCell(idx, _MD2MacroCouplingCells);
           std::string meshName = _preciceInterface->getMD2MacroSolverMeshName(idx);
-          std::vector<double> coordinates = addVertex(idx, meshName, _MD2MacroMeshes,
-            _preciceInterface->getMacro2MDSolverMeshOffset(idx));
-          if (_preciceInterface->twoWayCoupling()) {
-            int index = setMeshVertex(meshName, coordinates, _MD2MacroIndices);
-            setCellMapping(idx, index, meshName, _MD2MacroCellMapping); 
+          if (!meshName.empty()) {
+            std::vector<double> coordinates = addVertex(idx, meshName, _MD2MacroMeshes,
+              _preciceInterface->getMD2MacroSolverMeshOffset(idx));
+            if (_preciceInterface->twoWayCoupling()) {
+              int index = setMeshVertex(meshName, coordinates, _MD2MacroIndices);
+              setCellMapping(idx, index, meshName, _MD2MacroCellMapping); 
+            }
           }
         }    
       }
@@ -319,34 +325,36 @@ private:
       I01 idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;
       std::tie(couplingCell, idx) = pair;
-      std::string meshName;
-      unsigned int vertexIndex;
-      std::tie(meshName, vertexIndex) = cellMapping.at(I00{idx}.get());
-      if (_participant->requiresMeshConnectivityFor(meshName)) {
-          const int numberOfNeighbors = 7;
-          tarch::la::Vector<3, int> directions[numberOfNeighbors] = {{1, 0, 0}, {1, 1, 0}, {0, 1, 0}, {1, 0, 1}, {1, 1, 1}, {0, 1, 1}, {0, 0, 1}};
-          int neighborVertexIndices[numberOfNeighbors];
-          for (size_t j = 0; j < numberOfNeighbors; j++) {
-            I01 neighborCellIdx{idx.get() + directions[j]};
-            neighborVertexIndices[j] = -1;
-            if (_preciceInterface->contains(meshName, neighborCellIdx)) {
-              int neighborVertexIndex;
-              std::tie(std::ignore, neighborVertexIndex) = cellMapping.at(I00{neighborCellIdx}.get());
-              neighborVertexIndices[j] = neighborVertexIndex;
+      if (cellMapping.find(I00{idx}.get()) != cellMapping.end()) {
+        std::string meshName;
+        unsigned int vertexIndex;
+        std::tie(meshName, vertexIndex) = cellMapping.at(I00{idx}.get());
+        if (_participant->requiresMeshConnectivityFor(meshName)) {
+            const int numberOfNeighbors = 7;
+            tarch::la::Vector<3, int> directions[numberOfNeighbors] = {{1, 0, 0}, {1, 1, 0}, {0, 1, 0}, {1, 0, 1}, {1, 1, 1}, {0, 1, 1}, {0, 0, 1}};
+            int neighborVertexIndices[numberOfNeighbors];
+            for (size_t j = 0; j < numberOfNeighbors; j++) {
+              I01 neighborCellIdx{idx.get() + directions[j]};
+              neighborVertexIndices[j] = -1;
+              if (_preciceInterface->contains(meshName, neighborCellIdx)) {
+                int neighborVertexIndex;
+                std::tie(std::ignore, neighborVertexIndex) = cellMapping.at(I00{neighborCellIdx}.get());
+                neighborVertexIndices[j] = neighborVertexIndex;
+              }
             }
-          }
-          if (neighborVertexIndices[0] > -1 && neighborVertexIndices[5] > -1 && neighborVertexIndices[6] > -1)
-            _participant->setMeshTetrahedron(meshName, vertexIndex, neighborVertexIndices[0], neighborVertexIndices[5], neighborVertexIndices[6]);
-          if (neighborVertexIndices[0] > -1 && neighborVertexIndices[2] > -1 && neighborVertexIndices[5] > -1)
-            _participant->setMeshTetrahedron(meshName, vertexIndex, neighborVertexIndices[0], neighborVertexIndices[2], neighborVertexIndices[5]);
-          if (neighborVertexIndices[0] > -1 && neighborVertexIndices[5] > -1 && neighborVertexIndices[6] > -1 && neighborVertexIndices[3] > -1)
-            _participant->setMeshTetrahedron(meshName, neighborVertexIndices[0], neighborVertexIndices[5], neighborVertexIndices[6], neighborVertexIndices[3]);
-          if (neighborVertexIndices[0] > -1 && neighborVertexIndices[1] > -1 && neighborVertexIndices[2] > -1 && neighborVertexIndices[5] > -1)
-            _participant->setMeshTetrahedron(meshName, neighborVertexIndices[0], neighborVertexIndices[1], neighborVertexIndices[2], neighborVertexIndices[5]);
-          if (neighborVertexIndices[0] > -1 && neighborVertexIndices[1] > -1 && neighborVertexIndices[4] > -1 && neighborVertexIndices[5] > -1)
-            _participant->setMeshTetrahedron(meshName, neighborVertexIndices[0], neighborVertexIndices[1], neighborVertexIndices[4], neighborVertexIndices[5]);
-          if (neighborVertexIndices[0] > -1 && neighborVertexIndices[3] > -1 && neighborVertexIndices[4] > -1 && neighborVertexIndices[5] > -1)
-            _participant->setMeshTetrahedron(meshName, neighborVertexIndices[0], neighborVertexIndices[3], neighborVertexIndices[4], neighborVertexIndices[5]);
+            if (neighborVertexIndices[0] > -1 && neighborVertexIndices[5] > -1 && neighborVertexIndices[6] > -1)
+              _participant->setMeshTetrahedron(meshName, vertexIndex, neighborVertexIndices[0], neighborVertexIndices[5], neighborVertexIndices[6]);
+            if (neighborVertexIndices[0] > -1 && neighborVertexIndices[2] > -1 && neighborVertexIndices[5] > -1)
+              _participant->setMeshTetrahedron(meshName, vertexIndex, neighborVertexIndices[0], neighborVertexIndices[2], neighborVertexIndices[5]);
+            if (neighborVertexIndices[0] > -1 && neighborVertexIndices[5] > -1 && neighborVertexIndices[6] > -1 && neighborVertexIndices[3] > -1)
+              _participant->setMeshTetrahedron(meshName, neighborVertexIndices[0], neighborVertexIndices[5], neighborVertexIndices[6], neighborVertexIndices[3]);
+            if (neighborVertexIndices[0] > -1 && neighborVertexIndices[1] > -1 && neighborVertexIndices[2] > -1 && neighborVertexIndices[5] > -1)
+              _participant->setMeshTetrahedron(meshName, neighborVertexIndices[0], neighborVertexIndices[1], neighborVertexIndices[2], neighborVertexIndices[5]);
+            if (neighborVertexIndices[0] > -1 && neighborVertexIndices[1] > -1 && neighborVertexIndices[4] > -1 && neighborVertexIndices[5] > -1)
+              _participant->setMeshTetrahedron(meshName, neighborVertexIndices[0], neighborVertexIndices[1], neighborVertexIndices[4], neighborVertexIndices[5]);
+            if (neighborVertexIndices[0] > -1 && neighborVertexIndices[3] > -1 && neighborVertexIndices[4] > -1 && neighborVertexIndices[5] > -1)
+              _participant->setMeshTetrahedron(meshName, neighborVertexIndices[0], neighborVertexIndices[3], neighborVertexIndices[4], neighborVertexIndices[5]);
+        }
       }
     }
   }

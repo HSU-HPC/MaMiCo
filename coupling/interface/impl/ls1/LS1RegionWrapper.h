@@ -127,9 +127,10 @@ public:
     temp.setid(_curParticleID);
     _curParticleID += _IDIncrementor;
 
-    temp.setComponent(_locSimulation->getEnsemble()->getComponent(0));
+    temp.setComponent(_locSimulation->getEnsemble()->getComponent(1));
 
     addMolecule(temp);
+    std::cout << "Adding molecule to ls1 a position " << position << std::endl;
     //_particleContainer->addParticle(temp);
   }
 
