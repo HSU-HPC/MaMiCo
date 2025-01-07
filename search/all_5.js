@@ -13,7 +13,7 @@ var searchData=
   ['equilibrate_10',['equilibrate',['../classcoupling_1_1InstanceHandling.html#a7ddf0b99e9b6fe4184079172d1915c85',1,'coupling::InstanceHandling']]],
   ['equsteps_11',['equSteps',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a21913bc621f0067726c4773417822f76',1,'coupling::configurations::CouetteConfig']]],
   ['error_12',['Error',['../classtinyxml2_1_1XMLDocument.html#a34e6318e182e40e3cc4f4ba5d59ed9ed',1,'tinyxml2::XMLDocument']]],
-  ['error_13',['error',['../classtarch_1_1configuration_1_1ParseConfiguration_1_1XMLConfiguration.html#a2b2cda964cdff046de00457172441f1a',1,'tarch::configuration::ParseConfiguration::XMLConfiguration']]],
+  ['error_13',['error',['../classtarch_1_1configuration_1_1ParseConfiguration_1_1XMLConfiguration.html#a2b2cda964cdff046de00457172441f1a',1,'tarch::configuration::ParseConfiguration::XMLConfiguration::error'],['../classParseConfiguration_1_1XMLConfiguration.html#a2b2cda964cdff046de00457172441f1a',1,'ParseConfiguration::XMLConfiguration::error']]],
   ['errorbasequantity_14',['errorBaseQuantity',['../classcoupling_1_1error_1_1ErrorEstimation.html#a37f556584b08b8589f31bafa124a967a',1,'coupling::error::ErrorEstimation']]],
   ['errorestimation_15',['ErrorEstimation',['../classcoupling_1_1error_1_1ErrorEstimation.html',1,'coupling::error::ErrorEstimation'],['../classcoupling_1_1error_1_1ErrorEstimation.html#af1fc2be391ed9d76e6b1dd854ddc09ba',1,'coupling::error::ErrorEstimation::ErrorEstimation()']]],
   ['errorid_16',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]],

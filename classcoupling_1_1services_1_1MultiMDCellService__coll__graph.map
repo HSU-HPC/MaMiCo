@@ -1,9 +1,9 @@
 <map id="coupling::services::MultiMDCellService&lt; LinkedCell, dim &gt;" name="coupling::services::MultiMDCellService&lt; LinkedCell, dim &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="614,48,756,104"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1filtering_1_1FilterPipeline.html" title=" " alt="" coords="244,5,416,61"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="432,43,614,65,614,70,431,48"/>
-<area shape="rect" id="Node000003" href="$classcoupling_1_1sendrecv_1_1FromMD2Macro.html" title=" " alt="" coords="236,84,424,155"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="440,104,613,82,614,87,440,109"/>
-<area shape="rect" id="Node000004" href="$classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title=" " alt="" coords="5,84,187,155"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="202,117,235,117,235,122,202,122"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="668,94,810,150"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1filtering_1_1FilterPipeline.html" title=" " alt="" coords="236,5,478,121"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="495,82,668,108,667,114,494,87"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1sendrecv_1_1FromMD2Macro.html" title=" " alt="" coords="263,145,451,216"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="466,161,668,130,668,135,467,166"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title=" " alt="" coords="5,145,187,216"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="202,178,262,178,262,183,202,183"/>
 </map>

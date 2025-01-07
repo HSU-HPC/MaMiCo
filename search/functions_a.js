@@ -5,6 +5,6 @@ var searchData=
   ['lbcouettesolver_2',['LBCouetteSolver',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#af10faf0866b869f325e6acee3b131e5d',1,'coupling::solvers::LBCouetteSolver']]],
   ['lbcouettesolverinterface_3',['LBCouetteSolverInterface',['../classcoupling_1_1solvers_1_1LBCouetteSolverInterface.html#a48b23b24457671e88e91ec06ae17c7fe',1,'coupling::solvers::LBCouetteSolverInterface']]],
   ['linkedcellcontainer_4',['LinkedCellContainer',['../classcoupling_1_1datastructures_1_1LinkedCellContainer.html#a419c3908aab50875f9dbfd40c7d5b612',1,'coupling::datastructures::LinkedCellContainer']]],
-  ['load_5',['load',['../classtarch_1_1configuration_1_1ParseConfiguration_1_1XMLConfiguration.html#a03e0283dda4335736e6d00557866a76c',1,'tarch::configuration::ParseConfiguration::XMLConfiguration']]],
+  ['load_5',['load',['../classtarch_1_1configuration_1_1ParseConfiguration_1_1XMLConfiguration.html#a03e0283dda4335736e6d00557866a76c',1,'tarch::configuration::ParseConfiguration::XMLConfiguration::load()'],['../classParseConfiguration_1_1XMLConfiguration.html#a03e0283dda4335736e6d00557866a76c',1,'ParseConfiguration::XMLConfiguration::load()']]],
   ['loadfile_6',['LoadFile',['../classtinyxml2_1_1XMLDocument.html#a2ebd4647a8af5fc6831b294ac26a150a',1,'tinyxml2::XMLDocument::LoadFile(const char *filename)'],['../classtinyxml2_1_1XMLDocument.html#a5f1d330fad44c52f3d265338dd2a6dc2',1,'tinyxml2::XMLDocument::LoadFile(FILE *)']]]
 ];

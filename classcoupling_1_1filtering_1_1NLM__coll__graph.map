@@ -1,11 +1,11 @@
 <map id="coupling::filtering::NLM&lt; dim, scope &gt;" name="coupling::filtering::NLM&lt; dim, scope &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="570,50,711,91"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1filtering_1_1JunctorInterface.html" title=" " alt="" coords="277,5,406,61"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="422,38,546,52,570,55,569,61,546,57,421,43"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="522,93,664,134"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1filtering_1_1JunctorInterface.html" title=" " alt="" coords="217,5,346,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="362,43,429,57,499,75,543,90,541,95,498,80,428,62,361,49"/>
 <area shape="rect" id="Node000003" href="$classcoupling_1_1filtering_1_1FilterInterface.html" title=" " alt="" coords="5,13,156,54"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="171,30,276,30,276,36,171,36"/>
-<area shape="rect" id="Node000004" href="$classcoupling_1_1filtering_1_1Field.html" title=" " alt="" coords="283,85,400,126"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="415,105,479,104,546,97,580,89,581,94,546,102,479,109,415,111"/>
-<area shape="rect" id="Node000005" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="14,85,147,126"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="162,102,283,102,283,108,162,108"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="171,30,216,30,216,36,171,36"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1filtering_1_1Field.html" title=" " alt="" coords="205,85,358,141"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="374,110,522,110,522,116,374,116"/>
+<area shape="rect" id="Node000005" href="$classcoupling_1_1filtering_1_1Field.html" title=" " alt="" coords="218,165,346,221"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="360,171,521,129,523,134,361,176"/>
 </map>

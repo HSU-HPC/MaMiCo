@@ -2,7 +2,7 @@ var searchData=
 [
   ['xmlattribute_0',['XMLAttribute',['../classtinyxml2_1_1XMLAttribute.html',1,'tinyxml2']]],
   ['xmlcomment_1',['XMLComment',['../classtinyxml2_1_1XMLComment.html',1,'tinyxml2']]],
-  ['xmlconfiguration_2',['XMLConfiguration',['../classtarch_1_1configuration_1_1ParseConfiguration_1_1XMLConfiguration.html',1,'tarch::configuration::ParseConfiguration']]],
+  ['xmlconfiguration_2',['XMLConfiguration',['../classParseConfiguration_1_1XMLConfiguration.html',1,'ParseConfiguration::XMLConfiguration'],['../classtarch_1_1configuration_1_1ParseConfiguration_1_1XMLConfiguration.html',1,'tarch::configuration::ParseConfiguration::XMLConfiguration']]],
   ['xmlconsthandle_3',['XMLConstHandle',['../classtinyxml2_1_1XMLConstHandle.html',1,'tinyxml2']]],
   ['xmldeclaration_4',['XMLDeclaration',['../classtinyxml2_1_1XMLDeclaration.html',1,'tinyxml2']]],
   ['xmldocument_5',['XMLDocument',['../classtinyxml2_1_1XMLDocument.html',1,'tinyxml2::XMLDocument'],['../classtinyxml2_1_1XMLDocument.html#a57ddf17b6e054dda10af98991b1b8f70',1,'tinyxml2::XMLDocument::XMLDocument()']]],
