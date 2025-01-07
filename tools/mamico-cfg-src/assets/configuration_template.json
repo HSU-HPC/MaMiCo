@@ -114,6 +114,9 @@
         "value": "reflecting"
       },
       {
+        "value": "XY-periodic"
+      },
+      {
         "value": "periodic"
       }
     ]
