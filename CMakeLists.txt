@@ -399,7 +399,7 @@ elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
   endif()
   if(LS1_BUILT_WITH_AUTOPAS)
     target_compile_definitions(mamico INTERFACE MARDYN_AUTOPAS)
-    target_include_directories(mamico INTERFACE ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-src/src ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/spdlog-src/include ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-src/applicationLibrary/molecularDynamics ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/_deps/antlr4cppPrefix/install/include/antlr4-runtime)
+    target_include_directories(mamico INTERFACE ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-src/src ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/spdlog-src/include ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-src/applicationLibrary/molecularDynamics)
     target_link_directories(mamico INTERFACE ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/src/autopas ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/libs/harmony/include/lib ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/spdlog-build ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/applicationLibrary ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/_deps/antlr4cppPrefix/install/lib)
     target_link_libraries(mamico INTERFACE autopas pthread spdlog harmony antlr4-runtime molecularDynamicsLibrary)
     #pthread is required by spdlog
