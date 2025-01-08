@@ -29,9 +29,9 @@ void simplemd::moleculemappings::UpdateLinkedCellListsMapping::handleMolecule(Mo
       std::cout << "ERROR simplemd::moleculemappings::UpdateLinkedCellListsMapping::handleMolecule: Position ";
       std::cout << d << " is out of range!" << std::endl;
       std::cout << "Position: " << position << std::endl;
-      std::cout << molecule.getConstVelocity() << std::endl;
-      std::cout << molecule.getConstForce() << std::endl;
-      std::cout << molecule.getConstForceOld() << std::endl;
+      std::cout << "Velocity: " << molecule.getConstVelocity() << std::endl;
+      std::cout << "Force: " << molecule.getConstForce() << std::endl;
+      std::cout << "ForceOld: " << molecule.getConstForceOld() << std::endl;
       exit(EXIT_FAILURE);
     }
 #endif
