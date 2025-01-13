@@ -14,7 +14,11 @@ simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simpl
                            molecularPropertiesService.getMolecularProperties().getCutOffRadius()),
       _externalForceService(externalForceService) {}
 
-void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {}
+void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
+#if (MD_DEBUG == MD_YES)
+  std::cout << "simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() " << std::endl;
+#endif
+}
 
 void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCell& cell, const unsigned int& cellIndex) const {
   // force buffer
@@ -34,12 +38,18 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
     // iterate over all other molecules not touched so far
     m2++;
     while (m2 != end) {
-#if (MD_DEBUG == MD_YES)
-      std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
-#endif
-
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
       forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
+#if (MD_DEBUG == MD_YES)
+      if (tarch::la::dot(forceBuffer, forceBuffer) > 1e12) {
+        std::cout << "ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCell: Force " << forceBuffer << " out of range!" << std::endl;
+        std::cout << "Position1: " << position1 << std::endl;
+        std::cout << "Position2: " << (*m2)->getConstPosition() << std::endl;
+        std::cout << "ID1: " << (*m1)->getID() << std::endl;
+        std::cout << "ID2: " << (*m2)->getID() << std::endl;
+        exit(EXIT_FAILURE);
+      }
+#endif
       force1 += forceBuffer;
       force2 -= forceBuffer;
 
@@ -64,12 +74,18 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
 
     for (std::list<Molecule*>::const_iterator m2 = beginCell2; m2 != endCell2; m2++) {
-#if (MD_DEBUG == MD_YES)
-      std::cout << "Compute force " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
-#endif
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
-
       forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
+#if (MD_DEBUG == MD_YES)
+      if (tarch::la::dot(forceBuffer, forceBuffer) > 1e12) {
+        std::cout << "ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCellPair: Force " << forceBuffer << " out of range!" << std::endl;
+        std::cout << "Position1: " << position1 << std::endl;
+        std::cout << "Position2: " << (*m2)->getConstPosition() << std::endl;
+        std::cout << "ID1: " << (*m1)->getID() << std::endl;
+        std::cout << "ID2: " << (*m2)->getID() << std::endl;
+        exit(EXIT_FAILURE);
+      }
+#endif
       force1 += forceBuffer;
       force2 -= forceBuffer;
     }
