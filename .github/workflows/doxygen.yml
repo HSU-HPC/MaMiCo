@@ -45,7 +45,6 @@ jobs:
           # Working directory
           working-directory: "." # default is .
       - name: Get coverage
-        id: "parse_coverage"
         run: |
           mkdir build
           cd build
@@ -71,6 +70,7 @@ jobs:
         id: "parse_coverage"
         run: |
           chown -R $(whoami):$(whoami) .. # Fix issue of reading files in repo
+          git branch --show-current
           echo all files:
           pwd
           find .
