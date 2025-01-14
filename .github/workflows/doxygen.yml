@@ -73,11 +73,7 @@ jobs:
           echo 'PARSED_COVERAGE<<EOF' >> "$GITHUB_OUTPUT"
           python test/check_my_coverage.py >> "$GITHUB_OUTPUT"
           echo 'EOF' >> "$GITHUB_OUTPUT"
-          if [[ -z "$(cat "$GITHUB_OUTPUT" | grep "PARSED_COVERAGE=Sufficient")" ]]; then
-            COVERAGE_REACTION="eyes"
-          else
-            COVERAGE_REACTION="rocket"
-          fi
+          COVERAGE_REACTION=$(grep "PARSED_COVERAGE=Sufficient" $GITHUB_OUTPUT -q && echo "rocket" || echo "eyes")
           echo "COVERAGE_REACTION=$COVERAGE_REACTION" >> "$GITHUB_OUTPUT"
 
       - name: Comment Test Coverage

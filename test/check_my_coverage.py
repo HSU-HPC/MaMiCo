@@ -107,7 +107,7 @@ if __name__ == "__main__":
     current_branch = (
         subprocess.check_output(["git", "branch", "--show-current"]).decode().strip()
     )
-    # Fall back on branch name from environment when running on a pull request in GH CI pipeline
+    # Fall back on branch name from environment when running on a pull request in CI/CD pipeline
     if len(current_branch) == 0 and "GITHUB_HEAD_REF" in os.environ:
         current_branch = os.environ["GITHUB_HEAD_REF"]
     if len(current_branch) == 0:
