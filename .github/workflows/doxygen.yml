@@ -71,10 +71,14 @@ jobs:
         run: |
           chown -R $(whoami):$(whoami) .. # Fix issue of reading files in repo
           echo 'PARSED_COVERAGE<<EOF' >> "$GITHUB_OUTPUT"
-          python test/check_my_coverage.py >> "$GITHUB_OUTPUT"
+          python test/check_my_coverage.py | tee -a "$GITHUB_OUTPUT"
           echo 'EOF' >> "$GITHUB_OUTPUT"
           COVERAGE_REACTION=$(grep "PARSED_COVERAGE=Sufficient" $GITHUB_OUTPUT -q && echo "rocket" || echo "eyes")
           echo "COVERAGE_REACTION=$COVERAGE_REACTION" >> "$GITHUB_OUTPUT"
+          echo "debug output"
+          cat $GITHUB_OUTPUT
+          echo "debug grep"
+          grep "PARSED_COVERAGE=Sufficient" $GITHUB_OUTPUT
 
       - name: Comment Test Coverage
         if: github.event_name == 'pull_request'
