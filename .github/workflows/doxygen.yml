@@ -45,6 +45,7 @@ jobs:
           # Working directory
           working-directory: "." # default is .
       - name: Get coverage
+        id: "parse_coverage"
         run: |
           mkdir build
           cd build
@@ -55,6 +56,19 @@ jobs:
           make coverage
           mkdir -p ../docs/html
           mv coverage ../docs/html/coverage
+
+          echo 'PARSED_COVERAGE<<EOF' >> $GITHUB_OUTPUT
+          python ../test/check_my_coverage.py >> $GITHUB_OUTPUT
+          if [[ -z "$(echo $GITHUB_OUTPUT | grep "PARSED_COVERAGE=Sufficient")" ]]; then
+            COVERAGE_REACTION="eyes"
+          else
+            COVERAGE_REACTION="rocket"
+          fi
+          echo 'EOF' >> $GITHUB_OUTPUT
+          echo "COVERAGE_REACTION=$COVERAGE_REACTION" >> $GITHUB_OUTPUT
+
+          echo DEBUG
+          echo $GITHUB_OUTPUT
 
       - name: Deploy
         if: github.event_name == 'push'
@@ -67,27 +81,28 @@ jobs:
 
       # ========== Comment test coverage on corresponding PR ==========
 
-      - name: Parse Coverage
-        if: github.event_name == 'pull_request'
-        id: "parse_coverage"
-        run: |
-          echo all files:
-          pwd
-          find ..
-          echo ""
-          chown -R $(whoami):$(whoami) .. # Fix issue of reading files in repo
-          echo 'PARSED_COVERAGE<<EOF' >> $GITHUB_OUTPUT
-          python test/check_my_coverage.py >> $GITHUB_OUTPUT
-          if [[ -z "$(echo $GITHUB_OUTPUT | grep "PARSED_COVERAGE=Sufficient")" ]]; then
-            COVERAGE_REACTION="eyes"
-          else
-            COVERAGE_REACTION="rocket"
-          fi
-          echo 'EOF' >> $GITHUB_OUTPUT
-          echo "COVERAGE_REACTION=$COVERAGE_REACTION" >> $GITHUB_OUTPUT
-
-          echo DEBUG
-          echo $GITHUB_OUTPUT
+      #- name: Parse Coverage
+      #  if: github.event_name == 'pull_request'
+      #  id: "parse_coverage"
+      #  run: |
+      #    git reset --hard
+      #    echo all files:
+      #    pwd
+      #    find ..
+      #    echo ""
+      #    chown -R $(whoami):$(whoami) .. # Fix issue of reading files in repo
+      #    echo 'PARSED_COVERAGE<<EOF' >> $GITHUB_OUTPUT
+      #    python test/check_my_coverage.py >> $GITHUB_OUTPUT
+      #    if [[ -z "$(echo $GITHUB_OUTPUT | grep "PARSED_COVERAGE=Sufficient")" ]]; then
+      #      COVERAGE_REACTION="eyes"
+      #    else
+      #      COVERAGE_REACTION="rocket"
+      #    fi
+      #    echo 'EOF' >> $GITHUB_OUTPUT
+      #    echo "COVERAGE_REACTION=$COVERAGE_REACTION" >> $GITHUB_OUTPUT
+      #
+      #    echo DEBUG
+      #    echo $GITHUB_OUTPUT
 
       - name: Comment Test Coverage
         if: github.event_name == 'pull_request'
