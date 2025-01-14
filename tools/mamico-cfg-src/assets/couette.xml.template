@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<scenario-configuration>
+  <couette-test>
+    <domain
+      channelheight="{cfd-size}"
+      wall-init-velocity="0.0 ; 0.0 ; 0.0"
+      wall-init-cycles="0"
+      wall-velocity="{wall-velocity} ; 0.0 ; 0.0"
+      wall-oscillations="0"
+    />
+    <coupling
+      coupling-cycles="{coupling-cycles}"
+      two-way-coupling="{two-way-coupling}"
+      send-from-md-to-macro="yes"
+      filter-init-cycles="0"
+      write-csv-every-timestep="10"
+      send-from-macro-to-md="yes"
+      compute-snr="no"
+    />
+    <macroscopic-solver
+      type="{cfd-solver}"
+      viscosity="2.14"
+      number-of-processes="1 ; 1 ; 1"
+      plot-every-timestep="0"
+      init-advance-cycles="0"
+      {foam-setup}
+      boundaries-with-MD="0; 0; 0; 0; 0; 0; 1; 1; 1; 1; 1; 1"
+    />
+    <microscopic-solver
+      type="{md-solver}"
+      temperature="1.1"
+      equilibration-steps="{equilibration-steps}"
+      number-md-simulations="{num-md-sims}"
+      density="0.813037037"
+    />
+  </couette-test>
+
+  <mamico>
+    <coupling-cell-configuration
+      cell-size="{cell-size} ; {cell-size} ; {cell-size}"
+      linked-cells-per-coupling-cell="{linked-cells-per-coupling-cell} ; {linked-cells-per-coupling-cell} ; {linked-cells-per-coupling-cell}"
+      write-every-microscopic-timestep="0"
+      microscopic-filename="CouplingCell_micro"
+      write-every-macroscopic-timestep="0"
+      macroscopic-filename="CouplingCell_macro"
+    />
+    <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
+    <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" shift-by-timesteps="0.5"/>
+    <parallel-topology type="{parallel-topology-type}" />
+    <thermostat type='{thermostat-type}' number-layers='1' />
+    {boundary-condition-xml}
+  </mamico>
+
+  <molecular-dynamics>
+    <molecule-configuration
+      mass="1.0"
+      temperature="1.27"
+      sigma="1.0"
+      epsilon="1.0"
+      mean-velocity="0.0 ; 0.0 ; 0.0"
+    ></molecule-configuration>
+    <mpi-configuration number-of-processes="{mpi-size-x} ; {mpi-size-y} ; {mpi-size-z}" ></mpi-configuration>
+    <simulation-configuration
+      dt="0.005"
+      number-of-timesteps="{timesteps-per-coupling-cycle}"
+      reorganise-memory-every-timestep="20"
+      compute-macroscopic-quantities-every-timestep="0"
+      fix-seed="no"
+    ></simulation-configuration>
+    <!-- Change frequency (MD time steps) to output checkpoints/VTK -->
+    <checkpoint-configuration filename="CheckpointSimpleMD" write-every-timestep="0"></checkpoint-configuration>
+    <vtk-configuration filename="Molecules" write-every-timestep="0"></vtk-configuration>
+    <domain-configuration
+      {checkpoint}
+      molecules-per-direction="{molecules-per-direction} ; {molecules-per-direction} ; {molecules-per-direction}"
+      domain-size="{md-size} ; {md-size} ; {md-size}"
+      domain-offset="{domain-offset-x} ; {domain-offset-x} ; {domain-offset-z}"
+      cutoff-radius="2.2"
+      linked-cell-size="2.5 ; 2.5 ; 2.5"
+      k_B="1.0"
+      block-size="100"
+
+      bottom-south-west="{boundary-condition}" bottom-south="{boundary-condition}" bottom-south-east="{boundary-condition}"
+      bottom-west="{boundary-condition}"       bottom="{boundary-condition}"       bottom-east="{boundary-condition}"
+      bottom-north-west="{boundary-condition}" bottom-north="{boundary-condition}" bottom-north-east="{boundary-condition}"
+
+      south-west="{boundary-condition-XY}"     south="{boundary-condition-XY}"     south-east="{boundary-condition-XY}"
+      west="{boundary-condition-XY}"                                               east="{boundary-condition-XY}"
+      north-west="{boundary-condition-XY}"     north="{boundary-condition-XY}"     north-east="{boundary-condition-XY}"
+
+      top-south-west="{boundary-condition}"    top-south="{boundary-condition}"    top-south-east="{boundary-condition}"
+      top-west="{boundary-condition}"          top="{boundary-condition}"          top-east="{boundary-condition}"
+      top-north-west="{boundary-condition}"    top-north="{boundary-condition}"    top-north-east="{boundary-condition}"      
+    ></domain-configuration>
+  </molecular-dynamics>
+
+  <filter-pipeline>
+    {per-instance-filtering}
+    <post-multi-instance output="md"></post-multi-instance>
+  </filter-pipeline>
+</scenario-configuration>

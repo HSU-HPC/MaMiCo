@@ -34,14 +34,12 @@ public:
       _type = onlyOutestLayer;
     } else if (value == "outerLayers") {
       _type = outerLayers;
-      int cellsTemp = 0;
-      tarch::configuration::ParseConfiguration::readIntOptional(cellsTemp, node, "number-layers");
-      if (cellsTemp <= 0) {
+      tarch::configuration::ParseConfiguration::readIntMandatory(_cells, node, "number-layers");
+      if (_cells < 0) {
         std::cout << "ERROR coupling::ThermostatConfiguration: Wrong number of cells to use!" << std::endl;
         _isValid = false;
         exit(EXIT_FAILURE);
       }
-      _cells = cellsTemp - 1;
     } else if (value == "all") {
       _type = all;
     } else if (value == "nowhere") {

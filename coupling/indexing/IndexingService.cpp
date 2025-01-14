@@ -627,7 +627,7 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingC
     // we handle these two cases first, and then use the lookup table for everything else
     if (globalCellIndex[d] == 0) // first ghost, return first coord in this axis (usually 0)
       processCoords[d] = _subdomainOwnership[d][0];
-    else if (globalCellIndex[d] == globalNumberCouplingCells[d] + 1) //last ghost, return last coord
+    else if (globalCellIndex[d] == globalNumberCouplingCells[d] + 1) // last ghost, return last coord
       processCoords[d] = _subdomainOwnership[d][_subdomainOwnership[d].size() - 1];
     else // all internal cells
       processCoords[d] = _subdomainOwnership[d][globalCellIndex[d] - 1];

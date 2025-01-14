@@ -186,7 +186,7 @@ public:
     global_simulation->getMoleculeContainer()->deleteOuterParticles();
 #endif
     global_simulation->updateParticleContainerAndDecomposition(1.0, false);
-    global_simulation->domainDecomposition().removeNonPeriodicHalos();
+    global_simulation->domainDecomposition().removeNonPeriodicHalos(global_simulation->getMoleculeContainer());
   }
 
   /** is called each time when MaMiCo tried to insert momentum in the MD simulation. For the builtin MD simulation,
