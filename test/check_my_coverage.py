@@ -1,76 +1,20 @@
 #! /usr/bin/env python3
 
-'''
+"""
 This script parses the current remote and local state of git and the HTML output of the test coverage
 to suggest a list of files that still need to be tested.
-'''
+"""
 
-__author__ = 'Ruben'
+__author__ = "Ruben Horn"
 
 import os
 import subprocess
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup, Tag
-import numpy as np
-
-os.chdir(Path(__file__).parent.parent)
-
-if not Path('.git').is_dir():
-    print(f'{os.getcwd()} is not a git repository!', file=sys.stderr)
-    exit(1)
-
-# Look up target branch for pull request in CI/CD pipeline or default to master when running locally
-target_branch = ''
-if 'GITHUB_BASE_REF' in os.environ:
-    target_branch = os.environ['GITHUB_BASE_REF'].strip()
-if len(target_branch) == 0:
-    target_branch = 'master'
-
-
-# TODO remove (debugging)
-print('CWD:', os.getcwd(), file=sys.stderr)
-print('LS BEGIN:', file=sys.stderr)
-for f in Path('.').iterdir():
-    print('-', f)
-print('LS END', file=sys.stderr)
-if 'GITHUB_WORKSPACE' in os.environ:
-    print('LS GITHUB BEGIN:', file=sys.stderr)
-    print('GITHUB_WORKSPACE:', os.environ['GITHUB_WORKSPACE'], file=sys.stderr)
-    for f in Path(os.environ['GITHUB_WORKSPACE']).parent.iterdir():
-        print('-', f)
-    print('LS GITHUB END', file=sys.stderr)
-    print(file=sys.stderr)
-
-
-# Make sure to compare to the current target branch on the remote
-subprocess.call(['git', 'fetch'], stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL)
-uncommited_files = [l.split(' ')[-1] for l in subprocess.check_output(
-    ['git', 'status', '--porcelain']).decode().strip().splitlines()]
-current_branch = subprocess.check_output(
-    ['git', 'branch', '--show-current']).decode().strip()
-if len(current_branch) == 0:
-    print('Could not determine current branch!', file=sys.stderr)
-    exit(1)
-changed_files = subprocess.check_output(
-    ['git', 'diff', '--name-only', f'origin/{target_branch}...{current_branch}']).decode().strip().splitlines()
-touched_files = set(uncommited_files + changed_files)
-
-coverage_root = Path('build') / 'coverage'
-
-if not coverage_root.is_dir():
-    print(
-        f'No test coverage found in {str(coverage_root)}!', file=sys.stderr, end='')
-    coverage_root = Path('docs') / 'html' / \
-        'coverage'  # Check alternative location
-    print(f' (Switching to {str(coverage_root)})', file=sys.stderr)
-
-if not coverage_root.is_dir():
-    print('Coverage has not been generated yet.', file=sys.stderr)
-    exit(1)
 
 
 def iterate_coverage_indices(folder):
@@ -80,19 +24,16 @@ def iterate_coverage_indices(folder):
     for f in folder.iterdir():
         if f.is_dir():
             index_files += iterate_coverage_indices(f)
-        elif f.name.lower() == 'index.html':
+        elif f.name.lower() == "index.html":
             index_files.append(f)
     return index_files
-
-
-coverage_index_files = iterate_coverage_indices(coverage_root)
 
 
 def get_test_coverage(index_files):
     data = {}
 
     def parse_file(file):
-        soup = BeautifulSoup(f.read_text(), 'html.parser')
+        soup = BeautifulSoup(file.read_text(), "html.parser")
         root_element = soup.body.center.table
         for i, tr in enumerate(e for e in root_element if isinstance(e, Tag)):
             if 0 == i:
@@ -100,8 +41,8 @@ def get_test_coverage(index_files):
             elif 1 == i:
                 keys = [td.text.strip() for td in tr]
                 keys = [k for k in keys if len(k) > 0]
-                if keys[0] != 'Filename':
-                    print(f'Skipping {f}', file=sys.stderr)
+                if keys[0] != "Filename":
+                    print(f"Skipping {file}", file=sys.stderr)
                     return
                 if len(data) == 0:
                     # Second row contains header (filename and coverage)
@@ -111,19 +52,19 @@ def get_test_coverage(index_files):
                             continue
                         data[key] = []
             else:
-                folder = str(f.parent)[len(str(coverage_root))+1:]
+                folder = str(file.parent)[len(str(coverage_root)) + 1 :]
                 cells = [td.text.strip() for td in tr]
                 values = []
                 for j, s in enumerate(s for s in cells if len(s) > 0):
                     if 0 == j:
-                        values.append(f'{folder}/{s}')
-                    elif '%' in s:
+                        values.append(f"{folder}/{s}")
+                    elif "%" in s:
                         values.append(float(s[:-2]) / 100)
 
                 if len(data.keys()) - 1 == len(values):
                     values.append(np.nan)  # Has no function coverage
                 elif len(data.keys()) != len(values):
-                    print(f'Error in {f}')
+                    print(f"Error in {file}")
                     continue
 
                 for key, value in zip(data.keys(), values):
@@ -135,20 +76,93 @@ def get_test_coverage(index_files):
     return pd.DataFrame(data)
 
 
-df_coverage = get_test_coverage(coverage_index_files)
+if __name__ == "__main__":
+    os.chdir(Path(__file__).parent.parent)
 
-# Remove completely tested (100% line coverage)
-mask_not_completed = ~(
-    df_coverage[df_coverage.columns[1:]] >= 1).apply(all, axis=1)
-df_coverage = df_coverage[mask_not_completed]
-# Only keep those that were changed
-mask_touched = df_coverage.apply(
-    lambda r: r.values[0] in touched_files, axis=1)
-df_coverage = df_coverage[mask_touched]
+    if not Path(".git").is_dir():
+        print(f"{os.getcwd()} is not a git repository!", file=sys.stderr)
+        exit(1)
 
-if len(df_coverage) == 0:
-    print('Sufficient test coverage for changed files.')
-else:
-    print('You should write tests for:')
-    print(df_coverage.to_string(index=False, formatters={
-        c: '{:,.2%}'.format for c in df_coverage.columns[1:]}))
+    # Look up target branch for pull request in CI/CD pipeline or default to master when running locally
+    target_branch = ""
+    if "GITHUB_BASE_REF" in os.environ:
+        target_branch = os.environ["GITHUB_BASE_REF"].strip()
+    if len(target_branch) == 0:
+        target_branch = "master"
+
+    # TODO remove (debugging)
+    # region debugging
+    print("CWD:", os.getcwd(), file=sys.stderr)
+    print("LS BEGIN:", file=sys.stderr)
+    for f in Path(".").iterdir():
+        print("-", f)
+    print("LS END", file=sys.stderr)
+    if "GITHUB_WORKSPACE" in os.environ:
+        print("LS GITHUB BEGIN:", file=sys.stderr)
+        print("GITHUB_WORKSPACE:", os.environ["GITHUB_WORKSPACE"], file=sys.stderr)
+        for f in Path(os.environ["GITHUB_WORKSPACE"]).parent.iterdir():
+            print("-", f)
+        print("LS GITHUB END", file=sys.stderr)
+        print(file=sys.stderr)
+    # endregion debugging
+
+    # Make sure to compare to the current target branch on the remote
+    subprocess.call(
+        ["git", "fetch"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
+    uncommited_files = [
+        l.split(" ")[-1]
+        for l in subprocess.check_output(["git", "status", "--porcelain"])
+        .decode()
+        .strip()
+        .splitlines()
+    ]
+    current_branch = (
+        subprocess.check_output(["git", "branch", "--show-current"]).decode().strip()
+    )
+    if len(current_branch) == 0:
+        print("Could not determine current branch!", file=sys.stderr)
+        exit(1)
+    changed_files = (
+        subprocess.check_output(
+            ["git", "diff", "--name-only", f"origin/{target_branch}...{current_branch}"]
+        )
+        .decode()
+        .strip()
+        .splitlines()
+    )
+    touched_files = set(uncommited_files + changed_files)
+
+    coverage_root = Path("build") / "coverage"
+
+    if not coverage_root.is_dir():
+        print(
+            f"No test coverage found in {str(coverage_root)}!", file=sys.stderr, end=""
+        )
+        coverage_root = Path("docs") / "html" / "coverage"  # Check alternative location
+        print(f" (Switching to {str(coverage_root)})", file=sys.stderr)
+
+    if not coverage_root.is_dir():
+        print("Coverage has not been generated yet.", file=sys.stderr)
+        exit(1)
+
+    coverage_index_files = iterate_coverage_indices(coverage_root)
+    df_coverage = get_test_coverage(coverage_index_files)
+
+    # Remove completely tested (100% line coverage)
+    mask_not_completed = ~(df_coverage[df_coverage.columns[1:]] >= 1).apply(all, axis=1)
+    df_coverage = df_coverage[mask_not_completed]
+    # Only keep those that were changed
+    mask_touched = df_coverage.apply(lambda r: r.values[0] in touched_files, axis=1)
+    df_coverage = df_coverage[mask_touched]
+
+    if len(df_coverage) == 0:
+        print("Sufficient test coverage for changed files.")
+    else:
+        print("You should write tests for:")
+        print(
+            df_coverage.to_string(
+                index=False,
+                formatters={c: "{:,.2%}".format for c in df_coverage.columns[1:]},
+            )
+        )
