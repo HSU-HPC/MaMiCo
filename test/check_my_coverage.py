@@ -2,7 +2,7 @@
 
 """
 This script parses the current remote and local state of git and the HTML output of the test coverage
-to suggest a list of files that still need to be tested.
+to suggest a list of files for which more tests need to be written.
 """
 
 __author__ = "Ruben Horn"
@@ -126,14 +126,20 @@ if __name__ == "__main__":
     if len(current_branch) == 0:
         print("Could not determine current branch!", file=sys.stderr)
         exit(1)
-    changed_files = (
-        subprocess.check_output(
-            ["git", "diff", "--name-only", f"origin/{target_branch}...{current_branch}"]
-        )
-        .decode()
-        .strip()
-        .splitlines()
-    )
+    changed_files = []
+    remote = "origin"
+    for branch_prefix in ["", f"{remote}/"]:
+        try:
+            changed_files += (
+                subprocess.check_output(
+                    ["git", "diff", "--name-only", f"{remote}/{target_branch}...{branch_prefix}{current_branch}"]
+                )
+                .decode()
+                .strip()
+                .splitlines()
+            )
+        except:
+            pass # No such branch
     touched_files = set(uncommited_files + changed_files)
 
     coverage_root = Path("build") / "coverage"
