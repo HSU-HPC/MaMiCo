@@ -70,11 +70,6 @@ jobs:
         id: "parse_coverage"
         run: |
           chown -R $(whoami):$(whoami) .. # Fix issue of reading files in repo
-          git branch --show-current
-          echo all files:
-          pwd
-          find .
-          echo ""
           echo 'PARSED_COVERAGE<<EOF' >> $GITHUB_OUTPUT
           python test/check_my_coverage.py >> $GITHUB_OUTPUT
           if [[ -z "$(echo $GITHUB_OUTPUT | grep "PARSED_COVERAGE=Sufficient")" ]]; then
@@ -84,9 +79,6 @@ jobs:
           fi
           echo 'EOF' >> $GITHUB_OUTPUT
           echo "COVERAGE_REACTION=$COVERAGE_REACTION" >> $GITHUB_OUTPUT
-      
-          echo DEBUG
-          echo $GITHUB_OUTPUT
 
       - name: Comment Test Coverage
         if: github.event_name == 'pull_request'

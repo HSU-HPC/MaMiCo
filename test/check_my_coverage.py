@@ -90,29 +90,16 @@ if __name__ == "__main__":
     if len(target_branch) == 0:
         target_branch = "master"
 
-    # TODO remove (debugging)
-    # region debugging
-    print("CWD:", os.getcwd(), file=sys.stderr)
-    print("LS BEGIN:", file=sys.stderr)
-    for f in Path(".").iterdir():
-        print("-", f)
-    print("LS END", file=sys.stderr)
-    if "GITHUB_WORKSPACE" in os.environ:
-        print("LS GITHUB BEGIN:", file=sys.stderr)
-        print("GITHUB_WORKSPACE:", os.environ["GITHUB_WORKSPACE"], file=sys.stderr)
-        for f in Path(os.environ["GITHUB_WORKSPACE"]).parent.iterdir():
-            print("-", f)
-        print("LS GITHUB END", file=sys.stderr)
-        print(file=sys.stderr)
-    # endregion debugging
-
     # Make sure to compare to the current target branch on the remote
     subprocess.call(
         ["git", "fetch"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )
     uncommited_files = [
         l.split(" ")[-1]
-        for l in subprocess.check_output(["git", "status", "--porcelain"])
+        for l in subprocess.check_output(
+            ["git", "status", "--porcelain"],
+            stderr=subprocess.DEVNULL,
+        )
         .decode()
         .strip()
         .splitlines()
@@ -132,14 +119,20 @@ if __name__ == "__main__":
         try:
             changed_files += (
                 subprocess.check_output(
-                    ["git", "diff", "--name-only", f"{remote}/{target_branch}...{branch_prefix}{current_branch}"]
+                    [
+                        "git",
+                        "diff",
+                        "--name-only",
+                        f"{remote}/{target_branch}...{branch_prefix}{current_branch}",
+                    ],
+                    stderr=subprocess.DEVNULL,
                 )
                 .decode()
                 .strip()
                 .splitlines()
             )
         except:
-            pass # No such branch
+            pass  # No such branch
     touched_files = set(uncommited_files + changed_files)
 
     coverage_root = Path("build") / "coverage"
