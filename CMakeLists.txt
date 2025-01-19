@@ -183,7 +183,7 @@ if("${MD_SIM}" STREQUAL "LS1_MARDYN")
     endif()
     if(LS1_CACHE_AUTOPAS_ENABLE_RULES_BASED_AND_FUZZY_TUNING)
       find_library(antlr4-runtime REQUIRED NAMES "antlr4-runtime" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/_deps/antlr4cppPrefix/install/lib)
-    endif
+    endif()
     find_library(harmony REQUIRED NAMES "harmony" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/libs/harmony/include/lib )
   endif()
   if(LS1_CACHE_ENABLE_VTK)
@@ -406,7 +406,7 @@ elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
     target_link_libraries(mamico INTERFACE autopas pthread spdlog harmony molecularDynamicsLibrary)
     if(LS1_CACHE_AUTOPAS_ENABLE_RULES_BASED_AND_FUZZY_TUNING)
       target_link_libraries(mamico INTERFACE antlr4-runtime)
-    endif
+    endif()
     #pthread is required by spdlog
   endif()
   if(LS1_CACHE_ENABLE_VTK)
