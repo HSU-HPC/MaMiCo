@@ -9,6 +9,7 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+    types: [review_requested, ready_for_review]
 
 # Abort running jobs if a new one is triggered
 concurrency:
@@ -22,6 +23,8 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    # Expected runtime is < 3 minutes
+    timeout-minutes: 5
     # How to update container: See ../../test/docker/Readme.md
     container: ghcr.io/hsu-hpc/testmamico
 
@@ -29,13 +32,6 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-      - name: Doxygen Action
-        uses: mattnotmitt/doxygen-action@v1.1.0
-        with:
-          # Path to Doxyfile
-          doxyfile-path: "./Doxyfile" # default is ./Doxyfile
-          # Working directory
-          working-directory: "." # default is .
       - name: Doxygen Action
         if: github.event_name == 'push' # Only update documentation when PR was merged
         uses: mattnotmitt/doxygen-action@v1.1.0

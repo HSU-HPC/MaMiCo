@@ -7,6 +7,7 @@ to suggest a list of files for which more tests need to be written.
 
 __author__ = "Ruben Horn"
 
+import argparse
 import os
 import subprocess
 import sys
@@ -33,42 +34,44 @@ def get_test_coverage(index_files):
     data = {}
 
     def parse_file(file):
+        source_folder = str(file.parent)[len(str(coverage_root)) + 1 :]
         soup = BeautifulSoup(file.read_text(), "html.parser")
         root_element = soup.body.center.table
-        for i, tr in enumerate(e for e in root_element if isinstance(e, Tag)):
-            if 0 == i:
-                continue  # First row is empty -> skip
-            elif 1 == i:
-                keys = [td.text.strip() for td in tr]
-                keys = [k for k in keys if len(k) > 0]
-                if keys[0] != "Filename":
-                    print(f"Skipping {file}", file=sys.stderr)
-                    return
-                if len(data) == 0:
-                    # Second row contains header (filename and coverage)
-                    for td in tr:
-                        key = td.text.strip()
-                        if len(key) == 0:
-                            continue
-                        data[key] = []
-            else:
-                folder = str(file.parent)[len(str(coverage_root)) + 1 :]
-                cells = [td.text.strip() for td in tr]
-                values = []
-                for j, s in enumerate(s for s in cells if len(s) > 0):
-                    if 0 == j:
-                        values.append(f"{folder}/{s}")
-                    elif "%" in s:
-                        values.append(float(s[:-2]) / 100)
 
-                if len(data.keys()) - 1 == len(values):
-                    values.append(np.nan)  # Has no function coverage
-                elif len(data.keys()) != len(values):
-                    print(f"Error in {file}")
-                    continue
+        def parse_coverage_table_row(row, out_data):
+            cells = [td.text.strip() for td in row]
+            values = []
+            for j, s in enumerate(s for s in cells if len(s) > 0):
+                if 0 == j:
+                    values.append(f"{source_folder}/{s}")
+                elif "%" in s:
+                    values.append(float(s[:-2]) / 100)
+            if len(out_data.keys()) - 1 == len(values):
+                values.append(np.nan)  # Has no function coverage
+            elif len(out_data.keys()) != len(values):
+                print(out_data.keys(), values)
+                return False
+            for key, value in zip(out_data.keys(), values):
+                out_data[key].append(value)
+            return True
 
-                for key, value in zip(data.keys(), values):
-                    data[key].append(value)
+        rows = list(e for e in root_element if isinstance(e, Tag))
+        # First row is empty -> skip
+        # Second row contains header (filename and coverage)
+        # Third row contains more headers (type of coverage)
+        header_row = rows[1]
+        keys = [td.text.strip() for td in header_row]
+        keys = [k for k in keys if len(k) > 0]
+        if keys[0] != "Filename":
+            print(f"Skipping {file}", file=sys.stderr)
+            return
+        if len(data) == 0:
+            for key in keys:
+                data[key] = []
+        # Parse coverage for each file in this folder
+        for i, row in enumerate(rows[3:]):
+            if not parse_coverage_table_row(row, data):
+                print(f"Error parsing row {4 + i} in {file}")
 
     for f in index_files:
         parse_file(f)
@@ -77,7 +80,22 @@ def get_test_coverage(index_files):
 
 
 if __name__ == "__main__":
-    os.chdir(Path(__file__).parent.parent)
+    base_dir = Path(__file__).parent.parent
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument(
+        "-d", "--build-directory", type=Path, default=base_dir / Path("build")
+    )
+    arg_parser.add_argument("-m", "--make-coverage", action="store_true")
+    args = arg_parser.parse_args()
+    print("\n=== Analysing coverage of locally changed files ===\n", file=sys.stderr)
+    build_dir = args.build_directory.absolute()
+
+    if args.make_coverage:
+        os.chdir(build_dir)
+        os.system("make coverage") # Calls this script again
+        exit()
+
+    os.chdir(base_dir)
 
     if not Path(".git").is_dir():
         print(f"{os.getcwd()} is not a git repository!", file=sys.stderr)
@@ -135,7 +153,7 @@ if __name__ == "__main__":
             pass  # No such branch
     touched_files = set(uncommited_files + changed_files)
 
-    coverage_root = Path("build") / "coverage"
+    coverage_root = build_dir / "coverage"
 
     if not coverage_root.is_dir():
         print(
