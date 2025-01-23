@@ -842,8 +842,15 @@ if(ENABLE_COVERAGE)
       ${LCOV} --directory . --capture --exclude */test/* --exclude '/usr/*' --exclude '*/simplemd/*' --output-file coverage.info
     # generate report
     COMMAND ${GENHTML} --demangle-cpp -o coverage coverage.info
-    COMMAND ${PYTHON3} ../test/check_my_coverage.py --build-directory .
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+    # add my-coverage target
+    add_custom_target(
+      my-coverage
+      COMMAND ${PYTHON3} ../test/check_my_coverage.py --build-directory . --skip-make-coverage
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+    add_dependencies(my-coverage coverage)
 endif()
 
 #

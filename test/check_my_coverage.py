@@ -85,16 +85,15 @@ if __name__ == "__main__":
     arg_parser.add_argument(
         "-d", "--build-directory", type=Path, default=base_dir / Path("build")
     )
-    arg_parser.add_argument("-m", "--make-coverage", action="store_true")
+    arg_parser.add_argument("-M", "--skip-make-coverage", action="store_true")
     args = arg_parser.parse_args()
-    print("\n=== Analysing coverage of locally changed files ===\n", file=sys.stderr)
     build_dir = args.build_directory.absolute()
 
-    if args.make_coverage:
+    if not args.skip_make_coverage:
         os.chdir(build_dir)
         os.system("make coverage") # Calls this script again
-        exit()
 
+    print("\n=== Analysing coverage of locally changed files ===\n", file=sys.stderr)
     os.chdir(base_dir)
 
     if not Path(".git").is_dir():
