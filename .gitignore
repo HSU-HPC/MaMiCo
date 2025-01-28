@@ -34,4 +34,4 @@ docs/
 # Symbolic link to LAMMPS source files
 /lammps
 # mamico-cfg cache
-.cache
+.mamico-cfg.cache
