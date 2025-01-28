@@ -48,4 +48,4 @@ The corresponding entries will be removed from the interactive menu. If all conf
 3. Customize the generator settings and generate the `couette.xml` file.
 4. Customize the generated configuration even further according to the [documentation](https://github.com/HSU-HPC/MaMiCo/wiki/couette.xml). (Optional)
 
-If you encounter any issues, delete the file `.cache` and try again.
+If you encounter any issues, delete the file `.mamico-cfg.cache` and try again.
