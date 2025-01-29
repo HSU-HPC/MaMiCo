@@ -100,7 +100,16 @@ jobs:
           ml mpi || :
           srun mpirun -n ${{ matrix.mpi_ranks }} ../../couette
       - name: Assess couette profile
-        run: ./tools/assess-couette-flow-profile.py build/test_cases/${{ matrix.case }}
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          # python -m pip install -U --force-reinstall pip
+          pip install --upgrade pip
+          pip install matplotlib
+          ./tools/assess-couette-flow-profile.py build/test_cases/${{ matrix.case }}
+          mkdir -p "$GITHUB_WORKSPACE/artifacts"
+          cp build/test_cases/${{ matrix.case }}/couette-flow-profile.png "$GITHUB_WORKSPACE/artifacts/"
+          echo "::set-output name=image_path::$GITHUB_WORKSPACE/artifacts/couette-flow-profile.png"
       - uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.multi_md }}
