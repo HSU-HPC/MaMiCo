@@ -70,6 +70,10 @@ def git_clone_shallow(repository_url, repository_dir, branch):
 
 
 def build_ls1(mamico_repo_dir, with_mpi=False, jobs=8):
+    print("Fetching ls1-MarDyn source code...")
+    had_error = 0 != shell("git submodule init && git submodule update")
+    if had_error != 0:
+        return had_error
     print("Building ls1-MarDyn from source...")
     had_error = False
     build_dir = mamico_repo_dir / "ls1" / "build"
