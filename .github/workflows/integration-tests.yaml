@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false # If some versions fail to build, still build all the others
       matrix:
-        md-solver: [md, ls1] # lammps (LAMMPS integration does not work ATM -> issue #86)
+        md-solver: [md, ls1] # lammps (LAMMPS integration is currently broken -> issue #86)
     steps:
       - uses: actions/checkout@v2
       - name: Use cached LAMMPS/OpenFOAM
@@ -39,8 +39,8 @@ jobs:
           ./tools/build-couette.py \
             --jobs $(($(nproc --all) / 2)) \
             --with-mpi \
-            --md-solver ${{ matrix.md-solver }}
-            # --with-foam (OpenFOAM integration does not work ATM)
+            --md-solver ${{ matrix.md-solver }} \
+            --with-foam # (OpenFOAM integration is currently broken)
       - name: Cache LAMMPS/OpenFOAM
         uses: actions/cache/save@v4
         with:
@@ -50,7 +50,7 @@ jobs:
           key: 3rd-party-solvers
       - uses: actions/upload-artifact@v4
         with:
-          name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.solver_md }}
+          name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.md-solver }}
           path: build
 
   run-tests:
