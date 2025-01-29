@@ -203,9 +203,9 @@ def build_mamico_couette_md(md_solver="md", with_openfoam=False, with_mpi=False,
     had_error |= 0 != shell(cmd)
     if not had_error:
         with ChangeDir(build_dir):
-            couette_bin_path.unlink(
-                missing_ok=True
-            )  # Avoid confusing old build for different one
+            if couette_bin_path.exists():
+                # Avoid confusing old build for different one 
+                couette_bin_path.unlink()
             had_error = 0 != shell(f"make -j {jobs} couette")
     print(f"::: Completed (Successful: {not had_error}) :::")
     return None if had_error else couette_bin_path
