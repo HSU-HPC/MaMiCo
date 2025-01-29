@@ -158,7 +158,7 @@ def compute_couette_flow_profile_match():
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <directory>", file=sys.stderr)
+        print(f"Usage: {sys.argv[0]} <couette output directory>", file=sys.stderr)
         exit(1)
     os.chdir(sys.argv[1])
     load_values_from_xml()
