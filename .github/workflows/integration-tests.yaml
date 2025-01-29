@@ -19,11 +19,11 @@ jobs:
           test/integration/gh-act/get-test-cases-matrix.py >> $GITHUB_OUTPUT
 
   build-executable:
-    if: "always()" # If some versions fail to build, still build others
     runs-on: minicluster
     strategy:
+      fail-fast: false # If some versions fail to build, still build all the others
       matrix:
-        md-solver: [md, ls1] # lammps (LAMMPS integration does not work ATM)
+        md-solver: [md, ls1, lammps] # lammps (LAMMPS integration does not work ATM)
     steps:
       - uses: actions/checkout@v2
       - name: Use cached LAMMPS/OpenFOAM
@@ -34,7 +34,13 @@ jobs:
             build/openfoam
           key: 3rd-party-solvers
       - name: Build couette executable
-        run: ./tools/build-couette.py --with-mpi --md-solver ${{ matrix.md-solver }} # --with-foam (OpenFOAM integration does not work ATM)
+        run: |
+          ml mpi || :
+          ./tools/build-couette.py \
+            --jobs $(($(nproc --all) / 2)) \
+            --with-mpi \
+            --md-solver ${{ matrix.md-solver }}
+            # --with-foam (OpenFOAM integration does not work ATM)
       - name: Cache LAMMPS/OpenFOAM
         uses: actions/cache/save@v4
         with:
