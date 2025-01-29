@@ -12,7 +12,7 @@ jobs:
     outputs:
       matrix: ${{ steps.get-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - id: get-matrix
         name: Extract all test configurations from a text file
         run: |
@@ -25,7 +25,7 @@ jobs:
       matrix:
         md-solver: [md, ls1] # lammps (LAMMPS integration is currently broken -> issue #86)
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Use cached LAMMPS/OpenFOAM
         uses: actions/cache/restore@v4
         with:
