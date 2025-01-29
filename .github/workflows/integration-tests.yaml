@@ -67,6 +67,7 @@ jobs:
           path: build
       - name: Generate the test configuration for ${{ matrix.case }}
         run: |
+          MAMICO_CFG=$(pwd)/tools/mamico-cfg
           rm -rf build/test_cases # Clean up any old test
           mkdir -p build/test_cases/${{ matrix.case }} && cd $_
           O="domain_size=${{ matrix.domain_size }}"
@@ -80,7 +81,7 @@ jobs:
           O="$O,filtering=${{ matrix.filtering }}"
           O="$O,simulation=${{ matrix.simulation }}"
           O="$O,multi_md=${{ matrix.multi_md }}"
-          ../tools/mamico-cfg -O $O
+          $MAMICO_CFG -O $O
       - run: alias && which srun && srun hostname # TODO remove (debug only)
       - name: Run the couette executable with the generated configuration
         run: cd build/test_cases/${{ matrix.case }} && srun -n ${{ matrix.mpi_ranks }} ../../couette
