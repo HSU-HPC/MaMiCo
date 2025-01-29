@@ -67,6 +67,7 @@ jobs:
           path: build
       - name: Generate the test configuration for ${{ matrix.case }}
         run: |
+          rm -rf test_${{ matrix.case }} # Clean up any old test
           mkdir test_${{ matrix.case }} && cd $_
           O="domain_size=${{ matrix.domain_size }}"
           O="$O,use_checkpoint=${{ matrix.use_checkpoint }}"
