@@ -60,8 +60,9 @@ def shell(cmd):
     print(
         f"{getpass.getuser()}@{socket.gethostname()}:{os.getcwd()}$ {cmd}",
     )
-    cmd = f"{cmd} 2>&1"
-    return subprocess.call(["/bin/bash", "-c", "set -o pipefail; " + cmd])
+    # cmd = f"{cmd} 2>&1"
+    # return subprocess.call(["/bin/bash", "-c", "set -o pipefail; " + cmd])
+    return os.system(cmd)
 
 
 def git_clone_shallow(repository_url, repository_dir, branch):

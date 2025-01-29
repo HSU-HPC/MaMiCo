@@ -34,13 +34,13 @@ jobs:
             build/openfoam
           key: 3rd-party-solvers
       - name: Build couette executable
+        # Add "--with-foam" for OpenFOAM support # (OpenFOAM integration is currently broken -> issue #73)
         run: |
           ml gcc mpi || :
           ./tools/build-couette.py \
             --jobs $(($(nproc --all) / 2)) \
             --with-mpi \
-            --md-solver ${{ matrix.md-solver }} \
-            --with-foam # (OpenFOAM integration is currently broken)
+            --md-solver ${{ matrix.md-solver }}
       - name: Cache LAMMPS/OpenFOAM
         uses: actions/cache/save@v4
         with:
