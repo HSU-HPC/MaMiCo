@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - id: get-matrix
         name: Extract all test configurations from a text file
-        run: |<s
+        run: |
           test/integration/gh-act/get-test-cases-matrix.py >> $GITHUB_OUTPUT
 
   build-executable:
