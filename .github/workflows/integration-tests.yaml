@@ -19,6 +19,7 @@ jobs:
           test/integration/gh-act/get-test-cases-matrix.py >> $GITHUB_OUTPUT
 
   build-executable:
+    if: "always()" # If some versions fail to build, still build others
     runs-on: minicluster
     strategy:
       matrix:
