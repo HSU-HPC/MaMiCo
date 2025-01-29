@@ -26,13 +26,18 @@ jobs:
         md-solver: [md, ls1] # lammps (LAMMPS integration is currently broken -> issue #86)
     steps:
       - uses: actions/checkout@v4
-      - name: Use cached LAMMPS/OpenFOAM
+      - name: Use cached LAMMPS
         uses: actions/cache/restore@v4
         with:
           path: |
             build/LAMMPS
+          key: LAMMPS
+      - name: Use cached OpenFOAM
+        uses: actions/cache/restore@v4
+        with:
+          path: |
             build/openfoam
-          key: 3rd-party-solvers
+          key: OpenFOAM
       - name: Build couette executable
         # Add "--with-foam" for OpenFOAM support # (OpenFOAM integration is currently broken -> issue #73)
         run: |
@@ -41,13 +46,18 @@ jobs:
             --jobs $(($(nproc --all) / 2)) \
             --with-mpi \
             --md-solver ${{ matrix.md-solver }}
-      - name: Cache LAMMPS/OpenFOAM
+      - name: Cache LAMMPS
         uses: actions/cache/save@v4
         with:
           path: |
             build/LAMMPS
+          key: LAMMPS
+      - name: Cache OpenFOAM
+        uses: actions/cache/save@v4
+        with:
+          path: |
             build/openfoam
-          key: 3rd-party-solvers
+          key: OpenFOAM
       - uses: actions/upload-artifact@v4
         with:
           name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.md-solver }}
@@ -82,9 +92,11 @@ jobs:
           O="$O,simulation=${{ matrix.simulation }}"
           O="$O,multi_md=${{ matrix.multi_md }}"
           $MAMICO_CFG -O $O
-      - run: alias && which srun && srun hostname # TODO remove (debug only)
       - name: Run the couette executable with the generated configuration
-        run: cd build/test_cases/${{ matrix.case }} && srun -n ${{ matrix.mpi_ranks }} ../../couette
+        run: |
+          source ~/.bash_aliases || :
+          cd build/test_cases/${{ matrix.case }}
+          srun -n ${{ matrix.mpi_ranks }} ../../couette
       - name: Assess couette profile
         run: ./tools/assess-couette-flow-profile.py build/test_cases/${{ matrix.case }}
       - uses: actions/upload-artifact@v4
