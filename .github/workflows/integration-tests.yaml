@@ -41,8 +41,8 @@ jobs:
       - name: Build couette executable
         # Add "--with-foam" for OpenFOAM support # (OpenFOAM integration is currently broken -> issue #73)
         run: |
-          ml gcc mpi || :
           rm -rf build # Clean up any old files
+          ml gcc mpi || :
           ./tools/build-couette.py \
             --jobs $(($(nproc --all) / 2)) \
             --with-mpi \
@@ -97,7 +97,8 @@ jobs:
         run: |
           cd build/test_cases/${{ matrix.case }}
           chmod +x ../../couette
-          srun -n ${{ matrix.mpi_ranks }} ../../couette
+          ml mpi || :
+          srun mpirun -n ${{ matrix.mpi_ranks }} ../../couette
       - name: Assess couette profile
         run: ./tools/assess-couette-flow-profile.py build/test_cases/${{ matrix.case }}
       - uses: actions/upload-artifact@v4
