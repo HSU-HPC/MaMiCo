@@ -2,7 +2,7 @@ name: Integration Testing
 
 on:
   push:
-    # TODO also on feature branch just for testing
+    # TODO also on feature branch (just for testing)
     # branches:
     #   - master
 
