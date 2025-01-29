@@ -42,6 +42,7 @@ jobs:
         # Add "--with-foam" for OpenFOAM support # (OpenFOAM integration is currently broken -> issue #73)
         run: |
           ml gcc mpi || :
+          rm -rf build # Clean up any old files
           ./tools/build-couette.py \
             --jobs $(($(nproc --all) / 2)) \
             --with-mpi \
