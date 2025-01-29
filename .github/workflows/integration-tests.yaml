@@ -95,8 +95,8 @@ jobs:
           $MAMICO_CFG -O $O
       - name: Run the couette executable with the generated configuration
         run: |
-          source ~/.bash_aliases || :
           cd build/test_cases/${{ matrix.case }}
+          chmod +x ../../couette
           srun -n ${{ matrix.mpi_ranks }} ../../couette
       - name: Assess couette profile
         run: ./tools/assess-couette-flow-profile.py build/test_cases/${{ matrix.case }}
