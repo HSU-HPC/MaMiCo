@@ -59,10 +59,11 @@ OPEN_FOAM_THIRD_PARTY_URL = "https://dl.openfoam.com/source/v2206/ThirdParty-v22
 def shell(cmd):
     print(
         f"{getpass.getuser()}@{socket.gethostname()}:{os.getcwd()}$ {cmd}",
+        flush=True
     )
-    # cmd = f"{cmd} 2>&1"
-    # return subprocess.call(["/bin/bash", "-c", "set -o pipefail; " + cmd])
-    return os.system(cmd)
+    cmd = f"{cmd} 2>&1"
+    return subprocess.call(["/bin/bash", "-c", "set -o pipefail; " + cmd])
+    # return os.system(cmd)
 
 
 def git_clone_shallow(repository_url, repository_dir, branch):

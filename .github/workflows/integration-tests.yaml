@@ -67,8 +67,8 @@ jobs:
           path: build
       - name: Generate the test configuration for ${{ matrix.case }}
         run: |
-          rm -rf test_${{ matrix.case }} # Clean up any old test
-          mkdir test_${{ matrix.case }} && cd $_
+          rm -rf build/test_cases # Clean up any old test
+          mkdir -p build/test_cases/${{ matrix.case }} && cd $_
           O="domain_size=${{ matrix.domain_size }}"
           O="$O,use_checkpoint=${{ matrix.use_checkpoint }}"
           O="$O,solver_md=${{ matrix.solver_md }}"
@@ -81,11 +81,12 @@ jobs:
           O="$O,simulation=${{ matrix.simulation }}"
           O="$O,multi_md=${{ matrix.multi_md }}"
           ../tools/mamico-cfg -O $O
+      - run: alias && which srun && srun hostname # TODO remove (debug only)
       - name: Run the couette executable with the generated configuration
-        run: cd test_${{ matrix.case }} && srun -n ${{ matrix.mpi_ranks }} ../build/couette
+        run: cd build/test_cases/${{ matrix.case }} && srun -n ${{ matrix.mpi_ranks }} ../../couette
       - name: Assess couette profile
-        run: ./tools/assess-couette-flow-profile.py test_${{ matrix.case }}
+        run: ./tools/assess-couette-flow-profile.py build/test_cases/${{ matrix.case }}
       - uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.multi_md }}
-          path: test_${{ matrix.case }}
+          path: build/test_cases/${{ matrix.case }}
