@@ -101,7 +101,7 @@ jobs:
         run: |
           cd build/test_cases/${{ matrix.case }}
           chmod +x ../../couette
-          ml mpi || :
+          which mpirun # TODO remove (debugging only)
           srun mpirun -n ${{ matrix.mpi_ranks }} ../../couette
       - name: Assess couette profile
         run: |
