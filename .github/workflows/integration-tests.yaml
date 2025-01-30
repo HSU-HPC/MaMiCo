@@ -124,6 +124,6 @@ jobs:
         run: |
           echo '[:arrow_down: test results](${{ steps.artifact-upload-test-results.outputs.artifact-url }})' >> "$GITHUB_STEP_SUMMARY"
       - name: Report "no test results" in summary
-        if: "failure()"
+        if: "!success()"
         run: |
           echo ':x: no test results' >> "$GITHUB_STEP_SUMMARY"

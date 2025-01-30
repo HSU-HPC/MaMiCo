@@ -7,6 +7,7 @@ ls1-fd      small       True            ls1         fd          8           2.5 
 
 # Long running tests
 many-MD     small       use_checkpoint  md          analytical  8           2.5         reflecting  False           False       test        20
-large-MD    large       False           md          analytical  512         5           reflecting  False           gauss       test        1
+medium-MD   medium      False           md          analytical  64          5           reflecting  False           gauss       test        1
+long-MD     small       use_checkpoint  md          analytical  8           2.5         reflecting  False           False       long        2
 
 # End of file
