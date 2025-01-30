@@ -34,7 +34,7 @@ jobs:
           rm -rf build
       - uses: actions/checkout@v4
       - name: Use cached LAMMPS
-        if: matrix.md-solver == "lammps"
+        if: matrix.md-solver == 'lammps'
         uses: actions/cache/restore@v4
         with:
           path: |
@@ -57,7 +57,7 @@ jobs:
             --md-solver ${{ matrix.md-solver }}
       - name: Cache LAMMPS
         uses: actions/cache/save@v4
-        if: matrix.md-solver == "lammps"
+        if: matrix.md-solver == 'lammps'
         with:
           path: |
             build/LAMMPS
