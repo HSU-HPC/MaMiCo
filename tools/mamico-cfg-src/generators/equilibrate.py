@@ -30,7 +30,7 @@ def apply(partial_xml, get_config_value) -> None:
     partial_xml.substitute(
         "equilibration-steps",
         min(equilibration_steps_max, equilibration_steps * size)
-        * (0 if equilibrate == True else 1),
+        * (1 if equilibrate == True else 0),
     )
     checkpoint_key = 'init-from-sequential-checkpoint="CheckpointSimpleMD"'
     partial_xml.substitute("checkpoint", checkpoint_key if use_checkpoint else "")
