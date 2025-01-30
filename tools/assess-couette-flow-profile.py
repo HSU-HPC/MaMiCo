@@ -64,7 +64,7 @@ def couette_analytic(z, t):
             )
     k_sum = [_k_sum * 2.0 * wall_velocity / math.pi for _k_sum in k_sum]
     return [
-        wall_velocity * (1.0 - (_z / channel_height)) - _k_sum
+        max(0, wall_velocity * (1.0 - (_z / channel_height)) - _k_sum)
         for (_z, _k_sum) in zip(z, k_sum)
     ]
 
@@ -110,6 +110,60 @@ def get_rmspe(expected, actual):
     rmspe = mspe**0.5
     return rmspe
 
+def plot_compute_couette_flow_mpl(analytical, sampled, coupling_cycle=None, rmspe=None):
+    if plt is None:
+        return False
+    plt.style.use("ggplot")
+    plt.plot(analytical[0], analytical[1], "C0-", label="Analytical")
+    plt.plot(sampled[0], sampled[1], "C0o", label="Sampled")
+    plt.ylabel("$u_x$")
+    plt.xlabel("$z$")
+    plt.grid(True)
+    plt.legend()
+    info_text = ""
+    if coupling_cycle is not None or rmspe is not None:
+        if coupling_cycle is None:
+            coupling_cycle = "NaN"
+        if rmspe is None:
+            rmspe = "NaN"
+        else:
+            rmspe = f"{rmspe:.3f}%"
+        info_text = f"\n(coupling cycle={coupling_cycle}, RMSPE={rmspe})"
+    plt.title(
+        f"Couette startup flow{info_text}"
+    )
+    plt.ylim(0, wall_velocity)
+    plt.savefig("couette-flow-profile.png")
+    return True
+
+def plot_compute_couette_flow_mmd(analytical, sampled_z_start_stop, sampled_u_x, coupling_cycle=None, rmspe=None):
+    with open("couette-flow-profile.mmd", "w") as file:
+        print("xychart-beta", file=file)
+        info_text = ""
+        if coupling_cycle is not None or rmspe is not None:
+            if coupling_cycle is None:
+                coupling_cycle = "NaN"
+            if rmspe is None:
+                rmspe = "NaN"
+            else:
+                rmspe = f"{rmspe:.3f}%"
+            info_text = f" (coupling cycle={coupling_cycle}, RMSPE={rmspe})"
+        print(f"\ttitle \"Couette startup flow{info_text}\"", file=file)
+        print(f"\tx-axis \"z\" 0 --> {channel_height}", file=file)
+        print(f"\ty-axis \"u_x\" 0 --> {wall_velocity}", file=file)
+        print("\tbar [", end="", file=file)
+        i = 0
+        for j, z in enumerate(analytical[0]):
+            u_x = -1
+            if z >= sampled_z_start_stop[0] and z <= sampled_z_start_stop[1]:
+                u_x = sampled_u_x[i]
+                i += 1
+            if j > 0:
+                print(", ", end="", file=file)
+            print(u_x, end="", file=file)
+        print("]", file=file)
+        print("\tline", analytical[1], file=file)
+    return True
 
 def compute_couette_flow_profile_match():
     """Computes the sampling error and plots the flow profile for the last cycle."""
@@ -123,7 +177,7 @@ def compute_couette_flow_profile_match():
         print(f"File {csv_path} does not exist!", file=sys.stderr)
         return
     sampled = load_avg_ux_from_csv(csv_path)
-    z = [channel_height / 21 * i for i in range(21)]
+    z = [channel_height / 20 * i for i in range(21)]
     z_full = z
     analytical = couette_analytic(
         z, coupling_cycle / 4
@@ -142,18 +196,8 @@ def compute_couette_flow_profile_match():
     print(f"### Couette flow profile from `{csv_path.name}`")
     print(f"max. coupling cycles = {coupling_cycle}")
     print(f"analytical vs. sampled RMSPE = {rmspe:.3f}%")
-    if plt is not None:
-        plt.style.use("ggplot")
-        plt.plot(z_full, analytical, "C0-", label="Analytical")
-        plt.plot(z, sampled, "C0o", label="Sampled")
-        plt.ylabel("$u_x$")
-        plt.xlabel("$z$")
-        plt.grid(True)
-        plt.legend()
-        plt.title(
-            f"Couette startup flow\n(coupling cycle={coupling_cycle}, RMSPE={rmspe:.3f}%)"
-        )
-        plt.savefig("couette-flow-profile.png")
+    plot_compute_couette_flow_mpl([z_full, analytical], [z, sampled], coupling_cycle, rmspe)
+    plot_compute_couette_flow_mmd([z_full, analytical], [z_start, z_stop], sampled, coupling_cycle, rmspe)
 
 
 if __name__ == "__main__":

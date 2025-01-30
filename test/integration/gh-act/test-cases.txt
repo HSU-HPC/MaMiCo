@@ -1,5 +1,5 @@
 # Whitespace separated values per row (first non-comment row is header)
-case        domain_size equlibrate      solver_md   solver_cfd  mpi_ranks   cell_size   boundary    coupling_2way   filtering   simulation  multi_md
+case        domain_size equilibrate     solver_md   solver_cfd  mpi_ranks   cell_size   boundary    coupling_2way   filtering   simulation  multi_md
 
 # Short tests for solvers
 simpleMD-lb small       use_checkpoint  md          lb          8           2.5         reflecting  False           False       short       1
