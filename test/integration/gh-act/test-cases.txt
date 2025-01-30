@@ -1,2 +1,5 @@
 case        domain_size use_checkpoint  solver_md   solver_cfd  mpi_ranks   cell_size   boundary    coupling_2way   filtering   simulation  multi_md
-simpleMD    small       True            md          lb          1           2.5         reflecting  False           False       test        1
+simpleMD-lb small       True            md          lb          8           2.5         reflecting  False           False       short       1
+ls1-fd      small       False           ls1         fd          8           2.5         reflecting  False           False       short       1
+many-MD     small       True            md          analytical  8           2.5         reflecting  False           False       short       200
+large-MD    large       True            md          analytical  512         5           reflecting  False           gauss       test        1

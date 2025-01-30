@@ -139,7 +139,7 @@ def compute_couette_flow_profile_match():
     z = [z_start + z_step * i for i in range(coupling_cells)]
     analytical = couette_analytic(z_full, coupling_cycle / 4)
     rmspe = get_rmspe(analytical, sampled)
-    print(f"=== Couette flow profile from {csv_path} ===")
+    print(f"### Couette flow profile from `{csv_path.name}`")
     print(f"max. coupling cycles = {coupling_cycle}")
     print(f"analytical vs. sampled RMSPE = {rmspe:.3f}%")
     if plt is not None:

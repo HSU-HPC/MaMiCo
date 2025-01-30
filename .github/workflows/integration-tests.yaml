@@ -71,6 +71,9 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.extract-tests.outputs.matrix) }}
     steps:
+      - name: Initialize summary
+        run: |
+          echo ':x: no test results' > "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
@@ -108,7 +111,7 @@ jobs:
           cd build/test_cases/${{ matrix.case }}
           ../../../tools/assess-couette-flow-profile.py . > assess-couette-flow-profile.log
           cat assess-couette-flow-profile.log
-          cat assess-couette-flow-profile.log >> "$GITHUB_STEP_SUMMARY"
+          cat assess-couette-flow-profile.log > "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         id: artifact-upload-test-results
         with:
@@ -116,4 +119,4 @@ jobs:
           path: build/test_cases/${{ matrix.case }}      
       - name: Append test result download link to summary
         run: |
-          echo '[:arrow_down: test results](${{ steps.artifact-upload-test-results.outputs.artifact-url }})' >> "$GITHUB_STEP_SUMMARY"
+          echo ':arrow_down: [test results](${{ steps.artifact-upload-test-results.outputs.artifact-url }})' >> "$GITHUB_STEP_SUMMARY"
