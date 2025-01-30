@@ -64,7 +64,7 @@ jobs:
           name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.md-solver }}
           path: build
 
-  run-tests:
+  run-test:
     needs: [extract-tests, build-executable]
     if: "always()" # Only SOME couette binaries might have failed to build
     runs-on: minicluster
@@ -103,10 +103,11 @@ jobs:
         run: |
           python3 -m venv .venv
           source .venv/bin/activate
-          # python -m pip install -U --force-reinstall pip
           pip install --upgrade pip
           pip install matplotlib
           ./tools/assess-couette-flow-profile.py build/test_cases/${{ matrix.case }}
+          cd build/test_cases/${{ matrix.case }}
+          # Display plot in GitHub Actions workflow step
           python3 -c "import base64,pathlib;b=pathlib.Path('couette-flow-profile.png').read_bytes();print(f'![Hello World](data:image/png;base64,{base64.b64encode(b).decode()})')" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
