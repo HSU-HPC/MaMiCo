@@ -2,8 +2,8 @@ name: Integration Testing
 
 on:
   push:
-    # branches:
-    #   - master
+    branches:
+      - master
 
 # Abort running jobs if a new one is triggered
 concurrency:
