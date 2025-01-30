@@ -16,6 +16,8 @@ import term
 from utils import check_if_replacing, get_asset_text, get_bin_name
 from xml_templating import PartialXml
 
+_cache_file_name = ".mamico-cfg.cache"
+
 
 def select_option(configs: list, key: str, value: str) -> None:
     """Select an option based on a serialized key value pair without user input.
@@ -243,7 +245,7 @@ If all options are provided through the command line, the script is executed non
         "-d",
         "--default",
         action="store_true",
-        help="Use default values or .cache for all configs not set using -O/--override",
+        help=f"Use default values or {_cache_file_name} for all configs not set using -O/--override",
     )
     # Parse key=value overrides
     args = arg_parser.parse_args(argv)
@@ -279,7 +281,7 @@ def load_config_cache_or_template() -> list:
         output_dir = (
             parse_args().output
         )  # Get the output directory before args are actually parsed
-        return json.loads((output_dir / ".cache").read_text())
+        return json.loads((output_dir / _cache_file_name).read_text())
     except:
         # Fall back to loading the template (cache corrupted or does not exist)
         return json.loads(get_asset_text("configuration_template.json"))
@@ -310,7 +312,7 @@ def main() -> None:
             else:
                 main_menu.append(config["label"] + "\t" + get_selected(config)["label"])
         # Update cache
-        (args.output / ".cache").write_text(json.dumps(configs, indent=3))
+        (args.output / _cache_file_name).write_text(json.dumps(configs, indent=3))
         # 3. Validate
         validation_errors = validate(configs)
         is_valid = len(validation_errors.strip()) == 0

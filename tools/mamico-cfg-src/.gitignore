@@ -2,7 +2,7 @@
 .venv
 # Generated config files and cache
 *.xml
-.cache
+.mamico-cfg.cache
 # Except other (text) files, such as templates
 !requirements.txt
 !assets/*
