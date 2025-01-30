@@ -12,7 +12,6 @@ from pathlib import Path
 def clean_up_line(line):
     line = line.split("#")[0]  # Remove comment
     line = line.replace("\t", " ")
-    # line = line.replace("  ", " ")
     line = line.strip()
     return line
 
