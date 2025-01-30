@@ -107,9 +107,14 @@ jobs:
           pip install matplotlib
           ./tools/assess-couette-flow-profile.py build/test_cases/${{ matrix.case }}
           cd build/test_cases/${{ matrix.case }}
-          # Display plot in GitHub Actions workflow step
-          python3 -c "import base64,pathlib;b=pathlib.Path('couette-flow-profile.png').read_bytes();print(f'![Hello World](data:image/png;base64,{base64.b64encode(b).decode()})')" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.case }}
           path: build/test_cases/${{ matrix.case }}
+      - uses: actions/upload-artifact@v4
+        id: artifact-upload-flow-profile
+        with:
+          name: couette-flow-profile-${{ matrix.case }}
+          path: build/test_cases/${{ matrix.case }}/couette-flow-profile.png        
+      # Display plot in GitHub Actions workflow step
+      - run:  echo '![](${{ steps.artifact-upload-flow-profile.outputs.artifact-url }})' >> "$GITHUB_STEP_SUMMARY"
