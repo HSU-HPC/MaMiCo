@@ -123,7 +123,7 @@ def get_cmdline(configs: list):
             if "selected" in option and option["selected"]:
                 all_overrides.append(f"{key}={value}")
                 break
-    return f"{get_bin_name()} -r -O \"{','.join(all_overrides)}\""
+    return f'{get_bin_name()} -r -O "{",".join(all_overrides)}"'
 
 
 def generate(configs: list, output_dir: str, replace_existing: bool) -> None:

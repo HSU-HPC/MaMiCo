@@ -91,7 +91,7 @@ jobs:
           rm -rf build/test_cases # Clean up any old test
           mkdir -p build/test_cases/${{ matrix.case }} && cd $_
           O="domain_size=${{ matrix.domain_size }}"
-          O="$O,use_checkpoint=${{ matrix.use_checkpoint }}"
+          O="$O,equilibrate=${{ matrix.equilibrate }}"
           O="$O,solver_md=${{ matrix.solver_md }}"
           O="$O,solver_cfd=${{ matrix.solver_cfd }}"
           O="$O,mpi_ranks=${{ matrix.mpi_ranks }}"
