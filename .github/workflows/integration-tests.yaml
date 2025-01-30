@@ -114,9 +114,9 @@ jobs:
           ../../../tools/assess-couette-flow-profile.py . > assess-couette-flow-profile.log
           cat assess-couette-flow-profile.log
           cat assess-couette-flow-profile.log >> "$GITHUB_STEP_SUMMARY"
-          echo "```mermaid" >> "$GITHUB_STEP_SUMMARY"
+          echo '```mermaid' >> "$GITHUB_STEP_SUMMARY"
           cat couette-flow-profile.mmd >> "$GITHUB_STEP_SUMMARY"
-          echo "```" >> "$GITHUB_STEP_SUMMARY"
+          echo '```'' >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         id: artifact-upload-test-results
         with:

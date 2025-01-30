@@ -110,6 +110,7 @@ def get_rmspe(expected, actual):
     rmspe = mspe**0.5
     return rmspe
 
+
 def plot_compute_couette_flow_mpl(analytical, sampled, coupling_cycle=None, rmspe=None):
     if plt is None:
         return False
@@ -129,15 +130,23 @@ def plot_compute_couette_flow_mpl(analytical, sampled, coupling_cycle=None, rmsp
         else:
             rmspe = f"{rmspe:.3f}%"
         info_text = f"\n(coupling cycle={coupling_cycle}, RMSPE={rmspe})"
-    plt.title(
-        f"Couette startup flow{info_text}"
-    )
+    plt.title(f"Couette startup flow{info_text}")
     plt.ylim(0, wall_velocity)
     plt.savefig("couette-flow-profile.png")
     return True
 
-def plot_compute_couette_flow_mmd(analytical, sampled_z_start_stop, sampled_u_x, coupling_cycle=None, rmspe=None):
+
+def plot_compute_couette_flow_mmd(
+    analytical, sampled_z_start_stop, sampled_u_x, coupling_cycle=None, rmspe=None
+):
+    header = """---
+config:
+    themeVariables:
+        xyChart:
+            plotColorPalette: "#ff0000, #0000ff"
+---"""
     with open("couette-flow-profile.mmd", "w") as file:
+        print(header, file=file)
         print("xychart-beta", file=file)
         info_text = ""
         if coupling_cycle is not None or rmspe is not None:
@@ -148,22 +157,27 @@ def plot_compute_couette_flow_mmd(analytical, sampled_z_start_stop, sampled_u_x,
             else:
                 rmspe = f"{rmspe:.3f}%"
             info_text = f" (coupling cycle={coupling_cycle}, RMSPE={rmspe})"
-        print(f"\ttitle \"Couette startup flow{info_text}\"", file=file)
-        print(f"\tx-axis \"z\" 0 --> {channel_height}", file=file)
-        print(f"\ty-axis \"u_x\" 0 --> {wall_velocity}", file=file)
-        print("\tbar [", end="", file=file)
+        print(f'\ttitle "Couette startup flow{info_text}"', file=file)
+        print(f'\tx-axis "z" 0 --> {channel_height}', file=file)
+        print(f'\ty-axis "u_x" 0 --> {wall_velocity}', file=file)
+        line_data = ""
+        bar_data = ""
         i = 0
         for j, z in enumerate(analytical[0]):
-            u_x = -1
+            u_x_analytical = analytical[1][j]
+            u_x_sampled = -1
             if z >= sampled_z_start_stop[0] and z <= sampled_z_start_stop[1]:
-                u_x = sampled_u_x[i]
+                u_x_sampled = sampled_u_x[i]
                 i += 1
             if j > 0:
-                print(", ", end="", file=file)
-            print(u_x, end="", file=file)
-        print("]", file=file)
-        print("\tline", analytical[1], file=file)
+                line_data += ", "
+                bar_data += ", "
+            line_data += "{:f}".format(u_x_analytical)
+            bar_data += "{:f}".format(u_x_sampled)
+        print(f"\tbar [{bar_data}]", file=file)
+        print(f"\tline [{line_data}]", file=file)
     return True
+
 
 def compute_couette_flow_profile_match():
     """Computes the sampling error and plots the flow profile for the last cycle."""
@@ -196,8 +210,12 @@ def compute_couette_flow_profile_match():
     print(f"### Couette flow profile from `{csv_path.name}`")
     print(f"max. coupling cycles = {coupling_cycle}")
     print(f"analytical vs. sampled RMSPE = {rmspe:.3f}%")
-    plot_compute_couette_flow_mpl([z_full, analytical], [z, sampled], coupling_cycle, rmspe)
-    plot_compute_couette_flow_mmd([z_full, analytical], [z_start, z_stop], sampled, coupling_cycle, rmspe)
+    plot_compute_couette_flow_mpl(
+        [z_full, analytical], [z, sampled], coupling_cycle, rmspe
+    )
+    plot_compute_couette_flow_mmd(
+        [z_full, analytical], [z_start, z_stop], sampled, coupling_cycle, rmspe
+    )
 
 
 if __name__ == "__main__":
