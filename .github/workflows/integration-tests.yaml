@@ -2,7 +2,6 @@ name: Integration Testing
 
 on:
   push:
-    # TODO also on feature branch (just for testing)
     # branches:
     #   - master
 
@@ -13,7 +12,7 @@ concurrency:
 
 jobs:
   extract-tests:
-    runs-on: ubuntu-latest
+    runs-on: minicluster # ubuntu-latest
     outputs:
       matrix: ${{ steps.get-matrix.outputs.matrix }}
     steps:
@@ -30,23 +29,27 @@ jobs:
       matrix:
         md-solver: [md, ls1] # lammps (LAMMPS integration is currently broken -> issue #86)
     steps:
+      - name: Clean up any old files
+        run: |
+          rm -rf build
       - uses: actions/checkout@v4
       - name: Use cached LAMMPS
+        if: ${{ matrix.md-solver }} == "lammps"
         uses: actions/cache/restore@v4
         with:
           path: |
             build/LAMMPS
           key: LAMMPS
       - name: Use cached OpenFOAM
+        if: false # (OpenFOAM integration is currently broken -> issue #73)
         uses: actions/cache/restore@v4
         with:
           path: |
             build/openfoam
           key: OpenFOAM
       - name: Build couette executable
-        # Add "--with-foam" for OpenFOAM support # (OpenFOAM integration is currently broken -> issue #73)
+        # Add "--with-foam" for OpenFOAM support (OpenFOAM integration is currently broken -> issue #73)
         run: |
-          rm -rf build # Clean up any old files
           ml gcc mpi || :
           ./tools/build-couette.py \
             --jobs $(($(nproc --all) / 2)) \
@@ -54,11 +57,13 @@ jobs:
             --md-solver ${{ matrix.md-solver }}
       - name: Cache LAMMPS
         uses: actions/cache/save@v4
+        if: ${{ matrix.md-solver }} == "lammps"
         with:
           path: |
             build/LAMMPS
           key: LAMMPS
       - name: Cache OpenFOAM
+        if: false # (OpenFOAM integration is currently broken -> issue #73)
         uses: actions/cache/save@v4
         with:
           path: |
