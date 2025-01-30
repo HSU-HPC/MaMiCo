@@ -69,6 +69,7 @@ jobs:
     if: "always()" # Only SOME couette binaries might have failed to build
     runs-on: minicluster
     strategy:
+      fail-fast: false # If some test cases fail, still run all the others
       matrix: ${{ fromJson(needs.extract-tests.outputs.matrix) }}
     steps:
       - name: Initialize summary
