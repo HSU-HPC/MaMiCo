@@ -86,7 +86,7 @@
 								<z>{md-size}</z>
 							</upper>
 						</object>
-						<velocityAssigner type="MaxwellVelocityDistribution" enableRandomSeed="1"></velocityAssigner>
+						<velocityAssigner type="MaxwellVelocityDistribution" enableRandomSeed="true"></velocityAssigner>
 					</objectgenerator>
 				</generator>
 			</phasespacepoint>
