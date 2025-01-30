@@ -1,5 +1,12 @@
+# Whitespace separated values per row (first non-comment row is header)
 case        domain_size equlibrate      solver_md   solver_cfd  mpi_ranks   cell_size   boundary    coupling_2way   filtering   simulation  multi_md
+
+# Short tests for solvers
 simpleMD-lb small       use_checkpoint  md          lb          8           2.5         reflecting  False           False       short       1
 ls1-fd      small       True            ls1         fd          8           2.5         reflecting  False           False       short       1
+
+# Long running tests
 many-MD     small       use_checkpoint  md          analytical  8           2.5         reflecting  False           False       test        20
 large-MD    large       False           md          analytical  512         5           reflecting  False           gauss       test        1
+
+# End of file
