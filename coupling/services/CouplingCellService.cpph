@@ -67,7 +67,7 @@ coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::CouplingCellServic
   }
 
   // init Usher parameters
-  initIndexVectors4Usher(couplingCellConfiguration.getNumberLinkedCellsPerCouplingCell());
+  initIndexVectors4Usher();
 
   // init vector of inner (MD Domain/non-ghost) cells and their indices
   // TODO: REMOVE
@@ -208,8 +208,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 }
 
 template <class LinkedCell, unsigned int dim>
-void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::initIndexVectors4Usher(
-    tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell) {
+void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::initIndexVectors4Usher() {
 
   const tarch::la::Vector<dim, unsigned int> firstNonGhostCouplingCell(1);
 
