@@ -7,7 +7,7 @@ var searchData=
   ['initdimvector_4',['initDimVector',['../namespacecoupling.html#a1de06ce0e449d50fb6fc21773128c17d',1,'coupling']]],
   ['initdivisionfactor_5',['initDivisionFactor',['../classcoupling_1_1paralleltopology_1_1ZYXTopology.html#abea73607d5ad43760ef056c25d5354c4',1,'coupling::paralleltopology::ZYXTopology::initDivisionFactor()'],['../namespacecoupling.html#a7f7042c1e1ca449f2ee752a5eaf5c8a6',1,'coupling::initDivisionFactor()']]],
   ['initfiltering_6',['initFiltering',['../classcoupling_1_1services_1_1CouplingCellServiceImpl.html#a21ead3ba657c3c9bcde3b4d797346029',1,'coupling::services::CouplingCellServiceImpl']]],
-  ['initindexvectors4usher_7',['initIndexVectors4Usher',['../classcoupling_1_1services_1_1CouplingCellServiceImpl.html#a6ab48467fff66fc08d8d8fe23a2f396f',1,'coupling::services::CouplingCellServiceImpl']]],
+  ['initindexvectors4usher_7',['initIndexVectors4Usher',['../classcoupling_1_1services_1_1CouplingCellServiceImpl.html#a32b21733413b7293b1a588cd53c67353',1,'coupling::services::CouplingCellServiceImpl']]],
   ['initlinkedcellcontainer_8',['initLinkedCellContainer',['../classcoupling_1_1datastructures_1_1LinkedCellContainer.html#a8dc34adce4de91e8546242b652ef654b',1,'coupling::datastructures::LinkedCellContainer']]],
   ['initrange_9',['initRange',['../namespacecoupling.html#a6a609d1ea4be55fb9ceec0df5d56e517',1,'coupling']]],
   ['initsolvers_10',['initSolvers',['../classCouetteScenario.html#a44c2e8a96d8eef5db613387306e15423',1,'CouetteScenario']]],

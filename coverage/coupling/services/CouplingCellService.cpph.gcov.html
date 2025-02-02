@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2025-01-30 11:57:33</td>
+            <td class="headerValue">2025-02-02 22:18:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -125,11 +125,11 @@
 <a name="63"><span class="lineNum">      63 </span><span class="lineNoCov">          0 :     std::cout &lt;&lt; &quot;ERROR &quot;</span></a>
 <a name="64"><span class="lineNum">      64 </span>            :                  &quot;coupling::services::CouplingCellServiceImpl::&quot;</a>
 <a name="65"><span class="lineNum">      65 </span>            :                  &quot;CouplingCellServiceImpl(): _boundaryForceController==NULL!&quot;</a>
-<a name="66"><span class="lineNum">      66 </span><span class="lineCov">         16 :               &lt;&lt; std::endl;</span></a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineCov">          4 :               &lt;&lt; std::endl;</span></a>
 <a name="67"><span class="lineNum">      67 </span>            :   }</a>
 <a name="68"><span class="lineNum">      68 </span>            : </a>
 <a name="69"><span class="lineNum">      69 </span>            :   // init Usher parameters</a>
-<a name="70"><span class="lineNum">      70 </span><span class="lineCov">          4 :   initIndexVectors4Usher(couplingCellConfiguration.getNumberLinkedCellsPerCouplingCell());</span></a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineCov">          4 :   initIndexVectors4Usher();</span></a>
 <a name="71"><span class="lineNum">      71 </span>            : </a>
 <a name="72"><span class="lineNum">      72 </span>            :   // init vector of inner (MD Domain/non-ghost) cells and their indices</a>
 <a name="73"><span class="lineNum">      73 </span>            :   // TODO: REMOVE</a>
@@ -270,206 +270,205 @@
 <a name="208"><span class="lineNum">     208 </span><span class="lineNoCov">          0 : }</span></a>
 <a name="209"><span class="lineNum">     209 </span>            : </a>
 <a name="210"><span class="lineNum">     210 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="211"><span class="lineNum">     211 </span><span class="lineCov">          4 : void coupling::services::CouplingCellServiceImpl&lt;LinkedCell, dim&gt;::initIndexVectors4Usher(</span></a>
-<a name="212"><span class="lineNum">     212 </span>            :     tarch::la::Vector&lt;dim, unsigned int&gt; numberLinkedCellsPerCouplingCell) {</a>
-<a name="213"><span class="lineNum">     213 </span>            : </a>
-<a name="214"><span class="lineNum">     214 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;dim, unsigned int&gt; firstNonGhostCouplingCell(1);</span></a>
-<a name="215"><span class="lineNum">     215 </span>            : </a>
-<a name="216"><span class="lineNum">     216 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;3, unsigned int&gt; start(0);</span></a>
-<a name="217"><span class="lineNum">     217 </span><span class="lineCov">          8 :   const tarch::la::Vector&lt;3, unsigned int&gt; end = coupling::initRange&lt;dim&gt;(tarch::la::Vector&lt;dim, unsigned int&gt;(2));</span></a>
-<a name="218"><span class="lineNum">     218 </span><span class="lineCov">          4 :   tarch::la::Vector&lt;3, unsigned int&gt; loop(0);</span></a>
-<a name="219"><span class="lineNum">     219 </span><span class="lineCov">          4 :   unsigned int loopCounter = 0;</span></a>
-<a name="220"><span class="lineNum">     220 </span>            : </a>
-<a name="221"><span class="lineNum">     221 </span><span class="lineCov">         12 :   for (loop[2] = start[2]; loop[2] &lt; end[2]; loop[2]++) {</span></a>
-<a name="222"><span class="lineNum">     222 </span><span class="lineCov">         24 :     for (loop[1] = start[1]; loop[1] &lt; end[1]; loop[1]++) {</span></a>
-<a name="223"><span class="lineNum">     223 </span><span class="lineCov">         48 :       for (loop[0] = start[0]; loop[0] &lt; end[0]; loop[0]++) {</span></a>
-<a name="224"><span class="lineNum">     224 </span><span class="lineCov">        128 :         for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="225"><span class="lineNum">     225 </span><span class="lineCov">         96 :           _usherCellOffset[loopCounter][d] = loop[d];</span></a>
-<a name="226"><span class="lineNum">     226 </span><span class="lineCov">         96 :           _usherCellStart[loopCounter][d] = firstNonGhostCouplingCell[d] + loop[d] * (I10::numberCellsInDomain[d] / 2);</span></a>
-<a name="227"><span class="lineNum">     227 </span><span class="lineCov">         96 :           _usherCellEnd[loopCounter][d] =</span></a>
-<a name="228"><span class="lineNum">     228 </span><span class="lineCov">         96 :               firstNonGhostCouplingCell[d] + (1 - loop[d]) * (I10::numberCellsInDomain[d] / 2) + loop[d] * I10::numberCellsInDomain[d];</span></a>
-<a name="229"><span class="lineNum">     229 </span><span class="lineCov">         96 :           _usherRange[loopCounter][d] = _usherCellEnd[loopCounter][d] - _usherCellStart[loopCounter][d];</span></a>
-<a name="230"><span class="lineNum">     230 </span>            :         }</a>
-<a name="231"><span class="lineNum">     231 </span><span class="lineCov">         32 :         for (unsigned int d = dim; d &lt; 3; d++) {</span></a>
-<a name="232"><span class="lineNum">     232 </span>            :           _usherCellOffset[loopCounter][d] = 0;</a>
-<a name="233"><span class="lineNum">     233 </span>            :           _usherCellStart[loopCounter][d] = 0;</a>
-<a name="234"><span class="lineNum">     234 </span>            :           _usherCellEnd[loopCounter][d] = 1;</a>
-<a name="235"><span class="lineNum">     235 </span>            :         }</a>
-<a name="236"><span class="lineNum">     236 </span>            : </a>
-<a name="237"><span class="lineNum">     237 </span><span class="lineCov">         32 :         loopCounter++;</span></a>
-<a name="238"><span class="lineNum">     238 </span>            :       }</a>
-<a name="239"><span class="lineNum">     239 </span>            :     }</a>
-<a name="240"><span class="lineNum">     240 </span>            :   } // loop over all staggered versions (-&gt; (0,0,0), (0,0,1), (0,1,0),....,</a>
-<a name="241"><span class="lineNum">     241 </span>            :     // (1,1,1) )</a>
-<a name="242"><span class="lineNum">     242 </span><span class="lineCov">          4 : }</span></a>
-<a name="243"><span class="lineNum">     243 </span>            : </a>
-<a name="244"><span class="lineNum">     244 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="245"><span class="lineNum">     245 </span><span class="lineNoCov">          0 : tarch::la::Vector&lt;dim, double&gt; coupling::services::CouplingCellServiceImpl&lt;LinkedCell, dim&gt;::getPositionOfFirstLocalGhostCell() const {</span></a>
-<a name="246"><span class="lineNum">     246 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; position = I03{{0, 0, 0}}.getCellMidPoint() - 0.5 * IDXS.getCouplingCellSize();</span></a>
-<a name="247"><span class="lineNum">     247 </span><span class="lineNoCov">          0 :   return position;</span></a>
-<a name="248"><span class="lineNum">     248 </span>            : }</a>
-<a name="249"><span class="lineNum">     249 </span>            : </a>
-<a name="250"><span class="lineNum">     250 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::CouplingCellServiceImpl&lt;LinkedCell, dim&gt;::distributeMass(unsigned int t) {</span></a>
-<a name="251"><span class="lineNum">     251 </span>            :   // nop if there is no particle insertion</a>
-<a name="252"><span class="lineNum">     252 </span><span class="lineNoCov">          0 :   if (_particleInsertionType == coupling::configurations::ParticleInsertionConfiguration::NO_INSERTION) {</span></a>
-<a name="253"><span class="lineNum">     253 </span><span class="lineNoCov">          0 :     return;</span></a>
-<a name="254"><span class="lineNum">     254 </span>            :   }</a>
-<a name="255"><span class="lineNum">     255 </span>            :   // only insert mass every X time steps</a>
-<a name="256"><span class="lineNum">     256 </span><span class="lineNoCov">          0 :   if (!_particleInsertion-&gt;insertDeleteMassAtTimestep(t)) {</span></a>
-<a name="257"><span class="lineNum">     257 </span>            :     return;</a>
-<a name="258"><span class="lineNum">     258 </span>            :   }</a>
-<a name="259"><span class="lineNum">     259 </span>            : </a>
-<a name="260"><span class="lineNum">     260 </span>            :   // compute mean potential energy over all coupling cells and set the value</a>
-<a name="261"><span class="lineNum">     261 </span>            :   // in the coupling cell</a>
-<a name="262"><span class="lineNum">     262 </span><span class="lineNoCov">          0 :   coupling::cellmappings::ComputeMeanPotentialEnergyMapping&lt;LinkedCell, dim&gt; computeMeanPotentialEnergyMapping(_mdSolverInterface, *_boundaryForceController);</span></a>
-<a name="263"><span class="lineNum">     263 </span>            :   // coupling cell access</a>
-<a name="264"><span class="lineNum">     264 </span><span class="lineNoCov">          0 :   coupling::datastructures::CouplingCellWithLinkedCells&lt;LinkedCell, dim&gt;* const couplingCells = _couplingCells.getLinkedCellContainer();</span></a>
-<a name="265"><span class="lineNum">     265 </span>            :   // start coordinate of first (ghost) cell</a>
-<a name="266"><span class="lineNum">     266 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; startPosition = getPositionOfFirstLocalGhostCell();</span></a>
-<a name="267"><span class="lineNum">     267 </span>            :   // buffers for temperature,momentum,mean velocity,pot. energy</a>
-<a name="268"><span class="lineNum">     268 </span><span class="lineNoCov">          0 :   double temperature(0.0);</span></a>
-<a name="269"><span class="lineNum">     269 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; momentum(0.0);</span></a>
-<a name="270"><span class="lineNum">     270 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; meanVelocity(0.0);</span></a>
-<a name="271"><span class="lineNum">     271 </span><span class="lineNoCov">          0 :   double potentialEnergy = 0.0;</span></a>
-<a name="272"><span class="lineNum">     272 </span>            :   // buffer for insertion/deletion action that has been carried out</a>
-<a name="273"><span class="lineNum">     273 </span>            :   typename coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Action particleInsertionAction;</a>
-<a name="274"><span class="lineNum">     274 </span>            :   // true, if the costly operation of contructing the energy landscape is really</a>
-<a name="275"><span class="lineNum">     275 </span>            :   // required</a>
-<a name="276"><span class="lineNum">     276 </span>            :   bool constructEnergyLandscape;</a>
-<a name="277"><span class="lineNum">     277 </span>            : </a>
-<a name="278"><span class="lineNum">     278 </span>            :   // variables for internal looping --------------------------</a>
-<a name="279"><span class="lineNum">     279 </span>            :   // cellIndex used as loop counter</a>
-<a name="280"><span class="lineNum">     280 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;3, unsigned int&gt; cellIndex(0);</span></a>
-<a name="281"><span class="lineNum">     281 </span>            :   // loop over coupling cell domain (within MD domain) in a 2^dim-colour</a>
-<a name="282"><span class="lineNum">     282 </span>            :   // manner: For parallel simulations with an odd number of processes and</a>
-<a name="283"><span class="lineNum">     283 </span>            :   // periodic boundary conditions, a simple staggered loop over all coupling</a>
-<a name="284"><span class="lineNum">     284 </span>            :   // cells would imply that we insert particles on both sides of the global MD</a>
-<a name="285"><span class="lineNum">     285 </span>            :   // boundary in the same traversal. This can lead to strong forces and</a>
-<a name="286"><span class="lineNum">     286 </span>            :   // potential fields between inserted particles! So, we introduce another loop</a>
-<a name="287"><span class="lineNum">     287 </span>            :   // which subdivides each local domain into 2^D blocks and traverse each block</a>
-<a name="288"><span class="lineNum">     288 </span>            :   // in one loop traversal first.</a>
-<a name="289"><span class="lineNum">     289 </span><span class="lineNoCov">          0 :   for (unsigned int j = 0; j &lt; (1 &lt;&lt; dim); j++) {</span></a>
-<a name="290"><span class="lineNum">     290 </span>            :     // we have to at least carry out the construction of the energy landscape</a>
-<a name="291"><span class="lineNum">     291 </span>            :     // once for each sub-domain (since we do not know a priori if we need to</a>
-<a name="292"><span class="lineNum">     292 </span>            :     // insert particles or not)</a>
-<a name="293"><span class="lineNum">     293 </span><span class="lineNoCov">          0 :     constructEnergyLandscape = true;</span></a>
-<a name="294"><span class="lineNum">     294 </span>            :     // reduce size of usherCellStart-vector to be consistent with</a>
-<a name="295"><span class="lineNum">     295 </span>            :     // MDSolverInterface</a>
-<a name="296"><span class="lineNum">     296 </span><span class="lineNoCov">          0 :     const tarch::la::Vector&lt;dim, unsigned int&gt; usherCellStart = coupling::initDimVector&lt;dim&gt;(_usherCellStart[j]);</span></a>
-<a name="297"><span class="lineNum">     297 </span>            : </a>
-<a name="298"><span class="lineNum">     298 </span>            :     // loop over the block again in a 2^dim-colour manner: For each particle</a>
-<a name="299"><span class="lineNum">     299 </span>            :     // insertion within a coupling cell, the potential energy landscape needs</a>
-<a name="300"><span class="lineNum">     300 </span>            :     // to be reconstructed in the surrounding of the respective cell. This</a>
-<a name="301"><span class="lineNum">     301 </span>            :     // implies: - reset energy for molecules in this cell and the neighbours</a>
-<a name="302"><span class="lineNum">     302 </span>            :     //               - compute energy for all molecules of this cell and the</a>
-<a name="303"><span class="lineNum">     303 </span>            :     //               neighbours (= consider 5^dim cells!)</a>
-<a name="304"><span class="lineNum">     304 </span>            :     // So, it becomes apparent that re-computing the potential energy becomes</a>
-<a name="305"><span class="lineNum">     305 </span>            :     // quite expensive. Therefore, we loop over each block in a red-black</a>
-<a name="306"><span class="lineNum">     306 </span>            :     // manner. Doing so, each loop iteration over one &quot;colour&quot; of cells can be</a>
-<a name="307"><span class="lineNum">     307 </span>            :     // done without any re-computation of the potential energy as the molecules</a>
-<a name="308"><span class="lineNum">     308 </span>            :     // under consideration are independent from each other.</a>
-<a name="309"><span class="lineNum">     309 </span><span class="lineNoCov">          0 :     for (unsigned int i = 0; i &lt; (1 &lt;&lt; dim); i++) {</span></a>
-<a name="310"><span class="lineNum">     310 </span>            :       // setup potential energy landscape (i.e. computes the potential energy</a>
-<a name="311"><span class="lineNum">     311 </span>            :       // for all relevant molecules; here, we need to sweep over all molecules</a>
-<a name="312"><span class="lineNum">     312 </span>            :       // contained in the coupling cells of interest and compute their</a>
-<a name="313"><span class="lineNum">     313 </span>            :       // current potential energy). Only carry out this costly operation, if</a>
-<a name="314"><span class="lineNum">     314 </span>            :       // there have been modifications to the MD system OR this is the first</a>
-<a name="315"><span class="lineNum">     315 </span>            :       // consideration of this sub-domain. Besides, we skip this operation if</a>
-<a name="316"><span class="lineNum">     316 </span>            :       // the particle insertion does not require it (e.g. in case of rarefied</a>
-<a name="317"><span class="lineNum">     317 </span>            :       // gases, we possibly can come up with something better than USHER)</a>
-<a name="318"><span class="lineNum">     318 </span><span class="lineNoCov">          0 :       if (constructEnergyLandscape &amp;&amp; _particleInsertion-&gt;requiresPotentialEnergyLandscape()) {</span></a>
-<a name="319"><span class="lineNum">     319 </span><span class="lineNoCov">          0 :         _mdSolverInterface-&gt;setupPotentialEnergyLandscape(usherCellStart, _usherRange[j], _numberLinkedCellsPerCouplingCell);</span></a>
-<a name="320"><span class="lineNum">     320 </span>            :         // reset flag</a>
-<a name="321"><span class="lineNum">     321 </span>            :         constructEnergyLandscape = false;</a>
-<a name="322"><span class="lineNum">     322 </span>            :       }</a>
-<a name="323"><span class="lineNum">     323 </span>            : </a>
-<a name="324"><span class="lineNum">     324 </span>            :       // loop over all respective coupling cells (incrementing by 2 for</a>
-<a name="325"><span class="lineNum">     325 </span>            :       // 2^dim-colour-traversal)</a>
-<a name="326"><span class="lineNum">     326 </span><span class="lineNoCov">          0 :       for (cellIndex[2] = _usherCellStart[j][2] + _usherCellOffset[i][2]; cellIndex[2] &lt; _usherCellEnd[j][2]; cellIndex[2] = cellIndex[2] + 2) {</span></a>
-<a name="327"><span class="lineNum">     327 </span><span class="lineNoCov">          0 :         for (cellIndex[1] = _usherCellStart[j][1] + _usherCellOffset[i][1]; cellIndex[1] &lt; _usherCellEnd[j][1]; cellIndex[1] = cellIndex[1] + 2) {</span></a>
-<a name="328"><span class="lineNum">     328 </span><span class="lineNoCov">          0 :           for (cellIndex[0] = _usherCellStart[j][0] + _usherCellOffset[i][0]; cellIndex[0] &lt; _usherCellEnd[j][0]; cellIndex[0] = cellIndex[0] + 2) {</span></a>
-<a name="329"><span class="lineNum">     329 </span>            :             // determine coupling cell index</a>
-<a name="330"><span class="lineNum">     330 </span>            :             // coupling::indexing::CellIndex&lt;3, vector, coupling::indexing::IndexTrait::local&gt;</a>
-<a name="331"><span class="lineNum">     331 </span><span class="lineNoCov">          0 :             I03 localCellIndex{(tarch::la::Vector&lt;dim, int&gt;)cellIndex};</span></a>
-<a name="332"><span class="lineNum">     332 </span><span class="lineNoCov">          0 :             const unsigned int index = I02{localCellIndex}.get();</span></a>
-<a name="333"><span class="lineNum">     333 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="334"><span class="lineNum">     334 </span>            :             std::cout &lt;&lt; &quot;coupling::services::CouplingCellServiceImpl::&quot;</a>
-<a name="335"><span class="lineNum">     335 </span>            :                          &quot;distributeMass(): Insert mass in cell &quot;</a>
-<a name="336"><span class="lineNum">     336 </span>            :                       &lt;&lt; index &lt;&lt; std::endl;</a>
-<a name="337"><span class="lineNum">     337 </span>            : #endif</a>
-<a name="338"><span class="lineNum">     338 </span>            :             // compute cell position</a>
-<a name="339"><span class="lineNum">     339 </span><span class="lineNoCov">          0 :             tarch::la::Vector&lt;dim, double&gt; couplingCellPosition = startPosition;</span></a>
-<a name="340"><span class="lineNum">     340 </span><span class="lineNoCov">          0 :             auto dx = coupling::indexing::IndexingService&lt;3&gt;::getInstance().getCouplingCellSize();</span></a>
-<a name="341"><span class="lineNum">     341 </span><span class="lineNoCov">          0 :             for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="342"><span class="lineNum">     342 </span><span class="lineNoCov">          0 :               couplingCellPosition[d] += dx[d] * cellIndex[d];</span></a>
-<a name="343"><span class="lineNum">     343 </span>            :             }</a>
-<a name="344"><span class="lineNum">     344 </span>            : </a>
-<a name="345"><span class="lineNum">     345 </span>            :             // compute current momentum and energy</a>
-<a name="346"><span class="lineNum">     346 </span><span class="lineNoCov">          0 :             _momentumController.computeMomentumAndMeanVelocity(couplingCells[index], momentum, meanVelocity);</span></a>
-<a name="347"><span class="lineNum">     347 </span><span class="lineNoCov">          0 :             temperature = couplingCells[index].getTemperature();</span></a>
-<a name="348"><span class="lineNum">     348 </span>            :             // compute potential energy for this coupling cell and store it</a>
-<a name="349"><span class="lineNum">     349 </span><span class="lineNoCov">          0 :             couplingCells[index].iterateConstCells(computeMeanPotentialEnergyMapping);</span></a>
-<a name="350"><span class="lineNum">     350 </span><span class="lineNoCov">          0 :             potentialEnergy = computeMeanPotentialEnergyMapping.getPotentialEnergy();</span></a>
-<a name="351"><span class="lineNum">     351 </span><span class="lineNoCov">          0 :             couplingCells[index].setPotentialEnergy(potentialEnergy);</span></a>
-<a name="352"><span class="lineNum">     352 </span>            : </a>
-<a name="353"><span class="lineNum">     353 </span>            :             // insert/ delete mass</a>
-<a name="354"><span class="lineNum">     354 </span>            :             particleInsertionAction =</a>
-<a name="355"><span class="lineNum">     355 </span><span class="lineNoCov">          0 :                 _particleInsertion-&gt;insertDeleteMass(couplingCells[index], couplingCellPosition, dx, meanVelocity, temperature, *_boundaryForceController);</span></a>
-<a name="356"><span class="lineNum">     356 </span>            :             // if insertion/ deletion was successful...</a>
-<a name="357"><span class="lineNum">     357 </span><span class="lineNoCov">          0 :             if (particleInsertionAction != coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::NoAction) {</span></a>
-<a name="358"><span class="lineNum">     358 </span>            :               // ... determine new potential energy of the system (assumption:</a>
-<a name="359"><span class="lineNum">     359 </span>            :               // symmetric potential energy)</a>
-<a name="360"><span class="lineNum">     360 </span><span class="lineNoCov">          0 :               couplingCells[index].iterateConstCells(computeMeanPotentialEnergyMapping);</span></a>
-<a name="361"><span class="lineNum">     361 </span>            : </a>
-<a name="362"><span class="lineNum">     362 </span>            :               // ... reset momentum and temperature</a>
-<a name="363"><span class="lineNum">     363 </span><span class="lineNoCov">          0 :               _momentumController.setMomentum(couplingCells[index], momentum);</span></a>
-<a name="364"><span class="lineNum">     364 </span><span class="lineNoCov">          0 :               _kineticEnergyController.setTemperature(couplingCells[index], temperature);</span></a>
-<a name="365"><span class="lineNum">     365 </span>            :               // ... set flag to construct energy landscape for next insertion</a>
-<a name="366"><span class="lineNum">     366 </span>            :               // try</a>
-<a name="367"><span class="lineNum">     367 </span>            :               constructEnergyLandscape = true;</a>
-<a name="368"><span class="lineNum">     368 </span>            :             }</a>
-<a name="369"><span class="lineNum">     369 </span>            : </a>
-<a name="370"><span class="lineNum">     370 </span>            :           } // cellIndex(0)</a>
-<a name="371"><span class="lineNum">     371 </span>            :         } // cellIndex(1)</a>
-<a name="372"><span class="lineNum">     372 </span>            :       } // cellIndex(2)</a>
-<a name="373"><span class="lineNum">     373 </span>            :     } // 2^dim-colour single cells (1&lt;&lt;dim)</a>
-<a name="374"><span class="lineNum">     374 </span>            : </a>
-<a name="375"><span class="lineNum">     375 </span>            :     // synchronize molecules between processes</a>
-<a name="376"><span class="lineNum">     376 </span><span class="lineNoCov">          0 :     _mdSolverInterface-&gt;synchronizeMoleculesAfterMassModification();</span></a>
-<a name="377"><span class="lineNum">     377 </span>            : </a>
-<a name="378"><span class="lineNum">     378 </span>            :   } // 2^dim-colour whole domain (1&lt;&lt;dim)</a>
-<a name="379"><span class="lineNum">     379 </span>            : </a>
-<a name="380"><span class="lineNum">     380 </span>            : #ifdef USHER_DEBUG</a>
-<a name="381"><span class="lineNum">     381 </span>            :   coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;* p = ((coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;*)_particleInsertion);</a>
-<a name="382"><span class="lineNum">     382 </span>            :   std::cout &lt;&lt; &quot;_particlesInserted = &quot; &lt;&lt; p-&gt;_particlesInserted &lt;&lt; std::endl;</a>
-<a name="383"><span class="lineNum">     383 </span>            :   std::cout &lt;&lt; &quot;_energyInserted     = &quot; &lt;&lt; p-&gt;_energyInserted &lt;&lt; std::endl;</a>
-<a name="384"><span class="lineNum">     384 </span>            :   std::cout &lt;&lt; &quot;_ZhouEnergyInserted = &quot; &lt;&lt; p-&gt;_ZhouEnergyInserted &lt;&lt; std::endl;</a>
-<a name="385"><span class="lineNum">     385 </span>            :   std::cout &lt;&lt; &quot;and&quot; &lt;&lt; std::endl;</a>
-<a name="386"><span class="lineNum">     386 </span>            :   std::cout &lt;&lt; &quot;_particlesRemoved  = &quot; &lt;&lt; p-&gt;_particlesRemoved &lt;&lt; std::endl;</a>
-<a name="387"><span class="lineNum">     387 </span>            :   std::cout &lt;&lt; &quot;_energyRemoved      = &quot; &lt;&lt; p-&gt;_energyRemoved &lt;&lt; std::endl;</a>
-<a name="388"><span class="lineNum">     388 </span>            :   std::cout &lt;&lt; &quot;_ZhouEnergyRemoved  = &quot; &lt;&lt; p-&gt;_ZhouEnergyRemoved &lt;&lt; std::endl;</a>
-<a name="389"><span class="lineNum">     389 </span>            :   std::cout &lt;&lt; &quot;Energy inserted per Operation: &quot;</a>
-<a name="390"><span class="lineNum">     390 </span>            :             &lt;&lt; ((p-&gt;_energyInserted + p-&gt;_ZhouEnergyInserted) - (p-&gt;_energyRemoved + p-&gt;_ZhouEnergyRemoved)) / (p-&gt;_particlesInserted + p-&gt;_particlesRemoved)</a>
-<a name="391"><span class="lineNum">     391 </span>            :             &lt;&lt; std::endl;</a>
-<a name="392"><span class="lineNum">     392 </span>            :   std::cout &lt;&lt; std::endl;</a>
-<a name="393"><span class="lineNum">     393 </span>            : #endif</a>
-<a name="394"><span class="lineNum">     394 </span><span class="lineNoCov">          0 : }</span></a>
-<a name="395"><span class="lineNum">     395 </span>            : </a>
-<a name="396"><span class="lineNum">     396 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::CouplingCellServiceImpl&lt;LinkedCell, dim&gt;::plotEveryMicroscopicTimestep(unsigned int t) {</span></a>
-<a name="397"><span class="lineNum">     397 </span>            :   // trigger plotting</a>
-<a name="398"><span class="lineNum">     398 </span><span class="lineNoCov">          0 :   if ((_writeEveryMicroscopicTimestep != 0) &amp;&amp; (t % _writeEveryMicroscopicTimestep == 0)) {</span></a>
-<a name="399"><span class="lineNum">     399 </span><span class="lineNoCov">          0 :     coupling::CouplingCellPlotter&lt;LinkedCell, dim&gt; plotter(coupling::services::CouplingCellService&lt;dim&gt;::getID(), _microscopicFilename, IDXS.getRank(), t,</span></a>
-<a name="400"><span class="lineNum">     400 </span><span class="lineNoCov">          0 :                                                            _couplingCells, _mdSolverInterface);</span></a>
-<a name="401"><span class="lineNum">     401 </span>            :   }</a>
-<a name="402"><span class="lineNum">     402 </span><span class="lineNoCov">          0 : }</span></a>
-<a name="403"><span class="lineNum">     403 </span>            : </a>
-<a name="404"><span class="lineNum">     404 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::CouplingCellServiceImpl&lt;LinkedCell, dim&gt;::plotEveryMacroscopicTimestep(unsigned int t) {</span></a>
-<a name="405"><span class="lineNum">     405 </span>            :   // trigger plotting</a>
-<a name="406"><span class="lineNum">     406 </span><span class="lineNoCov">          0 :   if ((_writeEveryMacroscopicTimestep != 0) &amp;&amp; (t % _writeEveryMacroscopicTimestep == 0)) {</span></a>
-<a name="407"><span class="lineNum">     407 </span><span class="lineNoCov">          0 :     coupling::CouplingCellPlotter&lt;LinkedCell, dim&gt; plotter(coupling::services::CouplingCellService&lt;dim&gt;::getID(), _macroscopicFilename, IDXS.getRank(), t,</span></a>
-<a name="408"><span class="lineNum">     408 </span><span class="lineNoCov">          0 :                                                            _couplingCells, _mdSolverInterface);</span></a>
-<a name="409"><span class="lineNum">     409 </span>            :   }</a>
-<a name="410"><span class="lineNum">     410 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="211"><span class="lineNum">     211 </span><span class="lineCov">          4 : void coupling::services::CouplingCellServiceImpl&lt;LinkedCell, dim&gt;::initIndexVectors4Usher() {</span></a>
+<a name="212"><span class="lineNum">     212 </span>            : </a>
+<a name="213"><span class="lineNum">     213 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;dim, unsigned int&gt; firstNonGhostCouplingCell(1);</span></a>
+<a name="214"><span class="lineNum">     214 </span>            : </a>
+<a name="215"><span class="lineNum">     215 </span><span class="lineCov">          4 :   const tarch::la::Vector&lt;3, unsigned int&gt; start(0);</span></a>
+<a name="216"><span class="lineNum">     216 </span><span class="lineCov">          8 :   const tarch::la::Vector&lt;3, unsigned int&gt; end = coupling::initRange&lt;dim&gt;(tarch::la::Vector&lt;dim, unsigned int&gt;(2));</span></a>
+<a name="217"><span class="lineNum">     217 </span><span class="lineCov">          4 :   tarch::la::Vector&lt;3, unsigned int&gt; loop(0);</span></a>
+<a name="218"><span class="lineNum">     218 </span><span class="lineCov">          4 :   unsigned int loopCounter = 0;</span></a>
+<a name="219"><span class="lineNum">     219 </span>            : </a>
+<a name="220"><span class="lineNum">     220 </span><span class="lineCov">         12 :   for (loop[2] = start[2]; loop[2] &lt; end[2]; loop[2]++) {</span></a>
+<a name="221"><span class="lineNum">     221 </span><span class="lineCov">         24 :     for (loop[1] = start[1]; loop[1] &lt; end[1]; loop[1]++) {</span></a>
+<a name="222"><span class="lineNum">     222 </span><span class="lineCov">         48 :       for (loop[0] = start[0]; loop[0] &lt; end[0]; loop[0]++) {</span></a>
+<a name="223"><span class="lineNum">     223 </span><span class="lineCov">        128 :         for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="224"><span class="lineNum">     224 </span><span class="lineCov">         96 :           _usherCellOffset[loopCounter][d] = loop[d];</span></a>
+<a name="225"><span class="lineNum">     225 </span><span class="lineCov">         96 :           _usherCellStart[loopCounter][d] = firstNonGhostCouplingCell[d] + loop[d] * (I10::numberCellsInDomain[d] / 2);</span></a>
+<a name="226"><span class="lineNum">     226 </span><span class="lineCov">         96 :           _usherCellEnd[loopCounter][d] =</span></a>
+<a name="227"><span class="lineNum">     227 </span><span class="lineCov">         96 :               firstNonGhostCouplingCell[d] + (1 - loop[d]) * (I10::numberCellsInDomain[d] / 2) + loop[d] * I10::numberCellsInDomain[d];</span></a>
+<a name="228"><span class="lineNum">     228 </span><span class="lineCov">         96 :           _usherRange[loopCounter][d] = _usherCellEnd[loopCounter][d] - _usherCellStart[loopCounter][d];</span></a>
+<a name="229"><span class="lineNum">     229 </span>            :         }</a>
+<a name="230"><span class="lineNum">     230 </span><span class="lineCov">         32 :         for (unsigned int d = dim; d &lt; 3; d++) {</span></a>
+<a name="231"><span class="lineNum">     231 </span>            :           _usherCellOffset[loopCounter][d] = 0;</a>
+<a name="232"><span class="lineNum">     232 </span>            :           _usherCellStart[loopCounter][d] = 0;</a>
+<a name="233"><span class="lineNum">     233 </span>            :           _usherCellEnd[loopCounter][d] = 1;</a>
+<a name="234"><span class="lineNum">     234 </span>            :         }</a>
+<a name="235"><span class="lineNum">     235 </span>            : </a>
+<a name="236"><span class="lineNum">     236 </span><span class="lineCov">         32 :         loopCounter++;</span></a>
+<a name="237"><span class="lineNum">     237 </span>            :       }</a>
+<a name="238"><span class="lineNum">     238 </span>            :     }</a>
+<a name="239"><span class="lineNum">     239 </span>            :   } // loop over all staggered versions (-&gt; (0,0,0), (0,0,1), (0,1,0),....,</a>
+<a name="240"><span class="lineNum">     240 </span>            :     // (1,1,1) )</a>
+<a name="241"><span class="lineNum">     241 </span><span class="lineCov">          4 : }</span></a>
+<a name="242"><span class="lineNum">     242 </span>            : </a>
+<a name="243"><span class="lineNum">     243 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="244"><span class="lineNum">     244 </span><span class="lineNoCov">          0 : tarch::la::Vector&lt;dim, double&gt; coupling::services::CouplingCellServiceImpl&lt;LinkedCell, dim&gt;::getPositionOfFirstLocalGhostCell() const {</span></a>
+<a name="245"><span class="lineNum">     245 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; position = I03{{0, 0, 0}}.getCellMidPoint() - 0.5 * IDXS.getCouplingCellSize();</span></a>
+<a name="246"><span class="lineNum">     246 </span><span class="lineNoCov">          0 :   return position;</span></a>
+<a name="247"><span class="lineNum">     247 </span>            : }</a>
+<a name="248"><span class="lineNum">     248 </span>            : </a>
+<a name="249"><span class="lineNum">     249 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::CouplingCellServiceImpl&lt;LinkedCell, dim&gt;::distributeMass(unsigned int t) {</span></a>
+<a name="250"><span class="lineNum">     250 </span>            :   // nop if there is no particle insertion</a>
+<a name="251"><span class="lineNum">     251 </span><span class="lineNoCov">          0 :   if (_particleInsertionType == coupling::configurations::ParticleInsertionConfiguration::NO_INSERTION) {</span></a>
+<a name="252"><span class="lineNum">     252 </span><span class="lineNoCov">          0 :     return;</span></a>
+<a name="253"><span class="lineNum">     253 </span>            :   }</a>
+<a name="254"><span class="lineNum">     254 </span>            :   // only insert mass every X time steps</a>
+<a name="255"><span class="lineNum">     255 </span><span class="lineNoCov">          0 :   if (!_particleInsertion-&gt;insertDeleteMassAtTimestep(t)) {</span></a>
+<a name="256"><span class="lineNum">     256 </span>            :     return;</a>
+<a name="257"><span class="lineNum">     257 </span>            :   }</a>
+<a name="258"><span class="lineNum">     258 </span>            : </a>
+<a name="259"><span class="lineNum">     259 </span>            :   // compute mean potential energy over all coupling cells and set the value</a>
+<a name="260"><span class="lineNum">     260 </span>            :   // in the coupling cell</a>
+<a name="261"><span class="lineNum">     261 </span><span class="lineNoCov">          0 :   coupling::cellmappings::ComputeMeanPotentialEnergyMapping&lt;LinkedCell, dim&gt; computeMeanPotentialEnergyMapping(_mdSolverInterface, *_boundaryForceController);</span></a>
+<a name="262"><span class="lineNum">     262 </span>            :   // coupling cell access</a>
+<a name="263"><span class="lineNum">     263 </span><span class="lineNoCov">          0 :   coupling::datastructures::CouplingCellWithLinkedCells&lt;LinkedCell, dim&gt;* const couplingCells = _couplingCells.getLinkedCellContainer();</span></a>
+<a name="264"><span class="lineNum">     264 </span>            :   // start coordinate of first (ghost) cell</a>
+<a name="265"><span class="lineNum">     265 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; startPosition = getPositionOfFirstLocalGhostCell();</span></a>
+<a name="266"><span class="lineNum">     266 </span>            :   // buffers for temperature,momentum,mean velocity,pot. energy</a>
+<a name="267"><span class="lineNum">     267 </span><span class="lineNoCov">          0 :   double temperature(0.0);</span></a>
+<a name="268"><span class="lineNum">     268 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; momentum(0.0);</span></a>
+<a name="269"><span class="lineNum">     269 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, double&gt; meanVelocity(0.0);</span></a>
+<a name="270"><span class="lineNum">     270 </span><span class="lineNoCov">          0 :   double potentialEnergy = 0.0;</span></a>
+<a name="271"><span class="lineNum">     271 </span>            :   // buffer for insertion/deletion action that has been carried out</a>
+<a name="272"><span class="lineNum">     272 </span>            :   typename coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::Action particleInsertionAction;</a>
+<a name="273"><span class="lineNum">     273 </span>            :   // true, if the costly operation of contructing the energy landscape is really</a>
+<a name="274"><span class="lineNum">     274 </span>            :   // required</a>
+<a name="275"><span class="lineNum">     275 </span>            :   bool constructEnergyLandscape;</a>
+<a name="276"><span class="lineNum">     276 </span>            : </a>
+<a name="277"><span class="lineNum">     277 </span>            :   // variables for internal looping --------------------------</a>
+<a name="278"><span class="lineNum">     278 </span>            :   // cellIndex used as loop counter</a>
+<a name="279"><span class="lineNum">     279 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;3, unsigned int&gt; cellIndex(0);</span></a>
+<a name="280"><span class="lineNum">     280 </span>            :   // loop over coupling cell domain (within MD domain) in a 2^dim-colour</a>
+<a name="281"><span class="lineNum">     281 </span>            :   // manner: For parallel simulations with an odd number of processes and</a>
+<a name="282"><span class="lineNum">     282 </span>            :   // periodic boundary conditions, a simple staggered loop over all coupling</a>
+<a name="283"><span class="lineNum">     283 </span>            :   // cells would imply that we insert particles on both sides of the global MD</a>
+<a name="284"><span class="lineNum">     284 </span>            :   // boundary in the same traversal. This can lead to strong forces and</a>
+<a name="285"><span class="lineNum">     285 </span>            :   // potential fields between inserted particles! So, we introduce another loop</a>
+<a name="286"><span class="lineNum">     286 </span>            :   // which subdivides each local domain into 2^D blocks and traverse each block</a>
+<a name="287"><span class="lineNum">     287 </span>            :   // in one loop traversal first.</a>
+<a name="288"><span class="lineNum">     288 </span><span class="lineNoCov">          0 :   for (unsigned int j = 0; j &lt; (1 &lt;&lt; dim); j++) {</span></a>
+<a name="289"><span class="lineNum">     289 </span>            :     // we have to at least carry out the construction of the energy landscape</a>
+<a name="290"><span class="lineNum">     290 </span>            :     // once for each sub-domain (since we do not know a priori if we need to</a>
+<a name="291"><span class="lineNum">     291 </span>            :     // insert particles or not)</a>
+<a name="292"><span class="lineNum">     292 </span><span class="lineNoCov">          0 :     constructEnergyLandscape = true;</span></a>
+<a name="293"><span class="lineNum">     293 </span>            :     // reduce size of usherCellStart-vector to be consistent with</a>
+<a name="294"><span class="lineNum">     294 </span>            :     // MDSolverInterface</a>
+<a name="295"><span class="lineNum">     295 </span><span class="lineNoCov">          0 :     const tarch::la::Vector&lt;dim, unsigned int&gt; usherCellStart = coupling::initDimVector&lt;dim&gt;(_usherCellStart[j]);</span></a>
+<a name="296"><span class="lineNum">     296 </span>            : </a>
+<a name="297"><span class="lineNum">     297 </span>            :     // loop over the block again in a 2^dim-colour manner: For each particle</a>
+<a name="298"><span class="lineNum">     298 </span>            :     // insertion within a coupling cell, the potential energy landscape needs</a>
+<a name="299"><span class="lineNum">     299 </span>            :     // to be reconstructed in the surrounding of the respective cell. This</a>
+<a name="300"><span class="lineNum">     300 </span>            :     // implies: - reset energy for molecules in this cell and the neighbours</a>
+<a name="301"><span class="lineNum">     301 </span>            :     //               - compute energy for all molecules of this cell and the</a>
+<a name="302"><span class="lineNum">     302 </span>            :     //               neighbours (= consider 5^dim cells!)</a>
+<a name="303"><span class="lineNum">     303 </span>            :     // So, it becomes apparent that re-computing the potential energy becomes</a>
+<a name="304"><span class="lineNum">     304 </span>            :     // quite expensive. Therefore, we loop over each block in a red-black</a>
+<a name="305"><span class="lineNum">     305 </span>            :     // manner. Doing so, each loop iteration over one &quot;colour&quot; of cells can be</a>
+<a name="306"><span class="lineNum">     306 </span>            :     // done without any re-computation of the potential energy as the molecules</a>
+<a name="307"><span class="lineNum">     307 </span>            :     // under consideration are independent from each other.</a>
+<a name="308"><span class="lineNum">     308 </span><span class="lineNoCov">          0 :     for (unsigned int i = 0; i &lt; (1 &lt;&lt; dim); i++) {</span></a>
+<a name="309"><span class="lineNum">     309 </span>            :       // setup potential energy landscape (i.e. computes the potential energy</a>
+<a name="310"><span class="lineNum">     310 </span>            :       // for all relevant molecules; here, we need to sweep over all molecules</a>
+<a name="311"><span class="lineNum">     311 </span>            :       // contained in the coupling cells of interest and compute their</a>
+<a name="312"><span class="lineNum">     312 </span>            :       // current potential energy). Only carry out this costly operation, if</a>
+<a name="313"><span class="lineNum">     313 </span>            :       // there have been modifications to the MD system OR this is the first</a>
+<a name="314"><span class="lineNum">     314 </span>            :       // consideration of this sub-domain. Besides, we skip this operation if</a>
+<a name="315"><span class="lineNum">     315 </span>            :       // the particle insertion does not require it (e.g. in case of rarefied</a>
+<a name="316"><span class="lineNum">     316 </span>            :       // gases, we possibly can come up with something better than USHER)</a>
+<a name="317"><span class="lineNum">     317 </span><span class="lineNoCov">          0 :       if (constructEnergyLandscape &amp;&amp; _particleInsertion-&gt;requiresPotentialEnergyLandscape()) {</span></a>
+<a name="318"><span class="lineNum">     318 </span><span class="lineNoCov">          0 :         _mdSolverInterface-&gt;setupPotentialEnergyLandscape(usherCellStart, _usherRange[j], _numberLinkedCellsPerCouplingCell);</span></a>
+<a name="319"><span class="lineNum">     319 </span>            :         // reset flag</a>
+<a name="320"><span class="lineNum">     320 </span>            :         constructEnergyLandscape = false;</a>
+<a name="321"><span class="lineNum">     321 </span>            :       }</a>
+<a name="322"><span class="lineNum">     322 </span>            : </a>
+<a name="323"><span class="lineNum">     323 </span>            :       // loop over all respective coupling cells (incrementing by 2 for</a>
+<a name="324"><span class="lineNum">     324 </span>            :       // 2^dim-colour-traversal)</a>
+<a name="325"><span class="lineNum">     325 </span><span class="lineNoCov">          0 :       for (cellIndex[2] = _usherCellStart[j][2] + _usherCellOffset[i][2]; cellIndex[2] &lt; _usherCellEnd[j][2]; cellIndex[2] = cellIndex[2] + 2) {</span></a>
+<a name="326"><span class="lineNum">     326 </span><span class="lineNoCov">          0 :         for (cellIndex[1] = _usherCellStart[j][1] + _usherCellOffset[i][1]; cellIndex[1] &lt; _usherCellEnd[j][1]; cellIndex[1] = cellIndex[1] + 2) {</span></a>
+<a name="327"><span class="lineNum">     327 </span><span class="lineNoCov">          0 :           for (cellIndex[0] = _usherCellStart[j][0] + _usherCellOffset[i][0]; cellIndex[0] &lt; _usherCellEnd[j][0]; cellIndex[0] = cellIndex[0] + 2) {</span></a>
+<a name="328"><span class="lineNum">     328 </span>            :             // determine coupling cell index</a>
+<a name="329"><span class="lineNum">     329 </span>            :             // coupling::indexing::CellIndex&lt;3, vector, coupling::indexing::IndexTrait::local&gt;</a>
+<a name="330"><span class="lineNum">     330 </span><span class="lineNoCov">          0 :             I03 localCellIndex{(tarch::la::Vector&lt;dim, int&gt;)cellIndex};</span></a>
+<a name="331"><span class="lineNum">     331 </span><span class="lineNoCov">          0 :             const unsigned int index = I02{localCellIndex}.get();</span></a>
+<a name="332"><span class="lineNum">     332 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
+<a name="333"><span class="lineNum">     333 </span>            :             std::cout &lt;&lt; &quot;coupling::services::CouplingCellServiceImpl::&quot;</a>
+<a name="334"><span class="lineNum">     334 </span>            :                          &quot;distributeMass(): Insert mass in cell &quot;</a>
+<a name="335"><span class="lineNum">     335 </span>            :                       &lt;&lt; index &lt;&lt; std::endl;</a>
+<a name="336"><span class="lineNum">     336 </span>            : #endif</a>
+<a name="337"><span class="lineNum">     337 </span>            :             // compute cell position</a>
+<a name="338"><span class="lineNum">     338 </span><span class="lineNoCov">          0 :             tarch::la::Vector&lt;dim, double&gt; couplingCellPosition = startPosition;</span></a>
+<a name="339"><span class="lineNum">     339 </span><span class="lineNoCov">          0 :             auto dx = coupling::indexing::IndexingService&lt;3&gt;::getInstance().getCouplingCellSize();</span></a>
+<a name="340"><span class="lineNum">     340 </span><span class="lineNoCov">          0 :             for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="341"><span class="lineNum">     341 </span><span class="lineNoCov">          0 :               couplingCellPosition[d] += dx[d] * cellIndex[d];</span></a>
+<a name="342"><span class="lineNum">     342 </span>            :             }</a>
+<a name="343"><span class="lineNum">     343 </span>            : </a>
+<a name="344"><span class="lineNum">     344 </span>            :             // compute current momentum and energy</a>
+<a name="345"><span class="lineNum">     345 </span><span class="lineNoCov">          0 :             _momentumController.computeMomentumAndMeanVelocity(couplingCells[index], momentum, meanVelocity);</span></a>
+<a name="346"><span class="lineNum">     346 </span><span class="lineNoCov">          0 :             temperature = couplingCells[index].getTemperature();</span></a>
+<a name="347"><span class="lineNum">     347 </span>            :             // compute potential energy for this coupling cell and store it</a>
+<a name="348"><span class="lineNum">     348 </span><span class="lineNoCov">          0 :             couplingCells[index].iterateConstCells(computeMeanPotentialEnergyMapping);</span></a>
+<a name="349"><span class="lineNum">     349 </span><span class="lineNoCov">          0 :             potentialEnergy = computeMeanPotentialEnergyMapping.getPotentialEnergy();</span></a>
+<a name="350"><span class="lineNum">     350 </span><span class="lineNoCov">          0 :             couplingCells[index].setPotentialEnergy(potentialEnergy);</span></a>
+<a name="351"><span class="lineNum">     351 </span>            : </a>
+<a name="352"><span class="lineNum">     352 </span>            :             // insert/ delete mass</a>
+<a name="353"><span class="lineNum">     353 </span>            :             particleInsertionAction =</a>
+<a name="354"><span class="lineNum">     354 </span><span class="lineNoCov">          0 :                 _particleInsertion-&gt;insertDeleteMass(couplingCells[index], couplingCellPosition, dx, meanVelocity, temperature, *_boundaryForceController);</span></a>
+<a name="355"><span class="lineNum">     355 </span>            :             // if insertion/ deletion was successful...</a>
+<a name="356"><span class="lineNum">     356 </span><span class="lineNoCov">          0 :             if (particleInsertionAction != coupling::ParticleInsertion&lt;LinkedCell, dim&gt;::NoAction) {</span></a>
+<a name="357"><span class="lineNum">     357 </span>            :               // ... determine new potential energy of the system (assumption:</a>
+<a name="358"><span class="lineNum">     358 </span>            :               // symmetric potential energy)</a>
+<a name="359"><span class="lineNum">     359 </span><span class="lineNoCov">          0 :               couplingCells[index].iterateConstCells(computeMeanPotentialEnergyMapping);</span></a>
+<a name="360"><span class="lineNum">     360 </span>            : </a>
+<a name="361"><span class="lineNum">     361 </span>            :               // ... reset momentum and temperature</a>
+<a name="362"><span class="lineNum">     362 </span><span class="lineNoCov">          0 :               _momentumController.setMomentum(couplingCells[index], momentum);</span></a>
+<a name="363"><span class="lineNum">     363 </span><span class="lineNoCov">          0 :               _kineticEnergyController.setTemperature(couplingCells[index], temperature);</span></a>
+<a name="364"><span class="lineNum">     364 </span>            :               // ... set flag to construct energy landscape for next insertion</a>
+<a name="365"><span class="lineNum">     365 </span>            :               // try</a>
+<a name="366"><span class="lineNum">     366 </span>            :               constructEnergyLandscape = true;</a>
+<a name="367"><span class="lineNum">     367 </span>            :             }</a>
+<a name="368"><span class="lineNum">     368 </span>            : </a>
+<a name="369"><span class="lineNum">     369 </span>            :           } // cellIndex(0)</a>
+<a name="370"><span class="lineNum">     370 </span>            :         } // cellIndex(1)</a>
+<a name="371"><span class="lineNum">     371 </span>            :       } // cellIndex(2)</a>
+<a name="372"><span class="lineNum">     372 </span>            :     } // 2^dim-colour single cells (1&lt;&lt;dim)</a>
+<a name="373"><span class="lineNum">     373 </span>            : </a>
+<a name="374"><span class="lineNum">     374 </span>            :     // synchronize molecules between processes</a>
+<a name="375"><span class="lineNum">     375 </span><span class="lineNoCov">          0 :     _mdSolverInterface-&gt;synchronizeMoleculesAfterMassModification();</span></a>
+<a name="376"><span class="lineNum">     376 </span>            : </a>
+<a name="377"><span class="lineNum">     377 </span>            :   } // 2^dim-colour whole domain (1&lt;&lt;dim)</a>
+<a name="378"><span class="lineNum">     378 </span>            : </a>
+<a name="379"><span class="lineNum">     379 </span>            : #ifdef USHER_DEBUG</a>
+<a name="380"><span class="lineNum">     380 </span>            :   coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;* p = ((coupling::UsherParticleInsertion&lt;LinkedCell, dim&gt;*)_particleInsertion);</a>
+<a name="381"><span class="lineNum">     381 </span>            :   std::cout &lt;&lt; &quot;_particlesInserted = &quot; &lt;&lt; p-&gt;_particlesInserted &lt;&lt; std::endl;</a>
+<a name="382"><span class="lineNum">     382 </span>            :   std::cout &lt;&lt; &quot;_energyInserted     = &quot; &lt;&lt; p-&gt;_energyInserted &lt;&lt; std::endl;</a>
+<a name="383"><span class="lineNum">     383 </span>            :   std::cout &lt;&lt; &quot;_ZhouEnergyInserted = &quot; &lt;&lt; p-&gt;_ZhouEnergyInserted &lt;&lt; std::endl;</a>
+<a name="384"><span class="lineNum">     384 </span>            :   std::cout &lt;&lt; &quot;and&quot; &lt;&lt; std::endl;</a>
+<a name="385"><span class="lineNum">     385 </span>            :   std::cout &lt;&lt; &quot;_particlesRemoved  = &quot; &lt;&lt; p-&gt;_particlesRemoved &lt;&lt; std::endl;</a>
+<a name="386"><span class="lineNum">     386 </span>            :   std::cout &lt;&lt; &quot;_energyRemoved      = &quot; &lt;&lt; p-&gt;_energyRemoved &lt;&lt; std::endl;</a>
+<a name="387"><span class="lineNum">     387 </span>            :   std::cout &lt;&lt; &quot;_ZhouEnergyRemoved  = &quot; &lt;&lt; p-&gt;_ZhouEnergyRemoved &lt;&lt; std::endl;</a>
+<a name="388"><span class="lineNum">     388 </span>            :   std::cout &lt;&lt; &quot;Energy inserted per Operation: &quot;</a>
+<a name="389"><span class="lineNum">     389 </span>            :             &lt;&lt; ((p-&gt;_energyInserted + p-&gt;_ZhouEnergyInserted) - (p-&gt;_energyRemoved + p-&gt;_ZhouEnergyRemoved)) / (p-&gt;_particlesInserted + p-&gt;_particlesRemoved)</a>
+<a name="390"><span class="lineNum">     390 </span>            :             &lt;&lt; std::endl;</a>
+<a name="391"><span class="lineNum">     391 </span>            :   std::cout &lt;&lt; std::endl;</a>
+<a name="392"><span class="lineNum">     392 </span>            : #endif</a>
+<a name="393"><span class="lineNum">     393 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="394"><span class="lineNum">     394 </span>            : </a>
+<a name="395"><span class="lineNum">     395 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::CouplingCellServiceImpl&lt;LinkedCell, dim&gt;::plotEveryMicroscopicTimestep(unsigned int t) {</span></a>
+<a name="396"><span class="lineNum">     396 </span>            :   // trigger plotting</a>
+<a name="397"><span class="lineNum">     397 </span><span class="lineNoCov">          0 :   if ((_writeEveryMicroscopicTimestep != 0) &amp;&amp; (t % _writeEveryMicroscopicTimestep == 0)) {</span></a>
+<a name="398"><span class="lineNum">     398 </span><span class="lineNoCov">          0 :     coupling::CouplingCellPlotter&lt;LinkedCell, dim&gt; plotter(coupling::services::CouplingCellService&lt;dim&gt;::getID(), _microscopicFilename, IDXS.getRank(), t,</span></a>
+<a name="399"><span class="lineNum">     399 </span><span class="lineNoCov">          0 :                                                            _couplingCells, _mdSolverInterface);</span></a>
+<a name="400"><span class="lineNum">     400 </span>            :   }</a>
+<a name="401"><span class="lineNum">     401 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="402"><span class="lineNum">     402 </span>            : </a>
+<a name="403"><span class="lineNum">     403 </span><span class="lineNoCov">          0 : template &lt;class LinkedCell, unsigned int dim&gt; void coupling::services::CouplingCellServiceImpl&lt;LinkedCell, dim&gt;::plotEveryMacroscopicTimestep(unsigned int t) {</span></a>
+<a name="404"><span class="lineNum">     404 </span>            :   // trigger plotting</a>
+<a name="405"><span class="lineNum">     405 </span><span class="lineNoCov">          0 :   if ((_writeEveryMacroscopicTimestep != 0) &amp;&amp; (t % _writeEveryMacroscopicTimestep == 0)) {</span></a>
+<a name="406"><span class="lineNum">     406 </span><span class="lineNoCov">          0 :     coupling::CouplingCellPlotter&lt;LinkedCell, dim&gt; plotter(coupling::services::CouplingCellService&lt;dim&gt;::getID(), _macroscopicFilename, IDXS.getRank(), t,</span></a>
+<a name="407"><span class="lineNum">     407 </span><span class="lineNoCov">          0 :                                                            _couplingCells, _mdSolverInterface);</span></a>
+<a name="408"><span class="lineNum">     408 </span>            :   }</a>
+<a name="409"><span class="lineNum">     409 </span><span class="lineNoCov">          0 : }</span></a>
 </pre>
       </td>
     </tr>
