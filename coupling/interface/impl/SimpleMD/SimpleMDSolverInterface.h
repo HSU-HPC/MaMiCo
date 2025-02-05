@@ -37,7 +37,6 @@ private:
   const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& _localBoundaryInformation;
 
   /** number of linked cells in each coupling cell */
-  const tarch::la::Vector<MD_DIM, unsigned int> _numberOfLinkedCellsPerCouplingCell;
 
   const double _sigma6;
   const double _epsilon;
@@ -101,14 +100,13 @@ private:
   }
 
 public:
-  SimpleMDSolverInterface(tarch::la::Vector<MD_DIM, unsigned int> numberLinkedCellsPerCouplingCell, simplemd::BoundaryTreatment& boundaryTreatment,
+  SimpleMDSolverInterface(simplemd::BoundaryTreatment& boundaryTreatment,
                           simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
                           simplemd::services::LinkedCellService& linkedCellService,
                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
                           const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& localBoundaryInformation, const double& dt)
       : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService),
         _molecularPropertiesService(molecularPropertiesService), _boundaryTreatment(boundaryTreatment), _localBoundaryInformation(localBoundaryInformation),
-        _numberOfLinkedCellsPerCouplingCell(numberLinkedCellsPerCouplingCell),
         _sigma6(molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
                 molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
                 molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma()),
