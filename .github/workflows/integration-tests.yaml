@@ -1,0 +1,136 @@
+name: Integration Testing
+
+on:
+  push:
+    branches:
+      - master
+
+# Abort running jobs if a new one is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  extract-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.get-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: get-matrix
+        name: Extract all test configurations from a text file
+        run: |
+          test/integration/gh-act/get-test-cases-matrix.py >> $GITHUB_OUTPUT
+
+  build-executable:
+    runs-on: minicluster
+    strategy:
+      fail-fast: false # If some versions fail to build, still build all the others
+      matrix:
+        md-solver: [md, ls1] # lammps (LAMMPS integration is currently broken -> issue #86)
+    steps:
+      - name: Clean up any old files
+        run: |
+          rm -rf build
+      - uses: actions/checkout@v4
+      - name: Use cached LAMMPS
+        if: matrix.md-solver == 'lammps'
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            build/LAMMPS
+          key: LAMMPS
+      - name: Use cached OpenFOAM
+        if: false # (OpenFOAM integration is currently broken -> issue #73)
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            build/openfoam
+          key: OpenFOAM
+      - name: Build couette executable
+        # Add "--with-foam" for OpenFOAM support (OpenFOAM integration is currently broken -> issue #73)
+        run: |
+          ml gcc mpi || :
+          ./tools/build-couette.py \
+            --jobs $(($(nproc --all) / 2)) \
+            --with-mpi \
+            --md-solver ${{ matrix.md-solver }}
+      - name: Cache LAMMPS
+        uses: actions/cache/save@v4
+        if: matrix.md-solver == 'lammps'
+        with:
+          path: |
+            build/LAMMPS
+          key: LAMMPS
+      - name: Cache OpenFOAM
+        if: false # (OpenFOAM integration is currently broken -> issue #73)
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            build/openfoam
+          key: OpenFOAM
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.md-solver }}
+          path: build
+
+  run-test:
+    needs: [extract-tests, build-executable]
+    if: "success() || failure()" # Only SOME couette binaries might have failed to build (unless canceled)
+    runs-on: minicluster
+    strategy:
+      fail-fast: false # If some test cases fail, still run all the others
+      matrix: ${{ fromJson(needs.extract-tests.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.solver_md }}
+          path: build
+      - name: Generate the test configuration for ${{ matrix.case }}
+        run: |
+          MAMICO_CFG=$(pwd)/tools/mamico-cfg
+          rm -rf build/test_cases # Clean up any old test
+          mkdir -p build/test_cases/${{ matrix.case }} && cd $_
+          O="domain_size=${{ matrix.domain_size }}"
+          O="$O,equilibrate=${{ matrix.equilibrate }}"
+          O="$O,solver_md=${{ matrix.solver_md }}"
+          O="$O,solver_cfd=${{ matrix.solver_cfd }}"
+          O="$O,mpi_ranks=${{ matrix.mpi_ranks }}"
+          O="$O,cell_size=${{ matrix.cell_size }}"
+          O="$O,boundary=${{ matrix.boundary }}"
+          O="$O,coupling_2way=${{ matrix.coupling_2way }}"
+          O="$O,filtering=${{ matrix.filtering }}"
+          O="$O,simulation=${{ matrix.simulation }}"
+          O="$O,multi_md=${{ matrix.multi_md }}"
+          $MAMICO_CFG -O $O
+      - name: Run the couette executable with the generated configuration
+        run: |
+          cd build/test_cases/${{ matrix.case }}
+          chmod +x ../../couette
+          srun mpirun -n ${{ matrix.mpi_ranks }} ../../couette
+      - name: Assess couette profile
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install matplotlib
+          cd build/test_cases/${{ matrix.case }}
+          ../../../tools/assess-couette-flow-profile.py . > assess-couette-flow-profile.log
+          cat assess-couette-flow-profile.log
+          cat assess-couette-flow-profile.log >> "$GITHUB_STEP_SUMMARY"
+          echo '```mermaid' >> "$GITHUB_STEP_SUMMARY"
+          cat couette-flow-profile.mmd >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        id: artifact-upload-test-results
+        with:
+          name: test-results-${{ matrix.case }}
+          path: build/test_cases/${{ matrix.case }}      
+      - name: Append test result download link to summary
+        run: |
+          echo '[:arrow_down: test results](${{ steps.artifact-upload-test-results.outputs.artifact-url }})' >> "$GITHUB_STEP_SUMMARY"
+      - name: Report "no test results" in summary
+        if: "!success()"
+        run: |
+          echo ':x: no test results' >> "$GITHUB_STEP_SUMMARY"

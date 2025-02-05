@@ -19,11 +19,15 @@
     ]
   },
   {
-    "key": "use_checkpoint",
-    "label": "use checkpoint",
+    "key": "equilibrate",
+    "label": "equilibrate",
     "options": [
       {
         "selected": true,
+        "value": "use_checkpoint",
+        "label": "use checkpoint"
+      },
+      {
         "value": true
       },
       {
