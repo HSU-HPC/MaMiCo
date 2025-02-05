@@ -133,7 +133,7 @@ public:
       exit(EXIT_FAILURE);
     }
     mdSolverInterface = new coupling::interface::SimpleMDSolverInterface(
-        mamicoConfiguration.getCouplingCellConfiguration().getNumberLinkedCellsPerCouplingCell(), simpleMDSimulation->getBoundaryTreatment(),
+        simpleMDSimulation->getBoundaryTreatment(),
         simpleMDSimulation->getParallelTopologyService(), simpleMDSimulation->getMoleculeService(), simpleMDSimulation->getLinkedCellService(),
         simpleMDSimulation->getMolecularPropertiesService(), (simpleMDSimulation->getParallelTopologyService()).getLocalBoundaryInformation(),
         configuration.getSimulationConfiguration().getDt());
