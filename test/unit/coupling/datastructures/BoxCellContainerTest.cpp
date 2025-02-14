@@ -10,6 +10,7 @@ class BoxCellContainerTest : public CppUnit::TestFixture {
 
   CPPUNIT_TEST_SUITE(BoxCellContainerTest);
   CPPUNIT_TEST(testIteration);
+  CPPUNIT_TEST(testIteration2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -72,6 +73,20 @@ public:
     // TODO write more tests
     // TODO modify setUp and tearDown to use other position/size (not indexing domains)
 
+  }
+
+  void testIteration2(){
+    I01 lowerBound{1,2,3};
+    tarch::la::Vector<3, int> shape{1,2,0};
+    BoxCellContainer box{lowerBound, shape};
+    for(auto cell : box)
+      CPPUNIT_FAIL("Iterated over a cell, but container is empty!");
+    tarch::la::Vector<3, int> shape2{1,2,3};
+    BoxCellContainer box2{lowerBound, shape2};
+    int cnt = 0;
+    for(auto cell : box2)
+      cnt++
+    CPPUNIT_ASSERT_EQUAL(cnt, 6);
   }
 
 private:
