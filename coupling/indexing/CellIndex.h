@@ -144,6 +144,7 @@ public:
    */
   CellIndex& operator++() {
     if constexpr (std::is_same_v<value_T, tarch::la::Vector<dim, int>>) {
+      // See IndexIterator::operator++() in BoxCellContainer.h
       ++_index[0];
       if (_index[0] == (int)numberCellsInDomain[0]) {
         _index[0] = 0;

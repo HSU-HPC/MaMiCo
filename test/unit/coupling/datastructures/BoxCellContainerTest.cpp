@@ -25,7 +25,7 @@ public:
     tarch::la::Vector<3, unsigned int> numberProcesses{1, 1, 1};
     if (_size == 4)
       numberProcesses = {2, 2, 1};
-    IndexingService<3>::getInstance().initWithCells(8, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
+    IndexingService<3>::getInstance().initWithCells(8, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);    
     int i = 0;
     _couplingCells_fullcase.reserve(I01::linearNumberCellsInDomain);
     _idxs_fullcase.reserve(I01::linearNumberCellsInDomain);
@@ -54,7 +54,7 @@ public:
 
   void testIteration() {
     using namespace coupling::datastructures;
-    BoxCellContainer container(*I01::begin(), *I01::end());
+    BoxCellContainer container(*I01::begin(), I01::numberCellsInDomain);
     int i = 0;
     for (auto idx : I01()) {
       (void)idx; // Avoid unused variable error
