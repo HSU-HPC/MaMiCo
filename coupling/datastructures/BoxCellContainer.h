@@ -49,8 +49,8 @@ public:
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     for (int i = 0; i < 3; i++)
-    if (shape[i] <= 0) {
-        std::cout << "BoxCellContainer shape must be positive, but dimension " << i << " was " << shape[i] << std::endl;
+    if (shape[i] < 0) {
+        std::cout << "BoxCellContainer shape must not be negative, but dimension " << i << " was " << shape[i] << std::endl;
         std::exit(EXIT_FAILURE);       
     }
 #endif
