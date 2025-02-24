@@ -280,7 +280,7 @@ private:
 #include "CouplingCellTraversalWrappers.cpph"
 
   /** initialises the index structures for USHER scheme */
-  void initIndexVectors4Usher(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell);
+  void initIndexVectors4Usher();
 
   tarch::la::Vector<dim, double> getPositionOfFirstLocalGhostCell() const;
 

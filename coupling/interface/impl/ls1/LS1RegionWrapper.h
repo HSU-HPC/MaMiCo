@@ -206,17 +206,17 @@ public:
   }
 
 private:
-  double _startRegion[3], _endRegion[3];
-  unsigned long int _curParticleID;
-  int _IDIncrementor;
-  bool _IDinited;
+  Simulation* _locSimulation;
+  ParticleContainer* _particleContainer;
   const double _cutoff, _cutoff2;
   const double _sigma, _sigma6;
   const double _epsilon;
   const double _cutoffEnergy;
-  Simulation* _locSimulation;
+  double _startRegion[3], _endRegion[3];
+  unsigned long int _curParticleID;
+  int _IDIncrementor;
+  bool _IDinited;
   RegionParticleIterator _iterator;
-  ParticleContainer* _particleContainer;
 };
 } // namespace ls1
 

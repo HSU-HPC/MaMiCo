@@ -58,8 +58,7 @@ Optional dependencies are:
 
 ## Input file construction and first runs
 * The build instructions have created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. 
-* An example simulation configuration file can be generated using `./mamico-cfg` in the [tools](./tools/) folder. 
-* Copy the generated 'couette.xml' file to your build folder. 
+* An example simulation configuration can be generated in the current working directory using [`tools`](./tools/)`/mamico-cfg`. 
 * The available options and features are explained [here](https://github.com/HSU-HPC/MaMiCo/wiki/couette.xml).  
 (*Deprecated:* Some are also listed directly in the template file via XML comments, so that you can modify the configuration to suit your needs.)
 * Start the simulation by executing (sequential case) `./couette` or e.g. (MPI-parallel) `mpirun -n 8 ./couette`.
