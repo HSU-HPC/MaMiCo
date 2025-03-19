@@ -106,22 +106,19 @@ public:
     const tarch::la::Vector<3, double> domainOffset{mdConfig.getDomainConfiguration().getGlobalDomainOffset()};
     const tarch::la::Vector<3, double> cellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
     const tarch::la::Vector<dim, double> domainSize{mdConfig.getDomainConfiguration().getGlobalDomainSize()};
-    tarch::la::Vector<3, int> numberCells;
+    tarch::la::Vector<3, unsigned int> numberCells;
     for (unsigned int d = 0; d < 3; d++) {
       numberCells[d] = floor(domainSize[d] / cellSize[d] + 0.5);
     }
-    const double densityCell = mdConfig.getDomainConfiguration().getMoleculesPerDirection()[0] *
-                               mdConfig.getDomainConfiguration().getMoleculesPerDirection()[1] *
-                               mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
+    const double densityCell = 0.7302052825;
     const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
 
     _preciceInterface = new EvaporationPreciceInterface(massCell); 
 
-    coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
-        mdConfig.getDomainConfiguration().getGlobalDomainSize(), mdConfig.getDomainConfiguration().getGlobalDomainOffset(),
-        mdConfig.getMPIConfiguration().getNumberOfProcesses(), mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(),
-        mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(), mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
-        (unsigned int)rank);
+    coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(mdConfig.getDomainDecompConfiguration().getSubdomainWeights(), domainSize, domainOffset, 
+      mdConfig.getMPIConfiguration().getNumberOfProcesses(), cellSize, 
+      mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(),
+      mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(), (unsigned int)rank);
 
     _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(
         _instanceHandling->getMDSolverInterface(), _preciceInterface, mdConfig, mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
@@ -146,6 +143,7 @@ public:
       if(name == "MettDeamonFeedrateDirector")
         mettDeamonFeedrateDirector = dynamic_cast<MettDeamonFeedrateDirector*>(pit);
     }
+    mettDeamonFeedrateDirector->setInvDensityArea(1/(domainSize[0]*domainSize[2]*densityCell));
     int updateFrequency = mettDeamonFeedrateDirector->getUpdateFreq();
     dynamic_cast<EvaporationPreciceInterface*>(_preciceInterface)->updateFeedrate(mettDeamonFeedrateDirector->getInitFeedrate());
     dynamic_cast<EvaporationPreciceInterface*>(_preciceInterface)->updateFeedrate(0.0);
@@ -246,7 +244,7 @@ private:
     tarch::la::Vector<3, double> getMD2MacroSolverMeshOffset(I01 idx) const override {
       tarch::la::Vector<3, double> offset;
       if (isMD2MacroVapor(idx)) {
-        offset = tarch::la::Vector<3,double>{0, /*MD size*/-320/*CFD size*/-10/*half a mamico cell*/+1.25, 0};
+        offset = tarch::la::Vector<3,double>{0, /*MD size*/-440/*CFD size*/-20/*half a mamico cell*/+1.25, 0};
       }
       return offset;
     }
