@@ -869,7 +869,7 @@ if(ENABLE_COVERAGE)
     COMMAND
       ${LCOV} --directory . --capture --exclude */test/* --exclude '/usr/*' --exclude '*/simplemd/*' --output-file coverage.info
     # generate report
-    COMMAND ${GENHTML} --ignore-errors corrupt,inconsistent --demangle-cpp -o coverage coverage.info
+    COMMAND ${GENHTML} --rc check_data_consistency=0 --demangle-cpp -o coverage coverage.info
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
     # add my-coverage target
