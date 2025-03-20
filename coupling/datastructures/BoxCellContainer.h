@@ -5,6 +5,7 @@
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/datastructures/CouplingCell.h"
 #include "coupling/indexing/IndexingService.h"
+#include "coupling/datastructures/CellContainer.h"
 
 namespace coupling {
 namespace datastructures {
@@ -25,14 +26,27 @@ class BoxCellContainer;
 class coupling::datastructures::BoxCellContainer {
 
 public:
+  template<class CellIndexT> BoxCellContainer(coupling::datastructures::CellContainer<CellIndexT, 3> cellContainer)
+    : BoxCellContainer(CellIndexT::begin(), CellIndexT::numberCellsInDomain) {
+      for(auto cell : cellContainer)
+        this << cell;
+  }
+
   BoxCellContainer(I01 lowerBound, I01 upperBound) : BoxCellContainer({}, lowerBound, upperBound) {}
   
   BoxCellContainer(I01 lowerBound, tarch::la::Vector<3, int> shape) : BoxCellContainer({}, lowerBound, shape) {}
 
+  BoxCellContainer(I01 lowerBound, tarch::la::Vector<3, unsigned int> shape) : BoxCellContainer({}, lowerBound, shape) {}
+  
   BoxCellContainer(std::vector<coupling::datastructures::CouplingCell<3>*> couplingCells, I01 lowerBound, I01 upperBound)
-    : BoxCellContainer(couplingCells, lowerBound, upperBound.get() - lowerBound.get()) {}
+    : BoxCellContainer(couplingCells, lowerBound, (upperBound.get() + tarch::la::Vector<3,int>(1)) - lowerBound.get()) {
+    }
 
-  BoxCellContainer(std::vector<coupling::datastructures::CouplingCell<3>*> couplingCells, I01 lowerBound, tarch::la::Vector<3, int> shape) {
+  BoxCellContainer(std::vector<coupling::datastructures::CouplingCell<3>*> couplingCells, I01 lowerBound, tarch::la::Vector<3, unsigned int> shape)
+    : BoxCellContainer(couplingCells, lowerBound, tarch::la::Vector<3,int>{(int)shape[0], (int)shape[1], (int)shape[2]}){}
+  
+  BoxCellContainer(std::vector<coupling::datastructures::CouplingCell<3>*> couplingCells, I01 lowerBound, tarch::la::Vector<3, int> shape) : _lowerBound(lowerBound), _shape(shape) {
+
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     for (int i = 0; i < 3; i++)
     if (shape[i] < 0) {
@@ -40,8 +54,6 @@ public:
         std::exit(EXIT_FAILURE);       
     }
 #endif
-    _lowerBound = lowerBound;
-    _shape = shape;
     _couplingCells.reserve(linearNumberCellsInDomain());
     for (auto cell : couplingCells) {
       *this << cell;
@@ -116,46 +128,84 @@ public:
     return count;
   }
 
-  // FIXME: Iterator does not do bounds check yet -> using wrong indices
+  /**
+   * @brief Provides index iterator functionality
+   */
+  class IndexIterator 
+  {
+  public:
+    IndexIterator(I01 lowerBoundary, tarch::la::Vector<3,int>shape, tarch::la::Vector<3,int>offset):_lowerBoundary(lowerBoundary),_shape(shape),_index(offset){}
+    I01 operator*() const { return _lowerBoundary + _index; }
+    IndexIterator& operator++() {
+      // See CellIndex::operator++() in CellIndex.h
+      ++_index[0];
+      if (_index[0] == (int)_shape[0]) {
+          _index[0] = 0;
+          ++_index[1];
+          if (_index[1] == (int)_shape[1]) {
+              _index[1] = 0;
+              ++_index[2];
+          }
+      }
+      return *this;
+  }  
+    IndexIterator operator++(int) { IndexIterator tmp = *this; ++(*this); return tmp; }
+    friend bool operator== (const IndexIterator& a, const IndexIterator& b) {
+        return a._lowerBoundary == b._lowerBoundary && a._shape == b._shape && a._index == b._index;
+    }
+    friend bool operator!= (const IndexIterator& a, const IndexIterator& b) { return !(a == b); };     
+  private:
+    I01 _lowerBoundary;
+    tarch::la::Vector<3,int> _shape;
+    tarch::la::Vector<3,int> _index;
+  };
+
   /**
    * @brief Provides iterator functionality (increment, access as <*cell, index> pair, equality)
    */
-  class Iterator {
+  class CellIndexIterator {
   public:
     using CouplingCellIterator = typename std::vector<coupling::datastructures::CouplingCell<3>*>::const_iterator;
-    Iterator(CouplingCellIterator itCouplingCells, typename I01::IndexIterator itIdx) : _itCouplingCells(itCouplingCells), _itIdx(itIdx) {}
+    CellIndexIterator(CouplingCellIterator itCouplingCells, IndexIterator itIdx) : _itCouplingCells(itCouplingCells), _itIdx(itIdx) {}
     /**
      * Iterator access, returning the data at the current iterator location
      *
      * @return a std::pair with the cell pointer and the index of the data that the iterator points to
      */
     const std::pair<coupling::datastructures::CouplingCell<3>*, I01> operator*() const { return std::make_pair(*_itCouplingCells, *_itIdx); }
-    Iterator& operator++() {
+    CellIndexIterator& operator++() {
       ++_itCouplingCells;
       ++_itIdx;
       return *this;
     }
-    Iterator operator++(int) {
-      Iterator tmp = *this;
+    CellIndexIterator operator++(int) {
+      CellIndexIterator tmp = *this;
       ++(*this);
       return tmp;
     }
-    friend bool operator==(const Iterator& a, const Iterator& b) { return a._itCouplingCells == b._itCouplingCells; }
-    friend bool operator!=(const Iterator& a, const Iterator& b) { return !(a == b); }
+    friend bool operator==(const CellIndexIterator& a, const CellIndexIterator& b) {
+      return a._itCouplingCells == b._itCouplingCells && a._itIdx == b._itIdx;
+    }
+    friend bool operator!=(const CellIndexIterator& a, const CellIndexIterator& b) { return !(a == b); }
   private:
     /**Iterator to underlying cell* vector */
     CouplingCellIterator _itCouplingCells;
-    /**Iterator over the index subdomain
-     *
-     * As the container spans the whole index subdomain, the iterators already available for this index domain can be reused, and incremented in lockstep with
-     * the internal iterator for the vector
-     */
-    typename I01::IndexIterator _itIdx;
+    /**Box and iterator offset of the corresponding container */
+    IndexIterator _itIdx;
   };
   /** Provides pointer to beginning of iterator of this container */
-  Iterator begin() const { return Iterator(_couplingCells.begin(), _lowerBound); }
+  CellIndexIterator begin() const {
+    IndexIterator itIdxBegin = IndexIterator(_lowerBound, _shape, 0);
+    return CellIndexIterator(_couplingCells.begin(), itIdxBegin);
+  }
   /** Provides pointer to end of iterator of this container */
-  Iterator end() const { return Iterator(_couplingCells.end(), _upperBound()); }
+  CellIndexIterator end() const {
+    // Box with extent _shape means that the last cell is one less in each dimension
+    tarch::la::Vector<3,int> lastOffset = _shape - tarch::la::Vector<3,int>(1); 
+    // End of iterator is exclusive -> use next index as offset
+    IndexIterator itIdxEnd = IndexIterator(_lowerBound, _shape, (++I01(lastOffset)).get());
+    return CellIndexIterator(_couplingCells.end(), itIdxEnd);
+  }
 
 protected:
   /**
@@ -169,12 +219,5 @@ protected:
   /**
    * Defines the extent of the box along all dimensions
    */
-  tarch::la::Vector<3, int> _shape;
-  /**
-   * Defines the upper corner of the box
-   */
-  I01 _upperBound() const {
-    return I01(_lowerBound + _shape);
-  }
-  
+  tarch::la::Vector<3, int> _shape;  
 };

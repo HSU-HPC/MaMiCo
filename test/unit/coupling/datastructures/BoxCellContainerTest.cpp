@@ -11,6 +11,7 @@ class BoxCellContainerTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(BoxCellContainerTest);
   CPPUNIT_TEST(testIteration);
   CPPUNIT_TEST(testIteration2);
+  CPPUNIT_TEST(testIterationEmpty);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -25,7 +26,7 @@ public:
     tarch::la::Vector<3, unsigned int> numberProcesses{1, 1, 1};
     if (_size == 4)
       numberProcesses = {2, 2, 1};
-    IndexingService<3>::getInstance().initWithCells(8, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
+    IndexingService<3>::getInstance().initWithCells(8, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);    
     int i = 0;
     _couplingCells_fullcase.reserve(I01::linearNumberCellsInDomain);
     _idxs_fullcase.reserve(I01::linearNumberCellsInDomain);
@@ -54,7 +55,7 @@ public:
 
   void testIteration() {
     using namespace coupling::datastructures;
-    BoxCellContainer container(*I01::begin(), *I01::end());
+    BoxCellContainer container(*I01::begin(), I01::numberCellsInDomain);
     int i = 0;
     for (auto idx : I01()) {
       (void)idx; // Avoid unused variable error
@@ -76,17 +77,34 @@ public:
   }
 
   void testIteration2(){
-    I01 lowerBound{1,2,3};
+    using namespace coupling::datastructures;
+    I01 lowerBound{tarch::la::Vector<3,int>{1,2,3}};
     tarch::la::Vector<3, int> shape{1,2,0};
     BoxCellContainer box{lowerBound, shape};
-    for(auto cell : box)
+    for(auto cell : box) {
+      (void)cell; // Avoid unused variable error
       CPPUNIT_FAIL("Iterated over a cell, but container is empty!");
+    }
     tarch::la::Vector<3, int> shape2{1,2,3};
     BoxCellContainer box2{lowerBound, shape2};
     int cnt = 0;
-    for(auto cell : box2)
-      cnt++
+    for(auto cell : box2) {
+      (void)cell; // Avoid unused variable error
+      cnt++;
+    }
     CPPUNIT_ASSERT_EQUAL(cnt, 6);
+  }
+
+  void testIterationEmpty(){
+    using namespace coupling::datastructures;
+    I01 lowerUpperBound{tarch::la::Vector<3,int>{1,2,3}};
+    BoxCellContainer box{lowerUpperBound, lowerUpperBound};
+    int cnt = 0;
+    for(auto cell : box) {
+      (void)cell; // Avoid unused variable error
+      cnt++;
+    }
+    CPPUNIT_ASSERT_EQUAL(cnt, 0);
   }
 
 private:
