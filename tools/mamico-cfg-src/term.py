@@ -30,7 +30,7 @@ def select(
             if title is not None:
                 print(title)
             for i, option in enumerate(options):
-                print(f"{ '>' if i == pre_selected else ' ' }[{i+1}]\t{option}")
+                print(f"{'>' if i == pre_selected else ' '}[{i + 1}]\t{option}")
         try:
             input_str = input(prompt).strip()
             if len(input_str) == 0 and pre_selected is not None:
