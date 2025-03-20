@@ -19,15 +19,9 @@ using tarch::configuration::ParseConfiguration;
 
 namespace coupling {
 namespace filtering {
-template <class CellIndex_T, unsigned int dim> class FilterPipeline;
 
-/*
- * Used as member of FilterPipeline. Displays where that FP is used.
- * per instance:		apply filtering for each MD instance
- * individually, before merging instances post multi instance:	apply filtering
- * after MD instances have been merged
- */
-enum class Scope { perInstance, postMultiInstance };
+class FilterPipeline;
+
 } // namespace filtering
 } // namespace coupling
 
@@ -41,15 +35,14 @@ enum class Scope { perInstance, postMultiInstance };
  *
  * @author Felix Maurer
  */
-template <class CellIndex_T, unsigned int dim> class coupling::filtering::FilterPipeline {
+class coupling::filtering::FilterPipeline {
 public:
-  FilterPipeline(const coupling::datastructures::CellContainer<CellIndex_T, dim> inputCells, const coupling::filtering::Scope scope,
+  FilterPipeline(const coupling::datastructures::BoxCellContainer inputCells,
                  const tarch::utils::MultiMDService<dim>& multiMDService, const char* cfgpath);
 
   ~FilterPipeline() {
     for (auto sequence : _sequences)
       delete sequence;
-      // TODO: do i have to delete the _...cells as well?
 
 #ifdef DEBUG_FILTER_PIPELINE
     std::cout << "FP: FilterPipeline deconstructed." << std::endl;
@@ -58,7 +51,7 @@ public:
 
   /*
    * Applies each FilterSequence in order of their appearance in the config
-   * file. Ouput of the specified output-FilterSequence will be written to
+   * file. Output of the specified output-FilterSequence will be written to
    * _md2MacroCells.
    *
    * @returns The runtime of the filter pipeline in usec.
@@ -99,19 +92,11 @@ private:
   /*
    * Input cells within the local, md2macro, ghost layer excluding domain
    */
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _md2MacroCells;
-  /*
-   * Input cells that do not match the criteria to be in _md2MacroCells.
-   */
-  std::vector<coupling::datastructures::CouplingCell<dim>*> _outerCells;
+  coupling::datastructures::BoxCellContainer _md2MacroCells;
+  
+  coupling::datastructures::BoxCellContainer _allCells;
 
   ParseConfiguration::XMLConfiguration _config;
-
-  /*
-   * Scope in which this FilterPipeline is applied. Cf. coupling::Scope
-   * definition.
-   */
-  const coupling::filtering::Scope _scope;
 
   std::vector<coupling::filtering::FilterSequence<dim>*> _sequences;
 
