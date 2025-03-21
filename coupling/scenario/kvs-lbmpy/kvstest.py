@@ -475,9 +475,11 @@ class LBSolver():
                 optTarget = Target.CPU
             elif self.cfg.get("macroscopic-solver", "optimization-target") == "gpu":
                 optTarget = Target.GPU
+            method = Method.TRT
         except ImportError:   # for lbmpy version <= 0.3.4
             optTarget = self.cfg.get("macroscopic-solver", "optimization-target")
-        self.scen = LatticeBoltzmannStep(domain_size=self.domain_size, method='trt',stencil='D3Q19',
+            method ='trt'
+        self.scen = LatticeBoltzmannStep(domain_size=self.domain_size, method=method,stencil='D3Q19',
             relaxation_rate=self.omega, periodicity=(True, False, False),
             optimization={'target':optTarget, 
             'gpu_indexing':'line', 
