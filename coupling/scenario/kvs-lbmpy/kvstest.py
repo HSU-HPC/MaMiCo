@@ -323,7 +323,8 @@ class KVSTest():
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].shutdown()
-        # TODO something else to do here??
+
+        del self.multiMDCellService
 
     def advanceMacro(self, cycle):
         if self.rank == 0:
