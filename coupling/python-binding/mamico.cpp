@@ -382,6 +382,7 @@ PYBIND11_MODULE(mamico, mamico) {
   py::module services = coupling.def_submodule("services", "");
   py::module solvers = coupling.def_submodule("solvers", "");
   py::module interface = coupling.def_submodule("interface", "");
+  py::module paralleltopology = coupling.def_submodule("paralleltopology", "");
 
   utils.def("initMPI", &initMPI, "Calls MPI_Init and returns rank of this process");
   utils.def("finalizeMPI", &MPI_Finalize, "Calls MPI_Finalize");
@@ -605,6 +606,8 @@ PYBIND11_MODULE(mamico, mamico) {
       py::return_value_policy::take_ownership);
 
   py::class_<coupling::interface::MacroscopicSolverInterface<3>> maSoIf(interface, "MacroscopicSolverInterface");
+
+  py::class_<coupling::paralleltopology::ParallelTopologyType> ParallelTopologyType(paralleltopology, "ParallelTopologyType");
 
   // we indicate that CouetteSolverInterface is a subclass of
   // MacroscopicSolverInterface by passing maSoIf here
