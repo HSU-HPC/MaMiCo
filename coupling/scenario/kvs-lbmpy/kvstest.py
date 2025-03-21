@@ -28,7 +28,6 @@ import mamico.tarch.utils
 from mamico.coupling.services import MultiMDCellService
 from mamico.coupling.solvers import CouetteSolverInterface
 from configparser import ConfigParser
-import adios2
 
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
@@ -291,8 +290,7 @@ class KVSTest():
         # mcs.addFilterToSequence(filter_sequence="gauss-45", filter_index=0, scalar_filter_func = gauss_sca45, vector_filter_func=gauss_vec45)
         # mcs.addFilterToSequence(filter_sequence="gauss-5", filter_index=0, scalar_filter_func = gauss_sca5, vector_filter_func=gauss_vec5)
 
-        self.buf = mamico.coupling.Buffer(self.multiMDCellService.getCouplingCellService(0).getIndexConversion(),
-                                          self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
+        self.buf = mamico.coupling.Buffer(self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
 
         self.csv = self.cfg.getint("coupling", "csv-every-timestep")
         self.png = self.cfg.getint("coupling", "png-every-timestep")
@@ -302,10 +300,14 @@ class KVSTest():
         if self.rank==0:
             self.velLB = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
             if self.adios2 > 0:
-                self.adiosfile = adios2.open("kvstest_volume.bp", "w")
-                timefactor = self.adios2 * self.dt/(self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep() * self.simpleMDConfig.getSimulationConfiguration().getDt())
-                print("timefactor:", timefactor)
-                self.adiosfile.write_attribute('timefactor', str(timefactor))
+                from adios2 import Stream
+                self.adiosfile = Stream("kvstest_volume.bp", "w")
+                if self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep()==0:
+                    self.adiosfile.write_attribute('timefactor', "inf")
+                else:
+                    timefactor = self.adios2 * self.dt/(self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep() * self.simpleMDConfig.getSimulationConfiguration().getDt())
+                    print("timefactor:", timefactor)
+                    self.adiosfile.write_attribute('timefactor', str(timefactor))
     
         if self.rank==0:
             log.info("Finished initSolvers") # after ? ms
