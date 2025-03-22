@@ -388,9 +388,8 @@ PYBIND11_MODULE(mamico, mamico) {
   utils.def("finalizeMPI", &MPI_Finalize, "Calls MPI_Finalize");
   utils.def(
       "initIndexing",
-      [](const tarch::la::Vector<3, double>& globalMDDomainSize, const tarch::la::Vector<3, unsigned int>& mdNumberProcesses,
-         const tarch::la::Vector<3, double>& couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion,
-         const unsigned int rank) {
+      [](tarch::la::Vector<3, double> globalMDDomainSize, tarch::la::Vector<3, unsigned int> mdNumberProcesses,
+         tarch::la::Vector<3, double> couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion, unsigned int rank) {
         const unsigned int dim = 3;
         return IDXS.initWithMDSize(globalMDDomainSize, tarch::la::Vector<3, double>{0, 0, 0}, mdNumberProcesses, couplingCellSize, parallelTopologyType,
                                    outerRegion, rank);
