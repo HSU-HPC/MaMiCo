@@ -16,7 +16,6 @@
 #include "tarch/utils/RandomNumberService.h"
 #include "tarch/utils/Utils.h"
 #if (BUILD_WITH_OPENFOAM)
-#include "coupling/solvers/IcoFoamBufferSetup.h"
 #include "coupling/solvers/IcoFoamInterface.h"
 #endif
 #include "coupling/configurations/CouetteConfiguration.h"
@@ -920,7 +919,7 @@ protected:
     }
 #if (BUILD_WITH_OPENFOAM)
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) {
-      interface = new coupling::solvers::FoamSolverInterface<3>(globalNumberCouplingCells, outerRegion);
+      interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberCouplingCells, outerRegion);
     }
 #endif
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FD) {
