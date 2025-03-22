@@ -14,6 +14,7 @@
 #include "fvc.H"
 #include "fvm.H"
 #include "pisoControl.H"
+#include <map>
 
 namespace coupling {
 namespace solvers {
@@ -54,13 +55,9 @@ public:
     if (skipRank()) {
       return;
     }
-    if (_boundary2RecvBufferIndicesOuter) {
-      delete[] _boundary2RecvBufferIndicesOuter;
-      _boundary2RecvBufferIndicesOuter = NULL;
-    }
-    if (_boundary2RecvBufferIndicesInner) {
-      delete[] _boundary2RecvBufferIndicesInner;
-      _boundary2RecvBufferIndicesInner = NULL;
+    if (_boundaryIndicesInner) {
+      delete[] _boundaryIndicesInner;
+      _boundaryIndicesInner = NULL;
     }
     if (_boundaryIndices) {
       delete[] _boundaryIndices;
@@ -136,25 +133,32 @@ public:
     }
   };
 
-  // Applies the MD data (just velocities) as boundary condition, the mapping between the conntinuum and the MD is provided by the setMDBoundary()
+  // Applies the MD data (just velocities) as boundary condition, the mapping between the continuum and the MD is provided by the setMDBoundary()
   void setMDBoundaryValues(coupling::datastructures::FlexibleCellContainer<3>& md2macroBuffer) {
     if (skipRank()) {
       return;
     }
-    for (size_t i = 0; i < _numberBoundaryPoints; i++) {
-      size_t outer = _boundary2RecvBufferIndicesOuter[i];
-      size_t inner = _boundary2RecvBufferIndicesInner[i];
-      tarch::la::Vector<3, double> localOuterVel((1.0 / md2macroBuffer[outer]->getMacroscopicMass()) * md2macroBuffer[outer]->getMacroscopicMomentum());
-      tarch::la::Vector<3, double> localInnerVel((1.0 / md2macroBuffer[inner]->getMacroscopicMass()) * md2macroBuffer[inner]->getMacroscopicMomentum());
-      _boundaryIndices[i]->x() = (localOuterVel[0] + localInnerVel[0]) * 0.5;
-      _boundaryIndices[i]->y() = (localOuterVel[1] + localInnerVel[1]) * 0.5;
-      _boundaryIndices[i]->z() = (localOuterVel[2] + localInnerVel[2]) * 0.5;
+    size_t pointsWritten = 0;
+    I00 idx, coupling::datastructures::CouplingCell<3>* cell;
+    for (auto pair : md2macroBuffer) {
+      std::tie(cell, idx) = pair;
+      if(_boundaryPointMap.count(idx) > 0){
+        unsigned int boundarypoint = _boundaryPointMap.at(idx);
+        tarch::la::Vector<3, double> localOuterVel = getVelocity(_boundaryPointsOuter.at(boundarypoint));
+        tarch::la::Vector<3, double> localInnerVel = (1.0 / cell->getMacroscopicMass()) * cell->getMacroscopicMomentum();
+        _boundaryIndices[boundarypoint]->x() = (localOuterVel[0] + localInnerVel[0]) * 0.5;
+        _boundaryIndices[boundarypoint]->y() = (localOuterVel[1] + localInnerVel[1]) * 0.5;
+        _boundaryIndices[boundarypoint]->z() = (localOuterVel[2] + localInnerVel[2]) * 0.5;
+        pointsWritten++;
+      }
     }
+    if(pointsWritten != _numberBoundaryPoints)
+      throw std::runtime_error(std::string("IcoFoamInterface::setMDBoundaryValues(): boundary point mapping error!"));
   }
 
-  // Settup for the mapping from MD to continuum data. Velocity values are necessary directly on the boundary. Therefore the MD values from the two cells beside
+  // Setup for the mapping from MD to continuum data. Velocity values are necessary directly on the boundary. Therefore the MD values from the two cells beside
   // the boundary are interpolated. The function looks for the index of every cell that data is necessary from. This indices will be stored in two arrays.
-  void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip) {
+  void setupMDBoundary() {
     if (skipRank()) {
       return;
     }
@@ -163,8 +167,8 @@ public:
       innerMDBoundaryIndex++;
     }
     _numberBoundaryPoints = 6 * U.boundaryFieldRef()[innerMDBoundaryIndex].size();
-    _boundary2RecvBufferIndicesOuter = new I00[_numberBoundaryPoints];
-    _boundary2RecvBufferIndicesInner = new I00[_numberBoundaryPoints];
+    _boundaryPointsOuter.resize(_numberBoundaryPoints);
+    _boundaryIndicesInner = new I00[_numberBoundaryPoints];
     _boundaryIndices = new Foam::vector*[_numberBoundaryPoints];
     size_t counter = 0;
     for (size_t boundary = 0; boundary < 12; boundary++) {
@@ -172,30 +176,16 @@ public:
         size_t MDPointsPerBoundary = _numberBoundaryPoints / 6;
         for (size_t j = 0; j < MDPointsPerBoundary; j++) {
           _boundaryIndices[counter] = &(U.boundaryFieldRef()[boundary][j]);
-
-          const I00 globalIndexOuter = IDXS.getCellIndex(getOuterPointFromBoundary(boundary, j));
-          const I00 globalIndexInner = IDXS.getCellIndex(getInnerPointFromBoundary(boundary, j));
-
-          for (size_t k = 0; k < size; k++) {
-            if (globalIndexOuter == recvIndice[k]) {
-              _boundary2RecvBufferIndicesOuter[counter] = k;
-              goto endloop;
-            }
-          }
-          std::cout << "IcoFoamInterface: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
-        endloop:
-          for (size_t k = 0; k < size; k++) {
-            if (globalIndexInner == recvIndice[k]) {
-              _boundary2RecvBufferIndicesInner[counter] = k;
-              goto endloop2;
-            }
-          }
-          std::cout << "IcoFoamInterface: Within the mapping of the FoamBoundary and the SimpleMD cells there was an error" << std::endl;
-        endloop2:
+          _boundaryPointsOuter[counter] = getOuterPointFromBoundary(boundary, j);
+          _boundaryIndicesInner[counter] = IDXS.getCellIndex(getInnerPointFromBoundary(boundary, j));
           counter++;
         }
       }
     }
+    if(counter != _numberBoundaryPoints)
+      throw std::runtime_error(std::string("IcoFoamInterface::setupMDBoundary(): boundary point mapping error!"));
+    for (size_t i = 0; i < _numberBoundaryPoints; i++)
+      _boundaryPointMap.insert({_boundaryIndicesInner[i], i});
   }
 
 private:
@@ -323,8 +313,9 @@ private:
   tarch::la::Vector<12, unsigned int> _boundariesWithMD;
   float _dx;                                      // mesh size
   double _channelheight;                          // overall height of the Couette channel
-  I00* _boundary2RecvBufferIndicesOuter{nullptr}; // pointer to an array with data for communication
-  I00* _boundary2RecvBufferIndicesInner{nullptr}; // pointer to an array with data for communication
+  std::map<I00, unsigned int> _boundaryPointMap;
+  std::vector<tarch::la::Vector<3, double>> _boundaryPointsOuter;
+  I00* _boundaryIndicesInner{nullptr};             // pointer to an array with data for communication
   Foam::vector** _boundaryIndices{nullptr};       // pointer to OpenFOAM data for communication
   int _rank;                                      // rank of the actual process
   int _plotEveryTimestep;                         // every n-th time step should be plotted

@@ -659,9 +659,7 @@ protected:
       }
 #if (BUILD_WITH_OPENFOAM)
       else if ((_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
-        static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)
-            ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+        static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)->setupMDBoundary();
       }
 #endif
       if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle >= _cfg.filterInitCycles) {
