@@ -140,7 +140,7 @@ Requirements</h2>
 <h2><a class="anchor" id="autotoc_md9"></a>
 Usage</h2>
 <p>1. Navigate to the target directory for the <code>couette.xml</code> file. (Most likely the MaMiCo build folder) 2. Execute <code>$MAMICO_DIR/tool/mamico-cfg</code>. (Add <code>-r</code> to overwrite existing files.) <br  />
- Specific values can be fixed by providing them as a command line argument, e.g. <code>--override=domain_size=large,use_checkpoint=False,multi_md=2</code>. <br  />
+ Specific values can be fixed by providing them as a command line argument, e.g. <code>--override=domain_size=large,equilibrate=False,multi_md=2</code>. <br  />
  The corresponding entries will be removed from the interactive menu. If all configurations are overwritten, the script will run non-interactively. (May be used for automated testing.) 3. Customize the generator settings and generate the <code>couette.xml</code> file. 4. Customize the generated configuration even further according to the <a href="https://github.com/HSU-HPC/MaMiCo/wiki/couette.xml">documentation</a>. (Optional)</p>
 <p>If you encounter any issues, delete the file <code>.mamico-cfg.cache</code> and try again. </p>
 </div><!-- contents -->
