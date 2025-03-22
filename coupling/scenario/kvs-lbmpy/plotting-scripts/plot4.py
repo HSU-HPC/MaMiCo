@@ -13,17 +13,17 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
         return
 
     #CS data
-    cs = read_csv("lbm.csv", delimiter=";", usecols = [0,1,2], names=["Iteration", "VelY", "VelZ"])
+    cs = read_csv("../lbm.csv", delimiter=";", usecols = [0,1,2], names=["Iteration", "VelY", "VelZ"])
 
     #used in SNR computation. Indexing: MD, fst, snd, thrd
     sum_noise = [0,0,0,0]
     sum_signal = [0,0,0,0]
 
-    mplt.style.use("seaborn")
+    mplt.style.use("seaborn-v0_8")
     fig, ax = mplt.subplots(2,2)
     #unfiltered MD data
-    p_md = read_csv(unfiltered_csv, delimiter=";", usecols=[0,8,9,10], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
-    m_md = read_csv(unfiltered_csv, delimiter=";", usecols=[0,7], names=["Iteration", "Mass"], index_col=None)
+    p_md = read_csv(unfiltered_csv, delimiter=";", usecols=[0,2,3,4], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
+    m_md = read_csv(unfiltered_csv, delimiter=";", usecols=[0,1], names=["Iteration", "Mass"], index_col=None)
     ax[0,0].plot(p_md["Iteration"], (p_md.iloc[:,dir]) / (m_md.iloc[:,1]), ".", color="red", label = "MD")
     #noise and signal of MD
     for i in range(len(cs.iloc[:,dir])): #aka range 1000
@@ -35,8 +35,8 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
 
     #all filtered csvs
     #first
-    p_fst = read_csv(csvs_for_plotting[0], delimiter=";", usecols=[0,8,9,10], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
-    m_fst = read_csv(csvs_for_plotting[0], delimiter=";", usecols=[0,7], names=["Iteration", "Mass"], index_col=None)
+    p_fst = read_csv(csvs_for_plotting[0], delimiter=";", usecols=[0,2,3,4], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
+    m_fst = read_csv(csvs_for_plotting[0], delimiter=";", usecols=[0,1], names=["Iteration", "Mass"], index_col=None)
     #reformat .csv file name
     l = csvs_for_plotting[0].replace("_", " ")
     l = l.replace(".csv", "")
@@ -50,8 +50,8 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
 
     
     #second
-    p_snd = read_csv(csvs_for_plotting[1], delimiter=";", usecols=[0,8,9,10], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
-    m_snd = read_csv(csvs_for_plotting[1], delimiter=";", usecols=[0,7], names=["Iteration", "Mass"], index_col=None)
+    p_snd = read_csv(csvs_for_plotting[1], delimiter=";", usecols=[0,2,3,4], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
+    m_snd = read_csv(csvs_for_plotting[1], delimiter=";", usecols=[0,1], names=["Iteration", "Mass"], index_col=None)
     #reformat .csv file name
     l = csvs_for_plotting[1].replace("_", " ")
     l = l.replace(".csv", "")
@@ -65,8 +65,8 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
 
 
     #third
-    p_thrd = read_csv(csvs_for_plotting[2], delimiter=";", usecols=[0,8,9,10], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
-    m_thrd = read_csv(csvs_for_plotting[2], delimiter=";", usecols=[0,7], names=["Iteration", "Mass"], index_col=None)
+    p_thrd = read_csv(csvs_for_plotting[2], delimiter=";", usecols=[0,2,3,4], names=["Iteration", "MomentumX", "MomentumY", "MomentumZ"], index_col=None)
+    m_thrd = read_csv(csvs_for_plotting[2], delimiter=";", usecols=[0,1], names=["Iteration", "Mass"], index_col=None)
     #reformat .csv file name
     l = csvs_for_plotting[2].replace("_", " ")
     l = l.replace(".csv", "")
@@ -105,8 +105,8 @@ def plot4(dir, csvs_for_plotting, plot_file_location):
     mplt.savefig(plot_file_location)
 
 #YOU HAVE TO CUSTOMIZE THIS
-unfiltered_csv = "../unfiltered_csv"
-csvs = ["../POD.csv", "../Gaussian.csv", "../NLM_junction.csv"]
+unfiltered_csv = "../0_unfiltered.csv"
+csvs = ["../0_POD.csv", "../0_gauss.csv", "../0_nlm.csv"]
 
 #plot for dims 1,2,3 (i.e. x,y,z)
 plot4(1,csvs, "kvs_velx.png")
