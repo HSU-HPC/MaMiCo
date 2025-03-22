@@ -9,6 +9,7 @@
 #include "adjustPhi.H"
 #include "constrainHbyA.H"
 #include "constrainPressure.H"
+#include "coupling/datastructures/FlexibleCellContainer.h"
 #include "findRefCell.H"
 #include "fvc.H"
 #include "fvm.H"
@@ -136,16 +137,15 @@ public:
   };
 
   // Applies the MD data (just velocities) as boundary condition, the mapping between the conntinuum and the MD is provided by the setMDBoundary()
-  void setMDBoundaryValues(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, const unsigned int* const recvIndices,
-                           const coupling::IndexConversion<3>& indexConversion) {
+  void setMDBoundaryValues(coupling::datastructures::FlexibleCellContainer<3>& md2macroBuffer) {
     if (skipRank()) {
       return;
     }
     for (size_t i = 0; i < _numberBoundaryPoints; i++) {
       size_t outer = _boundary2RecvBufferIndicesOuter[i];
       size_t inner = _boundary2RecvBufferIndicesInner[i];
-      tarch::la::Vector<3, double> localOuterVel((1.0 / recvBuffer[outer]->getMacroscopicMass()) * recvBuffer[outer]->getMacroscopicMomentum());
-      tarch::la::Vector<3, double> localInnerVel((1.0 / recvBuffer[inner]->getMacroscopicMass()) * recvBuffer[inner]->getMacroscopicMomentum());
+      tarch::la::Vector<3, double> localOuterVel((1.0 / md2macroBuffer[outer]->getMacroscopicMass()) * md2macroBuffer[outer]->getMacroscopicMomentum());
+      tarch::la::Vector<3, double> localInnerVel((1.0 / md2macroBuffer[inner]->getMacroscopicMass()) * md2macroBuffer[inner]->getMacroscopicMomentum());
       _boundaryIndices[i]->x() = (localOuterVel[0] + localInnerVel[0]) * 0.5;
       _boundaryIndices[i]->y() = (localOuterVel[1] + localInnerVel[1]) * 0.5;
       _boundaryIndices[i]->z() = (localOuterVel[2] + localInnerVel[2]) * 0.5;
@@ -154,8 +154,7 @@ public:
 
   // Settup for the mapping from MD to continuum data. Velocity values are necessary directly on the boundary. Therefore the MD values from the two cells beside
   // the boundary are interpolated. The function looks for the index of every cell that data is necessary from. This indices will be stored in two arrays.
-  void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip,
-                     const coupling::IndexConversion<3>& indexConversion, const unsigned int* const recvIndice, unsigned int size) {
+  void setMDBoundary(tarch::la::Vector<3, double> mdDomainOffset, tarch::la::Vector<3, double> mdDomainSize, unsigned int overlapStrip) {
     if (skipRank()) {
       return;
     }
@@ -164,8 +163,8 @@ public:
       innerMDBoundaryIndex++;
     }
     _numberBoundaryPoints = 6 * U.boundaryFieldRef()[innerMDBoundaryIndex].size();
-    _boundary2RecvBufferIndicesOuter = new size_t[_numberBoundaryPoints];
-    _boundary2RecvBufferIndicesInner = new size_t[_numberBoundaryPoints];
+    _boundary2RecvBufferIndicesOuter = new I00[_numberBoundaryPoints];
+    _boundary2RecvBufferIndicesInner = new I00[_numberBoundaryPoints];
     _boundaryIndices = new Foam::vector*[_numberBoundaryPoints];
     size_t counter = 0;
     for (size_t boundary = 0; boundary < 12; boundary++) {
@@ -173,10 +172,10 @@ public:
         size_t MDPointsPerBoundary = _numberBoundaryPoints / 6;
         for (size_t j = 0; j < MDPointsPerBoundary; j++) {
           _boundaryIndices[counter] = &(U.boundaryFieldRef()[boundary][j]);
-          const size_t globalIndexOuter = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getOuterPointFromBoundary(boundary, j)));
-          const size_t globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getInnerPointFromBoundary(boundary, j)));
-          // const size_t globalIndexInner = indexConversion.getGlobalCellIndex(indexConversion.getGlobalVectorCellIndex(getInnerPointFromBoundary(boundary,
-          // j)));
+
+          const I00 globalIndexOuter = IDXS.getCellIndex(getOuterPointFromBoundary(boundary, j));
+          const I00 globalIndexInner = IDXS.getCellIndex(getInnerPointFromBoundary(boundary, j));
+
           for (size_t k = 0; k < size; k++) {
             if (globalIndexOuter == recvIndice[k]) {
               _boundary2RecvBufferIndicesOuter[counter] = k;
@@ -322,14 +321,14 @@ private:
   // the entries define which boundaries are for coupling with MD
   // 0 means no MD boundary and 1 means MD boundary
   tarch::la::Vector<12, unsigned int> _boundariesWithMD;
-  float _dx;                                         // mesh size
-  double _channelheight;                             // overall height of the Couette channel
-  size_t* _boundary2RecvBufferIndicesOuter{nullptr}; // pointer to an array with data for communication
-  size_t* _boundary2RecvBufferIndicesInner{nullptr}; // pointer to an array with data for communication
-  Foam::vector** _boundaryIndices{nullptr};          // pointer to OpenFOAM data for communication
-  int _rank;                                         // rank of the actual process
-  int _plotEveryTimestep;                            // every n-th time step should be plotted
-  int _timestepCounter{0};                           // actual time step number
+  float _dx;                                      // mesh size
+  double _channelheight;                          // overall height of the Couette channel
+  I00* _boundary2RecvBufferIndicesOuter{nullptr}; // pointer to an array with data for communication
+  I00* _boundary2RecvBufferIndicesInner{nullptr}; // pointer to an array with data for communication
+  Foam::vector** _boundaryIndices{nullptr};       // pointer to OpenFOAM data for communication
+  int _rank;                                      // rank of the actual process
+  int _plotEveryTimestep;                         // every n-th time step should be plotted
+  int _timestepCounter{0};                        // actual time step number
   // the following are original OpenFOAM variables, their names shall not be changed
   Foam::label pRefCell{0};
   Foam::scalar pRefValue{0.0};
