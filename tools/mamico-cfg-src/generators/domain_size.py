@@ -29,19 +29,10 @@ def validate(get_config_value) -> str:
 
 
 def apply(partial_xml, get_config_value) -> None:
-    equilibration_steps = 10000
-    equilibration_steps_max = 20000
-    size = get_domain_size(get_config_value)
     md_domain_size, cfd_domain_size = get_domain_sizes(get_config_value)
     domain_offset_xy = (cfd_domain_size - md_domain_size) / 2  # Centered
     partial_xml.substitute("md-size", md_domain_size)
     partial_xml.substitute("cfd-size", cfd_domain_size)
-    use_checkpoint = get_config_value("use_checkpoint")
-    partial_xml.substitute(
-        "equilibration-steps",
-        min(equilibration_steps_max, equilibration_steps * size)
-        * (0 if use_checkpoint else 1),
-    )
     partial_xml.substitute("domain-offset-x", domain_offset_xy)
     partial_xml.substitute("domain-offset-y", domain_offset_xy)
     cell_size = get_config_value("cell_size")
