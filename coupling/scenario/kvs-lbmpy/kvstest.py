@@ -28,7 +28,6 @@ import mamico.tarch.utils
 from mamico.coupling.services import MultiMDCellService
 from mamico.coupling.solvers import CouetteSolverInterface
 from configparser import ConfigParser
-import adios2
 
 log = logging.getLogger('KVSTest')
 logging.getLogger('matplotlib.font_manager').disabled = True
@@ -291,8 +290,7 @@ class KVSTest():
         # mcs.addFilterToSequence(filter_sequence="gauss-45", filter_index=0, scalar_filter_func = gauss_sca45, vector_filter_func=gauss_vec45)
         # mcs.addFilterToSequence(filter_sequence="gauss-5", filter_index=0, scalar_filter_func = gauss_sca5, vector_filter_func=gauss_vec5)
 
-        self.buf = mamico.coupling.Buffer(self.multiMDCellService.getCouplingCellService(0).getIndexConversion(),
-                                          self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
+        self.buf = mamico.coupling.Buffer(self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
 
         self.csv = self.cfg.getint("coupling", "csv-every-timestep")
         self.png = self.cfg.getint("coupling", "png-every-timestep")
@@ -302,10 +300,14 @@ class KVSTest():
         if self.rank==0:
             self.velLB = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
             if self.adios2 > 0:
-                self.adiosfile = adios2.open("kvstest_volume.bp", "w")
-                timefactor = self.adios2 * self.dt/(self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep() * self.simpleMDConfig.getSimulationConfiguration().getDt())
-                print("timefactor:", timefactor)
-                self.adiosfile.write_attribute('timefactor', str(timefactor))
+                from adios2 import Stream
+                self.adiosfile = Stream("kvstest_volume.bp", "w")
+                if self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep()==0:
+                    self.adiosfile.write_attribute('timefactor', "inf")
+                else:
+                    timefactor = self.adios2 * self.dt/(self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep() * self.simpleMDConfig.getSimulationConfiguration().getDt())
+                    log.info("timefactor:", timefactor)
+                    self.adiosfile.write_attribute('timefactor', str(timefactor))
     
         if self.rank==0:
             log.info("Finished initSolvers") # after ? ms
@@ -321,7 +323,8 @@ class KVSTest():
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].shutdown()
-        # TODO something else to do here??
+
+        del self.multiMDCellService
 
     def advanceMacro(self, cycle):
         if self.rank == 0:
@@ -358,19 +361,19 @@ class KVSTest():
             if self.adios2 > 0 and (cycle+1)%self.adios2 == 0:
                to_write = np.ascontiguousarray(self.macroscopicSolver.scen.velocity[:,:,:,:].data, dtype=np.float32)
                log.info("writing to adios2 " + str(type(to_write)) + " with shape " + str(to_write.shape) + " and dtype " + str(to_write.dtype))
-               shape = np.array(self.macroscopicSolver.scen.velocity[:,:,:,0].data.shape)*self.mamicoConfig.getMacroscopicCellConfiguration().getMacroscopicCellSize()
+               shape = np.array(self.macroscopicSolver.scen.velocity[:,:,:,0].data.shape)*self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()
                offset = [0.,0.,0.]
-               print(shape)
-               print(mdpos)
-               print(self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize())
+               log.debug(str(shape))
+               log.debug(str(mdpos))
+               log.debug(str(self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()))
                offset[0] = -((mdpos[0]/to_write.shape[0]* shape[0])-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[0]))
                offset[1] = -((mdpos[1]/to_write.shape[1]* shape[1])-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[1]))
                offset[2] = -((mdpos[2]/to_write.shape[2]* shape[2])-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[2]))
-               print(offset)
+               log.debug(str((offset)))
                gb_to_write = np.array([offset[0], offset[1], offset[2], offset[0] + shape[0], offset[1] + shape[1], offset[2] + shape[2]])
-               print(gb_to_write)
-               self.adiosfile.write("global_box", gb_to_write, gb_to_write.shape, np.zeros_like(gb_to_write.shape), gb_to_write.shape)
-               self.adiosfile.write("velocity", to_write, to_write.shape, np.zeros_like(to_write.shape), to_write.shape)
+               log.debug(str((gb_to_write)))
+               self.adiosfile.write("global_box", gb_to_write, gb_to_write.shape, np.zeros_like(gb_to_write.shape).tolist(), gb_to_write.shape)
+               self.adiosfile.write("velocity", to_write, to_write.shape, np.zeros_like(to_write.shape).tolist(), to_write.shape)
                self.adiosfile.end_step()
 
         if self.cfg.getboolean("coupling", "send-from-macro-to-md"):
@@ -473,9 +476,11 @@ class LBSolver():
                 optTarget = Target.CPU
             elif self.cfg.get("macroscopic-solver", "optimization-target") == "gpu":
                 optTarget = Target.GPU
+            method = Method.TRT
         except ImportError:   # for lbmpy version <= 0.3.4
             optTarget = self.cfg.get("macroscopic-solver", "optimization-target")
-        self.scen = LatticeBoltzmannStep(domain_size=self.domain_size, method='trt',stencil='D3Q19',
+            method ='trt'
+        self.scen = LatticeBoltzmannStep(domain_size=self.domain_size, method=method,stencil='D3Q19',
             relaxation_rate=self.omega, periodicity=(True, False, False),
             optimization={'target':optTarget, 
             'gpu_indexing':'line', 

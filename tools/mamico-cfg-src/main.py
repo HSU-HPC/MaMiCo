@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 """
-Utility script to generate basic couette.xml configurations for MaMiCo.
+Utility script to generate basic couette.xml configurations (and additional files) for MaMiCo.
 Do NOT run this script directly! Use ../mamico-cfg instead.
 """
 
