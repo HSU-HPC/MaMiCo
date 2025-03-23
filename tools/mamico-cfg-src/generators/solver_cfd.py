@@ -2,13 +2,16 @@ import shutil
 from pathlib import Path
 
 from utils import check_if_replacing, get_domain_size
-
+import sys
 
 def _create_foam_setup(get_config_value) -> Path:
     src_path = Path(__file__).parent.parent / "assets" / f"FoamSetup.template"
     dst_path = Path(get_config_value("output_dir")) / "FoamSetup"
     check_if_replacing(dst_path, get_config_value)
-    shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
+    if sys.version_info >= (3, 8):
+        shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
+    else:
+        shutil.copytree(src_path, dst_path)
     return dst_path
 
 
