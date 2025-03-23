@@ -11,7 +11,10 @@ def _create_foam_setup(get_config_value) -> Path:
     if sys.version_info >= (3, 8):
         shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
     else:
-        shutil.copytree(src_path, dst_path)
+        try:
+             shutil.copytree(src_path, dst_path)
+        except FileExistsError:
+             pass
     return dst_path
 
 
