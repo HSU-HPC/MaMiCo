@@ -139,7 +139,8 @@ public:
       return;
     }
     size_t pointsWritten = 0;
-    I00 idx, coupling::datastructures::CouplingCell<3>* cell;
+    I00 idx;
+    coupling::datastructures::CouplingCell<3>* cell;
     for (auto pair : md2macroBuffer) {
       std::tie(cell, idx) = pair;
       if(_boundaryPointMap.count(idx) > 0){
@@ -171,6 +172,7 @@ public:
     _boundaryIndicesInner = new I00[_numberBoundaryPoints];
     _boundaryIndices = new Foam::vector*[_numberBoundaryPoints];
     size_t counter = 0;
+    const unsigned int dim = 3;
     for (size_t boundary = 0; boundary < 12; boundary++) {
       if (_boundariesWithMD[boundary] == 1) {
         size_t MDPointsPerBoundary = _numberBoundaryPoints / 6;
