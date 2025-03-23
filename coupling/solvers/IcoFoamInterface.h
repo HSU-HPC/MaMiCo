@@ -195,14 +195,14 @@ public:
 private:
   // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
   const tarch::la::Vector<3, double> getOuterPointFromBoundary(const int layer, const int index) {
-    const Foam::vectorField FoamCoord(U.boundaryFieldRef()[layer].patch().Cf()[index] + (U.boundaryFieldRef()[layer].patch().nf() * _dx * 0.5));
+    const Foam::vectorField FoamCoord(U.boundaryFieldRef()[layer].patch().Cf()[index] - (U.boundaryFieldRef()[layer].patch().nf() * _dx * 0.5));
     const tarch::la::Vector<3, double> FoamCoordVector(FoamCoord[0][0], FoamCoord[0][1], FoamCoord[0][2]);
     return FoamCoordVector;
   }
 
   // Gets the next cell center beside the boundary, necessary to set the boundary condition from MD data
   const tarch::la::Vector<3, double> getInnerPointFromBoundary(const int layer, const int index) {
-    const Foam::vectorField FoamCoord(U.boundaryFieldRef()[layer].patch().Cf()[index] - (U.boundaryFieldRef()[layer].patch().nf() * _dx * 0.5));
+    const Foam::vectorField FoamCoord(U.boundaryFieldRef()[layer].patch().Cf()[index] + (U.boundaryFieldRef()[layer].patch().nf() * _dx * 0.5));
     const tarch::la::Vector<3, double> FoamCoordVector(FoamCoord[0][0], FoamCoord[0][1], FoamCoord[0][2]);
     return FoamCoordVector;
   }
