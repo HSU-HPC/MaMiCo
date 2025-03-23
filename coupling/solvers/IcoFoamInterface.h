@@ -144,13 +144,15 @@ public:
     for (auto pair : md2macroBuffer) {
       std::tie(cell, idx) = pair;
       if(_boundaryPointMap.count(idx) > 0){
-        unsigned int boundarypoint = _boundaryPointMap.at(idx);
-        tarch::la::Vector<3, double> localOuterVel = getVelocity(_boundaryPointsOuter.at(boundarypoint));
-        tarch::la::Vector<3, double> localInnerVel = (1.0 / cell->getMacroscopicMass()) * cell->getMacroscopicMomentum();
-        _boundaryIndices[boundarypoint]->x() = (localOuterVel[0] + localInnerVel[0]) * 0.5;
-        _boundaryIndices[boundarypoint]->y() = (localOuterVel[1] + localInnerVel[1]) * 0.5;
-        _boundaryIndices[boundarypoint]->z() = (localOuterVel[2] + localInnerVel[2]) * 0.5;
-        pointsWritten++;
+        for(auto[it, rangeEnd] = _boundaryPointMap.equal_range(idx); it != rangeEnd; ++it){
+          unsigned int boundarypoint = it->second;
+          tarch::la::Vector<3, double> localOuterVel = getVelocity(_boundaryPointsOuter.at(boundarypoint));
+          tarch::la::Vector<3, double> localInnerVel = (1.0 / cell->getMacroscopicMass()) * cell->getMacroscopicMomentum();
+          _boundaryIndices[boundarypoint]->x() = (localOuterVel[0] + localInnerVel[0]) * 0.5;
+          _boundaryIndices[boundarypoint]->y() = (localOuterVel[1] + localInnerVel[1]) * 0.5;
+          _boundaryIndices[boundarypoint]->z() = (localOuterVel[2] + localInnerVel[2]) * 0.5;
+          pointsWritten++;
+        }
       }
     }
     if(pointsWritten != _numberBoundaryPoints)
@@ -315,7 +317,7 @@ private:
   tarch::la::Vector<12, unsigned int> _boundariesWithMD;
   float _dx;                                      // mesh size
   double _channelheight;                          // overall height of the Couette channel
-  std::map<I00, unsigned int> _boundaryPointMap;
+  std::multimap<I00, unsigned int> _boundaryPointMap;
   std::vector<tarch::la::Vector<3, double>> _boundaryPointsOuter;
   I00* _boundaryIndicesInner{nullptr};             // pointer to an array with data for communication
   Foam::vector** _boundaryIndices{nullptr};       // pointer to OpenFOAM data for communication
