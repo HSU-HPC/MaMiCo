@@ -26,8 +26,11 @@ def validate(get_config_value) -> str:
     key = __name__.split(".")[-1]
     solver = get_config_value(key)
     use_2way_coupling = get_config_value("coupling_2way")
+    cell_size = get_config_value("cell_size")
     if solver == "foam" and get_domain_size(get_config_value) != 2:
         return f"OpenFOAM can only be used with the medium domain size."
+    if solver == "foam" and cell_size != 5.0:
+        return f"OpenFOAM can only be used with cell size 5.0"
     if solver == "analytical" and use_2way_coupling:
         return f"Cannot use two-way coupling with analytical CFD solver."
     if (
