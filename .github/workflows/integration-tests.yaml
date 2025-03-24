@@ -41,19 +41,18 @@ jobs:
             build/LAMMPS
           key: LAMMPS
       - name: Use cached OpenFOAM
-        if: false # (OpenFOAM integration is currently broken -> issue #73)
         uses: actions/cache/restore@v4
         with:
           path: |
             build/openfoam
           key: OpenFOAM
       - name: Build couette executable
-        # Add "--with-foam" for OpenFOAM support (OpenFOAM integration is currently broken -> issue #73)
         run: |
           ml gcc mpi || :
           ./tools/build-couette.py \
             --jobs $(($(nproc --all) / 2)) \
             --with-mpi \
+            --with-foam \
             --md-solver ${{ matrix.md-solver }}
       - name: Cache LAMMPS
         uses: actions/cache/save@v4
@@ -63,7 +62,6 @@ jobs:
             build/LAMMPS
           key: LAMMPS
       - name: Cache OpenFOAM
-        if: false # (OpenFOAM integration is currently broken -> issue #73)
         uses: actions/cache/save@v4
         with:
           path: |
@@ -106,6 +104,7 @@ jobs:
           $MAMICO_CFG -O $O
       - name: Run the couette executable with the generated configuration
         run: |
+          source build/openfoam/OpenFOAM-v*/etc/bashrc || :
           cd build/test_cases/${{ matrix.case }}
           chmod +x ../../couette
           srun mpirun -n ${{ matrix.mpi_ranks }} ../../couette
