@@ -94,7 +94,7 @@ jobs:
           O="$O,equilibrate=${{ matrix.equilibrate }}"
           O="$O,solver_md=${{ matrix.solver_md }}"
           O="$O,solver_cfd=${{ matrix.solver_cfd }}"
-          O="$O,mpi_ranks=${{ matrix.mpi_ranks }}"
+          O="$O,mpi_ranks=${{ matrix.mpi_ranks_per_md }}"
           O="$O,cell_size=${{ matrix.cell_size }}"
           O="$O,boundary=${{ matrix.boundary }}"
           O="$O,coupling_2way=${{ matrix.coupling_2way }}"
@@ -107,7 +107,7 @@ jobs:
           source build/openfoam/OpenFOAM-v*/etc/bashrc || :
           cd build/test_cases/${{ matrix.case }}
           chmod +x ../../couette
-          srun mpirun -n ${{ matrix.mpi_ranks }} ../../couette
+          srun mpirun -n $(( ${{ matrix.mpi_ranks_per_md }} * ${{ matrix.parallel_MD_instances }} )) ../../couette
       - name: Assess couette profile
         run: |
           python3 -m venv .venv
