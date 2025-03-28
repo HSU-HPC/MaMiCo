@@ -237,6 +237,31 @@ public:
     return _scalarNumberProcesses;
   }
 
+  BaseIndex<dim> getCellIndex(tarch::la::Vector<dim, double> position) const {
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (!_isInitialized) {
+      throw std::runtime_error(std::string("IndexingService: Called getCellIndex() before initalization! "));
+    }
+    if (!_initedWithMDSize) {
+      throw std::runtime_error(std::string("IndexingService: Called getCellIndex() without calling initWithMDSize()! "));
+    }
+#endif
+
+    tarch::la::Vector<dim, int> res_raw;
+    for (unsigned int d = 0; d < dim; d++) {
+      const double buf = position[d] - (_globalMDDomainOffset[d] - _couplingCellSize[d]);
+      res_raw[d] = buf / _couplingCellSize[d];
+    }
+
+    BaseIndex<dim> res{res_raw};
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (!BaseIndex<dim>::contains(res)) {
+      throw std::runtime_error(std::string("IndexingService::getCellIndex(): Invalid conversion!"));
+    }
+#endif
+    return res;
+  }
+
 private:
   unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
                                             const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells, unsigned int topologyOffset) const;

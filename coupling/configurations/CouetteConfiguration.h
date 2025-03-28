@@ -196,12 +196,6 @@ public:
       tarch::configuration::ParseConfiguration::readStringMandatory(cfg.foam.directory, subtag, "foam-setup-directory");
       tarch::configuration::ParseConfiguration::readStringMandatory(cfg.foam.folder, subtag, "foam-setup-folder");
       tarch::configuration::ParseConfiguration::readVectorMandatory<12, unsigned int>(cfg.foam.boundariesWithMD, subtag, "boundaries-with-MD");
-      if (!cfg.twoWayCoupling && cfg.foam.boundariesWithMD != tarch::la::Vector<12, unsigned int>{0}) {
-        std::cout << "ERROR: Two-way coupling is disabled, but boundaries with "
-                     "MD for openfoam were defined"
-                  << std::endl;
-        exit(EXIT_FAILURE);
-      }
     }
 #endif
     else if (type == "analytical") {
