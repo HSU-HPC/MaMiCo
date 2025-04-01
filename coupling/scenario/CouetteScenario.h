@@ -16,7 +16,6 @@
 #include "tarch/utils/RandomNumberService.h"
 #include "tarch/utils/Utils.h"
 #if (BUILD_WITH_OPENFOAM)
-#include "coupling/solvers/IcoFoamBufferSetup.h"
 #include "coupling/solvers/IcoFoamInterface.h"
 #endif
 #include "coupling/configurations/CouetteConfiguration.h"
@@ -660,9 +659,7 @@ protected:
       }
 #if (BUILD_WITH_OPENFOAM)
       else if ((_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
-        static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)
-            ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+        static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)->setupMDBoundary();
       }
 #endif
       if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle >= _cfg.filterInitCycles) {
@@ -920,7 +917,7 @@ protected:
     }
 #if (BUILD_WITH_OPENFOAM)
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) {
-      interface = new coupling::solvers::FoamSolverInterface<3>(globalNumberCouplingCells, outerRegion);
+      interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberCouplingCells, outerRegion);
     }
 #endif
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FD) {

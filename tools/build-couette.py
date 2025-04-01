@@ -171,12 +171,14 @@ md_solvers = dict(
 
 
 def build_mamico_couette_md(
-    md_solver="md", with_openfoam=False, with_mpi=False, jobs=8
+    md_solver="md", with_openfoam=False, with_mpi=False, jobs=8, clean=False
 ):
     run_info = f"Started {time.strftime('%Y-%m-%d %H:%M:%S %Z')}"
     print(run_info)
     had_error = False
     build_dir = MAMICO_REPO_DIR / "build"
+    if clean:
+        shutil.rmtree(build_dir, ignore_errors=True)
     couette_bin_path = build_dir / "couette"
     build_info = f"Building {couette_bin_path} ({md_solver})"
     if with_openfoam:
@@ -208,6 +210,8 @@ def build_mamico_couette_md(
         shell(f"ln -sf {LAMMPS_REPO_DIR}/src {MAMICO_REPO_DIR}/lammps")
     if with_openfoam:
         had_error |= build_open_foam(jobs)
+        if had_error:
+            return None
     cmake_args += f" -DBUILD_WITH_OPENFOAM={'ON' if with_openfoam else 'OFF'}"
     environement_prefix = " ".join(f"{k}={v}" for k, v in environement.items())
     cmd = f"{pre_cmake_cmd}{environement_prefix} cmake {cmake_args}"
@@ -235,6 +239,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("-F", "--with-foam", action="store_true")
     arg_parser.add_argument("-M", "--with-mpi", action="store_true")
     arg_parser.add_argument("-j", "--jobs", default=8)
+    arg_parser.add_argument("-c", "--clean", action="store_true")
     args = arg_parser.parse_args()
 
     exec_path = build_mamico_couette_md(
@@ -242,6 +247,7 @@ if __name__ == "__main__":
         with_openfoam=args.with_foam,
         with_mpi=args.with_mpi,
         jobs=args.jobs,
+        clean=args.clean
     )
     if exec_path is not None:
         print(exec_path)
