@@ -1,11 +1,11 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
 <area shape="rect" id="Node000000" href="$classcoupling_1_1sendrecv_1_1SendReceiveBuffer.html" title="generic class for send&#45;/ receive methodology." alt="" coords="5,125,144,181"/>
 <area shape="rect" id="Node000001" href="$classcoupling_1_1sendrecv_1_1FromMD2Macro.html" title="sends coupling cell information from MaMiCo to the macroscopic solver. Derived from the class couplin..." alt="" coords="203,5,356,61"/>
-<area shape="poly" id="edge40_Node000000_Node000001" title=" " alt="" coords="124,114,190,71,212,59,215,64,193,75,127,118"/>
+<area shape="poly" id="edge39_Node000000_Node000001" title=" " alt="" coords="124,114,190,71,212,59,215,64,193,75,127,118"/>
 <area shape="rect" id="Node000002" href="$classcoupling_1_1sendrecv_1_1FromMD2MacroRecvOnly.html" title="sends coupling cell information from MaMiCo to the macroscopic solver. Expects to only receive data f..." alt="" coords="192,85,368,141"/>
-<area shape="poly" id="edge41_Node000000_Node000002" title=" " alt="" coords="158,134,191,128,192,133,159,139"/>
+<area shape="poly" id="edge40_Node000000_Node000002" title=" " alt="" coords="158,134,191,128,192,133,159,139"/>
 <area shape="rect" id="Node000003" href="$classcoupling_1_1sendrecv_1_1FromMacro2MD.html" title="SendReceiveBuffer for transfer of quantities from a macroscopic solver to the coupling cells...." alt="" coords="203,165,356,221"/>
-<area shape="poly" id="edge42_Node000000_Node000003" title=" " alt="" coords="159,167,203,176,202,181,158,172"/>
+<area shape="poly" id="edge41_Node000000_Node000003" title=" " alt="" coords="159,167,203,176,202,181,158,172"/>
 <area shape="rect" id="Node000004" href="$classcoupling_1_1sendrecv_1_1FromMacro2MDSendOnly.html" title="SendReceiveBuffer for transfer of quantities from a macroscopic solver to the coupling cells...." alt="" coords="192,245,368,301"/>
-<area shape="poly" id="edge43_Node000000_Node000004" title=" " alt="" coords="127,188,193,231,215,242,212,247,190,235,124,192"/>
+<area shape="poly" id="edge42_Node000000_Node000004" title=" " alt="" coords="127,188,193,231,215,242,212,247,190,235,124,192"/>
 </map>

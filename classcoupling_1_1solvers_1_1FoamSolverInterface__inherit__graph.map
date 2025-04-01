@@ -1,5 +1,0 @@
-<map id="coupling::solvers::FoamSolverInterface&lt; dim &gt;" name="coupling::solvers::FoamSolverInterface&lt; dim &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="29,109,171,165"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1interface_1_1MacroscopicSolverInterface.html" title="interface for the macroscopic, i.e. continuum solver" alt="" coords="5,5,195,61"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,77,103,108,97,108,97,77"/>
-</map>
