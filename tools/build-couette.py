@@ -71,12 +71,13 @@ def git_clone_shallow(repository_url, repository_dir, branch):
     return 0 != shell(cmd)
 
 
-def build_ls1(mamico_repo_dir, with_mpi=False, jobs=8):
+def build_ls1(mamico_repo_dir, with_mpi=False, jobs=8, force_gcc=False):
     print("Building ls1-MarDyn from source...")
     ls1_dir = mamico_repo_dir / "ls1"
-    if ls1_dir.exists():
-        # Avoid issues with initializing submodule
-        shutil.rmtree(ls1_dir)
+    # Appears to not be necessary
+    # if ls1_dir.exists():
+    #     # Avoid issues with initializing submodule
+    #     shutil.rmtree(ls1_dir)
     had_error = 0 != shell("git submodule init && git submodule update")
     if had_error != 0:
         return had_error
@@ -84,6 +85,8 @@ def build_ls1(mamico_repo_dir, with_mpi=False, jobs=8):
     build_dir = ls1_dir / "build"
     build_dir.mkdir(exist_ok=True)
     cmake_args = ""
+    if force_gcc:
+        cmake_args += f" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
     cmake_args += f"-S{ls1_dir} -B{build_dir}"
     cmake_args += " -DENABLE_ADIOS2=OFF"
     cmake_args += f" -DENABLE_MPI={'ON' if with_mpi else 'OFF'}"
@@ -121,7 +124,10 @@ def download_open_foam():
                 OPEN_FOAM_THIRD_PARTY_URL, f"ThirdParty-v{OPEN_FOAM_VERSION}.tgz"
             )
             if not had_error:
-                shell(f"mv ThirdParty-v{OPEN_FOAM_VERSION} ThirdParty")
+                had_error = 0 != shell(f"mv ThirdParty-v{OPEN_FOAM_VERSION} ThirdParty")
+    if not had_error:
+        # Renamed unused logging macro to avoid issue when compiling MaMiCo with both OpenFOAM and ls1
+        had_error = 0 != shell(f"sed -i 's/^#define Log/#define FoamLog/g' {OPEN_FOAM_SRC_DIR}/src/OpenFOAM/lnInclude/messageStream.H")
     return had_error
 
 
@@ -171,7 +177,7 @@ md_solvers = dict(
 
 
 def build_mamico_couette_md(
-    md_solver="md", with_openfoam=False, with_mpi=False, jobs=8, clean=False
+    md_solver="md", with_openfoam=False, with_mpi=False, jobs=8, clean=False, force_gcc=False
 ):
     run_info = f"Started {time.strftime('%Y-%m-%d %H:%M:%S %Z')}"
     print(run_info)
@@ -190,6 +196,8 @@ def build_mamico_couette_md(
     except:
         raise ValueError("Unknown MD solver")
     cmake_args = ""
+    if force_gcc:
+        cmake_args += f" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
     cmake_args += f"-S{MAMICO_REPO_DIR} -B{build_dir}"
     cmake_args += f" -DCMAKE_BUILD_TYPE={MAMICO_BUILD_TYPE}"
     cmake_args += f" -DBUILD_WITH_MPI={'ON' if with_mpi else 'OFF'}"
@@ -199,7 +207,7 @@ def build_mamico_couette_md(
     cmake_args += " -DBUILD_WITH_LAMMPS=OFF"
     pre_cmake_cmd = ""
     if md_solver == "ls1":
-        had_error |= build_ls1(MAMICO_REPO_DIR, with_mpi, jobs)
+        had_error |= build_ls1(MAMICO_REPO_DIR, with_mpi, jobs, force_gcc)
         cmake_args += f" -DLS1_SRC_DIR={MAMICO_REPO_DIR / 'ls1'}"
     elif md_solver == "lammps":
         had_error |= build_lammps()
@@ -239,6 +247,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("-F", "--with-foam", action="store_true")
     arg_parser.add_argument("-M", "--with-mpi", action="store_true")
     arg_parser.add_argument("-j", "--jobs", default=8)
+    arg_parser.add_argument("-g", "--force-gcc", action="store_true")
     arg_parser.add_argument("-c", "--clean", action="store_true")
     args = arg_parser.parse_args()
 
@@ -247,7 +256,8 @@ if __name__ == "__main__":
         with_openfoam=args.with_foam,
         with_mpi=args.with_mpi,
         jobs=args.jobs,
-        clean=args.clean
+        clean=args.clean,
+        force_gcc=args.force_gcc
     )
     if exec_path is not None:
         print(exec_path)
