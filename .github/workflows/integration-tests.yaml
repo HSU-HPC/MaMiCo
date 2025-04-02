@@ -48,8 +48,10 @@ jobs:
           key: OpenFOAM
       - name: Build couette executable
         run: |
-          ml gcc mpi || :
+          source scl_source enable gcc-toolset-9 || :
+          ml mpi || :
           ./tools/build-couette.py \
+            --force-gcc \
             --jobs $(($(nproc --all) / 2)) \
             --with-mpi \
             --with-foam \
