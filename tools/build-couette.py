@@ -74,9 +74,10 @@ def git_clone_shallow(repository_url, repository_dir, branch):
 def build_ls1(mamico_repo_dir, with_mpi=False, jobs=8):
     print("Building ls1-MarDyn from source...")
     ls1_dir = mamico_repo_dir / "ls1"
-    if ls1_dir.exists():
-        # Avoid issues with initializing submodule
-        shutil.rmtree(ls1_dir)
+    # Appears to not be necessary
+    # if ls1_dir.exists():
+    #     # Avoid issues with initializing submodule
+    #     shutil.rmtree(ls1_dir)
     had_error = 0 != shell("git submodule init && git submodule update")
     if had_error != 0:
         return had_error
@@ -121,7 +122,10 @@ def download_open_foam():
                 OPEN_FOAM_THIRD_PARTY_URL, f"ThirdParty-v{OPEN_FOAM_VERSION}.tgz"
             )
             if not had_error:
-                shell(f"mv ThirdParty-v{OPEN_FOAM_VERSION} ThirdParty")
+                had_error = 0 != shell(f"mv ThirdParty-v{OPEN_FOAM_VERSION} ThirdParty")
+    if not had_error:
+        # Renamed unused logging macro to avoid issue when compiling MaMiCo with both OpenFOAM and ls1
+        had_error = 0 != shell(f"sed -i 's/^#define Log/#define FoamLog/g' {OPEN_FOAM_SRC_DIR}/src/OpenFOAM/lnInclude/messageStream.H")
     return had_error
 
 
