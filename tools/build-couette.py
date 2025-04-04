@@ -195,7 +195,6 @@ def build_mamico_couette_md(
         md_solver_cmake_flag = md_solvers[md_solver]
     except:
         raise ValueError("Unknown MD solver")
-    pre_cmake_cmd = ""
     if with_openfoam:
         had_error |= build_open_foam(jobs)
         if had_error:
@@ -222,7 +221,7 @@ def build_mamico_couette_md(
         shell(f"ln -sf {LAMMPS_REPO_DIR}/src {MAMICO_REPO_DIR}/lammps")
     cmake_args += f" -DBUILD_WITH_OPENFOAM={'ON' if with_openfoam else 'OFF'}"
     environement_prefix = " ".join(f"{k}={v}" for k, v in environement.items())
-    cmd = f"{pre_cmake_cmd}{environement_prefix} cmake {cmake_args}"
+    cmd = f"{environement_prefix} cmake {cmake_args}"
     if with_openfoam:
         cmd = f"source {OPEN_FOAM_SRC_DIR / 'etc' / 'bashrc'}; {cmd}"
     had_error |= 0 != shell(cmd)
