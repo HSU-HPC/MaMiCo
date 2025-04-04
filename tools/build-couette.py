@@ -125,9 +125,6 @@ def download_open_foam():
             )
             if not had_error:
                 had_error = 0 != shell(f"mv ThirdParty-v{OPEN_FOAM_VERSION} ThirdParty")
-    if not had_error:
-        # Renamed unused logging macro to avoid issue when compiling MaMiCo with both OpenFOAM and ls1
-        had_error = 0 != shell(f"sed -i 's/^#define Log/#define FoamLog/g' {OPEN_FOAM_SRC_DIR}/src/OpenFOAM/lnInclude/messageStream.H")
     return had_error
 
 
@@ -146,6 +143,9 @@ def build_open_foam(jobs=8):
         had_error |= 0 != shell(
             cmd_build + " || :"
         )  # Building OpenFOAM has some irrelevant errors (non-zero exit code)
+    if not had_error:
+        # Renamed unused logging macro to avoid issue when compiling MaMiCo with both OpenFOAM and ls1
+        had_error = 0 != shell(f"sed -i 's/^#define Log/#define FoamLog/g' {OPEN_FOAM_SRC_DIR}/src/OpenFOAM/lnInclude/messageStream.H")
     return had_error
 
 
@@ -195,6 +195,11 @@ def build_mamico_couette_md(
         md_solver_cmake_flag = md_solvers[md_solver]
     except:
         raise ValueError("Unknown MD solver")
+    pre_cmake_cmd = ""
+    if with_openfoam:
+        had_error |= build_open_foam(jobs)
+        if had_error:
+            return None
     cmake_args = ""
     if force_gcc:
         cmake_args += f" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
@@ -205,7 +210,6 @@ def build_mamico_couette_md(
     environement = dict()
     environement["PKG_CONFIG_PATH"] = "$PKG_CONFIG_PATH"
     cmake_args += " -DBUILD_WITH_LAMMPS=OFF"
-    pre_cmake_cmd = ""
     if md_solver == "ls1":
         had_error |= build_ls1(MAMICO_REPO_DIR, with_mpi, jobs, force_gcc)
         cmake_args += f" -DLS1_SRC_DIR={MAMICO_REPO_DIR / 'ls1'}"
@@ -216,10 +220,6 @@ def build_mamico_couette_md(
             pkgconfig_path = Path.home() / ".local" / f"lib{suffix}" / "pkgconfig"
             environement["PKG_CONFIG_PATH"] += f":{pkgconfig_path}"
         shell(f"ln -sf {LAMMPS_REPO_DIR}/src {MAMICO_REPO_DIR}/lammps")
-    if with_openfoam:
-        had_error |= build_open_foam(jobs)
-        if had_error:
-            return None
     cmake_args += f" -DBUILD_WITH_OPENFOAM={'ON' if with_openfoam else 'OFF'}"
     environement_prefix = " ".join(f"{k}={v}" for k, v in environement.items())
     cmd = f"{pre_cmake_cmd}{environement_prefix} cmake {cmake_args}"
