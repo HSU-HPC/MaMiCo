@@ -40,7 +40,7 @@ jobs:
           path: |
             build/LAMMPS
           key: LAMMPS
-      - &checkout_open_foam name: Use cached OpenFOAM
+      - name: Use cached OpenFOAM
         uses: actions/cache/restore@v4
         with:
           path: |
@@ -86,7 +86,12 @@ jobs:
       matrix: ${{ fromJson(needs.extract-tests.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - *checkout_open_foam
+      - name: Use cached OpenFOAM
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            build/openfoam
+          key: OpenFOAM
       - uses: actions/download-artifact@v4
         with:
           name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.solver_md }}
