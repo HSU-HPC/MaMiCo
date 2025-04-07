@@ -123,6 +123,28 @@ public:
     }
   }
 
+  /** called to push the micro solver into a new macroscopic state (given from outside)
+   * */
+  void equilibrateMicro() override {
+    if(_cfg.miSolverType == coupling::configurations::CouetteConfig::SYNTHETIC) return;
+
+    coupling::datastructures::FlexibleCellContainer<3> buffer;
+    for (auto pair : _couplingBuffer.macro2MDBuffer) buffer << pair;
+    for (auto pair : _couplingBuffer.md2macroBuffer) buffer << pair;
+    fillSendBuffer(_cfg.density, *_couetteSolver, buffer);
+
+    _multiMDCellService->setInnerMomentumImposition(true);
+    const int EQUI_CYCLES = 3; // 2 cycles should be sufficient (10 cycles without inner imposition on MD30), 3 cycles is even safer
+    for(int i = 0; i < EQUI_CYCLES; i++){
+      _multiMDCellService->sendFromMacro2MD(buffer);
+      _instanceHandling->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+        _mdStepCounter, *_multiMDCellService);
+    }
+    _mdStepCounter += EQUI_CYCLES*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
+
+    _multiMDCellService->setInnerMomentumImposition(false);
+  }
+
   coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { return _couetteSolver; }
 
 protected:

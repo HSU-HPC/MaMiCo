@@ -137,8 +137,8 @@ private:
         _supervisor = solver->getSupervisor(domain.size, _cfg.getViscMultiplier() );
         _F = [this, solver, domain](const std::unique_ptr<State>& s){
             solver->setState(s, domain.minCycle);
-            // TODO enable momentumTransfer on inner cells for MD equilibration steps here
-            // TODO run MD equilibration here
+            if(domain.minCycle > 0)
+                _scenario->equilibrateMicro();
             run_cycles(domain.minCycle, domain.maxCycle);
             // TODO double check that filter pipeline output ends up in solver.getState() here
             return solver->getState();

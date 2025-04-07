@@ -180,6 +180,14 @@ public:
     }
   }
 
+  void setInnerMomentumImposition(bool enable) {
+    for (unsigned int i = _blockOffset; i < _blockOffset + _localNumberMDSimulations; ++i) {
+      if (_couplingCellServices[i] == nullptr)
+        continue;
+      _couplingCellServices[i]->setInnerMomentumImposition(enable);
+    }
+  }
+
   void computeAndStoreTemperature(double temp) {
     for (unsigned int i = _blockOffset; i < _blockOffset + _localNumberMDSimulations; ++i) {
       if (_couplingCellServices[i] == nullptr)

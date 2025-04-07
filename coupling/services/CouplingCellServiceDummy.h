@@ -75,6 +75,7 @@ public:
   void applyBoundaryForce(unsigned int t) override {}
   void plotEveryMicroscopicTimestep(unsigned int t) override {}
   void plotEveryMacroscopicTimestep(unsigned int t) override {}
+  void setInnerMomentumImposition(bool enable) override {}
 
 private:
   /** interface for macroscopic solver */
