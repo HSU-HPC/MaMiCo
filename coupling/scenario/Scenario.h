@@ -20,6 +20,7 @@ public:
   virtual void run() = 0;
   virtual void init() = 0;
   virtual void runOneCouplingCycle(int cycle) = 0;
+  virtual void equilibrateMicro() = 0;
 
   virtual coupling::solvers::AbstractCouetteSolver<3>* getSolver() = 0;
   const coupling::services::ParallelTimeIntegrationService<3>* getTimeIntegrationService() const { return _timeIntegrationService.get(); }

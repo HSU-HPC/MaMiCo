@@ -66,5 +66,9 @@ public:
                                                                                    coupling::MomentumInsertion<LinkedCell, dim>::_mdSolverInterface);
     cell.iterateCells(setMomentumMapping);
   }
+
+  void setInnerImposition(bool enable) override {
+    throw std::runtime_error(std::string("coupling::AdditiveMomentumInsertion::setInnerImposition not implemented"));
+  }
 };
 #endif // _MOLECULARDYNAMICS_COUPLING_SETGIVENVELOCITY4MOMENTUMINSERTION_H_

@@ -30,7 +30,8 @@ public:
    *  @param innermostLayer the index of the innermost cell layer */
   NieVelocityImposition(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, const unsigned int& outermostLayer,
                         const unsigned int& innermostLayer)
-      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _outermostLayer(outermostLayer), _innermostLayer(innermostLayer) {}
+      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _outermostLayer(outermostLayer), _innermostLayer(innermostLayer),
+      _enableInnerImposition(false) {}
 
   /** @brief a simple destructor */
   virtual ~NieVelocityImposition() {}
@@ -62,6 +63,10 @@ public:
     cell.iterateCells(velocityImposition);
   }
 
+  void setInnerImposition(bool enable) override {
+    _enableInnerImposition = enable;
+  }
+
 private:
   /** returns true if the local cell at index currentLocalCouplingCellIndex is
    * inside the layer of imposition cells, given by outermostLayer and
@@ -83,13 +88,14 @@ private:
     bool outer = false;
     for (unsigned int d = 0; d < dim; d++)
       outer = outer || (globalIndexUnsigned[d] < _outermostLayer || globalIndexUnsigned[d] > 1 + I09::numberCellsInDomain[d] - _outermostLayer);
-    return !inner && !outer;
+    return (_enableInnerImposition || !inner) && !outer;
   }
 
   /** @brief the index of the outermost cell layer*/
   const unsigned int _outermostLayer;
   /** @brief the index of the innermost cell layer*/
   const unsigned int _innermostLayer;
+  bool _enableInnerImposition;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_VELOCITYGRADIENTRELAXATION_H_
