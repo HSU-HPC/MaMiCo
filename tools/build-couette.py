@@ -85,7 +85,7 @@ def build_ls1(mamico_repo_dir, with_mpi=False, jobs=8, force_gcc=False):
     cmake_args = ""
     if force_gcc:
         cmake_args += f" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
-    cmake_args += f"-S{ls1_dir} -B{build_dir}"
+    cmake_args += f" -S{ls1_dir} -B{build_dir}"
     cmake_args += " -DENABLE_ADIOS2=OFF"
     cmake_args += f" -DENABLE_MPI={'ON' if with_mpi else 'OFF'}"
     cmake_args += " -DOPENMP=OFF"
