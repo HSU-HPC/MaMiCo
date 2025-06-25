@@ -85,6 +85,9 @@ jobs:
         with:
           path: build/openfoam
           key: OpenFOAM
+          fail-on-cache-miss: true
+        env:
+          SEGMENT_DOWNLOAD_TIMEOUT_MINS: 5 # Average cache transfer speed should be over 3 MB/s
       - uses: actions/download-artifact@v4
         with:
           name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.solver_md }}
