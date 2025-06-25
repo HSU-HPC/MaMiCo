@@ -38,11 +38,15 @@ jobs:
         with:
           path: build/LAMMPS
           key: LAMMPS
+          fail-on-cache-miss: true
       - name: Use cached OpenFOAM
         uses: actions/cache/restore@v4
         with:
           path: build/openfoam
           key: OpenFOAM
+          fail-on-cache-miss: true
+        env:
+          SEGMENT_DOWNLOAD_TIMEOUT_MINS: 5 # Average cache transfer speed should be over 3 MB/s
       - name: Build couette executable
         run: |
           source scl_source enable gcc-toolset-9 || :
