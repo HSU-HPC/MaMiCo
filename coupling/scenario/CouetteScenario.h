@@ -123,6 +123,28 @@ public:
     }
   }
 
+  /** called to push the micro solver into a new macroscopic state (given from outside)
+   * */
+  void equilibrateMicro() override {
+    if(_cfg.miSolverType == coupling::configurations::CouetteConfig::SYNTHETIC) return;
+
+    coupling::datastructures::FlexibleCellContainer<3> buffer;
+    for (auto pair : _couplingBuffer.macro2MDBuffer) buffer << pair;
+    for (auto pair : _couplingBuffer.md2macroBuffer) buffer << pair;
+    fillSendBuffer(_cfg.density, *_couetteSolver, buffer);
+
+    _multiMDCellService->setInnerMomentumImposition(true);
+    const int EQUI_CYCLES = 3; // 2 cycles should be sufficient (10 cycles without inner imposition on MD30), 3 cycles is even safer
+    for(int i = 0; i < EQUI_CYCLES; i++){
+      _multiMDCellService->sendFromMacro2MD(buffer);
+      _instanceHandling->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
+        _mdStepCounter, *_multiMDCellService);
+    }
+    _mdStepCounter += EQUI_CYCLES*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
+
+    _multiMDCellService->setInnerMomentumImposition(false);
+  }
+
   coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { return _couetteSolver; }
 
 protected:
@@ -289,6 +311,7 @@ protected:
     _couetteSolver =
         getCouetteSolver(_mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[0],
                          _simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
+    _MDBoundarySetupDone = false;
 
     if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD || _cfg.miSolverType == coupling::configurations::CouetteConfig::LS1) {
       // set couette solver interface in MamicoInterfaceProvider
@@ -652,17 +675,17 @@ protected:
   void twoWayCoupling(int cycle) {
     using coupling::configurations::CouetteConfig;
     if (_cfg.twoWayCoupling) {
-      if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle == _cfg.filterInitCycles) {
-        static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
-            ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
-      }
 #if (BUILD_WITH_OPENFOAM)
-      else if ((_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
+      if ((_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
         static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)->setupMDBoundary();
       }
 #endif
       if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle >= _cfg.filterInitCycles) {
+        if (!_MDBoundarySetupDone){
+          static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
+            ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+            _MDBoundarySetupDone = true;
+          }
         static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_couplingBuffer.md2macroBuffer);
       }
 #if (BUILD_WITH_OPENFOAM)
@@ -1011,6 +1034,7 @@ protected:
   /** @brief a instance of the timingValues */
   TimingValues _tv;
   coupling::MultiMDMediator<MY_LINKEDCELL, 3>* _multiMDMediator;
+  bool _MDBoundarySetupDone;
 };
 
 #endif // _COUPLING_SCENARIO_COUETTESCENARIO_H_

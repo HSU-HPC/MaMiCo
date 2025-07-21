@@ -27,6 +27,7 @@
 #include "coupling/interface/MacroscopicSolverInterface.h"
 #include "coupling/sendrecv/DataExchangeFromMD2Macro.h"
 #include "coupling/sendrecv/DataExchangeFromMacro2MD.h"
+#include "coupling/sendrecv/DataExchangeFromAllMacro2MD.h"
 #include "coupling/sendrecv/FromMD2Macro.h"
 #include "coupling/sendrecv/FromMacro2MD.h"
 #include "tarch/utils/MultiMDService.h"
@@ -71,6 +72,7 @@ public:
   virtual void perturbateVelocity() = 0;
   virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
   virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
+  virtual void setInnerMomentumImposition(bool enable) = 0;
 
   virtual void initFiltering() {
     throw std::runtime_error("CouplingCellService: Error: Called "
@@ -237,6 +239,7 @@ public:
    */
   void plotEveryMicroscopicTimestep(unsigned int t) override;
   void plotEveryMacroscopicTimestep(unsigned int t) override;
+  void setInnerMomentumImposition(bool enable) override;
 
   /**
    * Initialises the _filterPipeline member. Called from _multiMDCellService's
@@ -309,6 +312,8 @@ private:
   /** for quantity transfer between solvers */
   coupling::sendrecv::FromMacro2MD<coupling::datastructures::CouplingCell<dim>, dim> _fromMacro2MD;
   coupling::sendrecv::DataExchangeFromMacro2MD<dim> _deFromMacro2MD;
+  coupling::sendrecv::DataExchangeFromAllMacro2MD<dim> _deFromAllMacro2MD;
+  bool _enableInnerImposition;
   coupling::sendrecv::FromMD2Macro<coupling::datastructures::CouplingCell<dim>, dim> _fromMD2Macro;
   coupling::sendrecv::DataExchangeFromMD2Macro<dim> _deFromMD2Macro;
 
