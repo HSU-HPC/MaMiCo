@@ -11,13 +11,14 @@ var searchData=
   ['endprocessoutercouplingcellsbeforesendingmdsolverdata_8',['endProcessOuterCouplingCellsBeforeSendingMDSolverData',['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a4558328439064ed35ef6b53046d2e54d',1,'coupling::transferstrategies::TransferStrategy']]],
   ['equals_9',['equals',['../namespacetarch_1_1la.html#a8bbd66d3a6348329fb8449f7307e187a',1,'tarch::la']]],
   ['equilibrate_10',['equilibrate',['../classcoupling_1_1InstanceHandling.html#a7ddf0b99e9b6fe4184079172d1915c85',1,'coupling::InstanceHandling']]],
-  ['equsteps_11',['equSteps',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a21913bc621f0067726c4773417822f76',1,'coupling::configurations::CouetteConfig']]],
-  ['error_12',['Error',['../classtinyxml2_1_1XMLDocument.html#a34e6318e182e40e3cc4f4ba5d59ed9ed',1,'tinyxml2::XMLDocument']]],
-  ['error_13',['error',['../classtarch_1_1configuration_1_1ParseConfiguration_1_1XMLConfiguration.html#a2b2cda964cdff046de00457172441f1a',1,'tarch::configuration::ParseConfiguration::XMLConfiguration::error'],['../classParseConfiguration_1_1XMLConfiguration.html#a2b2cda964cdff046de00457172441f1a',1,'ParseConfiguration::XMLConfiguration::error']]],
-  ['errorbasequantity_14',['errorBaseQuantity',['../classcoupling_1_1error_1_1ErrorEstimation.html#a37f556584b08b8589f31bafa124a967a',1,'coupling::error::ErrorEstimation']]],
-  ['errorestimation_15',['ErrorEstimation',['../classcoupling_1_1error_1_1ErrorEstimation.html',1,'coupling::error::ErrorEstimation'],['../classcoupling_1_1error_1_1ErrorEstimation.html#af1fc2be391ed9d76e6b1dd854ddc09ba',1,'coupling::error::ErrorEstimation::ErrorEstimation()']]],
-  ['errorid_16',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]],
-  ['errorlinenum_17',['ErrorLineNum',['../classtinyxml2_1_1XMLDocument.html#a57400f816dbe7799ece33615ead9ab76',1,'tinyxml2::XMLDocument']]],
-  ['errorstr_18',['ErrorStr',['../classtinyxml2_1_1XMLDocument.html#ae97fff2402a0d01e0509c430b37996b3',1,'tinyxml2::XMLDocument']]],
-  ['errortype_19',['errorType',['../classcoupling_1_1error_1_1ErrorEstimation.html#a3ed1fc36c80690f4d115cecba42316ff',1,'coupling::error::ErrorEstimation']]]
+  ['equilibratemicro_11',['equilibrateMicro',['../classCouetteScenario.html#a726905b9850e1edfa701b7df9361c8ce',1,'CouetteScenario']]],
+  ['equsteps_12',['equSteps',['../structcoupling_1_1configurations_1_1CouetteConfig.html#a21913bc621f0067726c4773417822f76',1,'coupling::configurations::CouetteConfig']]],
+  ['error_13',['Error',['../classtinyxml2_1_1XMLDocument.html#a34e6318e182e40e3cc4f4ba5d59ed9ed',1,'tinyxml2::XMLDocument']]],
+  ['error_14',['error',['../classtarch_1_1configuration_1_1ParseConfiguration_1_1XMLConfiguration.html#a2b2cda964cdff046de00457172441f1a',1,'tarch::configuration::ParseConfiguration::XMLConfiguration::error'],['../classParseConfiguration_1_1XMLConfiguration.html#a2b2cda964cdff046de00457172441f1a',1,'ParseConfiguration::XMLConfiguration::error']]],
+  ['errorbasequantity_15',['errorBaseQuantity',['../classcoupling_1_1error_1_1ErrorEstimation.html#a37f556584b08b8589f31bafa124a967a',1,'coupling::error::ErrorEstimation']]],
+  ['errorestimation_16',['ErrorEstimation',['../classcoupling_1_1error_1_1ErrorEstimation.html',1,'coupling::error::ErrorEstimation'],['../classcoupling_1_1error_1_1ErrorEstimation.html#af1fc2be391ed9d76e6b1dd854ddc09ba',1,'coupling::error::ErrorEstimation::ErrorEstimation()']]],
+  ['errorid_17',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]],
+  ['errorlinenum_18',['ErrorLineNum',['../classtinyxml2_1_1XMLDocument.html#a57400f816dbe7799ece33615ead9ab76',1,'tinyxml2::XMLDocument']]],
+  ['errorstr_19',['ErrorStr',['../classtinyxml2_1_1XMLDocument.html#ae97fff2402a0d01e0509c430b37996b3',1,'tinyxml2::XMLDocument']]],
+  ['errortype_20',['errorType',['../classcoupling_1_1error_1_1ErrorEstimation.html#a3ed1fc36c80690f4d115cecba42316ff',1,'coupling::error::ErrorEstimation']]]
 ];

@@ -205,6 +205,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a1cff3d06390c5e7dd730bb0f1f077b6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa075848d445a9ad934c1fdb1afe146c1" id="r_aa075848d445a9ad934c1fdb1afe146c1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa075848d445a9ad934c1fdb1afe146c1">plotEveryMacroscopicTimestep</a> (unsigned int t) override</td></tr>
 <tr class="separator:aa075848d445a9ad934c1fdb1afe146c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac18cb1244c7e62bd09a9de68dc5ef770" id="r_ac18cb1244c7e62bd09a9de68dc5ef770"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac18cb1244c7e62bd09a9de68dc5ef770">setInnerMomentumImposition</a> (bool enable) override</td></tr>
+<tr class="separator:ac18cb1244c7e62bd09a9de68dc5ef770"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21ead3ba657c3c9bcde3b4d797346029" id="r_a21ead3ba657c3c9bcde3b4d797346029"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a21ead3ba657c3c9bcde3b4d797346029">initFiltering</a> () override</td></tr>
 <tr class="separator:a21ead3ba657c3c9bcde3b4d797346029"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5a50804665070924b5bb5a6ffd1fb55" id="r_ab5a50804665070924b5bb5a6ffd1fb55"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcoupling_1_1filtering_1_1FilterPipeline.html">coupling::filtering::FilterPipeline</a>&lt; <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">I02</a>, dim &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5a50804665070924b5bb5a6ffd1fb55">getFilterPipeline</a> () const override</td></tr>
@@ -243,6 +245,12 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:ae95393cdb9fae8eaee0fc69d196b095f" id="r_ae95393cdb9fae8eaee0fc69d196b095f"><td class="memItemLeft" align="right" valign="top"><a id="ae95393cdb9fae8eaee0fc69d196b095f" name="ae95393cdb9fae8eaee0fc69d196b095f"></a>
 <a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromMacro2MD.html">coupling::sendrecv::DataExchangeFromMacro2MD</a>&lt; dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_deFromMacro2MD</b></td></tr>
 <tr class="separator:ae95393cdb9fae8eaee0fc69d196b095f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa286090e8ba2433d781205124db51c6b" id="r_aa286090e8ba2433d781205124db51c6b"><td class="memItemLeft" align="right" valign="top"><a id="aa286090e8ba2433d781205124db51c6b" name="aa286090e8ba2433d781205124db51c6b"></a>
+<a class="el" href="classcoupling_1_1sendrecv_1_1DataExchangeFromAllMacro2MD.html">coupling::sendrecv::DataExchangeFromAllMacro2MD</a>&lt; dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_deFromAllMacro2MD</b></td></tr>
+<tr class="separator:aa286090e8ba2433d781205124db51c6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0de3f2d7e40e185bd676bee88a03757c" id="r_a0de3f2d7e40e185bd676bee88a03757c"><td class="memItemLeft" align="right" valign="top"><a id="a0de3f2d7e40e185bd676bee88a03757c" name="a0de3f2d7e40e185bd676bee88a03757c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>_enableInnerImposition</b></td></tr>
+<tr class="separator:a0de3f2d7e40e185bd676bee88a03757c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d9b585e063f5de5da091aa375506c90" id="r_a8d9b585e063f5de5da091aa375506c90"><td class="memItemLeft" align="right" valign="top"><a id="a8d9b585e063f5de5da091aa375506c90" name="a8d9b585e063f5de5da091aa375506c90"></a>
 <a class="el" href="classcoupling_1_1sendrecv_1_1FromMD2Macro.html">coupling::sendrecv::FromMD2Macro</a>&lt; <a class="el" href="classcoupling_1_1datastructures_1_1CouplingCell.html">coupling::datastructures::CouplingCell</a>&lt; dim &gt;, dim &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_fromMD2Macro</b></td></tr>
 <tr class="separator:a8d9b585e063f5de5da091aa375506c90"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1027,6 +1035,35 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
           <td class="memname">void <a class="el" href="classcoupling_1_1services_1_1CouplingCellServiceImpl.html">coupling::services::CouplingCellServiceImpl</a>&lt; LinkedCell, dim &gt;::sendFromMD2MacroPreProcess </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classcoupling_1_1services_1_1CouplingCellService.html">coupling::services::CouplingCellService&lt; dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="ac18cb1244c7e62bd09a9de68dc5ef770" name="ac18cb1244c7e62bd09a9de68dc5ef770"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac18cb1244c7e62bd09a9de68dc5ef770">&#9670;&#160;</a></span>setInnerMomentumImposition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell, unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1services_1_1CouplingCellServiceImpl.html">coupling::services::CouplingCellServiceImpl</a>&lt; LinkedCell, dim &gt;::setInnerMomentumImposition </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>enable</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>

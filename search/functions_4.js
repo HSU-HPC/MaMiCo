@@ -11,9 +11,10 @@ var searchData=
   ['endprocessoutercouplingcellsbeforesendingmdsolverdata_8',['endProcessOuterCouplingCellsBeforeSendingMDSolverData',['../classcoupling_1_1transferstrategies_1_1TransferStrategy.html#a4558328439064ed35ef6b53046d2e54d',1,'coupling::transferstrategies::TransferStrategy']]],
   ['equals_9',['equals',['../namespacetarch_1_1la.html#a8bbd66d3a6348329fb8449f7307e187a',1,'tarch::la']]],
   ['equilibrate_10',['equilibrate',['../classcoupling_1_1InstanceHandling.html#a7ddf0b99e9b6fe4184079172d1915c85',1,'coupling::InstanceHandling']]],
-  ['error_11',['Error',['../classtinyxml2_1_1XMLDocument.html#a34e6318e182e40e3cc4f4ba5d59ed9ed',1,'tinyxml2::XMLDocument']]],
-  ['errorestimation_12',['ErrorEstimation',['../classcoupling_1_1error_1_1ErrorEstimation.html#af1fc2be391ed9d76e6b1dd854ddc09ba',1,'coupling::error::ErrorEstimation']]],
-  ['errorid_13',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]],
-  ['errorlinenum_14',['ErrorLineNum',['../classtinyxml2_1_1XMLDocument.html#a57400f816dbe7799ece33615ead9ab76',1,'tinyxml2::XMLDocument']]],
-  ['errorstr_15',['ErrorStr',['../classtinyxml2_1_1XMLDocument.html#ae97fff2402a0d01e0509c430b37996b3',1,'tinyxml2::XMLDocument']]]
+  ['equilibratemicro_11',['equilibrateMicro',['../classCouetteScenario.html#a726905b9850e1edfa701b7df9361c8ce',1,'CouetteScenario']]],
+  ['error_12',['Error',['../classtinyxml2_1_1XMLDocument.html#a34e6318e182e40e3cc4f4ba5d59ed9ed',1,'tinyxml2::XMLDocument']]],
+  ['errorestimation_13',['ErrorEstimation',['../classcoupling_1_1error_1_1ErrorEstimation.html#af1fc2be391ed9d76e6b1dd854ddc09ba',1,'coupling::error::ErrorEstimation']]],
+  ['errorid_14',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]],
+  ['errorlinenum_15',['ErrorLineNum',['../classtinyxml2_1_1XMLDocument.html#a57400f816dbe7799ece33615ead9ab76',1,'tinyxml2::XMLDocument']]],
+  ['errorstr_16',['ErrorStr',['../classtinyxml2_1_1XMLDocument.html#ae97fff2402a0d01e0509c430b37996b3',1,'tinyxml2::XMLDocument']]]
 ];

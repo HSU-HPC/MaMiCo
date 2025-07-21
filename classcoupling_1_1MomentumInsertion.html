@@ -136,6 +136,8 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~MomentumInsertion
 <tr class="memitem:a64debfdc970b99b07c321134fb44af45" id="r_a64debfdc970b99b07c321134fb44af45"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64debfdc970b99b07c321134fb44af45">insertMomentum</a> (<a class="el" href="classcoupling_1_1datastructures_1_1CouplingCellWithLinkedCells.html">coupling::datastructures::CouplingCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">I02</a> idx) const =0</td></tr>
 <tr class="memdesc:a64debfdc970b99b07c321134fb44af45"><td class="mdescLeft">&#160;</td><td class="mdescRight">inserts a fraction from the momentum of the coupling cell and distributes is over all molecules.  <br /></td></tr>
 <tr class="separator:a64debfdc970b99b07c321134fb44af45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83e5b38ef0f720039612567d51ed39af" id="r_a83e5b38ef0f720039612567d51ed39af"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a83e5b38ef0f720039612567d51ed39af">setInnerImposition</a> (bool enable)=0</td></tr>
+<tr class="separator:a83e5b38ef0f720039612567d51ed39af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -261,6 +263,36 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
 </dl>
 
 <p>Implemented in <a class="el" href="classcoupling_1_1AdditiveMomentumInsertion.html#a688eac43ddea4862a1b1e84bfe793d67">coupling::AdditiveMomentumInsertion&lt; LinkedCell, dim &gt;</a>, <a class="el" href="classcoupling_1_1NieVelocityImposition.html#a4b2082d160067a55a595b598089dbe7c">coupling::NieVelocityImposition&lt; LinkedCell, dim &gt;</a>, <a class="el" href="classcoupling_1_1NoMomentumInsertion.html#a6987a8adf9b1053bdc7d1c3d347a43f5">coupling::NoMomentumInsertion&lt; LinkedCell, dim &gt;</a>, <a class="el" href="classcoupling_1_1SetGivenVelocity4MomentumInsertion.html#ab548b0d5350819cec67a08dabb1311a1">coupling::SetGivenVelocity4MomentumInsertion&lt; LinkedCell, dim &gt;</a>, <a class="el" href="classcoupling_1_1VelocityGradientRelaxation.html#a07c6c919ddfcb74f9863f24882e200c0">coupling::VelocityGradientRelaxation&lt; LinkedCell, dim &gt;</a>, and <a class="el" href="classcoupling_1_1VelocityGradientRelaxationTopOnly.html#ae82b847ed7635f2345294def35831a98">coupling::VelocityGradientRelaxationTopOnly&lt; LinkedCell, dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a83e5b38ef0f720039612567d51ed39af" name="a83e5b38ef0f720039612567d51ed39af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a83e5b38ef0f720039612567d51ed39af">&#9670;&#160;</a></span>setInnerImposition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell, unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="classcoupling_1_1MomentumInsertion.html">coupling::MomentumInsertion</a>&lt; LinkedCell, dim &gt;::setInnerImposition </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>enable</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Used to activate / deactivate momentum insertion also on inner cell layers </p>
+
+<p>Implemented in <a class="el" href="classcoupling_1_1AdditiveMomentumInsertion.html#ad3a2af7e8f251adccace5308409e6d17">coupling::AdditiveMomentumInsertion&lt; LinkedCell, dim &gt;</a>, <a class="el" href="classcoupling_1_1NieVelocityImposition.html#aaeb3700358314a6eabc90030b8005d87">coupling::NieVelocityImposition&lt; LinkedCell, dim &gt;</a>, <a class="el" href="classcoupling_1_1NoMomentumInsertion.html#a5644cdf4ede860f2291cd9e170c8195a">coupling::NoMomentumInsertion&lt; LinkedCell, dim &gt;</a>, <a class="el" href="classcoupling_1_1SetGivenVelocity4MomentumInsertion.html#a3f88c0d332c9e79effd3508b0898b5e1">coupling::SetGivenVelocity4MomentumInsertion&lt; LinkedCell, dim &gt;</a>, and <a class="el" href="classcoupling_1_1VelocityGradientRelaxation.html#ac37301644a314adfa65fa1aa45bb0715">coupling::VelocityGradientRelaxation&lt; LinkedCell, dim &gt;</a>.</p>
 
 </div>
 </div>

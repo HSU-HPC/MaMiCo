@@ -32,16 +32,16 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">2</td>
-            <td class="headerCovTableEntry">5</td>
-            <td class="headerCovTableEntryLo">40.0 %</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryLo">33.3 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2025-06-25 11:26:37</td>
+            <td class="headerValue">2025-07-21 09:50:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">5</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
@@ -98,9 +98,11 @@
 <a name="36"><span class="lineNum">      36 </span>            :   /** @brief a dummy function, which doesn't do anything</a>
 <a name="37"><span class="lineNum">      37 </span>            :    * @param cell the coupling cell to not change */</a>
 <a name="38"><span class="lineNum">      38 </span><span class="lineNoCov">          0 :   void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell, I02 idx) const override {}</span></a>
-<a name="39"><span class="lineNum">      39 </span>            : };</a>
-<a name="40"><span class="lineNum">      40 </span>            : </a>
-<a name="41"><span class="lineNum">      41 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_NOMOMENTUMINSERTION_H_</a>
+<a name="39"><span class="lineNum">      39 </span>            : </a>
+<a name="40"><span class="lineNum">      40 </span><span class="lineNoCov">          0 :   void setInnerImposition(bool enable) override {}</span></a>
+<a name="41"><span class="lineNum">      41 </span>            : };</a>
+<a name="42"><span class="lineNum">      42 </span>            : </a>
+<a name="43"><span class="lineNum">      43 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_NOMOMENTUMINSERTION_H_</a>
 </pre>
       </td>
     </tr>

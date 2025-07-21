@@ -136,6 +136,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a688eac43ddea4862a1b1e84bfe793d67" id="r_a688eac43ddea4862a1b1e84bfe793d67"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a688eac43ddea4862a1b1e84bfe793d67">insertMomentum</a> (<a class="el" href="classcoupling_1_1datastructures_1_1CouplingCellWithLinkedCells.html">coupling::datastructures::CouplingCellWithLinkedCells</a>&lt; LinkedCell, dim &gt; &amp;cell, <a class="el" href="classcoupling_1_1indexing_1_1CellIndex.html">I02</a> idx) const override</td></tr>
 <tr class="memdesc:a688eac43ddea4862a1b1e84bfe793d67"><td class="mdescLeft">&#160;</td><td class="mdescRight">inserts momentum to the cell  <br /></td></tr>
 <tr class="separator:a688eac43ddea4862a1b1e84bfe793d67"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3a2af7e8f251adccace5308409e6d17" id="r_ad3a2af7e8f251adccace5308409e6d17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad3a2af7e8f251adccace5308409e6d17">setInnerImposition</a> (bool enable) override</td></tr>
+<tr class="separator:ad3a2af7e8f251adccace5308409e6d17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcoupling_1_1MomentumInsertion"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classcoupling_1_1MomentumInsertion')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcoupling_1_1MomentumInsertion.html">coupling::MomentumInsertion&lt; LinkedCell, dim &gt;</a></td></tr>
 <tr class="memitem:af10b00331787d64c1a0fdba158d8abec inherit pub_methods_classcoupling_1_1MomentumInsertion" id="r_af10b00331787d64c1a0fdba158d8abec"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcoupling_1_1MomentumInsertion.html#af10b00331787d64c1a0fdba158d8abec">MomentumInsertion</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface)</td></tr>
 <tr class="memdesc:af10b00331787d64c1a0fdba158d8abec inherit pub_methods_classcoupling_1_1MomentumInsertion"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
@@ -280,6 +282,36 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
 </dl>
 
 <p>Implements <a class="el" href="classcoupling_1_1MomentumInsertion.html#a64debfdc970b99b07c321134fb44af45">coupling::MomentumInsertion&lt; LinkedCell, dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="ad3a2af7e8f251adccace5308409e6d17" name="ad3a2af7e8f251adccace5308409e6d17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3a2af7e8f251adccace5308409e6d17">&#9670;&#160;</a></span>setInnerImposition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell, unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classcoupling_1_1AdditiveMomentumInsertion.html">coupling::AdditiveMomentumInsertion</a>&lt; LinkedCell, dim &gt;::setInnerImposition </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>enable</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Used to activate / deactivate momentum insertion also on inner cell layers </p>
+
+<p>Implements <a class="el" href="classcoupling_1_1MomentumInsertion.html#a83e5b38ef0f720039612567d51ed39af">coupling::MomentumInsertion&lt; LinkedCell, dim &gt;</a>.</p>
 
 </div>
 </div>

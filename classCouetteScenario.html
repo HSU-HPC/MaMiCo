@@ -202,6 +202,8 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~CouetteScenario</
 <tr class="memitem:ac8ef1d8c08241d9b6cf10545ad1173c3" id="r_ac8ef1d8c08241d9b6cf10545ad1173c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac8ef1d8c08241d9b6cf10545ad1173c3">runOneCouplingCycle</a> (int cycle) override</td></tr>
 <tr class="memdesc:ac8ef1d8c08241d9b6cf10545ad1173c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">combines the functioniality necessary for a cycle of the coupled simulation  <br /></td></tr>
 <tr class="separator:ac8ef1d8c08241d9b6cf10545ad1173c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a726905b9850e1edfa701b7df9361c8ce" id="r_a726905b9850e1edfa701b7df9361c8ce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a726905b9850e1edfa701b7df9361c8ce">equilibrateMicro</a> () override</td></tr>
+<tr class="separator:a726905b9850e1edfa701b7df9361c8ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac09977dce99668eb4b2cc246271485b2" id="r_ac09977dce99668eb4b2cc246271485b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.html">coupling::solvers::AbstractCouetteSolver</a>&lt; 3 &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac09977dce99668eb4b2cc246271485b2">getSolver</a> () override</td></tr>
 <tr class="separator:ac09977dce99668eb4b2cc246271485b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classScenario"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classScenario')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classScenario.html">Scenario</a></td></tr>
@@ -328,6 +330,9 @@ std::vector&lt; <a class="el" href="classcoupling_1_1interface_1_1MDSolverInterf
 <tr class="memitem:a912e47bc6859cae8d8535f6fd91cf1ab" id="r_a912e47bc6859cae8d8535f6fd91cf1ab"><td class="memItemLeft" align="right" valign="top"><a id="a912e47bc6859cae8d8535f6fd91cf1ab" name="a912e47bc6859cae8d8535f6fd91cf1ab"></a>
 <a class="el" href="classcoupling_1_1MultiMDMediator.html">coupling::MultiMDMediator</a>&lt; MY_LINKEDCELL, 3 &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>_multiMDMediator</b></td></tr>
 <tr class="separator:a912e47bc6859cae8d8535f6fd91cf1ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1dc53194ed67e7e739aa4d5f6b947c17" id="r_a1dc53194ed67e7e739aa4d5f6b947c17"><td class="memItemLeft" align="right" valign="top"><a id="a1dc53194ed67e7e739aa4d5f6b947c17" name="a1dc53194ed67e7e739aa4d5f6b947c17"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>_MDBoundarySetupDone</b></td></tr>
+<tr class="separator:a1dc53194ed67e7e739aa4d5f6b947c17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classScenario"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_attribs_classScenario')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classScenario.html">Scenario</a></td></tr>
 <tr class="memitem:af71eb63183673f5e74df857054f26096 inherit pro_attribs_classScenario" id="r_af71eb63183673f5e74df857054f26096"><td class="memItemLeft" align="right" valign="top">
 std::unique_ptr&lt; <a class="el" href="classcoupling_1_1services_1_1ParallelTimeIntegrationService.html">coupling::services::ParallelTimeIntegrationService</a>&lt; 3 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_timeIntegrationService</b></td></tr>
@@ -487,6 +492,34 @@ std::unique_ptr&lt; <a class="el" href="classcoupling_1_1services_1_1ParallelTim
 
 <p>used to compute signal-to-noise ratio, stores values in _sum_noise and _sum_signal </p>
 <p>todo@ use more cells </p>
+
+</div>
+</div>
+<a id="a726905b9850e1edfa701b7df9361c8ce" name="a726905b9850e1edfa701b7df9361c8ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a726905b9850e1edfa701b7df9361c8ce">&#9670;&#160;</a></span>equilibrateMicro()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CouetteScenario::equilibrateMicro </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>called to push the micro solver into a new macroscopic state (given from outside) </p>
+
+<p>Implements <a class="el" href="classScenario.html">Scenario</a>.</p>
 
 </div>
 </div>
