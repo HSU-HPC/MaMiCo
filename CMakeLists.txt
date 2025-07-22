@@ -713,6 +713,7 @@ set(CLANGFORMAT_SOURCES
   "test/integration/TestLBCouetteSolver.h"
   "test/integration/benchmarks.cpp"
   "test/integration/CellIdxIterBench.h"
+  "test/integration/SimpleMDBench.h"
   "test/integration/main_espresso.cpp"
   "test/integration/TestEspresso.h"
   "test/integration/TestMarDyn.h"

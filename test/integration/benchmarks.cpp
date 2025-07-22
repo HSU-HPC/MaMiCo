@@ -4,6 +4,7 @@
 #include <mpi.h>
 #endif
 #include "test/integration/CellIdxIterBench.h"
+#include "test/integration/SimpleMDBench.h"
 
 void runTest(Test* test) {
   if (test == NULL) {
@@ -21,6 +22,7 @@ int main(int argc, char* argv[]) {
 
   // run tests
   runTest(new CellIdxIterBench());
+  runTest(new SimpleMDBench());
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Finalize();
@@ -29,7 +31,7 @@ int main(int argc, char* argv[]) {
   return 0;
 };
 
-/* Sampe Output:
+/* Sample CellIdxIterBench Output:
 
 Run CellIdxIterBench...
 Number cells in test domain: 74088
