@@ -19,4 +19,4 @@ RUN apt install -y lcov
 RUN pip install pandas beautifulsoup4
 
 # Dependency for OpenMP / clang
-RUN apt install libomp-dev
+RUN apt install -y libomp-dev
