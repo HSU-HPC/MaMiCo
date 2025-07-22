@@ -289,8 +289,7 @@ target_compile_definitions(simplemd_interface INTERFACE ${MDDim})
 target_compile_options(simplemd_interface INTERFACE -fpic)
 
 target_compile_definitions(simplemd_interface INTERFACE KOKKOS_TARGET_${KOKKOS_TARGET})
-# External Kokkos may have been compiled with OpenMP support (which then requires OpenMP)
-target_compile_options(simplemd_interface INTERFACE -fopenmp)
+target_compile_options(simplemd_interface INTERFACE -fopenmp) # Always build MaMiCo/Kokkos with OpenMP support
 
 if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
   target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
@@ -404,6 +403,7 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 # MaMiCo interface
 #
 add_library(mamico INTERFACE)
+target_link_libraries(mamico INTERFACE Kokkos::kokkos)
 if(BUILD_WITH_MPI)
   option(USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
   if(USE_COLLECTIVE_MPI)
@@ -419,8 +419,7 @@ if(BUILD_WITH_ADIOS2)
 endif()
 target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors)
-# External Kokkos may have been compiled with OpenMP support (which then requires OpenMP)
-target_compile_options(mamico INTERFACE -fopenmp)
+target_compile_options(mamico INTERFACE -fopenmp) # Always build MaMiCo/Kokkos with OpenMP support
 if(BUILD_WITH_MPI)
   target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK)
   target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
