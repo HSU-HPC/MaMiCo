@@ -28,8 +28,14 @@ int main(int argc, char* argv[]) {
   MPI_Init(&argc, &argv);
 #endif
 
+  Kokkos::initialize(argc, argv);
+  std::cout << "Kokkos using execution space \"" << MainExecSpace::name() << "\" with memory space \"" << MainExecSpace::memory_space::name() << "\""
+            << std::endl;
+
   // run scenarios
   runScenario(new CouetteScenario());
+
+  Kokkos::finalize();
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Finalize();
