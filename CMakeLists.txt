@@ -879,6 +879,7 @@ foreach(clangformat_source ${CLANGFORMAT_SOURCES})
 endforeach()
 
 # Require specific clang-format version
+set(CLANGFORMAT_VERSION "<clang-format not installed>")
 execute_process(
   COMMAND clang-format --version
   OUTPUT_VARIABLE CLANGFORMAT_VERSION_OUTPUT

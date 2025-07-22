@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
   Kokkos::initialize(argc, argv);
   std::cout << "Kokkos using execution space \"" << MainExecSpace::name() << "\" with memory space \"" << MainExecSpace::memory_space::name() << "\""
             << std::endl;
+  MainExecSpace().print_configuration(std::cout);
 
   if (argc != 2) {
     std::cout << "Wrong number of arguments! Please call program by ./moleculardynamics inputfile.xml!" << std::endl;
