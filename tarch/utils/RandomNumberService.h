@@ -7,8 +7,6 @@
 
 #include "tarch/TarchDefinitions.h"
 #include "tarch/la/Vector.h"
-#include <cmath>
-#include <cstdlib>
 #include <iostream>
 
 namespace tarch {
