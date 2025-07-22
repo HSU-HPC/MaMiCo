@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
   }
 
   simulation.shutdownServices();
-  
+
   Kokkos::finalize();
 // shutdown parallel environment
 #if (MD_PARALLEL == MD_YES)
