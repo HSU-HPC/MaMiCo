@@ -70,10 +70,10 @@ public:
    *                   1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes
    *  @param numThreads number of OpenMP threads */
   LBCouetteSolver(const double channelheight, tarch::la::Vector<3, double> wallVelocity, const double kinVisc, const double dx, const double dt,
-                  const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes,
+                  const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes, double md_density,
                   const unsigned int numThreads = 1, const Scenario* scen = nullptr)
       : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes, scen), _mode(Mode::coupling), _dt_pint(dt),
-        _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)), _wallVelocity((dt / dx) * wallVelocity) {
+        _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)), _wallVelocity((dt / dx) * wallVelocity), _md_density(md_density) {
     // return if required
     if (skipRank()) {
       return;
@@ -231,7 +231,11 @@ public:
       // cell. This interpolation is valid for FLUID-MD_BOUNDARY neighbouring
       // relations only. determine local velocity received from MaMiCo and
       // convert it to LB units; store the velocity in _vel
-      tarch::la::Vector<3, double> localVel((1.0 / couplingCell->getMacroscopicMass()) * (_dt / _dx) * couplingCell->getMacroscopicMomentum());
+      // massFactor is used to ensure conservation of energy
+      double massMD = couplingCell->getMacroscopicMass() / (_md_density * _dx * _dx * _dx);
+      double massFactor = sqrt(massMD / _density[index]);
+      tarch::la::Vector<3, double> velMD((1.0 / couplingCell->getMacroscopicMass()) * (_dt / _dx) * couplingCell->getMacroscopicMomentum());
+      tarch::la::Vector<3, double> localVel(massFactor * velMD);
       for (unsigned int d = 0; d < 3; d++) {
         _vel[3 * index + d] = localVel[d];
       }
@@ -375,7 +379,7 @@ public:
 #endif
 
     auto res = std::make_unique<LBCouetteSolver>(_channelheight, _wallVelocity * _dx / _dt, _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep,
-                                                 _filestem + std::string("_supervising"), _processes, numThreads, _scen);
+                                                 _filestem + std::string("_supervising"), _processes, _md_density, numThreads, _scen);
 
     res->_mode = Mode::supervising;
     res->_dt_pint = _dt * num_cycles;
@@ -730,6 +734,7 @@ private:
   const double _omega;
   /** @brief velocity of moving wall of Couette flow */
   tarch::la::Vector<3, double> _wallVelocity;
+  double _md_density;
   int _pdfsize{0};
   /** @brief partical distribution function field */
   double* _pdf1{NULL};
