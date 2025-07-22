@@ -881,15 +881,18 @@ foreach(clangformat_source ${CLANGFORMAT_SOURCES})
 endforeach()
 
 # Require specific clang-format version
-set(CLANGFORMAT_VERSION "<clang-format not installed>")
 execute_process(
   COMMAND clang-format --version
   OUTPUT_VARIABLE CLANGFORMAT_VERSION_OUTPUT
   ERROR_VARIABLE CLANGFORMAT_VERSION_ERROR
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" CLANGFORMAT_VERSION ${CLANGFORMAT_VERSION_OUTPUT})
-message(STATUS "Found clang-format version: ${CLANGFORMAT_VERSION}")
+if(CLANGFORMAT_VERSION_OUTPUT STREQUAL "")
+  set(CLANGFORMAT_VERSION "<not installed>")
+else()
+  string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" CLANGFORMAT_VERSION ${CLANGFORMAT_VERSION_OUTPUT})
+  message(STATUS "Found clang-format version: ${CLANGFORMAT_VERSION}")
+endif()
 if(NOT CLANGFORMAT_VERSION MATCHES "^18\\.1\\.8")
   message(WARNING "clang-format version must be 18.1.8 but found ${CLANGFORMAT_VERSION} (Target \"clangformat\" will not be generated)")
 else()
