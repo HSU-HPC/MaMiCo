@@ -83,7 +83,7 @@ public:
                          Should be redesigned via meta class.*/
   }
 
-  virtual ~FilterInterface(){};
+  virtual ~FilterInterface() {};
 
   /*
    * Applies the filter to all cells that are within the filter's sequence's

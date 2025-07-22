@@ -741,9 +741,9 @@ set(CLANGFORMAT_SOURCES
   "coupling/solvers/FDCouetteSolver.h"
   "coupling/solvers/IcoFoamInterface.h"
   "coupling/solvers/LBCouetteSolver.h"
-  "coupling/solvers/IcoFoamBufferSetup.h"
   "coupling/solvers/CouetteSolver.h"
   "coupling/solvers/CouetteSolverInterface.h"
+  "coupling/solvers/LBCouetteSolverState.cpp"
   "coupling/solvers/LBCouetteSolverInterface.h"
   "coupling/solvers/NumericalSolver.h"
   "test/integration/TestEspressoMDMolecule.h"
@@ -878,7 +878,7 @@ foreach(clangformat_source ${CLANGFORMAT_SOURCES})
   list(APPEND CLANGFORMAT_SOURCES_ABS ${clangformat_source})
 endforeach()
 
-# Require clang-format version 18.1.x
+# Require specific clang-format version
 execute_process(
   COMMAND clang-format --version
   OUTPUT_VARIABLE CLANGFORMAT_VERSION_OUTPUT
@@ -887,8 +887,8 @@ execute_process(
 )
 string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" CLANGFORMAT_VERSION ${CLANGFORMAT_VERSION_OUTPUT})
 message(STATUS "Found clang-format version: ${CLANGFORMAT_VERSION}")
-if(NOT CLANGFORMAT_VERSION MATCHES "^18\\.1\\.")
-  message(WARNING "clang-format version must be 18.1.x but found ${CLANGFORMAT_VERSION} (Target \"clangformat\" will not be generated)")
+if(NOT CLANGFORMAT_VERSION MATCHES "^18\\.1\\.8")
+  message(WARNING "clang-format version must be 18.1.8 but found ${CLANGFORMAT_VERSION} (Target \"clangformat\" will not be generated)")
 else()
   add_custom_target(
     clangformat
