@@ -86,7 +86,7 @@ public:
     CPPUNIT_ASSERT(inputFile.is_open());
     std::cout << "restart_checkpoint_0_0.checkpoint read!" << std::endl;
 
-    _instanceHandling->~InstanceHandling();
+    _instanceHandling->shutdown();
     CPPUNIT_ASSERT(!_instanceHandling->getSimpleMD().size());
     CPPUNIT_ASSERT(!_instanceHandling->getMDSolverInterface().size());
   }
