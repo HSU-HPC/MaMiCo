@@ -17,3 +17,6 @@ RUN apt install -y lcov
 
 # Python dependencies for reporting coverage in PR
 RUN pip install pandas beautifulsoup4
+
+# Dependency for OpenMP / clang
+RUN apt install libomp-dev
