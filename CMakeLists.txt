@@ -147,6 +147,8 @@ else()
         mark_as_advanced(${_var})
       endif()
     endforeach()
+    target_compile_options(kokkoscore PUBLIC -fPIC)
+    target_link_options(kokkoscore PUBLIC -fPIC)
 endif()
 
 if(NOT "${MD_SIM}" STREQUAL "LS1_MARDYN" AND BUILD_WITH_ADIOS2) #ls1 can come bundled with own adios2, hence finding adios2 later for ls1
