@@ -827,12 +827,26 @@ foreach(clangformat_source ${CLANGFORMAT_SOURCES})
   get_filename_component(clangformat_source ${clangformat_source} ABSOLUTE)
   list(APPEND CLANGFORMAT_SOURCES_ABS ${clangformat_source})
 endforeach()
-add_custom_target(
-  clangformat
-  COMMAND /usr/bin/env clang-format --verbose
-  -i
-  ${CLANGFORMAT_SOURCES_ABS}
+
+# Require clang-format version 18.1.x
+execute_process(
+  COMMAND clang-format --version
+  OUTPUT_VARIABLE CLANGFORMAT_VERSION_OUTPUT
+  ERROR_VARIABLE CLANGFORMAT_VERSION_ERROR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" CLANGFORMAT_VERSION ${CLANGFORMAT_VERSION_OUTPUT})
+message(STATUS "Found clang-format version: ${CLANGFORMAT_VERSION}")
+if(NOT CLANGFORMAT_VERSION MATCHES "^18\\.1\\.")
+  message(WARNING "clang-format version must be 18.1.x but found ${CLANGFORMAT_VERSION} (Target \"clangformat\" will not be generated)")
+else()
+  add_custom_target(
+    clangformat
+    COMMAND /usr/bin/env clang-format --verbose
+    -i
+    ${CLANGFORMAT_SOURCES_ABS}
+  )
+endif()
 
 #
 # compiletest target
