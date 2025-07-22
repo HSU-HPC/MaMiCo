@@ -38,7 +38,7 @@ class TestEspresso : public Test {
 public:
   TestEspresso(std::string name, int argc, char** argv) : Test(name), _argc(argc), _argv(argv) {}
 
-  virtual ~TestEspresso() {};
+  virtual ~TestEspresso(){};
 
   virtual void run() {
     // Load Espresso Test Configuration

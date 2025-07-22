@@ -31,7 +31,7 @@ public:
   NieVelocityImposition(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, const unsigned int& outermostLayer,
                         const unsigned int& innermostLayer)
       : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _outermostLayer(outermostLayer), _innermostLayer(innermostLayer),
-      _enableInnerImposition(false) {}
+        _enableInnerImposition(false) {}
 
   /** @brief a simple destructor */
   virtual ~NieVelocityImposition() {}
@@ -63,9 +63,7 @@ public:
     cell.iterateCells(velocityImposition);
   }
 
-  void setInnerImposition(bool enable) override {
-    _enableInnerImposition = enable;
-  }
+  void setInnerImposition(bool enable) override { _enableInnerImposition = enable; }
 
 private:
   /** returns true if the local cell at index currentLocalCouplingCellIndex is

@@ -98,7 +98,8 @@ template <unsigned int dim, coupling::indexing::IndexTrait... scope> void coupli
       _sigsq *= 1.05;
     else if (rel > _sigsq_rel * 1.1)
       _sigsq *= 0.95;
-    if(_cycleCounter%20 == 0) std::cout << "NLM info: _sigsq is " << _sigsq << std::endl;
+    if (_cycleCounter % 20 == 0)
+      std::cout << "NLM info: _sigsq is " << _sigsq << std::endl;
   }
   if (_hsq_rel >= 0) { // negative value means adaptivity disabled
     double rel = (double)(cnt_hsq) / cnt_total;
@@ -106,7 +107,8 @@ template <unsigned int dim, coupling::indexing::IndexTrait... scope> void coupli
       _hsq *= 1.05;
     else if (rel > _hsq_rel * 1.1)
       _hsq *= 0.95;
-    if(_cycleCounter%20 == 0) std::cout << "NLM info: _hsq is " << _hsq << std::endl;
+    if (_cycleCounter % 20 == 0)
+      std::cout << "NLM info: _hsq is " << _hsq << std::endl;
   }
 }
 
