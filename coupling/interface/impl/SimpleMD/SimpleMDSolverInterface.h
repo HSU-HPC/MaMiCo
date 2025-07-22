@@ -100,9 +100,8 @@ private:
   }
 
 public:
-  SimpleMDSolverInterface(simplemd::BoundaryTreatment& boundaryTreatment,
-                          simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
-                          simplemd::services::LinkedCellService& linkedCellService,
+  SimpleMDSolverInterface(simplemd::BoundaryTreatment& boundaryTreatment, simplemd::services::ParallelTopologyService& parallelTopologyService,
+                          simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService,
                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
                           const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& localBoundaryInformation, const double& dt)
       : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService),
