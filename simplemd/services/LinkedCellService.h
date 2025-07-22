@@ -12,6 +12,8 @@
 #include "tarch/la/Vector.h"
 #include <iostream>
 
+#include <Kokkos_Core.hpp>
+
 namespace simplemd {
 namespace services {
 class LinkedCellService;
@@ -175,8 +177,6 @@ void simplemd::services::LinkedCellService::iterateCells(A& a, const tarch::la::
 
   // start iteration();
   a.beginCellIteration();
-
-#if (MD_OPENMP == MD_YES)
   if (useOpenMP) {
     const tarch::la::Vector<MD_DIM, unsigned int> size(simplemd::services::LinkedCellService::getInstance().getLocalNumberOfCells() +
                                                        2 * simplemd::services::LinkedCellService::getInstance().getLocalIndexOfFirstCell());
@@ -188,9 +188,8 @@ void simplemd::services::LinkedCellService::iterateCells(A& a, const tarch::la::
                        * cellRange(2)
 #endif
         ;
-// loop over domain, but with a single loop
-#pragma omp parallel for
-    for (int i = 0; i < length; i++) {
+    // loop over domain, but with a single loop
+    Kokkos::parallel_for(length, [=](const unsigned int i)) {
 // compute index of the current cell
 #if (MD_DIM > 1)
       int helpIndex1 = i;
@@ -226,8 +225,6 @@ void simplemd::services::LinkedCellService::iterateCells(A& a, const tarch::la::
       a.handleCell(_cells[index], index);
     }
   } else {
-#endif
-
     tarch::la::Vector<MD_DIM, unsigned int> coords(0);
 // loop over domain
 #if (MD_DIM > 2)
@@ -249,10 +246,7 @@ void simplemd::services::LinkedCellService::iterateCells(A& a, const tarch::la::
 #if (MD_DIM > 2)
     }
 #endif
-
-#if (MD_OPENMP == MD_YES)
   }
-#endif
 
   // end iteration();
   a.endCellIteration();
@@ -324,8 +318,6 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
 
   // start iteration();
   a.beginCellIteration();
-
-#if (MD_OPENMP == MD_YES)
   if (useOpenMP) {
     const tarch::la::Vector<MD_DIM, unsigned int> size(simplemd::services::LinkedCellService::getInstance().getLocalNumberOfCells() +
                                                        2 * simplemd::services::LinkedCellService::getInstance().getLocalIndexOfFirstCell());
@@ -361,9 +353,8 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
 #endif
               ;
 
-// parallelise loop for all cells that are to be traversed in this way
-#pragma omp parallel for
-          for (int j = 0; j < length; j++) {
+          // parallelise loop for all cells that are to be traversed in this way
+          Kokkos::parallel_for(length, [=](const unsigned int j)) {
             // compute index of the current cell
             unsigned int index = 0;
 #if (MD_DIM > 1)
@@ -417,7 +408,6 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
 #endif
     // now: no open mp
   } else {
-#endif
 
     tarch::la::Vector<MD_DIM, unsigned int> coords(0);
     unsigned int coordsCell1Buffer(0);
@@ -456,10 +446,7 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
 #if (MD_DIM > 2)
     }
 #endif
-
-#if (MD_OPENMP == MD_YES)
   }
-#endif
 
   // end iteration();
   a.endCellIteration();

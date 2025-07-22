@@ -19,9 +19,8 @@
 #include <list>
 #include <sstream>
 #include <vector>
-#if (MD_OPENMP == MD_YES)
-#include <omp.h>
-#endif
+
+#include <Kokkos_Core.hpp>
 
 namespace simplemd {
 namespace services {
@@ -135,8 +134,7 @@ template <class A> void simplemd::services::MoleculeService::iterateMolecules(A&
   // start iteration();
   a.beginMoleculeIteration();
 
-// open MP
-#if (MD_OPENMP == MD_YES)
+  // open MP
   if (useOpenMP) {
 
     // sort empty positions list
@@ -148,12 +146,11 @@ template <class A> void simplemd::services::MoleculeService::iterateMolecules(A&
       // loop over all intervals, starting at a certain point and ranging up to a deleted position
       for (unsigned int i = 0; i < freeMoleculePositions; i++) {
         const unsigned int end = (*myIt);
-#pragma omp parallel for
-        for (unsigned int j = start; j < end; j++) {
+        Kokkos::parallel_for(end - start, [=](const unsigned int j)) {
 #if (MD_DEBUG == MD_YES)
-          std::cout << "Handle molecule " << j << std::endl;
+          std::cout << "Handle molecule " << (j + start) << std::endl;
 #endif
-          a.handleMolecule(_molecules[j / blockSize][j % blockSize]);
+          a.handleMolecule(_molecules[(j + start) / blockSize][j % blockSize]);
         }
 
         // go to next possible start position (one position after *myIt) and increment myIt
@@ -163,17 +160,15 @@ template <class A> void simplemd::services::MoleculeService::iterateMolecules(A&
         myIt++;
       }
 
-// do final loop (from last deleted molecule to last existing molecule)
-#pragma omp parallel for
-      for (unsigned int i = start; i < freeMoleculePositionsAndNumberMolecules; i++) {
+      // do final loop (from last deleted molecule to last existing molecule)
+      Kokkos::parallel_for((freeMoleculePositionsAndNumberMolecules - start), [=](const unsigned int i)) {
 #if (MD_DEBUG == MD_YES)
-        std::cout << "Handle molecule " << i << std::endl;
+        std::cout << "Handle molecule " << (i + start) << std::endl;
 #endif
-        a.handleMolecule(_molecules[i / blockSize][i % blockSize]);
+        a.handleMolecule(_molecules[(i + start) / blockSize][i % blockSize]);
       }
     } else {
-#pragma omp parallel for
-      for (unsigned int i = 0; i < numberMolecules; i++) {
+      Kokkos::parallel_for(numberMolecules, [=](const unsigned int i)) {
 #if (MD_DEBUG == MD_YES)
         std::cout << "Handle molecule " << i << std::endl;
 #endif
@@ -183,8 +178,6 @@ template <class A> void simplemd::services::MoleculeService::iterateMolecules(A&
 
     // no Open MP
   } else {
-#endif
-
     // sort empty positions list
     if (!_freeMoleculePositions.empty()) {
       _freeMoleculePositions.sort();
@@ -223,10 +216,7 @@ template <class A> void simplemd::services::MoleculeService::iterateMolecules(A&
         a.handleMolecule(_molecules[i / blockSize][i % blockSize]);
       }
     }
-
-#if (MD_OPENMP == MD_YES)
   }
-#endif
 
   // end iteration();
   a.endMoleculeIteration();
