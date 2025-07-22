@@ -405,6 +405,7 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 # MaMiCo interface
 #
 add_library(mamico INTERFACE)
+target_compile_definitions(mamico INTERFACE KOKKOS_TARGET_${KOKKOS_TARGET})
 target_link_libraries(mamico INTERFACE Kokkos::kokkos)
 if(BUILD_WITH_MPI)
   option(USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
