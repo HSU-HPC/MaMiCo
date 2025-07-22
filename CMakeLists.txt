@@ -711,7 +711,8 @@ set(CLANGFORMAT_SOURCES
   "test/integration/TestLammps.h"
   "test/integration/TestLammpsInitialVelocity.h"
   "test/integration/TestLBCouetteSolver.h"
-  "test/integration/cell_idx_iter_benchmark.cpp"
+  "test/integration/benchmarks.cpp"
+  "test/integration/CellIdxIterBench.h"
   "test/integration/main_espresso.cpp"
   "test/integration/TestEspresso.h"
   "test/integration/TestMarDyn.h"
@@ -864,7 +865,7 @@ add_custom_target(
 #
 set(BENCHMARKS_SOURCES
   ${MAMICO_SOURCES}
-  "test/integration/cell_idx_iter_benchmark.cpp"
+  "test/integration/benchmarks.cpp"
 )
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
 set_target_properties(benchmarks PROPERTIES CXX_STANDARD 17)
