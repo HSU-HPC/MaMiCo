@@ -19,6 +19,7 @@ public:
   virtual void run() {
     init();
     bench();
+    check_result();
     shutdown();
   }
 
@@ -83,6 +84,14 @@ private:
   void shutdown() {}
 
   void bench() {}
+
+  void check_result() {
+    #if defined (__FAST_MATH__)
+    std::cout << "WARN SimpleMDBench: Result validity check FAILED: -ffast-math is active!" << std::endl;
+    return;
+    #endif
+
+  }
 
   int _rank;
   simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;

@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
 
   // run tests
   runTest(new CellIdxIterBench());
+  std::cout << std::endl << "==================== ==================== ====================" << std::endl << std::endl;
   runTest(new SimpleMDBench());
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
