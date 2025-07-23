@@ -39,6 +39,8 @@ public:
 #else
     unsigned long long checksum() { return sum; }
 
+    static const bool IsParallel = false;
+
   private:
     void process(const double& data) { sum ^= *((unsigned long long*)&data); }
     unsigned long long sum = 0;

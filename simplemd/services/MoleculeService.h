@@ -83,7 +83,7 @@ public:
    */
   template <class A> void iterateMolecules(A& a, const bool& useOpenMP);
 
-    /** can be used to apply a molecule-mapping which is iterated over all molecules of this process
+  /** can be used to apply a molecule-mapping which is iterated over all molecules of this process
    *  (e.g. time integration)
    */
   template <class A> void iterateMoleculesSerial(A& a, const bool& useOpenMP);
@@ -92,7 +92,6 @@ public:
    *  (e.g. time integration)
    */
   template <class A> void iterateMoleculesParallel(A& a, const bool& useOpenMP);
-
 
   /** creates initial velocity for molecule from meanVelocity and given temperature and stores the result in initialVelocity */
   void getInitialVelocity(const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
@@ -144,44 +143,43 @@ template <class A> void simplemd::services::MoleculeService::iterateMoleculesSer
   const unsigned int freeMoleculePositionsAndNumberMolecules = (const unsigned int)(numberMolecules + freeMoleculePositions);
   // start iteration();
   a.beginMoleculeIteration();
-    // sort empty positions list
-    if (!_freeMoleculePositions.empty()) {
-      _freeMoleculePositions.sort();
-      std::list<unsigned int>::iterator myIt = _freeMoleculePositions.begin();
-      unsigned int start = 0;
+  // sort empty positions list
+  if (!_freeMoleculePositions.empty()) {
+    _freeMoleculePositions.sort();
+    std::list<unsigned int>::iterator myIt = _freeMoleculePositions.begin();
+    unsigned int start = 0;
 
-      // loop over all intervals, starting at a certain point and ranging up to a deleted position
-      for (unsigned int i = 0; i < freeMoleculePositions; i++) {
-        const unsigned int end = *myIt;
-        for (unsigned int j = start; j < end; j++) {
+    // loop over all intervals, starting at a certain point and ranging up to a deleted position
+    for (unsigned int i = 0; i < freeMoleculePositions; i++) {
+      const unsigned int end = *myIt;
+      for (unsigned int j = start; j < end; j++) {
 #if (MD_DEBUG == MD_YES)
-          std::cout << "Handle molecule " << j << std::endl;
+        std::cout << "Handle molecule " << j << std::endl;
 #endif
-          a.handleMolecule(_molecules[j / blockSize][j % blockSize]);
-        }
-
-        // go to next possible start position (one position after *myIt) and increment myIt
-        // -> remark: It may happen that *(myIt++) == (*myIt)+1. Then, the upper inner loop degenerates to
-        // an empty loop...
-        start = (*myIt) + 1;
-        myIt++;
+        a.handleMolecule(_molecules[j / blockSize][j % blockSize]);
       }
 
-      // do final loop (from last deleted molecule to last existing molecule)
-      for (unsigned int i = start; i < freeMoleculePositionsAndNumberMolecules; i++) {
+      // go to next possible start position (one position after *myIt) and increment myIt
+      // -> remark: It may happen that *(myIt++) == (*myIt)+1. Then, the upper inner loop degenerates to
+      // an empty loop...
+      start = (*myIt) + 1;
+      myIt++;
+    }
+
+    // do final loop (from last deleted molecule to last existing molecule)
+    for (unsigned int i = start; i < freeMoleculePositionsAndNumberMolecules; i++) {
 #if (MD_DEBUG == MD_YES)
-        std::cout << "Handle molecule " << i << std::endl;
+      std::cout << "Handle molecule " << i << std::endl;
 #endif
-        a.handleMolecule(_molecules[i / blockSize][i % blockSize]);
-      }
-    } else {
-      for (unsigned int i = 0; i < numberMolecules; i++) {
+      a.handleMolecule(_molecules[i / blockSize][i % blockSize]);
+    }
+  } else {
+    for (unsigned int i = 0; i < numberMolecules; i++) {
 #if (MD_DEBUG == MD_YES)
-        std::cout << "Handle molecule " << i << std::endl;
+      std::cout << "Handle molecule " << i << std::endl;
 #endif
-        a.handleMolecule(_molecules[i / blockSize][i % blockSize]);
-      }
-    
+      a.handleMolecule(_molecules[i / blockSize][i % blockSize]);
+    }
   }
 
   // end iteration();
@@ -197,44 +195,46 @@ template <class A> void simplemd::services::MoleculeService::iterateMoleculesPar
   // start iteration();
   a.beginMoleculeIteration();
 
-    // sort empty positions list
-    if (!_freeMoleculePositions.empty()) {
-      _freeMoleculePositions.sort();
-      std::list<unsigned int>::iterator myIt = _freeMoleculePositions.begin();
-      unsigned int start = 0;
+  // sort empty positions list
+  if (!_freeMoleculePositions.empty()) {
+    _freeMoleculePositions.sort();
+    std::list<unsigned int>::iterator myIt = _freeMoleculePositions.begin();
+    unsigned int start = 0;
 
-      // loop over all intervals, starting at a certain point and ranging up to a deleted position
-      for (unsigned int i = 0; i < freeMoleculePositions; i++) {
-        const unsigned int end = (*myIt);
-        Kokkos::parallel_for(end - start, KOKKOS_LAMBDA (const unsigned int j) {
+    // loop over all intervals, starting at a certain point and ranging up to a deleted position
+    for (unsigned int i = 0; i < freeMoleculePositions; i++) {
+      const unsigned int end = (*myIt);
+      Kokkos::parallel_for(
+          end - start, KOKKOS_LAMBDA(const unsigned int j) {
 #if (MD_DEBUG == MD_YES)
-          std::cout << "Handle molecule " << (j + start) << std::endl;
+            std::cout << "Handle molecule " << (j + start) << std::endl;
 #endif
-          a.handleMolecule(_molecules[(j + start) / blockSize][j % blockSize]);
-        }); // Kokkos::parallel_for
+            a.handleMolecule(_molecules[(j + start) / blockSize][j % blockSize]);
+          }); // Kokkos::parallel_for
 
-        // go to next possible start position (one position after *myIt) and increment myIt
-        // -> remark: It may happen that *(myIt++) == (*myIt)+1. Then, the upper inner loop degenerates to
-        // an empty loop...
-        start = end + 1;
-        myIt++;
-      }
-
-      // do final loop (from last deleted molecule to last existing molecule)
-      Kokkos::parallel_for((freeMoleculePositionsAndNumberMolecules - start), KOKKOS_LAMBDA (const unsigned int i) {
-#if (MD_DEBUG == MD_YES)
-        std::cout << "Handle molecule " << (i + start) << std::endl;
-#endif
-        a.handleMolecule(_molecules[(i + start) / blockSize][i % blockSize]);
-      }); // Kokkos::parallel_for
-    } else {
-      Kokkos::parallel_for(numberMolecules, KOKKOS_LAMBDA (const unsigned int i) {
-#if (MD_DEBUG == MD_YES)
-        std::cout << "Handle molecule " << i << std::endl;
-#endif
-        a.handleMolecule(_molecules[i / blockSize][i % blockSize]);
-      }); // Kokkos::parallel_for
+      // go to next possible start position (one position after *myIt) and increment myIt
+      // -> remark: It may happen that *(myIt++) == (*myIt)+1. Then, the upper inner loop degenerates to
+      // an empty loop...
+      start = end + 1;
+      myIt++;
     }
+
+    // do final loop (from last deleted molecule to last existing molecule)
+    Kokkos::parallel_for((freeMoleculePositionsAndNumberMolecules - start), KOKKOS_LAMBDA(const unsigned int i) {
+#if (MD_DEBUG == MD_YES)
+      std::cout << "Handle molecule " << (i + start) << std::endl;
+#endif
+      a.handleMolecule(_molecules[(i + start) / blockSize][i % blockSize]);
+    }); // Kokkos::parallel_for
+  } else {
+    Kokkos::parallel_for(
+        numberMolecules, KOKKOS_LAMBDA(const unsigned int i) {
+#if (MD_DEBUG == MD_YES)
+          std::cout << "Handle molecule " << i << std::endl;
+#endif
+          a.handleMolecule(_molecules[i / blockSize][i % blockSize]);
+        }); // Kokkos::parallel_for
+  }
 
   // end iteration();
   a.endMoleculeIteration();
@@ -243,8 +243,7 @@ template <class A> void simplemd::services::MoleculeService::iterateMoleculesPar
 template <class A> void simplemd::services::MoleculeService::iterateMolecules(A& a, const bool& useOpenMP) {
   if constexpr (A::IsParallel) {
     iterateMoleculesParallel(a, useOpenMP);
-  }
-  else {
+  } else {
     iterateMoleculesSerial(a, useOpenMP);
   }
 }

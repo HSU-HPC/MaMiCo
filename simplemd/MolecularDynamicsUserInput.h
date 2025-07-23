@@ -18,7 +18,7 @@ using MainExecSpace =
 #elif defined(KOKKOS_TARGET_CUDA)
     Kokkos::CUDA
 #else
-    #error "No KOKKOS_TARGET_* macro defined!"
+#error "No KOKKOS_TARGET_* macro defined!"
     /* use the default execution space */
     Kokkos::DefaultExecutionSpace
 #endif

@@ -31,7 +31,7 @@ public:
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
 
   static const bool IsParallel = false;
-  
+
 private:
   simplemd::services::MoleculeService& _moleculeService;
 };

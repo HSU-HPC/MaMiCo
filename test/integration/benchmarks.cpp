@@ -6,6 +6,8 @@
 #include "test/integration/CellIdxIterBench.h"
 #include "test/integration/SimpleMDBench.h"
 
+#include <Kokkos_Core.hpp>
+
 void runTest(Test* test) {
   if (test == NULL) {
     std::cout << "ERROR executeTest: test==NULL!" << std::endl;
@@ -19,12 +21,14 @@ int main(int argc, char* argv[]) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Init(&argc, &argv);
 #endif
+  Kokkos::initialize(argc, argv);
 
   // run tests
   runTest(new CellIdxIterBench());
   std::cout << std::endl << "==================== ==================== ====================" << std::endl << std::endl;
   runTest(new SimpleMDBench());
 
+  Kokkos::finalize();
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Finalize();
 #endif
