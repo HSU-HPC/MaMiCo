@@ -9,7 +9,7 @@ simplemd::services::LinkedCellService::LinkedCellService(const tarch::la::Vector
                                                          const tarch::la::Vector<MD_DIM, double>& domainOffset,
                                                          const simplemd::services::ParallelTopologyService& parallelTopologyService,
                                                          simplemd::services::MoleculeService& moleculeService)
-    : _cells(NULL), _domainSize(domainSize), _domainOffset(domainOffset), _meshWidth(getMeshwidth(domainSize, parallelTopologyService.getLocalNumberOfCells())),
+    : _cells("_cells", 0), _domainSize(domainSize), _domainOffset(domainOffset), _meshWidth(getMeshwidth(domainSize, parallelTopologyService.getLocalNumberOfCells())),
       _numberOfCells(parallelTopologyService.getLocalNumberOfCells()), _indexOffset(tarch::la::Vector<MD_DIM, unsigned int>(1)),
       _totalNumberOfCells(_numberOfCells + 2u * _indexOffset)
 #if (MD_DIM > 2)
@@ -32,30 +32,16 @@ const tarch::la::Vector<MD_DIM, unsigned int>& simplemd::services::LinkedCellSer
 
 void simplemd::services::LinkedCellService::initCellStructure() {
   unsigned int numberCells = 1;
-  if (_cells != NULL) {
-    delete[] _cells;
-    _cells = NULL;
-  }
 
   for (unsigned int d = 0; d < MD_DIM; d++) {
     // increase number of cells by two to account for ghost layer
     numberCells = numberCells * _totalNumberOfCells[d];
   }
-
-  _cells = new LinkedCell[numberCells];
-  if (_cells == NULL) {
-    std::cout << "ERROR simplemd::services::LinkedCellService::initCellStructure(): "
-                 "_cells==NULL!"
-              << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  Kokkos::realloc(_cells, numberCells);
 }
 
 void simplemd::services::LinkedCellService::shutdown() {
-  if (_cells != NULL) {
-    delete[] _cells;
-    _cells = NULL;
-  }
+  Kokkos::realloc(_cells, 0);
 }
 
 unsigned int simplemd::services::LinkedCellService::getLocalIndexFromLocalVector(const tarch::la::Vector<MD_DIM, unsigned int>& coords) const {
@@ -98,11 +84,11 @@ void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& mo
 #endif
       ;
 
-  _cells[index].addMolecule(&molecule);
+  _cells(index).addMolecule(&molecule);
 }
 
 void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& molecule, const unsigned int& localCellIndex) {
-  _cells[localCellIndex].addMolecule(&molecule);
+  _cells(localCellIndex).addMolecule(&molecule);
 }
 
 simplemd::LinkedCell& simplemd::services::LinkedCellService::getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex) {
@@ -124,7 +110,7 @@ simplemd::LinkedCell& simplemd::services::LinkedCellService::getLinkedCell(const
                        + localCellIndex[2] * _totalNumberOfCells_X_By_totalNumberOfCells_Y
 #endif
       ;
-  return _cells[index];
+  return _cells(index);
 }
 
 void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex) {
@@ -137,7 +123,7 @@ void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecul
                        + localCellIndex[2] * _totalNumberOfCells_X_By_totalNumberOfCells_Y
 #endif
       ;
-  _cells[index].deleteMolecule(&molecule);
+  _cells(index).deleteMolecule(&molecule);
 }
 
 bool simplemd::services::LinkedCellService::isGhostCell(const unsigned int& cellIndex) const {

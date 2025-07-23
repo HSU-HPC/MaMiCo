@@ -99,13 +99,6 @@ public:
   /** returns the local cell index from the local cell index vector */
   unsigned int getLocalCellIndex(const tarch::la::Vector<MD_DIM, unsigned int>& cellIndexVector) const;
 
-  ~LinkedCellService() {
-    if (_cells != NULL) {
-      delete[] _cells;
-      _cells = NULL;
-    }
-  }
-
 private:
   /** initialise linked-cell structure for local process.
    *  indexOffset denotes the integer coordinates of the first cell
@@ -129,7 +122,7 @@ private:
   }
 
   /** contains all (local) linked cells */
-  LinkedCell* _cells;
+  Kokkos::View<LinkedCell*, Kokkos::SharedHostPinnedSpace> _cells;
   /** size of global domain */
   const tarch::la::Vector<MD_DIM, double> _domainSize;
   /** offset of local domain */
@@ -223,7 +216,7 @@ void simplemd::services::LinkedCellService::iterateCells(A& a, const tarch::la::
 #endif
 
       // handle cell
-      a.handleCell(_cells[index], index);
+      a.handleCell(_cells(index), index);
     }
   } else {
 #endif
@@ -241,7 +234,7 @@ void simplemd::services::LinkedCellService::iterateCells(A& a, const tarch::la::
           std::cout << "Handle cell " << coords << std::endl;
 #endif
           index = getLocalIndexFromLocalVector(coords);
-          a.handleCell(_cells[index], index);
+          a.handleCell(_cells(index), index);
         }
 #if (MD_DIM > 1)
       }
@@ -397,7 +390,7 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
             std::cout << "Handle cell " << index << std::endl;
 #endif
 
-            a.handleCell(_cells[index], index);
+            a.handleCell(_cells(index), index);
             // handle pairs (lower,left,back-oriented cells)
             for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS / 2; i++) {
 #if (MD_DEBUG == MD_YES)
@@ -405,7 +398,7 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
 #endif
               coordsCell1Buffer = index + indexOffset[i];
               coordsCell2Buffer = index + neighbourOffset[i];
-              a.handleCellPair(_cells[coordsCell1Buffer], _cells[coordsCell2Buffer], coordsCell1Buffer, coordsCell2Buffer);
+              a.handleCellPair(_cells(coordsCell1Buffer), _cells(coordsCell2Buffer), coordsCell1Buffer, coordsCell2Buffer);
             }
           } // j
         } // x
@@ -438,7 +431,7 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
           std::cout << "iterateCellPairs: Single index " << index << std::endl;
 #endif
 
-          a.handleCell(_cells[index], index);
+          a.handleCell(_cells(index), index);
           // handle pairs (lower,left,back-oriented cells)
           for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS / 2; i++) {
 #if (MD_DEBUG == MD_YES)
@@ -447,7 +440,7 @@ void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::
 
             coordsCell1Buffer = index + indexOffset[i];
             coordsCell2Buffer = index + neighbourOffset[i];
-            a.handleCellPair(_cells[coordsCell1Buffer], _cells[coordsCell2Buffer], coordsCell1Buffer, coordsCell2Buffer);
+            a.handleCellPair(_cells(coordsCell1Buffer), _cells(coordsCell2Buffer), coordsCell1Buffer, coordsCell2Buffer);
           }
         } // coords(0)
 #if (MD_DIM > 1)
