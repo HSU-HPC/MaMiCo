@@ -105,6 +105,52 @@ if(BUILD_WITH_MPI)
   find_package(MPI REQUIRED)
 endif()
 
+set(KOKKOS_TARGET OPENMP CACHE STRING "Choose CUDA, OPENMP, or SERIAL")
+set_property(CACHE KOKKOS_TARGET PROPERTY STRINGS CUDA OPENMP SERIAL)
+
+find_package(Kokkos CONFIG) # Try to find Kokkos externally
+if(Kokkos_FOUND)
+    message(STATUS "Found Kokkos: ${Kokkos_DIR} (version \"${Kokkos_VERSION}\")")
+else()
+    message(STATUS "Kokkos not found externally. Fetching via FetchContent.")
+    include(FetchContent)
+    set(Kokkos_ARCH_NATIVE ON CACHE STRING "Always build Kokkos for the CPU on which MaMiCo is being compiled" FORCE)
+
+    # Backends
+    set(Kokkos_ENABLE_SERIAL ON CACHE STRING "Always build Kokkos with Serial support" FORCE)
+    set(Kokkos_ENABLE_OPENMP ON CACHE STRING "Always build Kokkos with OpenMP support" FORCE)
+    if(KOKKOS_TARGET STREQUAL "CUDA")
+      set(Kokkos_ENABLE_CUDA ON CACHE STRING "Build MaMiCo/Kokkos with CUDA support" FORCE)
+    else()
+      set(Kokkos_ENABLE_CUDA OFF CACHE STRING "Build MaMiCo/Kokkos without CUDA support" FORCE)
+    endif()
+
+    # Debugging
+    if(CMAKE_BUILD_TYPE MATCHES "^Debug" AND (NOT CMAKE_BUILD_TYPE STREQUAL "DebugOptimized"))
+      set(KOKKOS_DEBUG "ON")
+    else()
+      set(KOKKOS_DEBUG "OFF")
+    endif()
+    set(Kokkos_ENABLE_DEBUG ${KOKKOS_DEBUG} CACHE STRING "Debug builds only" FORCE)
+    set(Kokkos_ENABLE_DEBUG_BOUNDS_CHECK ${KOKKOS_DEBUG} CACHE STRING "Debug builds only" FORCE)
+
+    FetchContent_Declare(
+        Kokkos
+        URL https://github.com/kokkos/kokkos/archive/refs/tags/4.6.02.tar.gz
+    )
+    FetchContent_MakeAvailable(Kokkos)
+
+    # Hide Kokkos related options in ccmake
+    get_cmake_property(_vars CACHE_VARIABLES)
+    foreach(_var ${_vars})
+      if(_var MATCHES "^FETCHCONTENT_" OR _var MATCHES "^Kokkos_")
+        mark_as_advanced(${_var})
+      endif()
+    endforeach()
+    target_compile_options(kokkoscore PUBLIC -fPIC)
+    target_link_options(kokkoscore PUBLIC -fPIC)
+endif()
+
 if(NOT "${MD_SIM}" STREQUAL "LS1_MARDYN" AND BUILD_WITH_ADIOS2) #ls1 can come bundled with own adios2, hence finding adios2 later for ls1
   enable_language(C)
   find_package(ADIOS2 REQUIRED)
@@ -244,6 +290,9 @@ add_library(simplemd_interface INTERFACE)
 target_compile_definitions(simplemd_interface INTERFACE ${MDDim})
 target_compile_options(simplemd_interface INTERFACE -fpic)
 
+target_compile_definitions(simplemd_interface INTERFACE KOKKOS_TARGET_${KOKKOS_TARGET})
+target_compile_options(simplemd_interface INTERFACE -fopenmp) # Always build MaMiCo/Kokkos with OpenMP support
+
 if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
   target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
   target_compile_options(simplemd_interface INTERFACE -Og -g3)
@@ -265,6 +314,7 @@ if(BUILD_WITH_MPI)
     target_compile_definitions(simplemd_interface INTERFACE MDParallel TarchParallel)
     target_link_libraries(simplemd_interface INTERFACE MPI::MPI_CXX)
 endif()
+target_link_libraries(simplemd_interface INTERFACE Kokkos::kokkos)
 if(BUILD_WITH_ADIOS2)
   target_compile_definitions(simplemd_interface INTERFACE BUILD_WITH_ADIOS2)
   if(BUILD_WITH_MPI)
@@ -277,14 +327,14 @@ endif()
 message(STATUS ">> CMAKE_CXX_COMPILER : " ${CMAKE_CXX_COMPILER})
 message(STATUS ">> CMAKE_CXX_COMPILER_ID : " ${CMAKE_CXX_COMPILER_ID})
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor)
+  target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wno-non-virtual-dtor)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
   target_compile_options(simplemd_interface INTERFACE -fstrict-aliasing -qpack_semantic=gnu -ipo -align -ansi-alias) #-w
   target_link_options(simplemd_interface INTERFACE -ipo)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
-  target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -mcpu=a64fx)
+  target_compile_options(simplemd_interface INTERFACE -Wall -Werror -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -mcpu=a64fx)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  target_compile_options(simplemd_interface INTERFACE -Wall -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wconversion -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -Wno-gnu-array-member-paren-init)
+  target_compile_options(simplemd_interface INTERFACE -Wall -pedantic -pedantic-errors -Wstrict-aliasing -fstrict-aliasing -Wno-long-long -Wno-unknown-pragmas -Wno-non-virtual-dtor -Wno-sign-conversion -Wno-unused-private-field -Wno-gnu-array-member-paren-init)
 else()
   message(STATUS ">> Unsupported compiler.")
 endif()
@@ -355,6 +405,8 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 # MaMiCo interface
 #
 add_library(mamico INTERFACE)
+target_compile_definitions(mamico INTERFACE KOKKOS_TARGET_${KOKKOS_TARGET})
+target_link_libraries(mamico INTERFACE Kokkos::kokkos)
 if(BUILD_WITH_MPI)
   option(USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
   if(USE_COLLECTIVE_MPI)
@@ -370,6 +422,7 @@ if(BUILD_WITH_ADIOS2)
 endif()
 target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors)
+target_compile_options(mamico INTERFACE -fopenmp) # Always build MaMiCo/Kokkos with OpenMP support
 if(BUILD_WITH_MPI)
   target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MPICH_IGNORE_CXX_SEEK)
   target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
@@ -835,8 +888,12 @@ execute_process(
   ERROR_VARIABLE CLANGFORMAT_VERSION_ERROR
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" CLANGFORMAT_VERSION ${CLANGFORMAT_VERSION_OUTPUT})
-message(STATUS "Found clang-format version: ${CLANGFORMAT_VERSION}")
+if(CLANGFORMAT_VERSION_OUTPUT STREQUAL "")
+  set(CLANGFORMAT_VERSION "<not installed>")
+else()
+  string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" CLANGFORMAT_VERSION ${CLANGFORMAT_VERSION_OUTPUT})
+  message(STATUS "Found clang-format version: ${CLANGFORMAT_VERSION}")
+endif()
 if(NOT CLANGFORMAT_VERSION MATCHES "^18\\.1\\.8")
   message(WARNING "clang-format version must be 18.1.8 but found ${CLANGFORMAT_VERSION} (Target \"clangformat\" will not be generated)")
 else()
