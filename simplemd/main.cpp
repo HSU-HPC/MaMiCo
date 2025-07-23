@@ -19,6 +19,11 @@ int main(int argc, char* argv[]) {
 #if (MD_PARALLEL == MD_YES)
   MPI_Init(&argc, &argv);
 #endif
+  Kokkos::initialize(argc, argv);
+  std::cout << "Kokkos using execution space \"" << MainExecSpace::name() << "\" with memory space \"" << MainExecSpace::memory_space::name() << "\""
+            << std::endl;
+  MainExecSpace().print_configuration(std::cout);
+
   if (argc != 2) {
     std::cout << "Wrong number of arguments! Please call program by ./moleculardynamics inputfile.xml!" << std::endl;
     return -1;
@@ -45,6 +50,7 @@ int main(int argc, char* argv[]) {
 
   simulation.shutdownServices();
 
+  Kokkos::finalize();
 // shutdown parallel environment
 #if (MD_PARALLEL == MD_YES)
   MPI_Finalize();

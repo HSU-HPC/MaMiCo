@@ -12,6 +12,7 @@
 namespace coupling {
 template <class LinkedCell, unsigned int dim> class InstanceHandling;
 }
+class InstanceHandlingTest;
 
 /** holds one vector of MDSimulation and one vector for MDSolverInterface.
  *Initialization, execution of MD time steps and shutdown are abstracted into
@@ -62,25 +63,7 @@ public:
 
   /** Destructor:
    */
-  ~InstanceHandling() {
-    for (unsigned int i = 0; i < _mdSimulations.size(); ++i) {
-      coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
-      if (_mdSimulations[i] != nullptr) {
-        _mdSimulations[i]->shutdown();
-        delete _mdSimulations[i];
-        _mdSimulations[i] = nullptr;
-      }
-      _mdSolverInterface[i] = coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().getMDSolverInterface();
-    }
-    _mdSimulations.clear();
-    for (auto& solverInterface : _mdSolverInterface) {
-      if (solverInterface != nullptr) {
-        delete solverInterface;
-        solverInterface = nullptr;
-      }
-    }
-    _mdSolverInterface.clear();
-  }
+  ~InstanceHandling() { shutdown(); }
 
   /** switches off the coupling between the new MD simulations and Macroscopic
    *solver and lets the MD simulations run t time steps starting from the time
@@ -284,6 +267,26 @@ public:
   }
 
 private:
+  void shutdown() {
+    for (unsigned int i = 0; i < _mdSimulations.size(); ++i) {
+      coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().setMDSolverInterface(_mdSolverInterface[i]);
+      if (_mdSimulations[i] != nullptr) {
+        _mdSimulations[i]->shutdown();
+        delete _mdSimulations[i];
+        _mdSimulations[i] = nullptr;
+      }
+      _mdSolverInterface[i] = coupling::interface::MamicoInterfaceProvider<LinkedCell, dim>::getInstance().getMDSolverInterface();
+    }
+    _mdSimulations.clear();
+    for (auto& solverInterface : _mdSolverInterface) {
+      if (solverInterface != nullptr) {
+        delete solverInterface;
+        solverInterface = nullptr;
+      }
+    }
+    _mdSolverInterface.clear();
+  }
+
   std::vector<coupling::interface::MDSimulation*> _mdSimulations;
   std::vector<coupling::interface::MDSolverInterface<LinkedCell, dim>*> _mdSolverInterface;
 
@@ -291,6 +294,7 @@ private:
   coupling::configurations::MaMiCoConfiguration<dim>& _mamicoConfig;
 
   const tarch::utils::MultiMDService<dim>& _multiMDService;
+  friend InstanceHandlingTest;
 };
 
 #endif //_INSTANCE_HANDLING_H_
