@@ -10,6 +10,49 @@
 #include <cstdlib>
 #include <iostream>
 #include <sys/time.h>
+#ifdef BOOST_FOUND
+#include <boost/crc.hpp>
+#endif
+
+class BenchSim : public simplemd::MolecularDynamicsSimulation{
+public:
+  BenchSim(const simplemd::configurations::MolecularDynamicsConfiguration& configuration): 
+    simplemd::MolecularDynamicsSimulation(configuration){}
+  virtual ~BenchSim() {}
+
+  class {
+  public:
+    void beginMoleculeIteration() {}
+    void handleMolecule(simplemd::Molecule& molecule) {
+      for (unsigned int d = 0; d < MD_DIM; d++) {
+        process(molecule.getConstPosition()[d]);
+        process(molecule.getConstVelocity()[d]);
+        process(molecule.getConstForceOld()[d]);
+      }
+    }
+    void endMoleculeIteration() {}
+#ifdef BOOST_FOUND
+    unsigned long long checksum() { return sum.checksum(); }
+  private:
+    void process(const double& data){
+      sum.process_bytes(&data, sizeof(double));
+    }
+    boost::crc_32_type sum;
+#else
+    unsigned long long checksum() { return sum; }
+  private:
+    void process(const double& data){
+      sum ^= *((unsigned long long*)&data);
+    }
+    unsigned long long sum = 0;
+#endif
+  } mapping;
+
+  unsigned long long getChecksum() {
+    _moleculeService->iterateMolecules(mapping, false);
+    return mapping.checksum();
+  }
+};
 
 class SimpleMDBench : public Test {
 public:
@@ -79,11 +122,35 @@ private:
   </scenario-configuration>)mdconf"
          << std::endl;
     file.close();
+    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(fname, "molecular-dynamics",
+                                                                                                                           _simpleMDConfig);
+    std::remove(fname.c_str());
+    if (!_simpleMDConfig.isValid()) {
+      std::cout << "ERROR SimpleMDBench: Invalid SimpleMD config!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    _simulation = std::make_unique<BenchSim>(_simpleMDConfig);
+    _simulation->initServices();
   }
 
-  void shutdown() {}
+  void shutdown() {
+    _simulation->shutdownServices();
+  }
 
-  void bench() {}
+  void bench() {
+    // warm-up timestep, for more reliable benchmarking result
+    _simulation->simulateOneTimestep(0);
+
+    timeval start, end;
+    gettimeofday(&start, NULL);
+    for (unsigned int t = 1; t < _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()+1; t++) {
+      _simulation->simulateOneTimestep(t);
+    }
+    gettimeofday(&end, NULL);
+    double runtime = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
+    std::cout << "Runtime: " << (int)(runtime / 1000) << "ms" << std::endl;
+  }
 
   void check_result() {
     #if defined (__FAST_MATH__)
@@ -91,8 +158,23 @@ private:
     return;
     #endif
 
+    unsigned long long sum = _simulation->getChecksum();
+#ifdef BOOST_FOUND
+    std::cout << "INFO SimpleMDBench: CRC32 Checksum is " << sum << std::endl;
+    unsigned long long correct = 1740937012;
+#else
+    std::cout << "INFO SimpleMDBench: XOR Checksum is " << sum << std::endl;
+    unsigned long long correct = 34940402907449993;
+#endif
+    if(sum == correct)
+      std::cout << "INFO SimpleMDBench: SUCCESS Checksum is correct :-)" << std::endl;
+    else{
+      std::cout << "ERROR SimpleMDBench: ERROR Checksum is wrong!! " << std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
 
   int _rank;
   simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
+  std::unique_ptr<BenchSim> _simulation;
 };
