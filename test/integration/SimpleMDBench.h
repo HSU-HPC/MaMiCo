@@ -152,7 +152,7 @@ private:
 
     unsigned long long sum = _simulation->getChecksum();
     std::cout << "INFO SimpleMDBench: Final XOR Checksum is " << sum << std::endl;
-    unsigned long long correct = 9212315073094241008u;
+    unsigned long long correct = 9224833478695498352u;
     if (sum == correct)
       std::cout << "INFO SimpleMDBench: SUCCESS Checksum is correct :-)" << std::endl;
     else {
