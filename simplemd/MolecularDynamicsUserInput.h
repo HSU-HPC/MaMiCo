@@ -16,7 +16,7 @@ using MainExecSpace =
 #elif defined(KOKKOS_TARGET_OPENMP)
     Kokkos::OpenMP
 #elif defined(KOKKOS_TARGET_CUDA)
-    Kokkos::CUDA
+    Kokkos::Cuda
 #else
     #error "No KOKKOS_TARGET_* macro defined!"
     /* use the default execution space */
