@@ -38,6 +38,10 @@ void tarch::utils::RandomNumberService::init(bool fixSeed) {
 void tarch::utils::RandomNumberService::shutdown() {}
 
 double tarch::utils::RandomNumberService::getUniformRandomNumber() const {
+  if (!_isInitialized) {
+    throw std::runtime_error(std::string("RandomNumberService: Called getUniformRandomNumber() before initalization!"));
+  }
+
   // We do not want this method to return 1.0, as this can lead to invalid behaviour
   // in some situations. E.g., the Usher particle insertion relies on this method
   // in order to generate valid positions within the local subdomain, which only
@@ -46,6 +50,9 @@ double tarch::utils::RandomNumberService::getUniformRandomNumber() const {
 }
 
 double tarch::utils::RandomNumberService::getGaussianRandomNumber() {
+  if (!_isInitialized) {
+    throw std::runtime_error(std::string("RandomNumberService: Called getGaussianRandomNumber() before initalization!"));
+  }
 
   // if the first random number is going to be called, create Gaussian random numbers
   if (_isFirstRandomNumber) {
