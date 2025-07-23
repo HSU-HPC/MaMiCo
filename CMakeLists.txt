@@ -871,17 +871,7 @@ set(BENCHMARKS_SOURCES
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
 set_target_properties(benchmarks PROPERTIES CXX_STANDARD 17)
 target_link_libraries(benchmarks PRIVATE mamico)
-if(POLICY CMP0167)
-  cmake_policy(SET CMP0167 OLD)
-endif()
-find_package(Boost QUIET)
-if(Boost_FOUND)
-  message(STATUS ">> Found Boost, using CRC32 for SimpleMDBench")
-  target_include_directories(benchmarks PRIVATE ${Boost_INCLUDE_DIRS})
-  target_compile_definitions(benchmarks PRIVATE BOOST_FOUND)
-else()
-  message(STATUS ">> Boost not found, using XOR checksum for SimpleMDBench")
-endif()
+target_compile_definitions(benchmarks PRIVATE TarchDebug)
 
 #
 # Coverage

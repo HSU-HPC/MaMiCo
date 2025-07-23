@@ -15,6 +15,27 @@ class RandomNumberService;
 }
 } // namespace tarch
 
+namespace tarch {
+// These helper functions are neither accurate nor fast!
+// Generally, std::sin(), std::cos() and log() should be preferred in almost all cases!
+// However, these functions provide reproducibility - independent of std::sin() implementation / compiler / system
+// Thus, they can be helpful for debugging in some cases, where bitwise reproducible results are required
+
+double simple_sin(double x);
+double simple_cos(double x);
+double simple_log(double x);
+}
+
+#if (TARCH_DEBUG == TARCH_YES)
+#define TARCH_SIN tarch::simple_sin
+#define TARCH_COS tarch::simple_cos
+#define TARCH_LOG tarch::simple_log
+#else
+#define TARCH_SIN std::sin
+#define TARCH_COS std::cos
+#define TARCH_LOG std::log
+#endif
+
 /** creates random numbers.
  *  @author Philipp Neumann
  */

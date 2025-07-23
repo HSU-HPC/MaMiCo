@@ -10,9 +10,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <sys/time.h>
-#ifdef BOOST_FOUND
-#include <boost/crc.hpp>
-#endif
 
 class BenchSim : public simplemd::MolecularDynamicsSimulation {
 public:
@@ -30,19 +27,11 @@ public:
       }
     }
     void endMoleculeIteration() {}
-#ifdef BOOST_FOUND
-    unsigned long long checksum() { return sum.checksum(); }
-
-  private:
-    void process(const double& data) { sum.process_bytes(&data, sizeof(double)); }
-    boost::crc_32_type sum;
-#else
     unsigned long long checksum() { return sum; }
 
   private:
     void process(const double& data) { sum ^= *((unsigned long long*)&data); }
     unsigned long long sum = 0;
-#endif
   };
 
   unsigned long long getChecksum() {
@@ -138,6 +127,7 @@ private:
   void bench() {
     // warm-up timestep, for more reliable benchmarking result
     _simulation->simulateOneTimestep(0);
+    std::cout << "INFO SimpleMDBench: Warmup Checksum is " << _simulation->getChecksum() << std::endl;
 
     timeval start, end;
     gettimeofday(&start, NULL);
@@ -155,14 +145,14 @@ private:
     return;
 #endif
 
-    unsigned long long sum = _simulation->getChecksum();
-#ifdef BOOST_FOUND
-    std::cout << "INFO SimpleMDBench: CRC32 Checksum is " << sum << std::endl;
-    unsigned long long correct = 1740937012;
-#else
-    std::cout << "INFO SimpleMDBench: XOR Checksum is " << sum << std::endl;
-    unsigned long long correct = 34940402907449993;
+#if (TARCH_DEBUG == TARCH_NO)
+    std::cout << "WARN SimpleMDBench: Result validity check FAILED: TARCH_DEBUG is off!" << std::endl;
+    return;
 #endif
+
+    unsigned long long sum = _simulation->getChecksum();
+    std::cout << "INFO SimpleMDBench: Final XOR Checksum is " << sum << std::endl;
+    unsigned long long correct = 9212315073094241008u;
     if (sum == correct)
       std::cout << "INFO SimpleMDBench: SUCCESS Checksum is correct :-)" << std::endl;
     else {
