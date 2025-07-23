@@ -409,7 +409,7 @@ void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::servi
 
   // create copy of molecules and store the copies in a std::list
   std::list<simplemd::Molecule>& copyBuffer = copyMoleculesMapping.getCopyOfMolecules();
-  linkedCellService.iterateCells(copyMoleculesMapping, false);
+  linkedCellService.iterateCells(copyMoleculesMapping);
   // std::cout <<  "Number molecules: " << copyBuffer.size() << std::endl;
 
   // reset all values and delete molecules
@@ -456,22 +456,22 @@ void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::servi
   }
 
   // populate linked cell lists again
-  iterateMolecules(updateLinkedCellListsMapping, false);
+  iterateMolecules(updateLinkedCellListsMapping);
 }
 
 void simplemd::services::MoleculeService::writeCheckPoint(const simplemd::services::ParallelTopologyService& parallelTopologyService,
                                                           const std::string& filestem, const unsigned int& t) {
   simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(parallelTopologyService, filestem, t);
-  iterateMolecules(writeCheckPointMapping, false);
+  iterateMolecules(writeCheckPointMapping);
 }
 
 void simplemd::services::MoleculeService::resetMeanVelocity() {
   simplemd::moleculemappings::ComputeMeanVelocityMapping compute;
-  iterateMolecules(compute, false);
+  iterateMolecules(compute);
   tarch::la::Vector<MD_DIM, double> currentVel = compute.getMeanVelocity();
   simplemd::moleculemappings::SetMeanVelocityMapping set(currentVel, _meanVelocity);
-  iterateMolecules(set, false);
+  iterateMolecules(set);
 
   // check again
-  iterateMolecules(compute, false);
+  iterateMolecules(compute);
 }

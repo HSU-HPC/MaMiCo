@@ -81,7 +81,7 @@ public:
   /** can be used to apply a molecule-mapping which is iterated over all molecules of this process
    *  uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
-  template <class A> void iterateMolecules(A& a, const bool& useOpenMP);
+  template <class A> void iterateMolecules(A& a);
 
   /** creates initial velocity for molecule from meanVelocity and given temperature and stores the result in initialVelocity */
   void getInitialVelocity(const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
@@ -111,11 +111,11 @@ public:
 private:
   /** applies molecule mapping without any node-level parallelisation
    */
-  template <class A> void iterateMoleculesSerial(A& a, const bool& useOpenMP);
+  template <class A> void iterateMoleculesSerial(A& a);
 
   /** applies molecule mapping while parallelising using Kokkos
    */
-  template <class A> void iterateMoleculesParallel(A& a, const bool& useOpenMP);
+  template <class A> void iterateMoleculesParallel(A& a);
 
   /** pointer to all the molecules */
   std::vector<simplemd::Molecule*> _molecules;
@@ -133,7 +133,7 @@ private:
   unsigned int _blockSize;
 };
 
-template <class A> void simplemd::services::MoleculeService::iterateMoleculesSerial(A& a, const bool& useOpenMP) {
+template <class A> void simplemd::services::MoleculeService::iterateMoleculesSerial(A& a) {
 
   const unsigned int blockSize = _blockSize;
   const unsigned int freeMoleculePositions = (const unsigned int)_freeMoleculePositions.size();
@@ -184,7 +184,7 @@ template <class A> void simplemd::services::MoleculeService::iterateMoleculesSer
   a.endMoleculeIteration();
 }
 
-template <class A> void simplemd::services::MoleculeService::iterateMoleculesParallel(A& a, const bool& useOpenMP) {
+template <class A> void simplemd::services::MoleculeService::iterateMoleculesParallel(A& a) {
 
   const unsigned int blockSize = _blockSize;
   const unsigned int freeMoleculePositions = (const unsigned int)_freeMoleculePositions.size();
@@ -238,11 +238,11 @@ template <class A> void simplemd::services::MoleculeService::iterateMoleculesPar
   a.endMoleculeIteration();
 }
 
-template <class A> void simplemd::services::MoleculeService::iterateMolecules(A& a, const bool& useOpenMP) {
+template <class A> void simplemd::services::MoleculeService::iterateMolecules(A& a) {
   if constexpr (A::IsParallel) {
-    iterateMoleculesParallel(a, useOpenMP);
+    iterateMoleculesParallel(a);
   } else {
-    iterateMoleculesSerial(a, useOpenMP);
+    iterateMoleculesSerial(a);
   }
 }
 

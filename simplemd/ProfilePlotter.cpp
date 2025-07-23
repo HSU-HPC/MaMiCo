@@ -61,6 +61,6 @@ void simplemd::ProfilePlotter::accumulateAndPlotInformation(const unsigned int& 
       continue; // skip profiles which have no intersection with local domain
 #endif
     _plotters[i]->setCurrentTimestep(t);
-    _linkedCellService.iterateCells<simplemd::cellmappings::ProfilePlotterMapping>(*_plotters[i], _startCells[i], _ranges[i], false);
+    _linkedCellService.iterateCells<simplemd::cellmappings::ProfilePlotterMapping>(*_plotters[i], _startCells[i], _ranges[i]);
   }
 }

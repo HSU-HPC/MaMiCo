@@ -57,22 +57,21 @@ public:
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called.
    */
   template <class A>
-  void iterateCells(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
-                    const bool& useOpenMP);
+  void iterateCells(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
   /** iterates over all cells in the inner part (i.e. does not consider the
    * ghost layer)
    *
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
-  template <class A> void iterateCells(A& a, const bool& useOpenMP);
+  template <class A> void iterateCells(A& a);
 
   /** iterates over all cell pairs for the cells in the inner region of each
    * local process
    *
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
-  template <class A> void iterateCellPairs(A& a, const bool& useOpenMP) const;
+  template <class A> void iterateCellPairs(A& a) const;
 
   /** iterates over all cell pairs cell1 and cell2 with cell1 in the range
    * described by lowerLeftFrontCell and cellRange; cell2 does not need to lie
@@ -83,8 +82,8 @@ public:
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
   template <class A>
-  void iterateCellPairs(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
-                        const bool& useOpenMP) const;
+  void iterateCellPairs(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
+                        const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) const;
 
   /** returns the index of the first (non-ghost) cell */
   const tarch::la::Vector<MD_DIM, unsigned int>& getLocalIndexOfFirstCell() const;
@@ -143,18 +142,17 @@ private:
   /** iterates over cells in parallel using Kokkos
    */
   template <class A>
-  void iterateCellsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
-                            const bool& useOpenMP);
+  void iterateCellsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
   /** iterates over all cells in the inner part (i.e. does not consider the
    * ghost layer) in parallel using Kokkos
    */
-  template <class A> void iterateCellsParallel(A& a, const bool& useOpenMP);
+  template <class A> void iterateCellsParallel(A& a);
 
   /** iterates over all cell pairs for the cells in the inner region of each
    * local process in parallel using Kokkos
    */
-  template <class A> void iterateCellPairsParallel(A& a, const bool& useOpenMP) const;
+  template <class A> void iterateCellPairsParallel(A& a) const;
 
   /** iterates over all cell pairs cell1 and cell2 with cell1 in the range
    * described by lowerLeftFrontCell and cellRange in parallel using Kokkos; cell2 does not need to lie
@@ -164,21 +162,20 @@ private:
    */
   template <class A>
   void iterateCellPairsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
-                                const tarch::la::Vector<MD_DIM, unsigned int>& cellRange, const bool& useOpenMP) const;
+                                const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) const;
 
   /** iterates over cells without parallelisation
    */
   template <class A>
-  void iterateCellsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
-                          const bool& useOpenMP);
+  void iterateCellsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
   /** iterates over all cells in the inner part (i.e. does not consider the
    * ghost layer) without parallelisation */
-  template <class A> void iterateCellsSerial(A& a, const bool& useOpenMP);
+  template <class A> void iterateCellsSerial(A& a);
 
   /** iterates over all cell pairs for the cells in the inner region of each
    * local process without parallelisation */
-  template <class A> void iterateCellPairsSerial(A& a, const bool& useOpenMP) const;
+  template <class A> void iterateCellPairsSerial(A& a) const;
 
   /** iterates over all cell pairs cell1 and cell2 with cell1 in the range
    * described by lowerLeftFrontCell and cellRange without parallelisation; cell2 does not need to lie
@@ -187,8 +184,8 @@ private:
    * (0,0,0),(1,1,1)).
    */
   template <class A>
-  void iterateCellPairsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
-                              const bool& useOpenMP) const;
+  void iterateCellPairsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
+                              const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) const;
 
   /** contains all (local) linked cells */
   LinkedCell* _cells;
@@ -216,7 +213,7 @@ private:
 
 template <class A>
 void simplemd::services::LinkedCellService::iterateCellsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
-                                                               const tarch::la::Vector<MD_DIM, unsigned int>& cellRange, const bool& useOpenMP) {
+                                                               const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) {
   unsigned int index = 0;
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
@@ -263,13 +260,11 @@ void simplemd::services::LinkedCellService::iterateCellsSerial(A& a, const tarch
   a.endCellIteration();
 }
 
-template <class A> void simplemd::services::LinkedCellService::iterateCellsSerial(A& a, const bool& useOpenMP) {
-  iterateCellsSerial(a, _indexOffset, _numberOfCells, useOpenMP);
-}
+template <class A> void simplemd::services::LinkedCellService::iterateCellsSerial(A& a) { iterateCellsSerial(a, _indexOffset, _numberOfCells); }
 
 template <class A>
 void simplemd::services::LinkedCellService::iterateCellPairsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
-                                                                   const tarch::la::Vector<MD_DIM, unsigned int>& cellRange, const bool& useOpenMP) const {
+                                                                   const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) const {
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS / 2, unsigned int> neighbourOffset;
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS / 2, unsigned int> indexOffset;
 #if (MD_DIM == 1)
@@ -371,15 +366,15 @@ void simplemd::services::LinkedCellService::iterateCellPairsSerial(A& a, const t
   a.endCellIteration();
 }
 
-template <class A> void simplemd::services::LinkedCellService::iterateCellPairsSerial(A& a, const bool& useOpenMP) const {
+template <class A> void simplemd::services::LinkedCellService::iterateCellPairsSerial(A& a) const {
   const tarch::la::Vector<MD_DIM, unsigned int> pairIterationStart(0);
   const tarch::la::Vector<MD_DIM, unsigned int> pairIterationLength(getLocalNumberOfCells() + getLocalIndexOfFirstCell());
-  iterateCellPairsSerial(a, pairIterationStart, pairIterationLength, useOpenMP);
+  iterateCellPairsSerial(a, pairIterationStart, pairIterationLength);
 }
 
 template <class A>
 void simplemd::services::LinkedCellService::iterateCellsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
-                                                                 const tarch::la::Vector<MD_DIM, unsigned int>& cellRange, const bool& useOpenMP) {
+                                                                 const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) {
   unsigned int index = 0;
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
@@ -451,13 +446,11 @@ void simplemd::services::LinkedCellService::iterateCellsParallel(A& a, const tar
   a.endCellIteration();
 }
 
-template <class A> void simplemd::services::LinkedCellService::iterateCellsParallel(A& a, const bool& useOpenMP) {
-  iterateCellsParallel(a, _indexOffset, _numberOfCells, useOpenMP);
-}
+template <class A> void simplemd::services::LinkedCellService::iterateCellsParallel(A& a) { iterateCellsParallel(a, _indexOffset, _numberOfCells); }
 
 template <class A>
 void simplemd::services::LinkedCellService::iterateCellPairsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
-                                                                     const tarch::la::Vector<MD_DIM, unsigned int>& cellRange, const bool& useOpenMP) const {
+                                                                     const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) const {
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS / 2, unsigned int> neighbourOffset;
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS / 2, unsigned int> indexOffset;
 #if (MD_DIM == 1)
@@ -608,40 +601,38 @@ void simplemd::services::LinkedCellService::iterateCellPairsParallel(A& a, const
   a.endCellIteration();
 }
 
-template <class A> void simplemd::services::LinkedCellService::iterateCellPairsParallel(A& a, const bool& useOpenMP) const {
+template <class A> void simplemd::services::LinkedCellService::iterateCellPairsParallel(A& a) const {
   const tarch::la::Vector<MD_DIM, unsigned int> pairIterationStart(0);
   const tarch::la::Vector<MD_DIM, unsigned int> pairIterationLength(getLocalNumberOfCells() + getLocalIndexOfFirstCell());
-  iterateCellPairsParallel(a, pairIterationStart, pairIterationLength, useOpenMP);
+  iterateCellPairsParallel(a, pairIterationStart, pairIterationLength);
 }
 
 template <class A>
 void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
-                                                             const tarch::la::Vector<MD_DIM, unsigned int>& cellRange, const bool& useOpenMP) const {
+                                                             const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) const {
   if constexpr (A::IsParallel) {
-    iterateCellPairsParallel(a, lowerLeftFrontCell, cellRange, useOpenMP);
+    iterateCellPairsParallel(a, lowerLeftFrontCell, cellRange);
   } else {
-    iterateCellPairsSerial(a, lowerLeftFrontCell, cellRange, useOpenMP);
+    iterateCellPairsSerial(a, lowerLeftFrontCell, cellRange);
   }
 }
 
-template <class A> void simplemd::services::LinkedCellService::iterateCellPairs(A& a, const bool& useOpenMP) const {
+template <class A> void simplemd::services::LinkedCellService::iterateCellPairs(A& a) const {
   const tarch::la::Vector<MD_DIM, unsigned int> pairIterationStart(0);
   const tarch::la::Vector<MD_DIM, unsigned int> pairIterationLength(getLocalNumberOfCells() + getLocalIndexOfFirstCell());
-  iterateCellPairs(a, pairIterationStart, pairIterationLength, useOpenMP);
+  iterateCellPairs(a, pairIterationStart, pairIterationLength);
 }
 
 template <class A>
 void simplemd::services::LinkedCellService::iterateCells(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
-                                                         const tarch::la::Vector<MD_DIM, unsigned int>& cellRange, const bool& useOpenMP) {
+                                                         const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) {
   if constexpr (A::IsParallel) {
-    iterateCellsParallel(a, lowerLeftFrontCell, cellRange, useOpenMP);
+    iterateCellsParallel(a, lowerLeftFrontCell, cellRange);
   } else {
-    iterateCellsSerial(a, lowerLeftFrontCell, cellRange, useOpenMP);
+    iterateCellsSerial(a, lowerLeftFrontCell, cellRange);
   }
 }
 
-template <class A> void simplemd::services::LinkedCellService::iterateCells(A& a, const bool& useOpenMP) {
-  iterateCells(a, _indexOffset, _numberOfCells, useOpenMP);
-}
+template <class A> void simplemd::services::LinkedCellService::iterateCells(A& a) { iterateCells(a, _indexOffset, _numberOfCells); }
 
 #endif // _MOLECULARDYNAMICS_SERVICES_LINKEDCELLSERVICE_H_

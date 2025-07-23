@@ -9,13 +9,13 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCells(const tarch::
   _periodicBoundaryMapping.setDomainSize(parallelTopologyService.getGlobalDomainSize());
   _periodicBoundaryMapping.setProcessCoordinates(parallelTopologyService.getProcessCoordinates());
   _periodicBoundaryMapping.setNumberOfProcesses(parallelTopologyService.getNumberOfProcesses());
-  applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, false, _periodicBoundaryMapping);
+  applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, _periodicBoundaryMapping);
   // collect molecules in open-boundary region and remove them from the simulation.
   _collectMoleculesMapping.reset();
-  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, false, _collectMoleculesMapping);
+  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, _collectMoleculesMapping);
 
 #if (MD_PARALLEL == MD_YES)
-  applyMappingToBoundaryCells(boundary, simplemd::PARALLEL_BOUNDARY, false, _parallelBoundaryMapping);
+  applyMappingToBoundaryCells(boundary, simplemd::PARALLEL_BOUNDARY, _parallelBoundaryMapping);
 
   // after data from periodic/ parallel boundaries have been sent, receive them and put them into the local
   // data management systems
@@ -30,7 +30,7 @@ void simplemd::BoundaryTreatment::fillBoundaryCells(const tarch::la::Vector<MD_L
   tarch::la::Vector<MD_DIM, unsigned int> numberCellsOuter;
   _fillCellsMapping.setDomainSize(parallelTopologyService.getGlobalDomainSize());
 
-  applyMappingToOutermostNonBoundaryCells(false, _fillCellsMapping);
+  applyMappingToOutermostNonBoundaryCells(_fillCellsMapping);
 
 #if (MD_PARALLEL == MD_YES)
   parallelTopologyService.communicationSteps_1_2();
@@ -44,9 +44,9 @@ void simplemd::BoundaryTreatment::emptyGhostBoundaryCells() {
 #if (MD_DIM == 1)
   startOuter[0] = 0;
   numberCellsOuter[0] = 1;
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   startOuter[0] = _linkedCellService.getLocalNumberOfCells()[0] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[0] - 1;
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
 #endif
 
 #if (MD_DIM == 2)
@@ -55,21 +55,21 @@ void simplemd::BoundaryTreatment::emptyGhostBoundaryCells() {
   startOuter[1] = 0;
   numberCellsOuter[0] = _linkedCellService.getLocalNumberOfCells()[0] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[0];
   numberCellsOuter[1] = 1;
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // upper edge
   startOuter[0] = 0;
   startOuter[1] = _linkedCellService.getLocalNumberOfCells()[1] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[1] - 1;
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // left edge
   startOuter[0] = 0;
   startOuter[1] = 1;
   numberCellsOuter[0] = 1;
   numberCellsOuter[1] = _linkedCellService.getLocalNumberOfCells()[1];
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // right edge
   startOuter[0] = _linkedCellService.getLocalNumberOfCells()[0] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[0] - 1;
   startOuter[1] = 1;
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
 #endif
 
 #if (MD_DIM == 3)
@@ -78,12 +78,12 @@ void simplemd::BoundaryTreatment::emptyGhostBoundaryCells() {
   numberCellsOuter[1] = _linkedCellService.getLocalNumberOfCells()[1] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[1];
   numberCellsOuter[2] = 1;
   startOuter = tarch::la::Vector<MD_DIM, unsigned int>(0);
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // top face
   startOuter[0] = 0;
   startOuter[1] = 0;
   startOuter[2] = _linkedCellService.getLocalNumberOfCells()[2] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[2] - 1;
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // left face
   numberCellsOuter[0] = 1;
   numberCellsOuter[1] = _linkedCellService.getLocalNumberOfCells()[1] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[1];
@@ -91,12 +91,12 @@ void simplemd::BoundaryTreatment::emptyGhostBoundaryCells() {
   startOuter[0] = 0;
   startOuter[1] = 0;
   startOuter[2] = 1;
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // right face
   startOuter[0] = _linkedCellService.getLocalNumberOfCells()[0] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[0] - 1;
   startOuter[1] = 0;
   startOuter[2] = 1;
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // front face
   numberCellsOuter[0] = _linkedCellService.getLocalNumberOfCells()[0];
   numberCellsOuter[1] = 1;
@@ -104,12 +104,12 @@ void simplemd::BoundaryTreatment::emptyGhostBoundaryCells() {
   startOuter[0] = 1;
   startOuter[1] = 0;
   startOuter[2] = 1;
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // back face
   startOuter[0] = 1;
   startOuter[1] = _linkedCellService.getLocalNumberOfCells()[1] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[1] - 1;
   startOuter[2] = 1;
-  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter, false);
+  _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
 #endif
 }
 
@@ -123,17 +123,17 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsAndFillBoundar
   _fillCellsMapping.setDomainSize(parallelTopologyService.getGlobalDomainSize());
 
   // iterating with _fillCellsMapping, not _periodicBoundaryMapping or _parallelBoundaryMapping!
-  applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, false, _fillCellsMapping);
+  applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, _fillCellsMapping);
   // collect molecules in open-boundary region and remove them from the simulation.
   _collectMoleculesMapping.reset();
-  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, false, _collectMoleculesMapping);
+  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, _collectMoleculesMapping);
 
 #if (MD_PARALLEL == MD_YES)
-  applyMappingToBoundaryCells(boundary, simplemd::PARALLEL_BOUNDARY, false, _fillCellsMapping);
+  applyMappingToBoundaryCells(boundary, simplemd::PARALLEL_BOUNDARY, _fillCellsMapping);
 #endif
 
   // fillBoundaryCells
-  applyMappingToOutermostNonBoundaryCells(false, _fillCellsMapping);
+  applyMappingToOutermostNonBoundaryCells(_fillCellsMapping);
 
   // handle local periodic ghost cells
   parallelTopologyService.unpackLocalBuffer(_moleculeService, _linkedCellService);
@@ -146,7 +146,7 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsAndFillBoundar
 
 void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(
     const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary, simplemd::services::ParallelTopologyService& parallelTopologyService,
-    simplemd::cellmappings::LennardJonesForceMapping& lennardJonesForce, const bool& useOpenMP) {
+    simplemd::cellmappings::LennardJonesForceMapping& lennardJonesForce) {
   // prevent execution in case domain is too small
   const tarch::la::Vector<MD_DIM, unsigned int> localNumberOfCells(_linkedCellService.getLocalNumberOfCells());
   for (unsigned int d = 0; d < MD_DIM; d++) {
@@ -163,17 +163,17 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
   // putBoundaryParticlesToInnerCells
   _fillCellsMapping.setDomainSize(parallelTopologyService.getGlobalDomainSize());
 
-  applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, false, _fillCellsMapping);
+  applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, _fillCellsMapping);
   // collect molecules in open-boundary region and remove them from the simulation.
   _collectMoleculesMapping.reset();
-  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, false, _collectMoleculesMapping);
+  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, _collectMoleculesMapping);
 
 #if (MD_PARALLEL == MD_YES)
-  applyMappingToBoundaryCells(boundary, simplemd::PARALLEL_BOUNDARY, false, _fillCellsMapping);
+  applyMappingToBoundaryCells(boundary, simplemd::PARALLEL_BOUNDARY, _fillCellsMapping);
 #endif
 
   // fillBoundaryCells
-  applyMappingToOutermostNonBoundaryCells(false, _fillCellsMapping);
+  applyMappingToOutermostNonBoundaryCells(_fillCellsMapping);
 
 // send out buffers, but don't wait for them
 #if (MD_PARALLEL == MD_YES)
@@ -192,7 +192,7 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
   parallelTopologyService.unpackLocalBuffer(_moleculeService, _linkedCellService);
 
   // compute forces in inner cells, where boundary and process-leaving particles are not needed.
-  applyMappingToCommunicationIndependentCells(useOpenMP, lennardJonesForce);
+  applyMappingToCommunicationIndependentCells(lennardJonesForce);
 
 // wait for buffers
 #if (MD_PARALLEL == MD_YES)
@@ -205,5 +205,5 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
 #endif
 
   // compute rest of forces
-  applyMappingToCommunicationDependentCells(useOpenMP, lennardJonesForce);
+  applyMappingToCommunicationDependentCells(lennardJonesForce);
 }
