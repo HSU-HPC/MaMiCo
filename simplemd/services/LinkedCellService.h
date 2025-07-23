@@ -53,17 +53,25 @@ public:
    * cellRange defines a number of cells in each spatial direction that the
    * class A shall be applied to. lowerLeftFrontCell needs to be given in local
    * coordinates.
+   * 
+   * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called.
    */
   template <class A>
   void iterateCells(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
                     const bool& useOpenMP);
 
   /** iterates over all cells in the inner part (i.e. does not consider the
-   * ghost layer) */
+   * ghost layer) 
+   * 
+   * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
+   */
   template <class A> void iterateCells(A& a, const bool& useOpenMP);
 
   /** iterates over all cell pairs for the cells in the inner region of each
-   * local process */
+   * local process 
+   * 
+   * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
+   */
   template <class A> void iterateCellPairs(A& a, const bool& useOpenMP) const;
 
   /** iterates over all cell pairs cell1 and cell2 with cell1 in the range
@@ -71,66 +79,12 @@ public:
    * within the range (example: iterate only over lowerLeftFrontCell=(1,1,1) and
    * cellRange=(1,1,1). Then, we will consider amongst others the pair
    * (0,0,0),(1,1,1)).
+   * 
+   * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
   template <class A>
   void iterateCellPairs(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
                         const bool& useOpenMP) const;
-
-  /** iterates over all cells in the range defined by the lower left front
-   * corner cell lowerLeftFrontCell and the size of the domain cellRange.
-   * cellRange defines a number of cells in each spatial direction that the
-   * class A shall be applied to. lowerLeftFrontCell needs to be given in local
-   * coordinates.
-   */
-  template <class A>
-  void iterateCellsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
-                            const bool& useOpenMP);
-
-  /** iterates over all cells in the inner part (i.e. does not consider the
-   * ghost layer) */
-  template <class A> void iterateCellsParallel(A& a, const bool& useOpenMP);
-
-  /** iterates over all cell pairs for the cells in the inner region of each
-   * local process */
-  template <class A> void iterateCellPairsParallel(A& a, const bool& useOpenMP) const;
-
-  /** iterates over all cell pairs cell1 and cell2 with cell1 in the range
-   * described by lowerLeftFrontCell and cellRange; cell2 does not need to lie
-   * within the range (example: iterate only over lowerLeftFrontCell=(1,1,1) and
-   * cellRange=(1,1,1). Then, we will consider amongst others the pair
-   * (0,0,0),(1,1,1)).
-   */
-  template <class A>
-  void iterateCellPairsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
-                                const tarch::la::Vector<MD_DIM, unsigned int>& cellRange, const bool& useOpenMP) const;
-
-  /** iterates over all cells in the range defined by the lower left front
-   * corner cell lowerLeftFrontCell and the size of the domain cellRange.
-   * cellRange defines a number of cells in each spatial direction that the
-   * class A shall be applied to. lowerLeftFrontCell needs to be given in local
-   * coordinates.
-   */
-  template <class A>
-  void iterateCellsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
-                          const bool& useOpenMP);
-
-  /** iterates over all cells in the inner part (i.e. does not consider the
-   * ghost layer) */
-  template <class A> void iterateCellsSerial(A& a, const bool& useOpenMP);
-
-  /** iterates over all cell pairs for the cells in the inner region of each
-   * local process */
-  template <class A> void iterateCellPairsSerial(A& a, const bool& useOpenMP) const;
-
-  /** iterates over all cell pairs cell1 and cell2 with cell1 in the range
-   * described by lowerLeftFrontCell and cellRange; cell2 does not need to lie
-   * within the range (example: iterate only over lowerLeftFrontCell=(1,1,1) and
-   * cellRange=(1,1,1). Then, we will consider amongst others the pair
-   * (0,0,0),(1,1,1)).
-   */
-  template <class A>
-  void iterateCellPairsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
-                              const bool& useOpenMP) const;
 
   /** returns the index of the first (non-ghost) cell */
   const tarch::la::Vector<MD_DIM, unsigned int>& getLocalIndexOfFirstCell() const;
@@ -185,6 +139,56 @@ private:
     }
     return meshWidth;
   }
+
+  /** iterates over cells in parallel using Kokkos
+   */
+  template <class A>
+  void iterateCellsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
+                            const bool& useOpenMP);
+
+  /** iterates over all cells in the inner part (i.e. does not consider the
+   * ghost layer) in parallel using Kokkos
+   */
+  template <class A> void iterateCellsParallel(A& a, const bool& useOpenMP);
+
+  /** iterates over all cell pairs for the cells in the inner region of each
+   * local process in parallel using Kokkos
+   */
+  template <class A> void iterateCellPairsParallel(A& a, const bool& useOpenMP) const;
+
+  /** iterates over all cell pairs cell1 and cell2 with cell1 in the range
+   * described by lowerLeftFrontCell and cellRange in parallel using Kokkos; cell2 does not need to lie
+   * within the range (example: iterate only over lowerLeftFrontCell=(1,1,1) and
+   * cellRange=(1,1,1). Then, we will consider amongst others the pair
+   * (0,0,0),(1,1,1)).
+   */
+  template <class A>
+  void iterateCellPairsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
+                                const tarch::la::Vector<MD_DIM, unsigned int>& cellRange, const bool& useOpenMP) const;
+
+  /** iterates over cells without parallelisation
+   */
+  template <class A>
+  void iterateCellsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
+                          const bool& useOpenMP);
+
+  /** iterates over all cells in the inner part (i.e. does not consider the
+   * ghost layer) without parallelisation */
+  template <class A> void iterateCellsSerial(A& a, const bool& useOpenMP);
+
+  /** iterates over all cell pairs for the cells in the inner region of each
+   * local process without parallelisation */
+  template <class A> void iterateCellPairsSerial(A& a, const bool& useOpenMP) const;
+
+  /** iterates over all cell pairs cell1 and cell2 with cell1 in the range
+   * described by lowerLeftFrontCell and cellRange without parallelisation; cell2 does not need to lie
+   * within the range (example: iterate only over lowerLeftFrontCell=(1,1,1) and
+   * cellRange=(1,1,1). Then, we will consider amongst others the pair
+   * (0,0,0),(1,1,1)).
+   */
+  template <class A>
+  void iterateCellPairsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange,
+                              const bool& useOpenMP) const;
 
   /** contains all (local) linked cells */
   LinkedCell* _cells;

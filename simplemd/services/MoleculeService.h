@@ -79,19 +79,9 @@ public:
   void shutdown();
 
   /** can be used to apply a molecule-mapping which is iterated over all molecules of this process
-   *  (e.g. time integration)
+   *  uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
   template <class A> void iterateMolecules(A& a, const bool& useOpenMP);
-
-  /** can be used to apply a molecule-mapping which is iterated over all molecules of this process
-   *  (e.g. time integration)
-   */
-  template <class A> void iterateMoleculesSerial(A& a, const bool& useOpenMP);
-
-  /** can be used to apply a molecule-mapping which is iterated over all molecules of this process
-   *  (e.g. time integration)
-   */
-  template <class A> void iterateMoleculesParallel(A& a, const bool& useOpenMP);
 
   /** creates initial velocity for molecule from meanVelocity and given temperature and stores the result in initialVelocity */
   void getInitialVelocity(const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
@@ -119,6 +109,14 @@ public:
   void resetMeanVelocity();
 
 private:
+  /** applies molecule mapping without any node-level parallelisation
+   */
+  template <class A> void iterateMoleculesSerial(A& a, const bool& useOpenMP);
+
+  /** applies molecule mapping while parallelising using Kokkos
+   */
+  template <class A> void iterateMoleculesParallel(A& a, const bool& useOpenMP);
+
   /** pointer to all the molecules */
   std::vector<simplemd::Molecule*> _molecules;
 
