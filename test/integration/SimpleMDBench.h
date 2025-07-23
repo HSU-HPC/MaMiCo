@@ -14,13 +14,12 @@
 #include <boost/crc.hpp>
 #endif
 
-class BenchSim : public simplemd::MolecularDynamicsSimulation{
+class BenchSim : public simplemd::MolecularDynamicsSimulation {
 public:
-  BenchSim(const simplemd::configurations::MolecularDynamicsConfiguration& configuration): 
-    simplemd::MolecularDynamicsSimulation(configuration){}
+  BenchSim(const simplemd::configurations::MolecularDynamicsConfiguration& configuration) : simplemd::MolecularDynamicsSimulation(configuration) {}
   virtual ~BenchSim() {}
 
-  class {
+  class ChecksumMapping {
   public:
     void beginMoleculeIteration() {}
     void handleMolecule(simplemd::Molecule& molecule) {
@@ -33,22 +32,21 @@ public:
     void endMoleculeIteration() {}
 #ifdef BOOST_FOUND
     unsigned long long checksum() { return sum.checksum(); }
+
   private:
-    void process(const double& data){
-      sum.process_bytes(&data, sizeof(double));
-    }
+    void process(const double& data) { sum.process_bytes(&data, sizeof(double)); }
     boost::crc_32_type sum;
 #else
     unsigned long long checksum() { return sum; }
+
   private:
-    void process(const double& data){
-      sum ^= *((unsigned long long*)&data);
-    }
+    void process(const double& data) { sum ^= *((unsigned long long*)&data); }
     unsigned long long sum = 0;
 #endif
-  } mapping;
+  };
 
   unsigned long long getChecksum() {
+    ChecksumMapping mapping;
     _moleculeService->iterateMolecules(mapping, false);
     return mapping.checksum();
   }
@@ -132,11 +130,10 @@ private:
 
     _simulation = std::make_unique<BenchSim>(_simpleMDConfig);
     _simulation->initServices();
+    std::cout << "INFO SimpleMDBench: Initial Checksum is " << _simulation->getChecksum() << std::endl;
   }
 
-  void shutdown() {
-    _simulation->shutdownServices();
-  }
+  void shutdown() { _simulation->shutdownServices(); }
 
   void bench() {
     // warm-up timestep, for more reliable benchmarking result
@@ -144,7 +141,7 @@ private:
 
     timeval start, end;
     gettimeofday(&start, NULL);
-    for (unsigned int t = 1; t < _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()+1; t++) {
+    for (unsigned int t = 1; t < _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps() + 1; t++) {
       _simulation->simulateOneTimestep(t);
     }
     gettimeofday(&end, NULL);
@@ -153,10 +150,10 @@ private:
   }
 
   void check_result() {
-    #if defined (__FAST_MATH__)
+#if defined(__FAST_MATH__)
     std::cout << "WARN SimpleMDBench: Result validity check FAILED: -ffast-math is active!" << std::endl;
     return;
-    #endif
+#endif
 
     unsigned long long sum = _simulation->getChecksum();
 #ifdef BOOST_FOUND
@@ -166,9 +163,9 @@ private:
     std::cout << "INFO SimpleMDBench: XOR Checksum is " << sum << std::endl;
     unsigned long long correct = 34940402907449993;
 #endif
-    if(sum == correct)
+    if (sum == correct)
       std::cout << "INFO SimpleMDBench: SUCCESS Checksum is correct :-)" << std::endl;
-    else{
+    else {
       std::cout << "ERROR SimpleMDBench: ERROR Checksum is wrong!! " << std::endl;
       exit(EXIT_FAILURE);
     }
