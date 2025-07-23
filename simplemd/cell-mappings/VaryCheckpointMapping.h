@@ -56,6 +56,8 @@ public:
     }
   }
 
+  static const bool IsParallel = false;
+
 private:
   const double _molecularMass;
   const double _kB;

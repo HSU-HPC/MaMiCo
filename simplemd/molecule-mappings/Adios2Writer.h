@@ -79,6 +79,8 @@ public:
    */
   void handleMolecule(Molecule& molecule);
 
+   static const bool IsParallel = false;
+
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
   const simplemd::services::MoleculeService& _moleculeService;

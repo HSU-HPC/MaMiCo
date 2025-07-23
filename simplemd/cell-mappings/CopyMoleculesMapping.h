@@ -44,6 +44,8 @@ public:
   std::list<simplemd::Molecule>& getCopyOfMolecules() { return _molecules; }
   void removeCopy() { _molecules.clear(); }
 
+  static const bool IsParallel = false;
+
 private:
   std::list<simplemd::Molecule> _molecules;
 };

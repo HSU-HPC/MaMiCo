@@ -17,7 +17,7 @@ simplemd::cellmappings::LennardJonesPotentialEnergyMapping::LennardJonesPotentia
 
 void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::beginCellIteration() {}
 
-void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) const {
 
   // iterate over all molecules
   const std::list<Molecule*>::const_iterator itEnd = cell.end();
@@ -55,7 +55,7 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
 }
 
 void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1,
-                                                                                const unsigned int& cellIndex2) {
+                                                                                const unsigned int& cellIndex2) const {
 
   // iterate over pairs of molecules
   const std::list<Molecule*>::const_iterator m1End = cell1.end();

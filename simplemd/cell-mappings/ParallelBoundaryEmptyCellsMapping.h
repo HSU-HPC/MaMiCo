@@ -40,6 +40,7 @@ public:
       cell.getList().clear();
     }
   }
+  static const bool IsParallel = false;
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
