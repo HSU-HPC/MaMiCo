@@ -53,7 +53,7 @@ public:
    * cellRange defines a number of cells in each spatial direction that the
    * class A shall be applied to. lowerLeftFrontCell needs to be given in local
    * coordinates.
-   * 
+   *
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called.
    */
   template <class A>
@@ -61,15 +61,15 @@ public:
                     const bool& useOpenMP);
 
   /** iterates over all cells in the inner part (i.e. does not consider the
-   * ghost layer) 
-   * 
+   * ghost layer)
+   *
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
   template <class A> void iterateCells(A& a, const bool& useOpenMP);
 
   /** iterates over all cell pairs for the cells in the inner region of each
-   * local process 
-   * 
+   * local process
+   *
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
   template <class A> void iterateCellPairs(A& a, const bool& useOpenMP) const;
@@ -79,7 +79,7 @@ public:
    * within the range (example: iterate only over lowerLeftFrontCell=(1,1,1) and
    * cellRange=(1,1,1). Then, we will consider amongst others the pair
    * (0,0,0),(1,1,1)).
-   * 
+   *
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
   template <class A>
