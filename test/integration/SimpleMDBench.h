@@ -69,7 +69,7 @@ public:
 private:
   void init() {
     _rank = 0;
-#if (MD_PARALLEL == MD_PARALLEL)
+#if (MD_PARALLEL == MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
 #endif
 
