@@ -620,7 +620,8 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
     _moleculeService->reorganiseMemory(*_parallelTopologyService, *_linkedCellService);
   }
 
-  if (t % 500 == 0) {
+  auto& dc = _configuration.getDomainConfiguration();
+  if (t % 500 == 0 && (dc.initFromCheckpoint() || dc.initFromSequentialCheckpoint())) {
     cellmappings::VaryCheckpointMapping varyCheckpointMapping(
         _configuration.getMoleculeConfiguration().getMass(), _configuration.getDomainConfiguration().getKB(),
         _configuration.getMoleculeConfiguration().getTemperature(), _configuration.getMoleculeConfiguration().getSigma(),

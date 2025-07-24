@@ -109,6 +109,8 @@ public:
   /** resets the velocity over the whole molecule system to the mean velocity specified at the beginning */
   void resetMeanVelocity();
 
+  bool tarchDebugIsOn() const;
+
 private:
   /** pointer to all the molecules */
   std::vector<simplemd::Molecule*> _molecules;
