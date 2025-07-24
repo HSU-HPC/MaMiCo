@@ -34,11 +34,12 @@ public:
       return _moleculeService->getCellMolecule(_cellIndex, _moleculeIndex);
     }
     Iterator operator++(int) { Iterator tmp = *this; _moleculeIndex++; return tmp; }
-    Iterator& operator--() { 
+    Iterator operator--(int) { 
       if (_moleculeIndex == 0)
         throw "Cannot decrement simplemd::LinkedCell::Iterator (_moleculeIndex cannot be negative)";
-      _moleculeIndex--;
-      return *this;
+      Iterator tmp = *this;
+        _moleculeIndex--;
+      return tmp;
     }
     bool operator!=(const Iterator& other) const {
       if (_cellIndex != other._cellIndex) return true;

@@ -85,7 +85,7 @@ void simplemd::cellmappings::RDFMapping::handleCell(LinkedCell& cell, const unsi
 
   double dist;
   unsigned int interval;
-  for (auto m1 = cell.begin(_moleculeService); m1 != --cell.end(); m1++) {
+  for (auto m1 = cell.begin(_moleculeService); m1 != cell.end()--; m1++) {
     auto m2 = m1;
 
     // iterate over all other molecules not touched so far
