@@ -488,7 +488,7 @@ simplemd::Molecule* simplemd::services::MoleculeService::getCellMolecule(const u
 void simplemd::services::MoleculeService::addCellMolecule(simplemd::Molecule& molecule, const unsigned int cellIndex) {
   while (_linkedCellsMolecules.size() <= cellIndex)
     _linkedCellsMolecules.push_back({});
-  _linkedCellsMolecules[cellIndex].push_back(&molecule);  
+  _linkedCellsMolecules[cellIndex].push_back(&molecule);
 }
 
 void simplemd::services::MoleculeService::clearCellMolecules(const unsigned int cellIndex) {
@@ -497,4 +497,3 @@ void simplemd::services::MoleculeService::clearCellMolecules(const unsigned int 
   _linkedCellsMolecules[cellIndex].clear();
 }
 #pragma endregion TODO replace with Kokkos datastructure
-

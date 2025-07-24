@@ -26,8 +26,8 @@ public:
   ComputeTemperatureMapping(simplemd::services::MoleculeService& moleculeService, simplemd::services::ParallelTopologyService& parallelTopologyService,
                             const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
                             const tarch::la::Vector<MD_DIM, double>& meanVelocity, const unsigned int& localMDSimulation, const bool& writeToFile = true)
-      : _moleculeService(moleculeService), _parallelTopologyService(parallelTopologyService), _molecularPropertiesService(molecularPropertiesService), _meanVelocity(meanVelocity),
-        _localMDSimulation(localMDSimulation), _writeToFile(writeToFile) {}
+      : _moleculeService(moleculeService), _parallelTopologyService(parallelTopologyService), _molecularPropertiesService(molecularPropertiesService),
+        _meanVelocity(meanVelocity), _localMDSimulation(localMDSimulation), _writeToFile(writeToFile) {}
   ~ComputeTemperatureMapping() {}
 
   void beginCellIteration() {

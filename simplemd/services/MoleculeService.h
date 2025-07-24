@@ -122,7 +122,6 @@ private:
   /** pointer to all the molecules */
   std::vector<simplemd::Molecule*> _molecules;
 
-
   /** stores the mean velocity for normalisation */
   tarch::la::Vector<MD_DIM, double> _meanVelocity;
 

@@ -22,7 +22,8 @@ class LennardJonesForceMapping;
 class simplemd::cellmappings::LennardJonesForceMapping {
 public:
   LennardJonesForceMapping(simplemd::services::ExternalForceService& externalForceService,
-                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,simplemd::services::MoleculeService& moleculeService);
+                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
+                           simplemd::services::MoleculeService& moleculeService);
   ~LennardJonesForceMapping() {}
 
   void beginCellIteration();

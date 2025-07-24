@@ -19,7 +19,8 @@ class LennardJonesPotentialEnergyMapping;
  */
 class simplemd::cellmappings::LennardJonesPotentialEnergyMapping {
 public:
-  LennardJonesPotentialEnergyMapping(const simplemd::services::MolecularPropertiesService& molecularPropertiesService, simplemd::services::MoleculeService& moleculeService);
+  LennardJonesPotentialEnergyMapping(const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
+                                     simplemd::services::MoleculeService& moleculeService);
   ~LennardJonesPotentialEnergyMapping() {}
 
   void beginCellIteration();

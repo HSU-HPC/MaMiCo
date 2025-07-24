@@ -9,9 +9,9 @@ simplemd::services::LinkedCellService::LinkedCellService(const tarch::la::Vector
                                                          const tarch::la::Vector<MD_DIM, double>& domainOffset,
                                                          const simplemd::services::ParallelTopologyService& parallelTopologyService,
                                                          simplemd::services::MoleculeService& moleculeService)
-    : _cells("_cells", 0), _domainSize(domainSize), _domainOffset(domainOffset), _meshWidth(getMeshwidth(domainSize, parallelTopologyService.getLocalNumberOfCells())),
-      _numberOfCells(parallelTopologyService.getLocalNumberOfCells()), _indexOffset(tarch::la::Vector<MD_DIM, unsigned int>(1)),
-      _totalNumberOfCells(_numberOfCells + 2u * _indexOffset)
+    : _cells("_cells", 0), _domainSize(domainSize), _domainOffset(domainOffset),
+      _meshWidth(getMeshwidth(domainSize, parallelTopologyService.getLocalNumberOfCells())), _numberOfCells(parallelTopologyService.getLocalNumberOfCells()),
+      _indexOffset(tarch::la::Vector<MD_DIM, unsigned int>(1)), _totalNumberOfCells(_numberOfCells + 2u * _indexOffset)
 #if (MD_DIM > 2)
       ,
       _totalNumberOfCells_X_By_totalNumberOfCells_Y(_totalNumberOfCells[0] * _totalNumberOfCells[1])
@@ -38,17 +38,10 @@ void simplemd::services::LinkedCellService::initCellStructure() {
     numberCells = numberCells * _totalNumberOfCells[d];
   }
   Kokkos::realloc(_cells, numberCells);
-  Kokkos::parallel_for(
-    numberCells,
-    KOKKOS_LAMBDA(const size_t index) {
-      _cells(index) = LinkedCell(index);
-    }
-  );
+  Kokkos::parallel_for(numberCells, KOKKOS_LAMBDA(const size_t index) { _cells(index) = LinkedCell(index); });
 }
 
-void simplemd::services::LinkedCellService::shutdown() {
-  Kokkos::realloc(_cells, 0);
-}
+void simplemd::services::LinkedCellService::shutdown() { Kokkos::realloc(_cells, 0); }
 
 unsigned int simplemd::services::LinkedCellService::getLocalIndexFromLocalVector(const tarch::la::Vector<MD_DIM, unsigned int>& coords) const {
   return coords[0]
@@ -67,7 +60,8 @@ const tarch::la::Vector<MD_DIM, double>& simplemd::services::LinkedCellService::
 
 const tarch::la::Vector<MD_DIM, double>& simplemd::services::LinkedCellService::getLocalDomainSize() const { return _domainSize; }
 
-void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex,simplemd::services::MoleculeService& moleculeService) {
+void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex,
+                                                                    simplemd::services::MoleculeService& moleculeService) {
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (localCellIndex[d] >= _totalNumberOfCells[d]) {
@@ -92,7 +86,8 @@ void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& mo
   addMoleculeToLinkedCell(molecule, index, moleculeService);
 }
 
-void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& molecule, const unsigned int& localCellIndex, simplemd::services::MoleculeService& moleculeService) {
+void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& molecule, const unsigned int& localCellIndex,
+                                                                    simplemd::services::MoleculeService& moleculeService) {
   moleculeService.addCellMolecule(molecule, localCellIndex);
   _cells(localCellIndex).addMolecule();
 }
@@ -119,7 +114,8 @@ simplemd::LinkedCell& simplemd::services::LinkedCellService::getLinkedCell(const
   return _cells(index);
 }
 
-void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex, simplemd::services::MoleculeService& moleculeService) {
+void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex,
+                                                                         simplemd::services::MoleculeService& moleculeService) {
   // compute index of respective cell
   unsigned int index = localCellIndex[0]
 #if (MD_DIM > 1)

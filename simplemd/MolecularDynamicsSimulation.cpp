@@ -156,7 +156,8 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _updateLinkedCellListsMapping = new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService, *_moleculeService);
+    _updateLinkedCellListsMapping =
+        new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService, *_moleculeService);
     if (_updateLinkedCellListsMapping == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_updateLinkedCellListsMapping==NULL!"
@@ -201,9 +202,9 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _rdfMapping =
-        new simplemd::cellmappings::RDFMapping(*_parallelTopologyService, *_moleculeService, *_linkedCellService, _configuration.getDomainConfiguration().getCutoffRadius(),
-                                               _configuration.getRDFConfiguration().getNumberOfPoints());
+    _rdfMapping = new simplemd::cellmappings::RDFMapping(*_parallelTopologyService, *_moleculeService, *_linkedCellService,
+                                                         _configuration.getDomainConfiguration().getCutoffRadius(),
+                                                         _configuration.getRDFConfiguration().getNumberOfPoints());
     if (_rdfMapping == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_rdfMapping==NULL!"
@@ -220,8 +221,8 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     for (unsigned int d = 0; d < MD_DIM; d++) {
       linkedCellVolume = linkedCellVolume * _linkedCellService->getMeshWidth()[d];
     }
-    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_moleculeService, *_linkedCellService,
-                                                   linkedCellVolume, _localMDSimulation);
+    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_moleculeService,
+                                                   *_linkedCellService, linkedCellVolume, _localMDSimulation);
     if (_profilePlotter == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initService(): "
                    "_profilePlotter==NULL!"
@@ -385,7 +386,8 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _updateLinkedCellListsMapping = new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService, *_moleculeService);
+    _updateLinkedCellListsMapping =
+        new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService, *_moleculeService);
     if (_updateLinkedCellListsMapping == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_updateLinkedCellListsMapping==NULL!"
@@ -430,9 +432,9 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _rdfMapping =
-        new simplemd::cellmappings::RDFMapping(*_parallelTopologyService, *_moleculeService, *_linkedCellService, _configuration.getDomainConfiguration().getCutoffRadius(),
-                                               _configuration.getRDFConfiguration().getNumberOfPoints());
+    _rdfMapping = new simplemd::cellmappings::RDFMapping(*_parallelTopologyService, *_moleculeService, *_linkedCellService,
+                                                         _configuration.getDomainConfiguration().getCutoffRadius(),
+                                                         _configuration.getRDFConfiguration().getNumberOfPoints());
     if (_rdfMapping == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_rdfMapping==NULL!"
@@ -449,8 +451,8 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     for (unsigned int d = 0; d < MD_DIM; d++) {
       linkedCellVolume = linkedCellVolume * _linkedCellService->getMeshWidth()[d];
     }
-    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_moleculeService, *_linkedCellService,
-                                                   linkedCellVolume, _localMDSimulation);
+    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_moleculeService,
+                                                   *_linkedCellService, linkedCellVolume, _localMDSimulation);
     if (_profilePlotter == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initService(): "
                    "_profilePlotter==NULL!"

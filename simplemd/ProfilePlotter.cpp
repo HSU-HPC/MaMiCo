@@ -6,9 +6,8 @@
 
 simplemd::ProfilePlotter::ProfilePlotter(const std::vector<simplemd::configurations::ProfilePlotterConfiguration>& configurations,
                                          const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                         simplemd::services::MoleculeService& moleculeService,
-                                         simplemd::services::LinkedCellService& linkedCellService, const double& linkedCellVolume,
-                                         const unsigned int& localMDSimulation)
+                                         simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService,
+                                         const double& linkedCellVolume, const unsigned int& localMDSimulation)
     : _linkedCellService(linkedCellService) {
   for (unsigned int i = 0; i < _plotters.size(); i++) {
     if (_plotters[i] != NULL) {
@@ -19,9 +18,9 @@ simplemd::ProfilePlotter::ProfilePlotter(const std::vector<simplemd::configurati
   _plotters.clear();
 
   for (unsigned int i = 0; i < configurations.size(); i++) {
-    _plotters.push_back(new simplemd::cellmappings::ProfilePlotterMapping(moleculeService, parallelTopologyService, linkedCellService, configurations[i].getWriteEveryTimestep(),
-                                                                          configurations[i].getSampleEveryTimestep(), configurations[i].getStartAtTimestep(),
-                                                                          linkedCellVolume, localMDSimulation));
+    _plotters.push_back(new simplemd::cellmappings::ProfilePlotterMapping(moleculeService, parallelTopologyService, linkedCellService,
+                                                                          configurations[i].getWriteEveryTimestep(), configurations[i].getSampleEveryTimestep(),
+                                                                          configurations[i].getStartAtTimestep(), linkedCellVolume, localMDSimulation));
     _ranges.push_back(configurations[i].getRange());
     _startCells.push_back(configurations[i].getStartCell());
   }

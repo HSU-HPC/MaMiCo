@@ -26,34 +26,38 @@ public:
   class Iterator {
   public:
     Iterator() : Iterator(0, 0) {} // For "uninitialized" stack variables in other classes
-    Iterator(unsigned int cellIndex, unsigned int moleculeIndex, simplemd::services::MoleculeService* moleculeService = nullptr) :
-    _moleculeService(moleculeService), _cellIndex(cellIndex), _moleculeIndex(moleculeIndex) {}
+    Iterator(unsigned int cellIndex, unsigned int moleculeIndex, simplemd::services::MoleculeService* moleculeService = nullptr)
+        : _moleculeService(moleculeService), _cellIndex(cellIndex), _moleculeIndex(moleculeIndex) {}
     Molecule* operator*() const {
       if (_moleculeService == nullptr)
         throw std::runtime_error("Cannot get molecule from simplemd::LinkedCell::Iterator (Pointer to simplemd::services::MoleculeService is a nullptr)");
       return _moleculeService->getCellMolecule(_cellIndex, _moleculeIndex);
     }
-    Iterator operator++(int) { Iterator tmp = *this; _moleculeIndex++; return tmp; }
-    Iterator operator--(int) { 
+    Iterator operator++(int) {
+      Iterator tmp = *this;
+      _moleculeIndex++;
+      return tmp;
+    }
+    Iterator operator--(int) {
       if (_moleculeIndex == 0)
         throw "Cannot decrement simplemd::LinkedCell::Iterator (_moleculeIndex cannot be negative)";
       Iterator tmp = *this;
-        _moleculeIndex--;
+      _moleculeIndex--;
       return tmp;
     }
     bool operator!=(const Iterator& other) const {
-      if (_cellIndex != other._cellIndex) return true;
+      if (_cellIndex != other._cellIndex)
+        return true;
       return _moleculeIndex != other._moleculeIndex;
     }
+
   private:
     simplemd::services::MoleculeService* _moleculeService;
     unsigned int _cellIndex;
     unsigned int _moleculeIndex;
   };
   /** iterators to begin and end position */
-  Iterator begin (simplemd::services::MoleculeService& moleculeService) const {
-    return Iterator(_index, 0, &moleculeService);
-  }
+  Iterator begin(simplemd::services::MoleculeService& moleculeService) const { return Iterator(_index, 0, &moleculeService); }
   Iterator end() const { return Iterator(_index, _moleculeCount); }
 
   void clear(simplemd::services::MoleculeService& moleculeService) {

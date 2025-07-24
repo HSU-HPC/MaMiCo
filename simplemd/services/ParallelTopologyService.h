@@ -125,7 +125,8 @@ public:
    * The MPI send calls are executed later (from within BoundaryTreatment).
    */
   std::vector<tarch::la::Vector<MD_DIM, unsigned int>> broadcastInnerCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
-                                                                                   const simplemd::services::LinkedCellService& linkedCellService, simplemd::services::MoleculeService& moleculeService);
+                                                                                   const simplemd::services::LinkedCellService& linkedCellService,
+                                                                                   simplemd::services::MoleculeService& moleculeService);
 
   /** sends all molecules from cell cellIndex to the respective neighbouring process. The cell
    * cellIndex needs to be a ghost cell.
@@ -136,7 +137,8 @@ public:
    *
    * The MPI send calls are executed later (from within BoundaryTreatment).
    */
-  bool reduceGhostCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex, const simplemd::services::LinkedCellService& linkedCellService, simplemd::services::MoleculeService& moleculeService);
+  bool reduceGhostCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex, const simplemd::services::LinkedCellService& linkedCellService,
+                                simplemd::services::MoleculeService& moleculeService);
 
   /** unpack and resort local buffer
    */

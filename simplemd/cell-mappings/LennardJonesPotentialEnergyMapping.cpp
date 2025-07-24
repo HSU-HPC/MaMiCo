@@ -13,7 +13,8 @@ simplemd::cellmappings::LennardJonesPotentialEnergyMapping::LennardJonesPotentia
       _cutOffRadiusSquared(molecularPropertiesService.getMolecularProperties().getCutOffRadius() *
                            molecularPropertiesService.getMolecularProperties().getCutOffRadius()),
       _cutOffEnergy(4.0 * _epsilon * _sigma6 / (_cutOffRadiusSquared * _cutOffRadiusSquared * _cutOffRadiusSquared) *
-                    (_sigma6 / (_cutOffRadiusSquared * _cutOffRadiusSquared * _cutOffRadiusSquared) - 1.0)), _moleculeService(moleculeService) {}
+                    (_sigma6 / (_cutOffRadiusSquared * _cutOffRadiusSquared * _cutOffRadiusSquared) - 1.0)),
+      _moleculeService(moleculeService) {}
 
 void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::beginCellIteration() {}
 

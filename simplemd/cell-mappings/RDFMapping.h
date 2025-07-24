@@ -26,8 +26,8 @@ class RDFMapping;
  */
 class simplemd::cellmappings::RDFMapping {
 public:
-  RDFMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService,
-             const double& cutoffRadius, const unsigned int& numberIntervals);
+  RDFMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
+             simplemd::services::LinkedCellService& linkedCellService, const double& cutoffRadius, const unsigned int& numberIntervals);
 
   ~RDFMapping();
 

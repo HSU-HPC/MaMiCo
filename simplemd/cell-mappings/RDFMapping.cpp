@@ -8,11 +8,10 @@
 #include <fstream>
 
 simplemd::cellmappings::RDFMapping::RDFMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                               simplemd::services::MoleculeService& moleculeService,
-                                               simplemd::services::LinkedCellService& linkedCellService, const double& cutoffRadius,
-                                               const unsigned int& numberIntervals)
-    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService), _cutoffRadius(cutoffRadius), _numberIntervals(numberIntervals),
-      _meshsize(cutoffRadius / ((double)numberIntervals)), _particleCounter(0.0), _evaluationCounter(0.0) {
+                                               simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService,
+                                               const double& cutoffRadius, const unsigned int& numberIntervals)
+    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService), _cutoffRadius(cutoffRadius),
+      _numberIntervals(numberIntervals), _meshsize(cutoffRadius / ((double)numberIntervals)), _particleCounter(0.0), _evaluationCounter(0.0) {
   _particlesPerInterval.clear();
   for (unsigned int i = 0; i < numberIntervals; i++) {
     _particlesPerInterval.push_back(0.0);

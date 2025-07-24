@@ -21,10 +21,10 @@ class ComputeMeanVelocityMapping;
  */
 class simplemd::cellmappings::ComputeMeanVelocityMapping {
 public:
-  ComputeMeanVelocityMapping(simplemd::services::MoleculeService& moleculeService, simplemd::services::ParallelTopologyService& parallelTopologyService, const unsigned int& localMDSimulation,
-                             const bool& writeToFile = true)
-      : _moleculeService(moleculeService), _parallelTopologyService(parallelTopologyService), _particleCounter(0), _meanVelocity(0.0), _localMDSimulation(localMDSimulation),
-        _writeToFile(writeToFile) {}
+  ComputeMeanVelocityMapping(simplemd::services::MoleculeService& moleculeService, simplemd::services::ParallelTopologyService& parallelTopologyService,
+                             const unsigned int& localMDSimulation, const bool& writeToFile = true)
+      : _moleculeService(moleculeService), _parallelTopologyService(parallelTopologyService), _particleCounter(0), _meanVelocity(0.0),
+        _localMDSimulation(localMDSimulation), _writeToFile(writeToFile) {}
   ~ComputeMeanVelocityMapping() {}
 
   void beginCellIteration() {

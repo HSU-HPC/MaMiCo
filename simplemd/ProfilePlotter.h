@@ -23,10 +23,8 @@ class ProfilePlotter;
 class simplemd::ProfilePlotter {
 public:
   ProfilePlotter(const std::vector<simplemd::configurations::ProfilePlotterConfiguration>& configurations,
-                 const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                 simplemd::services::MoleculeService& moleculeService,
-                 simplemd::services::LinkedCellService& linkedCellService,
-                 const double& linkedCellVolume, const unsigned int& localMDSimulation);
+                 const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
+                 simplemd::services::LinkedCellService& linkedCellService, const double& linkedCellVolume, const unsigned int& localMDSimulation);
   ~ProfilePlotter();
 
   /** accumulates information from the respective linked cells and - in case that this is the respective timestep -

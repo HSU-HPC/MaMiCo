@@ -5,7 +5,8 @@
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
 
 simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simplemd::services::ExternalForceService& externalForceService,
-                                                                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,simplemd::services::MoleculeService& moleculeService)
+                                                                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
+                                                                           simplemd::services::MoleculeService& moleculeService)
     : _epsilon(molecularPropertiesService.getMolecularProperties().getEpsilon()),
       _sigma6(molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
               molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *

@@ -24,14 +24,13 @@ class ProfilePlotterMapping;
  */
 class simplemd::cellmappings::ProfilePlotterMapping {
 public:
-  ProfilePlotterMapping(simplemd::services::MoleculeService& moleculeService,
-                        const simplemd::services::ParallelTopologyService& parallelTopologyService,
+  ProfilePlotterMapping(simplemd::services::MoleculeService& moleculeService, const simplemd::services::ParallelTopologyService& parallelTopologyService,
                         const simplemd::services::LinkedCellService& linkedCellService, const unsigned int& plotEveryTimestep,
                         const unsigned int& sampleEveryTimestep, const unsigned int& startAtTimestep, const double& linkedCellVolume,
                         const unsigned int& localMDSimulation)
-      : _moleculeService(moleculeService), _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService), _plotEveryTimestep(plotEveryTimestep),
-        _sampleEveryTimestep(sampleEveryTimestep), _startAtTimestep(startAtTimestep), _linkedCellVolume(linkedCellVolume),
-        _localMDSimulation(localMDSimulation), _currentTimestep(0), _cellCounter(0) {
+      : _moleculeService(moleculeService), _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService),
+        _plotEveryTimestep(plotEveryTimestep), _sampleEveryTimestep(sampleEveryTimestep), _startAtTimestep(startAtTimestep),
+        _linkedCellVolume(linkedCellVolume), _localMDSimulation(localMDSimulation), _currentTimestep(0), _cellCounter(0) {
     _velocityAndDensity.clear();
   }
   ~ProfilePlotterMapping() {}

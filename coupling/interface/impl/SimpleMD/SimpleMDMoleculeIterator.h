@@ -18,7 +18,8 @@ namespace interface {
  */
 class SimpleMDMoleculeIterator : public MoleculeIterator<simplemd::LinkedCell, MD_DIM> {
 public:
-  SimpleMDMoleculeIterator(simplemd::LinkedCell& cell, simplemd::services::MoleculeService& moleculeService) : coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM>(cell), _buffer(NULL), _moleculeService(moleculeService) {}
+  SimpleMDMoleculeIterator(simplemd::LinkedCell& cell, simplemd::services::MoleculeService& moleculeService)
+      : coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM>(cell), _buffer(NULL), _moleculeService(moleculeService) {}
   virtual ~SimpleMDMoleculeIterator() {}
 
   /** sets the iterator to the first element */
