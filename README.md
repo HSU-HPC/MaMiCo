@@ -41,6 +41,17 @@ Optional dependencies are:
 
         make
 
+### Building with GPU support
+
+To compile for Nvidia GPUs, use `-DKOKKOS_TARGET=CUDA`.  
+For compilation on a host without a GPU (such as the login node of a cluster), it is also necessary to specify the [target GPU architecture](https://kokkos.org/kokkos-core-wiki/get-started/configuration-guide.html#gpu-architectures):
+
+```sh
+ml gcc cuda cmake # Load build tools
+cmake -DKOKKOS_TARGET=CUDA -DKokkos_ARCH_AMPERE80=ON .. # Nvidia A100
+make
+```
+
 ### Additional instructions to build with ls1
 * After cloning the repository, initialize the ls1 submodule with
 

@@ -51,6 +51,8 @@ public:
     }
     _velold = new double[3 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
 #if defined(_OPENMP)
+    // Could affect Kokkos when using OpenMP backend
+    std::cout << "[OpenMP] FiniteDifferenceSolver is setting the number of threads to " << numThreads << std::endl;
     omp_set_num_threads(numThreads);
 #endif
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
@@ -160,7 +162,6 @@ public:
     if (skipRank()) {
       return;
     }
-#pragma omp parallel for
     for (auto pair : md2macroBuffer) {
       I01 idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;

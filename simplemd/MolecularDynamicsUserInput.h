@@ -8,6 +8,22 @@
 #define MD_YES 1
 #define MD_NO 0
 
+// KOKKOS
+#include <Kokkos_Core.hpp>
+using MainExecSpace =
+#if defined(KOKKOS_TARGET_SERIAL)
+    Kokkos::Serial
+#elif defined(KOKKOS_TARGET_OPENMP)
+    Kokkos::OpenMP
+#elif defined(KOKKOS_TARGET_CUDA)
+    Kokkos::Cuda
+#else
+    #error "No KOKKOS_TARGET_* macro defined!"
+    /* use the default execution space */
+    Kokkos::DefaultExecutionSpace
+#endif
+    ;
+
 // USER INPUT --------------------------
 // Dimension of simulation (1D=1,2D=2, 3D=3)
 #if defined(MDDim2)
