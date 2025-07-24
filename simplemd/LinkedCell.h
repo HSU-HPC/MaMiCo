@@ -57,10 +57,15 @@ public:
   Iterator end() const { return Iterator(_index, _moleculeCount); }
 
   void clear(simplemd::services::MoleculeService& moleculeService) {
+    moleculeService.clearCellMolecules(_index);
     _moleculeCount = 0;
   }
   void addMolecule() { _moleculeCount++; }
-  void deleteMolecule() { _moleculeCount--; }
+  void deleteMolecule() {
+    if (_moleculeCount == 0)
+      throw std::runtime_error("Tried to call simplemd::LinkedCell::deleteMolecule() when _moleculeCount was already 0");
+    _moleculeCount--;
+  }
   unsigned int getMoleculeCount() const { return _moleculeCount; }
   unsigned int getIndex() const { return _index; }
 
