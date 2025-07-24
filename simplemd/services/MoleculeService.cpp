@@ -500,8 +500,13 @@ void simplemd::services::MoleculeService::addCellMolecule(simplemd::Molecule& mo
 }
 
 void simplemd::services::MoleculeService::clearCellMolecules(const unsigned int cellIndex) {
-  if (cellIndex >= _linkedCellsMolecules.size())
-    throw std::runtime_error("cell index exceeds simplemd::services::MoleculeService cells");
-  _linkedCellsMolecules[cellIndex].clear();
+  if (cellIndex < _linkedCellsMolecules.size()) {
+    _linkedCellsMolecules[cellIndex].clear();
+  } else {
+#if (MD_DEBUG == MD_YES)
+    std::cout << "WARNING simplemd::services::MoleculeService::clearCellMolecules called with cellIndex=" << cellIndex << ", which does not exist (yet)"
+              << std::endl;
+#endif
+  }
 }
 #pragma endregion TODO replace with Kokkos datastructure
