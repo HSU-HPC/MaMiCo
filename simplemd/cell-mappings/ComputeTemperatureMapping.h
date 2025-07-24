@@ -65,7 +65,7 @@ public:
 
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
     double buffer;
-    for (auto m1 = cell.begin(_moleculeService); m1 != cell.end(); ++m1) {
+    for (auto m1 = cell.begin(_moleculeService); m1 != cell.end(); m1++) {
       buffer = tarch::la::dot(_meanVelocity - (*m1)->getConstVelocity(), _meanVelocity - (*m1)->getConstVelocity());
       _temperature += buffer;
       _particleCounter++;

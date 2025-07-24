@@ -61,7 +61,7 @@ public:
   }
 
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-    for (auto m1 = cell.begin(_moleculeService); m1 != cell.end(); ++m1) {
+    for (auto m1 = cell.begin(_moleculeService); m1 != cell.end(); m1++) {
       _meanVelocity += (*m1)->getConstVelocity();
       _particleCounter++;
     }

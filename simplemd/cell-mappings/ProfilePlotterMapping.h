@@ -71,7 +71,7 @@ public:
     if ((_currentTimestep - _startAtTimestep) % _sampleEveryTimestep == 0) {
       tarch::la::Vector<MD_DIM, double> vel(0.0);
       double mass = 0.0;
-      for (auto m1 = cell.begin(_moleculeService); m1 != cell.end(); ++m1) {
+      for (auto m1 = cell.begin(_moleculeService); m1 != cell.end(); m1++) {
         vel += (*m1)->getConstVelocity();
         mass += 1.0;
       }

@@ -33,7 +33,7 @@ public:
         throw std::runtime_error("Cannot get molecule from simplemd::LinkedCell::Iterator (Pointer to simplemd::services::MoleculeService is a nullptr)");
       return _moleculeService->getCellMolecule(_cellIndex, _moleculeIndex);
     }
-    Iterator& operator++() { _moleculeIndex++; return *this; }
+    Iterator operator++(int) { Iterator tmp = *this; _moleculeIndex++; return tmp; }
     Iterator& operator--() { 
       if (_moleculeIndex == 0)
         throw "Cannot decrement simplemd::LinkedCell::Iterator (_moleculeIndex cannot be negative)";

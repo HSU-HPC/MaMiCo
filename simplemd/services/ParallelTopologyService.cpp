@@ -270,7 +270,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
               std::cout << "Pack " << cell.getList().size() << " molecules in buffer " << bufferIndex << std::endl;
 #endif
               // push molecules into buffer
-              for (auto it = cell.begin(moleculeService); it != cell.end(); ++it) {
+              for (auto it = cell.begin(moleculeService); it != cell.end(); it++) {
                 // for periodic boundaries: adapt position vector
                 tarch::la::Vector<MD_DIM, double> position((*it)->getConstPosition());
                 adaptPositionForPeriodicBoundaries(position, _boundary[help], x
@@ -301,7 +301,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
               std::cout << "Pack " << cell.getList().size() << " molecules in local buffer " << std::endl;
 #endif
               // push molecules into buffer
-              for (auto it = cell.begin(moleculeService); it != cell.end(); ++it) {
+              for (auto it = cell.begin(moleculeService); it != cell.end(); it++) {
                 // for periodic boundaries: adapt position vector
                 tarch::la::Vector<MD_DIM, double> position((*it)->getConstPosition());
                 adaptPositionForPeriodicBoundaries(position, _boundary[help], x
@@ -415,7 +415,7 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
   if (isParallelNeighbour(neighbourRank)) {
     // determine appropriate buffer index
     int bufferIndex = getCurrentBufferIndexFromNeighbourRank(neighbourRank);
-    for (auto it = cell.begin(moleculeService); it != cell.end(); ++it) {
+    for (auto it = cell.begin(moleculeService); it != cell.end(); it++) {
 #if (MD_DEBUG == MD_YES)
       std::cout << "Reduce molecule at position " << (*it)->getConstPosition() << ", velocity " << (*it)->getConstVelocity() << std::endl;
 #endif

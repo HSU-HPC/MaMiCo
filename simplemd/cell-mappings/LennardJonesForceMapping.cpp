@@ -27,7 +27,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
   // iterate over all molecules
   auto end = cell.end();
   auto begin = cell.begin(_moleculeService);
-  for (auto m1 = begin; m1 != end; ++m1) {
+  for (auto m1 = begin; m1 != end; m1++) {
     auto m2 = m1;
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
@@ -36,7 +36,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
     _externalForceService.addExternalForce(force1);
 
     // iterate over all other molecules not touched so far
-    ++m2;
+    m2++;
     while (m2 != end) {
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
       forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
@@ -53,7 +53,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
       force1 += forceBuffer;
       force2 -= forceBuffer;
 
-      ++m2;
+      m2++;
     }
   }
 }
@@ -69,11 +69,11 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
   auto endCell2 = cell2.end();
   auto beginCell1 = cell1.begin(_moleculeService);
   auto beginCell2 = cell2.begin(_moleculeService);
-  for (auto m1 = beginCell1; m1 != endCell1; ++m1) {
+  for (auto m1 = beginCell1; m1 != endCell1; m1++) {
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
 
-    for (auto m2 = beginCell2; m2 != endCell2; ++m2) {
+    for (auto m2 = beginCell2; m2 != endCell2; m2++) {
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
       forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
 #if (MD_DEBUG == MD_YES)

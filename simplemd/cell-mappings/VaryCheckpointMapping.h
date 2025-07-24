@@ -28,12 +28,12 @@ public:
 
     tarch::la::Vector<MD_DIM, double> randomNumbers(0.0);
 
-    for (auto molecule = cell.begin(_moleculeService); molecule != cell.end(); ++molecule) {
+    for (auto molecule = cell.begin(_moleculeService); molecule != cell.end(); molecule++) {
       meanVelocityForCell += (*molecule)->getVelocity();
     }
     meanVelocityForCell = meanVelocityForCell / (double)cell.getMoleculeCount() / _molecularMass;
 
-    for (auto molecule = cell.begin(_moleculeService); molecule != cell.end(); ++molecule) {
+    for (auto molecule = cell.begin(_moleculeService); molecule != cell.end(); molecule++) {
       randomNumbers[0] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
       for (unsigned int d = 1; d < MD_DIM; ++d) {
         randomNumbers[d] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();

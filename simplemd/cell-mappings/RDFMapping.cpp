@@ -85,11 +85,11 @@ void simplemd::cellmappings::RDFMapping::handleCell(LinkedCell& cell, const unsi
 
   double dist;
   unsigned int interval;
-  for (auto m1 = cell.begin(_moleculeService); m1 != --cell.end(); ++m1) {
+  for (auto m1 = cell.begin(_moleculeService); m1 != --cell.end(); m1++) {
     auto m2 = m1;
 
     // iterate over all other molecules not touched so far
-    ++m2;
+    m2++;
     while (m2 != cell.end()) {
 
       dist = std::sqrt(tarch::la::dot(((*m2)->getConstPosition() - (*m1)->getConstPosition()), ((*m2)->getConstPosition() - (*m1)->getConstPosition())));
@@ -99,7 +99,7 @@ void simplemd::cellmappings::RDFMapping::handleCell(LinkedCell& cell, const unsi
         _particlesPerInterval[interval] += 2.0;
       }
 
-      ++m2;
+      m2++;
     }
     _particleCounter += 1.0;
   }
@@ -107,9 +107,9 @@ void simplemd::cellmappings::RDFMapping::handleCell(LinkedCell& cell, const unsi
 void simplemd::cellmappings::RDFMapping::handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) {
   double dist;
   unsigned int interval;
-  for (auto m1 = cell1.begin(_moleculeService); m1 != cell1.end(); ++m1) {
+  for (auto m1 = cell1.begin(_moleculeService); m1 != cell1.end(); m1++) {
 
-    for (auto m2 = cell2.begin(_moleculeService); m2 != cell2.end(); ++m2) {
+    for (auto m2 = cell2.begin(_moleculeService); m2 != cell2.end(); m2++) {
       dist = std::sqrt(tarch::la::dot(((*m2)->getConstPosition() - (*m1)->getConstPosition()), ((*m2)->getConstPosition() - (*m1)->getConstPosition())));
       interval = (unsigned int)(dist / _meshsize);
       if (dist < _cutoffRadius) {

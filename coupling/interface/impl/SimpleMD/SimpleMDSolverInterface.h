@@ -158,7 +158,7 @@ public:
         _moleculeService.deleteMolecule(*myMolecule);
         return;
       }
-      ++it;
+      it++;
     }
 
     std::cout << "Could delete molecule at position " << moleculePosition << "!" << std::endl;
@@ -275,7 +275,7 @@ public:
 
           // loop over all molecules in each cell
           const simplemd::LinkedCell& thisCell = _linkedCellService.getLinkedCell(loopIndex);
-          for (auto it = thisCell.begin(_moleculeService); it != thisCell.end(); ++it) {
+          for (auto it = thisCell.begin(_moleculeService); it != thisCell.end(); it++) {
             forceOld += getLennardJonesForce(position, (*it)->getConstPosition());
             energy += getPotentialEnergy(position, (*it)->getConstPosition());
           }

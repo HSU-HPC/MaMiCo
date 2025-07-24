@@ -30,7 +30,7 @@ public:
   /** sets the iterator to the next molecule */
   void next() {
     // check if we need to update molecule information and reset flag in this case
-    ++_it;
+    _it++;
   }
 
   /** returns a reference to the molecule that this iterator currently points to */

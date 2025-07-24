@@ -24,7 +24,7 @@ public:
   void beginCellIteration() {}
   void endCellIteration() {}
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-    for (auto it = cell.begin(_moleculeService); it != cell.end(); ++it) {
+    for (auto it = cell.begin(_moleculeService); it != cell.end(); it++) {
       (*it)->setPotentialEnergy(_zero);
     }
   }

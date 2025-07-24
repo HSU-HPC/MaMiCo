@@ -24,7 +24,7 @@ void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handle
       }
     }
     // iterate over cell's molecules and add molecules to local ghost cell
-    for (auto it = cell.begin(_moleculeService); it != cell.end(); ++it) {
+    for (auto it = cell.begin(_moleculeService); it != cell.end(); it++) {
       positionBuffer = (*it)->getConstPosition();
       positionBuffer += shift;
       Molecule myMolecule(positionBuffer, (*it)->getConstVelocity());

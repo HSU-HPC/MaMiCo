@@ -21,12 +21,12 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
   // iterate over all molecules
   auto itEnd = cell.end();
   auto itBegin = cell.begin(_moleculeService);
-  for (auto m1 = itBegin; m1 != itEnd; ++m1) {
+  for (auto m1 = itBegin; m1 != itEnd; m1++) {
     auto m2 = m1;
     double& potentialEnergy1 = (*m1)->getPotentialEnergy();
 
     // iterate over all other molecules not touched so far
-    ++m2;
+    m2++;
     while (m2 != itEnd) {
 #if (MD_DEBUG == MD_YES)
       std::cout << "Compute potential energy " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
@@ -48,7 +48,7 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
         potentialEnergy2 += 0.5 * energyBuffer;
       }
 
-      ++m2;
+      m2++;
     }
   }
 }
@@ -60,10 +60,10 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPair(
   auto m2End = cell2.end();
   auto m1Begin = cell1.begin(_moleculeService);
   auto m2Begin = cell2.begin(_moleculeService);
-  for (auto m1 = m1Begin; m1 != m1End; ++m1) {
+  for (auto m1 = m1Begin; m1 != m1End; m1++) {
     double& potentialEnergy1 = (*m1)->getPotentialEnergy();
 
-    for (auto m2 = m2Begin; m2 != m2End; ++m2) {
+    for (auto m2 = m2Begin; m2 != m2End; m2++) {
 #if (MD_DEBUG == MD_YES)
       std::cout << "Compute potential energy " << (*m1)->getID() << " <-> " << (*m2)->getID() << std::endl;
 #endif

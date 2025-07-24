@@ -29,7 +29,7 @@ public:
 
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
     // loop over molecules
-    for (auto it = cell.begin(_moleculeService); it != cell.end(); ++it) {
+    for (auto it = cell.begin(_moleculeService); it != cell.end(); it++) {
       // push back molecule on buffer and remove it from simulation
       Molecule* myMolecule = (*it);
 #if (MD_DEBUG == MD_YES)
