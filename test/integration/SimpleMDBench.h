@@ -27,12 +27,14 @@ public:
       }
     }
     void endMoleculeIteration() {}
-    unsigned long long checksum() { return sum; }
+    unsigned long long checksum() const { return sum; }
 
   private:
     void process(const double& data) { sum ^= *((unsigned long long*)&data); }
     unsigned long long sum = 0;
   };
+
+  bool tarchDebugIsOn() const { return _moleculeService->tarchDebugIsOn(); }
 
   unsigned long long getChecksum() {
     ChecksumMapping mapping;
@@ -60,7 +62,7 @@ private:
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
     int size = 0;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    if(size != 1){
+    if (size != 1) {
       std::cout << "ERROR SimpleMDBench: Must be run with exactly one MPI process!" << std::endl;
       exit(EXIT_FAILURE);
     }
@@ -155,6 +157,16 @@ private:
     std::cout << "WARN SimpleMDBench: Result validity check FAILED: TARCH_DEBUG is off!" << std::endl;
     return;
 #endif
+
+    if (!_simulation->tarchDebugIsOn()) {
+      std::cout << "WARN SimpleMDBench: Result validity check FAILED: MoleculeService: TARCH_DEBUG is off!" << std::endl;
+      return;
+    }
+
+    if (!tarch::utils::RandomNumberService::getInstance().tarchDebugIsOn()) {
+      std::cout << "WARN SimpleMDBench: Result validity check FAILED: RandomNumberService: TARCH_DEBUG is off!" << std::endl;
+      return;
+    }
 
     unsigned long long sum = _simulation->getChecksum();
     std::cout << "INFO SimpleMDBench: Final XOR Checksum is " << sum << std::endl;
