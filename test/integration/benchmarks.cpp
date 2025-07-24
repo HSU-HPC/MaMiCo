@@ -23,10 +23,17 @@ int main(int argc, char* argv[]) {
 #endif
   Kokkos::initialize(argc, argv);
 
-  // run tests
-  runTest(new CellIdxIterBench());
-  std::cout << std::endl << "==================== ==================== ====================" << std::endl << std::endl;
-  runTest(new SimpleMDBench());
+  {
+    Kokkos::ScopeGuard kokkos(argc, argv);
+    std::cout << "Kokkos using execution space \"" << MainExecSpace::name() << "\" with memory space \"" << MainExecSpace::memory_space::name() << "\""
+              << std::endl;
+    MainExecSpace().print_configuration(std::cout);
+
+    // run tests
+    runTest(new CellIdxIterBench());
+    std::cout << std::endl << "==================== ==================== ====================" << std::endl << std::endl;
+    runTest(new SimpleMDBench());
+  }
 
   Kokkos::finalize();
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)

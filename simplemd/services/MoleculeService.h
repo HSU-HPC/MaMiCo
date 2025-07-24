@@ -108,6 +108,8 @@ public:
   /** resets the velocity over the whole molecule system to the mean velocity specified at the beginning */
   void resetMeanVelocity();
 
+  bool tarchDebugIsOn() const;
+
 private:
   /** applies molecule mapping without any node-level parallelisation
    */

@@ -43,12 +43,12 @@ public:
 #if (MD_DIM == 1)
       mVelocity = meanVelocityForCell + stdDeviation * randomNumbers;
 #elif (MD_DIM == 2)
-      mVelocity[0] = meanVelocityForCell[0] + stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));
-      mVelocity[1] = meanVelocityForCell[1] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]));
+      mVelocity[0] = meanVelocityForCell[0] + stdDeviation * (randomNumbers[0] * TARCH_COS(randomNumbers[1]));
+      mVelocity[1] = meanVelocityForCell[1] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]));
 #elif (MD_DIM == 3)
-      mVelocity[0] = meanVelocityForCell[0] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::cos(randomNumbers[2]));
-      mVelocity[1] = meanVelocityForCell[1] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::sin(randomNumbers[2]));
-      mVelocity[2] = meanVelocityForCell[2] + stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));
+      mVelocity[0] = meanVelocityForCell[0] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]) * TARCH_COS(randomNumbers[2]));
+      mVelocity[1] = meanVelocityForCell[1] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]) * TARCH_SIN(randomNumbers[2]));
+      mVelocity[2] = meanVelocityForCell[2] + stdDeviation * (randomNumbers[0] * TARCH_COS(randomNumbers[1]));
 #endif
 
       tarch::la::Vector<MD_DIM, double>& mPosition = (*molecule)->getPosition();

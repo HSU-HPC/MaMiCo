@@ -9,6 +9,30 @@
 #include <mpi.h>
 #endif
 
+namespace tarch {
+double simple_sin(double x) {
+  double res = x;
+  double t = x;
+  for (int c = 2; c < 30; c += 2) {
+    t *= -x * x / (c * c + c);
+    res += t;
+  }
+  return res;
+}
+
+double simple_cos(double x) { return 1 - 2 * simple_sin(x / 2) * simple_sin(x / 2); }
+
+double simple_log(double x) {
+  double res = 0;
+  double t = 1;
+  for (int k = 1; k < 200; k++) {
+    t *= 1 - x;
+    res -= t / k;
+  }
+  return res;
+}
+} // namespace tarch
+
 std::minstd_rand simple_rand;
 const auto RAMAX = std::minstd_rand::max();
 
@@ -68,8 +92,8 @@ double tarch::utils::RandomNumberService::getGaussianRandomNumber() {
       v[1] = (2.0 * _randomNumbers[1] - 1.0);
       s = v[0] * v[0] + v[1] * v[1];
     }
-    _randomNumbers[0] = v[0] * sqrt((-2.0 * log(s)) / s);
-    _randomNumbers[1] = v[1] * sqrt((-2.0 * log(s)) / s);
+    _randomNumbers[0] = v[0] * sqrt((-2.0 * TARCH_LOG(s)) / s);
+    _randomNumbers[1] = v[1] * sqrt((-2.0 * TARCH_LOG(s)) / s);
 
     // change to the other variable in the next call
     _isFirstRandomNumber = false;
@@ -80,4 +104,12 @@ double tarch::utils::RandomNumberService::getGaussianRandomNumber() {
     _isFirstRandomNumber = true;
     return _randomNumbers[1];
   }
+}
+
+bool tarch::utils::RandomNumberService::tarchDebugIsOn() const {
+#if (TARCH_DEBUG == TARCH_YES)
+  return true;
+#else
+  return false;
+#endif
 }

@@ -10,9 +10,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <sys/time.h>
-#ifdef BOOST_FOUND
-#include <boost/crc.hpp>
-#endif
 
 class BenchSim : public simplemd::MolecularDynamicsSimulation {
 public:
@@ -30,22 +27,16 @@ public:
       }
     }
     void endMoleculeIteration() {}
-#ifdef BOOST_FOUND
-    unsigned long long checksum() { return sum.checksum(); }
-
-  private:
-    void process(const double& data) { sum.process_bytes(&data, sizeof(double)); }
-    boost::crc_32_type sum;
-#else
-    unsigned long long checksum() { return sum; }
+    unsigned long long checksum() const { return sum; }
 
     static const bool IsParallel = false;
 
   private:
     void process(const double& data) { sum ^= *((unsigned long long*)&data); }
     unsigned long long sum = 0;
-#endif
   };
+
+  bool tarchDebugIsOn() const { return _moleculeService->tarchDebugIsOn(); }
 
   unsigned long long getChecksum() {
     ChecksumMapping mapping;
@@ -71,6 +62,12 @@ private:
     _rank = 0;
 #if (MD_PARALLEL == MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
+    int size = 0;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (size != 1) {
+      std::cout << "ERROR SimpleMDBench: Must be run with exactly one MPI process!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
 #endif
 
     std::string fname = "mdconf.xml.tmp." + std::to_string(_rank);
@@ -140,6 +137,7 @@ private:
   void bench() {
     // warm-up timestep, for more reliable benchmarking result
     _simulation->simulateOneTimestep(0);
+    std::cout << "INFO SimpleMDBench: Warmup Checksum is " << _simulation->getChecksum() << std::endl;
 
     timeval start, end;
     gettimeofday(&start, NULL);
@@ -157,14 +155,24 @@ private:
     return;
 #endif
 
-    unsigned long long sum = _simulation->getChecksum();
-#ifdef BOOST_FOUND
-    std::cout << "INFO SimpleMDBench: CRC32 Checksum is " << sum << std::endl;
-    unsigned long long correct = 1740937012;
-#else
-    std::cout << "INFO SimpleMDBench: XOR Checksum is " << sum << std::endl;
-    unsigned long long correct = 34940402907449993;
+#if (TARCH_DEBUG == TARCH_NO)
+    std::cout << "WARN SimpleMDBench: Result validity check FAILED: TARCH_DEBUG is off!" << std::endl;
+    return;
 #endif
+
+    if (!_simulation->tarchDebugIsOn()) {
+      std::cout << "WARN SimpleMDBench: Result validity check FAILED: MoleculeService: TARCH_DEBUG is off!" << std::endl;
+      return;
+    }
+
+    if (!tarch::utils::RandomNumberService::getInstance().tarchDebugIsOn()) {
+      std::cout << "WARN SimpleMDBench: Result validity check FAILED: RandomNumberService: TARCH_DEBUG is off!" << std::endl;
+      return;
+    }
+
+    unsigned long long sum = _simulation->getChecksum();
+    std::cout << "INFO SimpleMDBench: Final XOR Checksum is " << sum << std::endl;
+    unsigned long long correct = 9224833478695498352u;
     if (sum == correct)
       std::cout << "INFO SimpleMDBench: SUCCESS Checksum is correct :-)" << std::endl;
     else {

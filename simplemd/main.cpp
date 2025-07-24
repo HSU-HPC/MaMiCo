@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 #if (MD_PARALLEL == MD_YES)
   MPI_Init(&argc, &argv);
 #endif
-  Kokkos::initialize(argc, argv);
+  Kokkos::ScopeGuard kokkos(argc, argv);
   std::cout << "Kokkos using execution space \"" << MainExecSpace::name() << "\" with memory space \"" << MainExecSpace::memory_space::name() << "\""
             << std::endl;
   MainExecSpace().print_configuration(std::cout);
@@ -50,7 +50,6 @@ int main(int argc, char* argv[]) {
 
   simulation.shutdownServices();
 
-  Kokkos::finalize();
 // shutdown parallel environment
 #if (MD_PARALLEL == MD_YES)
   MPI_Finalize();
