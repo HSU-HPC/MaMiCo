@@ -24,12 +24,15 @@ class EmptyLinkedListsMapping;
  */
 class simplemd::cellmappings::EmptyLinkedListsMapping {
 public:
-  EmptyLinkedListsMapping() {}
+  EmptyLinkedListsMapping(simplemd::services::MoleculeService& moleculeService) : _moleculeService(moleculeService) {}
   ~EmptyLinkedListsMapping() {}
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) { cell.clear(); }
+  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) { cell.clear(_moleculeService); }
+
+private:
+  simplemd::services::MoleculeService& _moleculeService;
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_EMPTYLINKEDLISTSMAPPING_H_

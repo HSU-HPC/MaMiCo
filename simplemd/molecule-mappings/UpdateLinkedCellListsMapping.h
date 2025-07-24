@@ -26,8 +26,8 @@ class UpdateLinkedCellListsMapping;
 class simplemd::moleculemappings::UpdateLinkedCellListsMapping {
 public:
   UpdateLinkedCellListsMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                               simplemd::services::LinkedCellService& linkedCellService)
-      : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService) {}
+                               simplemd::services::LinkedCellService& linkedCellService, simplemd::services::MoleculeService& moleculeService)
+      : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService), _moleculeService(moleculeService) {}
   ~UpdateLinkedCellListsMapping() {}
 
   void beginMoleculeIteration();
@@ -37,6 +37,7 @@ public:
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
   simplemd::services::LinkedCellService& _linkedCellService;
+  simplemd::services::MoleculeService& _moleculeService;
 #if (MD_ERROR == MD_YES)
   /** global domain size */
   tarch::la::Vector<MD_DIM, double> _domainSize;

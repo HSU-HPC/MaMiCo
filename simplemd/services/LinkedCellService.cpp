@@ -22,7 +22,7 @@ simplemd::services::LinkedCellService::LinkedCellService(const tarch::la::Vector
   initCellStructure();
 
   // sort molecules into cells. This is done as an initial step.
-  simplemd::moleculemappings::UpdateLinkedCellListsMapping updateLinkedCellLists(parallelTopologyService, *this);
+  simplemd::moleculemappings::UpdateLinkedCellListsMapping updateLinkedCellLists(parallelTopologyService, *this, moleculeService);
   moleculeService.iterateMolecules(updateLinkedCellLists, false);
 }
 
@@ -67,7 +67,7 @@ const tarch::la::Vector<MD_DIM, double>& simplemd::services::LinkedCellService::
 
 const tarch::la::Vector<MD_DIM, double>& simplemd::services::LinkedCellService::getLocalDomainSize() const { return _domainSize; }
 
-void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex) {
+void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex,simplemd::services::MoleculeService& moleculeService) {
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (localCellIndex[d] >= _totalNumberOfCells[d]) {
@@ -89,14 +89,11 @@ void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& mo
                        + _totalNumberOfCells_X_By_totalNumberOfCells_Y * localCellIndex[2]
 #endif
       ;
-  addMoleculeToLinkedCell(molecule, index);
+  addMoleculeToLinkedCell(molecule, index, moleculeService);
 }
 
-void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& molecule, const unsigned int& localCellIndex) {
-  // TODO FIXME add molecule to 2D data structure
-  std::cout << __FILE__ << ":" << __LINE__ << " Not yet implemented" << std::endl; // FIXME TODO
-  throw "Not yet implemented!";
-
+void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& molecule, const unsigned int& localCellIndex, simplemd::services::MoleculeService& moleculeService) {
+  moleculeService.addCellMolecule(molecule, localCellIndex);
   _cells(localCellIndex).addMolecule();
 }
 
@@ -122,7 +119,7 @@ simplemd::LinkedCell& simplemd::services::LinkedCellService::getLinkedCell(const
   return _cells(index);
 }
 
-void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex) {
+void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex, simplemd::services::MoleculeService& moleculeService) {
   // compute index of respective cell
   unsigned int index = localCellIndex[0]
 #if (MD_DIM > 1)
@@ -132,9 +129,7 @@ void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecul
                        + localCellIndex[2] * _totalNumberOfCells_X_By_totalNumberOfCells_Y
 #endif
       ;
-  std::cout << __FILE__ << ":" << __LINE__ << " Not yet implemented" << std::endl; // FIXME TODO
-  throw "Not yet implemented";
-  
+  throw "simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell is not implemented (Was never used)";
   _cells(index).deleteMolecule();
 }
 

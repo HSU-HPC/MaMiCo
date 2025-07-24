@@ -75,10 +75,10 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
         myMolecule.fix();
       _moleculeService.deleteMolecule(*(*it));
       Molecule* mPtr = _moleculeService.addMolecule(myMolecule);
-      _linkedCellService.addMoleculeToLinkedCell(*mPtr, innerCell->getIndex());
+      _linkedCellService.addMoleculeToLinkedCell(*mPtr, innerCell->getIndex(), _moleculeService);
       innerCell->addMolecule();
     }
   }
   // in any case: clear list in this cell
-  cell.clear();
+  cell.clear(_moleculeService);
 }

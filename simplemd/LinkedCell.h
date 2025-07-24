@@ -30,10 +30,8 @@ public:
     _moleculeService(moleculeService), _cellIndex(cellIndex), _moleculeIndex(moleculeIndex) {}
     Molecule* operator*() const {
       if (_moleculeService == nullptr)
-        throw "Cannot get molecule from simplemd::LinkedCell::Iterator (Pointer to simplemd::services::MoleculeService is a nullptr)";
-      std::cout << __FILE__ << ":" << __LINE__ << ": Iterator function operator*() not yet implemented" << std::endl; // FIXME TODO implement
-      throw "Not yet implemented";
-      return nullptr;
+        throw std::runtime_error("Cannot get molecule from simplemd::LinkedCell::Iterator (Pointer to simplemd::services::MoleculeService is a nullptr)");
+      return _moleculeService->getCellMolecule(_cellIndex, _moleculeIndex);
     }
     Iterator& operator++() { _moleculeIndex++; return *this; }
     Iterator& operator--() { 
@@ -57,7 +55,9 @@ public:
   }
   Iterator end() const { return Iterator(_index, _moleculeCount); }
 
-  void clear() { _moleculeCount = 0; }
+  void clear(simplemd::services::MoleculeService& moleculeService) {
+    _moleculeCount = 0;
+  }
   void addMolecule() { _moleculeCount++; }
   void deleteMolecule() { _moleculeCount--; }
   unsigned int getMoleculeCount() const { return _moleculeCount; }

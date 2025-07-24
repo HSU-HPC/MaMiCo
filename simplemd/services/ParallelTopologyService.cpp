@@ -1166,7 +1166,7 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalB
 #if (MD_DEBUG == MD_YES)
     std::cout << "Rank " << _rank << ": unpacked molecule from buffer into cell " << cellIndex << std::endl;
 #endif
-    linkedCellService.addMoleculeToLinkedCell(*mPtr, cellIndex);
+    linkedCellService.addMoleculeToLinkedCell(*mPtr, cellIndex, moleculeService);
   }
 
   // clear the buffer

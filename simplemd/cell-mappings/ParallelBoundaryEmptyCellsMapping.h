@@ -37,7 +37,7 @@ public:
       for (auto it = cell.begin(_moleculeService); it != cell.end(); ++it) {
         _moleculeService.deleteMolecule(*(*it));
       }
-      cell.clear();
+      cell.clear(_moleculeService);
     }
   }
 

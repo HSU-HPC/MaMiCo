@@ -68,5 +68,5 @@ void simplemd::moleculemappings::UpdateLinkedCellListsMapping::handleMolecule(Mo
             << " , force: " << molecule.getConstForceOld() << " into cell " << std::endl;
   std::cout << cellVectorIndex << std::endl;
 #endif
-  _linkedCellService.addMoleculeToLinkedCell(molecule, cellVectorIndex);
+  _linkedCellService.addMoleculeToLinkedCell(molecule, cellVectorIndex, _moleculeService);
 }

@@ -37,7 +37,7 @@ public:
     }
 
     // delete molecules from the cell
-    cell.clear();
+    cell.clear(_moleculeService);
   }
 
   std::list<simplemd::Molecule>& getCopyOfMolecules() { return _molecules; }

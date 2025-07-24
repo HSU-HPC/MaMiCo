@@ -176,7 +176,7 @@ public:
     // add molecule to MoleculeService and LinkedCellService
     simplemd::Molecule* myMolecule = _moleculeService.addMolecule(newMolecule);
     tarch::la::Vector<MD_DIM, unsigned int> linkedCellIndex(getLinkedCellIndexForMoleculePosition(myMolecule->getConstPosition()));
-    _linkedCellService.addMoleculeToLinkedCell(*myMolecule, linkedCellIndex);
+    _linkedCellService.addMoleculeToLinkedCell(*myMolecule, linkedCellIndex, _moleculeService);
   }
 
   tarch::la::Vector<MD_DIM, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<MD_DIM, double>& position) {

@@ -405,7 +405,7 @@ void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::servi
   // loop counter
   unsigned int i = 0;
   simplemd::cellmappings::CopyMoleculesMapping copyMoleculesMapping(*this);
-  simplemd::moleculemappings::UpdateLinkedCellListsMapping updateLinkedCellListsMapping(parallelTopologyService, linkedCellService);
+  simplemd::moleculemappings::UpdateLinkedCellListsMapping updateLinkedCellListsMapping(parallelTopologyService, linkedCellService, *this);
 
   // create copy of molecules and store the copies in a std::list
   std::list<simplemd::Molecule>& copyBuffer = copyMoleculesMapping.getCopyOfMolecules();
@@ -475,3 +475,26 @@ void simplemd::services::MoleculeService::resetMeanVelocity() {
   // check again
   iterateMolecules(compute, false);
 }
+
+#pragma region TODO replace with Kokkos datastructure
+simplemd::Molecule* simplemd::services::MoleculeService::getCellMolecule(const unsigned int cellIndex, const unsigned int moleculeIndex) {
+  if (cellIndex >= _linkedCellsMolecules.size())
+    throw std::runtime_error("cell index exceeds simplemd::services::MoleculeService cells");
+  if (moleculeIndex >= _linkedCellsMolecules[cellIndex].size())
+    throw std::runtime_error("molecule index exceeds molecules in simplemd::services::MoleculeService cell");
+  return _linkedCellsMolecules[cellIndex][moleculeIndex];
+}
+
+void simplemd::services::MoleculeService::addCellMolecule(simplemd::Molecule& molecule, const unsigned int cellIndex) {
+  while (_linkedCellsMolecules.size() <= cellIndex)
+    _linkedCellsMolecules.push_back({});
+  _linkedCellsMolecules[cellIndex].push_back(&molecule);  
+}
+
+void simplemd::services::MoleculeService::clearCellMolecules(const unsigned int cellIndex) {
+  if (cellIndex >= _linkedCellsMolecules.size())
+    throw std::runtime_error("cell index exceeds simplemd::services::MoleculeService cells");
+  _linkedCellsMolecules[cellIndex].clear();
+}
+#pragma endregion TODO replace with Kokkos datastructure
+

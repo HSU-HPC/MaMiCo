@@ -40,7 +40,7 @@ public:
       // delete molecule from MoleculeService
       _moleculeService.deleteMolecule(*myMolecule);
     }
-    cell.clear();
+    cell.clear(_moleculeService);
   }
   void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) {}
 

@@ -36,12 +36,12 @@ public:
 
   /** puts the molecule into the cell defined by the local index (vector)
    * coordinates localCellIndex */
-  void addMoleculeToLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex);
+  void addMoleculeToLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex, simplemd::services::MoleculeService& moleculeService);
   /** puts the molecule into the cell defined by the local index (scalar)
    * coordinates localCellIndex */
-  void addMoleculeToLinkedCell(Molecule& molecule, const unsigned int& localCellIndex);
+  void addMoleculeToLinkedCell(Molecule& molecule, const unsigned int& localCellIndex, simplemd::services::MoleculeService& moleculeService);
 
-  void deleteMoleculeFromLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex);
+  void deleteMoleculeFromLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex, simplemd::services::MoleculeService& moleculeService);
 
   /** returns the linked cell at the respective coordinates */
   LinkedCell& getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex);

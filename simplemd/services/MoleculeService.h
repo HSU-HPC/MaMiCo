@@ -109,9 +109,19 @@ public:
   /** resets the velocity over the whole molecule system to the mean velocity specified at the beginning */
   void resetMeanVelocity();
 
+#pragma region TODO replace with Kokkos datastructure
+  Molecule* getCellMolecule(const unsigned int cellIndex, const unsigned int moleculeIndex);
+  void addCellMolecule(Molecule& molecule, const unsigned int cellIndex);
+  void clearCellMolecules(const unsigned int cellIndex);
+
 private:
+  // TODO (temporary): Will be replaced by datastructure wrapping Kokkos::View<simplemd::Molecule**>
+  std::vector<std::vector<simplemd::Molecule*>> _linkedCellsMolecules;
+#pragma endregion TODO replace with Kokkos datastructure
+
   /** pointer to all the molecules */
   std::vector<simplemd::Molecule*> _molecules;
+
 
   /** stores the mean velocity for normalisation */
   tarch::la::Vector<MD_DIM, double> _meanVelocity;

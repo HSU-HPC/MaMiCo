@@ -156,7 +156,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _updateLinkedCellListsMapping = new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService);
+    _updateLinkedCellListsMapping = new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService, *_moleculeService);
     if (_updateLinkedCellListsMapping == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_updateLinkedCellListsMapping==NULL!"
@@ -194,7 +194,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _emptyLinkedListsMapping = new simplemd::cellmappings::EmptyLinkedListsMapping();
+    _emptyLinkedListsMapping = new simplemd::cellmappings::EmptyLinkedListsMapping(*_moleculeService);
     if (_emptyLinkedListsMapping == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_emptyLinkedListsMapping==NULL!"
@@ -385,7 +385,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _updateLinkedCellListsMapping = new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService);
+    _updateLinkedCellListsMapping = new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService, *_moleculeService);
     if (_updateLinkedCellListsMapping == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_updateLinkedCellListsMapping==NULL!"
@@ -423,7 +423,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _emptyLinkedListsMapping = new simplemd::cellmappings::EmptyLinkedListsMapping();
+    _emptyLinkedListsMapping = new simplemd::cellmappings::EmptyLinkedListsMapping(*_moleculeService);
     if (_emptyLinkedListsMapping == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_emptyLinkedListsMapping==NULL!"

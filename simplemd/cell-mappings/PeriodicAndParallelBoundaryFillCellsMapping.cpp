@@ -32,7 +32,7 @@ void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handle
       if ((*it)->isFixed())
         myMolecule.fix();
       Molecule* myPtr = _moleculeService.addMolecule(myMolecule);
-      _linkedCellService.addMoleculeToLinkedCell(*myPtr, localIndex[i]);
+      _linkedCellService.addMoleculeToLinkedCell(*myPtr, localIndex[i], _moleculeService);
     }
   }
 }

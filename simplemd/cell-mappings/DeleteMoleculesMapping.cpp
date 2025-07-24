@@ -5,7 +5,12 @@
 #include "simplemd/cell-mappings/DeleteMoleculesMapping.h"
 
 void simplemd::cellmappings::DeleteMoleculesMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-  throw "Not implemented!";
-  // _moleculeService.deleteCellMolecules(cell);
-  cell.clear();
+  for (auto it = cell.begin(_moleculeService); it != cell.end(); ++it) {
+    // get the molecule pointer and set it to NULL within the cell
+    Molecule* myMolecule = (*it);
+
+    // delete molecule from MoleculeService
+    _moleculeService.deleteMolecule(*myMolecule);
+  }
+  cell.clear(_moleculeService);
 }
