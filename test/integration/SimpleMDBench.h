@@ -172,7 +172,11 @@ private:
 
     unsigned long long sum = _simulation->getChecksum();
     std::cout << "INFO SimpleMDBench: Final XOR Checksum is " << sum << std::endl;
-    unsigned long long correct = 9224833478695498352u;
+    unsigned long long correct;
+    if (simplemd::cellmappings::LennardJonesForceMapping::IsParallel) // Different cell traversal
+      correct = 9224833478677969387u;
+    else
+      correct = 9224833478695498352u;
     if (sum == correct)
       std::cout << "INFO SimpleMDBench: SUCCESS Checksum is correct :-)" << std::endl;
     else {
