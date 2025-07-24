@@ -8,9 +8,10 @@
 #include <fstream>
 
 simplemd::cellmappings::RDFMapping::RDFMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService,
+                                               simplemd::services::MoleculeService& moleculeService,
                                                simplemd::services::LinkedCellService& linkedCellService, const double& cutoffRadius,
                                                const unsigned int& numberIntervals)
-    : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService), _cutoffRadius(cutoffRadius), _numberIntervals(numberIntervals),
+    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService), _cutoffRadius(cutoffRadius), _numberIntervals(numberIntervals),
       _meshsize(cutoffRadius / ((double)numberIntervals)), _particleCounter(0.0), _evaluationCounter(0.0) {
   _particlesPerInterval.clear();
   for (unsigned int i = 0; i < numberIntervals; i++) {
@@ -84,11 +85,7 @@ void simplemd::cellmappings::RDFMapping::handleCell(LinkedCell& cell, const unsi
 
   double dist;
   unsigned int interval;
-
-  simplemd::services::MoleculeService* _moleculeService = nullptr;
-  throw "Not yet implemented: init _moleculeService";
-
-  for (auto m1 = cell.begin(*_moleculeService); m1 != --cell.end(); ++m1) {
+  for (auto m1 = cell.begin(_moleculeService); m1 != --cell.end(); ++m1) {
     auto m2 = m1;
 
     // iterate over all other molecules not touched so far
@@ -110,13 +107,9 @@ void simplemd::cellmappings::RDFMapping::handleCell(LinkedCell& cell, const unsi
 void simplemd::cellmappings::RDFMapping::handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) {
   double dist;
   unsigned int interval;
+  for (auto m1 = cell1.begin(_moleculeService); m1 != cell1.end(); ++m1) {
 
-  simplemd::services::MoleculeService* _moleculeService = nullptr;
-  throw "Not yet implemented: init _moleculeService";
-
-  for (auto m1 = cell1.begin(*_moleculeService); m1 != cell1.end(); ++m1) {
-
-    for (auto m2 = cell2.begin(*_moleculeService); m2 != cell2.end(); ++m2) {
+    for (auto m2 = cell2.begin(_moleculeService); m2 != cell2.end(); ++m2) {
       dist = std::sqrt(tarch::la::dot(((*m2)->getConstPosition() - (*m1)->getConstPosition()), ((*m2)->getConstPosition() - (*m1)->getConstPosition())));
       interval = (unsigned int)(dist / _meshsize);
       if (dist < _cutoffRadius) {

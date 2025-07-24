@@ -23,7 +23,9 @@ class ProfilePlotter;
 class simplemd::ProfilePlotter {
 public:
   ProfilePlotter(const std::vector<simplemd::configurations::ProfilePlotterConfiguration>& configurations,
-                 const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::LinkedCellService& linkedCellService,
+                 const simplemd::services::ParallelTopologyService& parallelTopologyService,
+                 simplemd::services::MoleculeService& moleculeService,
+                 simplemd::services::LinkedCellService& linkedCellService,
                  const double& linkedCellVolume, const unsigned int& localMDSimulation);
   ~ProfilePlotter();
 

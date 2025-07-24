@@ -187,7 +187,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
 #endif
 
     // cell mappings
-    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
+    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService, *_moleculeService);
     if (_lennardJonesForce == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_lennardJonesForce==NULL!"
@@ -202,7 +202,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
       exit(EXIT_FAILURE);
     }
     _rdfMapping =
-        new simplemd::cellmappings::RDFMapping(*_parallelTopologyService, *_linkedCellService, _configuration.getDomainConfiguration().getCutoffRadius(),
+        new simplemd::cellmappings::RDFMapping(*_parallelTopologyService, *_moleculeService, *_linkedCellService, _configuration.getDomainConfiguration().getCutoffRadius(),
                                                _configuration.getRDFConfiguration().getNumberOfPoints());
     if (_rdfMapping == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
@@ -220,7 +220,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     for (unsigned int d = 0; d < MD_DIM; d++) {
       linkedCellVolume = linkedCellVolume * _linkedCellService->getMeshWidth()[d];
     }
-    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_linkedCellService,
+    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_moleculeService, *_linkedCellService,
                                                    linkedCellVolume, _localMDSimulation);
     if (_profilePlotter == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initService(): "
@@ -416,7 +416,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
 #endif
 
     // cell mappings
-    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
+    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService, *_moleculeService);
     if (_lennardJonesForce == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_lennardJonesForce==NULL!"
@@ -431,7 +431,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
       exit(EXIT_FAILURE);
     }
     _rdfMapping =
-        new simplemd::cellmappings::RDFMapping(*_parallelTopologyService, *_linkedCellService, _configuration.getDomainConfiguration().getCutoffRadius(),
+        new simplemd::cellmappings::RDFMapping(*_parallelTopologyService, *_moleculeService, *_linkedCellService, _configuration.getDomainConfiguration().getCutoffRadius(),
                                                _configuration.getRDFConfiguration().getNumberOfPoints());
     if (_rdfMapping == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
@@ -449,7 +449,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     for (unsigned int d = 0; d < MD_DIM; d++) {
       linkedCellVolume = linkedCellVolume * _linkedCellService->getMeshWidth()[d];
     }
-    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_linkedCellService,
+    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_moleculeService, *_linkedCellService,
                                                    linkedCellVolume, _localMDSimulation);
     if (_profilePlotter == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initService(): "
@@ -624,7 +624,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
     cellmappings::VaryCheckpointMapping varyCheckpointMapping(
         _configuration.getMoleculeConfiguration().getMass(), _configuration.getDomainConfiguration().getKB(),
         _configuration.getMoleculeConfiguration().getTemperature(), _configuration.getMoleculeConfiguration().getSigma(),
-        _configuration.getDomainConfiguration().getMeshWidth());
+        _configuration.getDomainConfiguration().getMeshWidth(), *_moleculeService);
     _linkedCellService->iterateCells(varyCheckpointMapping, false);
   }
 
@@ -671,10 +671,10 @@ void simplemd::MolecularDynamicsSimulation::evaluateStatistics(const unsigned in
 
   if ((timeInterval != 0) && (t % timeInterval == 0)) {
     // compute average velocity
-    simplemd::cellmappings::ComputeMeanVelocityMapping computeMeanVelocityMapping(*_parallelTopologyService, _localMDSimulation);
+    simplemd::cellmappings::ComputeMeanVelocityMapping computeMeanVelocityMapping(*_moleculeService, *_parallelTopologyService, _localMDSimulation);
     _linkedCellService->iterateCells(computeMeanVelocityMapping, false);
     // compute average temperature
-    simplemd::cellmappings::ComputeTemperatureMapping computeTemperatureMapping(*_parallelTopologyService, *_molecularPropertiesService,
+    simplemd::cellmappings::ComputeTemperatureMapping computeTemperatureMapping(*_moleculeService, *_parallelTopologyService, *_molecularPropertiesService,
                                                                                 computeMeanVelocityMapping.getMeanVelocity(), _localMDSimulation);
     _linkedCellService->iterateCells(computeTemperatureMapping, false);
   }

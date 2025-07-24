@@ -18,23 +18,20 @@ class ResetPotentialEnergyMapping;
  */
 class simplemd::cellmappings::ResetPotentialEnergyMapping {
 public:
-  ResetPotentialEnergyMapping() : _zero(0.0) {}
+  ResetPotentialEnergyMapping(simplemd::services::MoleculeService& moleculeService) : _zero(0.0), _moleculeService(moleculeService) {}
   ~ResetPotentialEnergyMapping() {}
 
   void beginCellIteration() {}
   void endCellIteration() {}
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-
-    simplemd::services::MoleculeService* _moleculeService = nullptr;
-    throw "Not yet implemented: init _moleculeService";
-
-    for (auto it = cell.begin(*_moleculeService); it != cell.end(); ++it) {
+    for (auto it = cell.begin(_moleculeService); it != cell.end(); ++it) {
       (*it)->setPotentialEnergy(_zero);
     }
   }
 
 private:
   const double _zero;
+  simplemd::services::MoleculeService& _moleculeService;
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_RESETPOTENTIALENERGYMAPPING_H_

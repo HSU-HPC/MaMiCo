@@ -404,7 +404,7 @@ void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::servi
   unsigned int numberBlocks = 0;
   // loop counter
   unsigned int i = 0;
-  simplemd::cellmappings::CopyMoleculesMapping copyMoleculesMapping;
+  simplemd::cellmappings::CopyMoleculesMapping copyMoleculesMapping(*this);
   simplemd::moleculemappings::UpdateLinkedCellListsMapping updateLinkedCellListsMapping(parallelTopologyService, linkedCellService);
 
   // create copy of molecules and store the copies in a std::list

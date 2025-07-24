@@ -21,9 +21,9 @@ class ComputeMeanVelocityMapping;
  */
 class simplemd::cellmappings::ComputeMeanVelocityMapping {
 public:
-  ComputeMeanVelocityMapping(simplemd::services::ParallelTopologyService& parallelTopologyService, const unsigned int& localMDSimulation,
+  ComputeMeanVelocityMapping(simplemd::services::MoleculeService& moleculeService, simplemd::services::ParallelTopologyService& parallelTopologyService, const unsigned int& localMDSimulation,
                              const bool& writeToFile = true)
-      : _parallelTopologyService(parallelTopologyService), _particleCounter(0), _meanVelocity(0.0), _localMDSimulation(localMDSimulation),
+      : _moleculeService(moleculeService), _parallelTopologyService(parallelTopologyService), _particleCounter(0), _meanVelocity(0.0), _localMDSimulation(localMDSimulation),
         _writeToFile(writeToFile) {}
   ~ComputeMeanVelocityMapping() {}
 
@@ -61,10 +61,7 @@ public:
   }
 
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-    simplemd::services::MoleculeService* _moleculeService = nullptr;
-    throw "Not yet implemented: init _moleculeService";
-
-    for (auto m1 = cell.begin(*_moleculeService); m1 != cell.end(); ++m1) {
+    for (auto m1 = cell.begin(_moleculeService); m1 != cell.end(); ++m1) {
       _meanVelocity += (*m1)->getConstVelocity();
       _particleCounter++;
     }
@@ -78,6 +75,7 @@ public:
   const unsigned int& getGlobalNumberMolecules() const { return _particleCounter; }
 
 private:
+  simplemd::services::MoleculeService& _moleculeService;
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
   /** number of particles.
    * After endCellIteration has been called, stores the global number of particles in the MD simulation.

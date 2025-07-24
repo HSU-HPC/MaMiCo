@@ -19,7 +19,7 @@ class LennardJonesPotentialEnergyMapping;
  */
 class simplemd::cellmappings::LennardJonesPotentialEnergyMapping {
 public:
-  LennardJonesPotentialEnergyMapping(const simplemd::services::MolecularPropertiesService& molecularPropertiesService);
+  LennardJonesPotentialEnergyMapping(const simplemd::services::MolecularPropertiesService& molecularPropertiesService, simplemd::services::MoleculeService& moleculeService);
   ~LennardJonesPotentialEnergyMapping() {}
 
   void beginCellIteration();
@@ -38,6 +38,7 @@ private:
 
   /** energy to be subtracted for truncated shifted LJ potentials */
   const double _cutOffEnergy;
+  simplemd::services::MoleculeService& _moleculeService;
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_LENNARDJONESPOTENTIALENERGYMAPPING_H_

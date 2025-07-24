@@ -60,7 +60,7 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
   }
 
   // if the molecules need to be sent, they are sent and deleted from the local molecule service
-  if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService)) {
+  if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService, _moleculeService)) {
     for (auto it = cell.begin(_moleculeService); it != cell.end(); ++it) {
       _moleculeService.deleteMolecule(*(*it));
     }

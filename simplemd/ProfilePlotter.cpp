@@ -6,6 +6,7 @@
 
 simplemd::ProfilePlotter::ProfilePlotter(const std::vector<simplemd::configurations::ProfilePlotterConfiguration>& configurations,
                                          const simplemd::services::ParallelTopologyService& parallelTopologyService,
+                                         simplemd::services::MoleculeService& moleculeService,
                                          simplemd::services::LinkedCellService& linkedCellService, const double& linkedCellVolume,
                                          const unsigned int& localMDSimulation)
     : _linkedCellService(linkedCellService) {
@@ -18,7 +19,7 @@ simplemd::ProfilePlotter::ProfilePlotter(const std::vector<simplemd::configurati
   _plotters.clear();
 
   for (unsigned int i = 0; i < configurations.size(); i++) {
-    _plotters.push_back(new simplemd::cellmappings::ProfilePlotterMapping(parallelTopologyService, linkedCellService, configurations[i].getWriteEveryTimestep(),
+    _plotters.push_back(new simplemd::cellmappings::ProfilePlotterMapping(moleculeService, parallelTopologyService, linkedCellService, configurations[i].getWriteEveryTimestep(),
                                                                           configurations[i].getSampleEveryTimestep(), configurations[i].getStartAtTimestep(),
                                                                           linkedCellVolume, localMDSimulation));
     _ranges.push_back(configurations[i].getRange());

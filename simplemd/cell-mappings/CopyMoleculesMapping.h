@@ -24,18 +24,14 @@ class CopyMoleculesMapping;
  */
 class simplemd::cellmappings::CopyMoleculesMapping {
 public:
-  CopyMoleculesMapping() {}
+  CopyMoleculesMapping(simplemd::services::MoleculeService& moleculeService) : _moleculeService(moleculeService) {}
   ~CopyMoleculesMapping() {}
 
   void beginCellIteration() { _molecules.clear(); }
   void endCellIteration() {}
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-
-    simplemd::services::MoleculeService* _moleculeService = nullptr;
-    throw "Not yet implemented: init _moleculeService";
-
     // append molecules to list. Doing so, the molecules are sorted w.r.t. their linked cell structure
-    for (auto it = cell.begin(*_moleculeService); it != cell.end(); ++it) {
+    for (auto it = cell.begin(_moleculeService); it != cell.end(); ++it) {
       _molecules.push_back(*(*it));
       // reset pointer to this molecule in the linked cell
     }
@@ -48,6 +44,7 @@ public:
   void removeCopy() { _molecules.clear(); }
 
 private:
+  simplemd::services::MoleculeService& _moleculeService;
   std::list<simplemd::Molecule> _molecules;
 };
 

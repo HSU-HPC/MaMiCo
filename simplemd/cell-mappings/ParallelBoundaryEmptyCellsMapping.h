@@ -32,7 +32,7 @@ public:
 
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
     // send molecules from this cell first...
-    if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService)) {
+    if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService, _moleculeService)) {
       // ... and erase them afterwards
       for (auto it = cell.begin(_moleculeService); it != cell.end(); ++it) {
         _moleculeService.deleteMolecule(*(*it));

@@ -5,14 +5,14 @@
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
 
 simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simplemd::services::ExternalForceService& externalForceService,
-                                                                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService)
+                                                                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,simplemd::services::MoleculeService& moleculeService)
     : _epsilon(molecularPropertiesService.getMolecularProperties().getEpsilon()),
       _sigma6(molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
               molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
               molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma()),
       _cutOffRadiusSquared(molecularPropertiesService.getMolecularProperties().getCutOffRadius() *
                            molecularPropertiesService.getMolecularProperties().getCutOffRadius()),
-      _externalForceService(externalForceService) {}
+      _externalForceService(externalForceService), _moleculeService(moleculeService) {}
 
 void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
 #if (MD_DEBUG == MD_YES)
@@ -24,12 +24,9 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
   // force buffer
   tarch::la::Vector<MD_DIM, double> forceBuffer(0.0);
 
-  simplemd::services::MoleculeService* _moleculeService = nullptr;
-  throw "Not yet implemented: init _moleculeService";
-
   // iterate over all molecules
   auto end = cell.end();
-  auto begin = cell.begin(*_moleculeService);
+  auto begin = cell.begin(_moleculeService);
   for (auto m1 = begin; m1 != end; ++m1) {
     auto m2 = m1;
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
@@ -67,14 +64,11 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
   // force buffer
   tarch::la::Vector<MD_DIM, double> forceBuffer(0.0);
 
-  simplemd::services::MoleculeService* _moleculeService = nullptr;
-    throw "Not yet implemented: init _moleculeService";
-
   // iterate over pairs of molecules
   auto endCell1 = cell1.end();
   auto endCell2 = cell2.end();
-  auto beginCell1 = cell1.begin(*_moleculeService);
-  auto beginCell2 = cell2.begin(*_moleculeService);
+  auto beginCell1 = cell1.begin(_moleculeService);
+  auto beginCell2 = cell2.begin(_moleculeService);
   for (auto m1 = beginCell1; m1 != endCell1; ++m1) {
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();

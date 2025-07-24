@@ -22,7 +22,7 @@ class LennardJonesForceMapping;
 class simplemd::cellmappings::LennardJonesForceMapping {
 public:
   LennardJonesForceMapping(simplemd::services::ExternalForceService& externalForceService,
-                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService);
+                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,simplemd::services::MoleculeService& moleculeService);
   ~LennardJonesForceMapping() {}
 
   void beginCellIteration();
@@ -46,6 +46,7 @@ private:
   const double _cutOffRadiusSquared;
   /** external forces*/
   simplemd::services::ExternalForceService& _externalForceService;
+  simplemd::services::MoleculeService& _moleculeService;
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_LENNARDJONESFORCEMAPPING_H_

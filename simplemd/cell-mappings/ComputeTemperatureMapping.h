@@ -23,10 +23,10 @@ class ComputeTemperatureMapping;
  */
 class simplemd::cellmappings::ComputeTemperatureMapping {
 public:
-  ComputeTemperatureMapping(simplemd::services::ParallelTopologyService& parallelTopologyService,
+  ComputeTemperatureMapping(simplemd::services::MoleculeService& moleculeService, simplemd::services::ParallelTopologyService& parallelTopologyService,
                             const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
                             const tarch::la::Vector<MD_DIM, double>& meanVelocity, const unsigned int& localMDSimulation, const bool& writeToFile = true)
-      : _parallelTopologyService(parallelTopologyService), _molecularPropertiesService(molecularPropertiesService), _meanVelocity(meanVelocity),
+      : _moleculeService(moleculeService), _parallelTopologyService(parallelTopologyService), _molecularPropertiesService(molecularPropertiesService), _meanVelocity(meanVelocity),
         _localMDSimulation(localMDSimulation), _writeToFile(writeToFile) {}
   ~ComputeTemperatureMapping() {}
 
@@ -65,11 +65,7 @@ public:
 
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
     double buffer;
-
-    simplemd::services::MoleculeService* _moleculeService = nullptr;
-    throw "Not yet implemented: init _moleculeService";
-
-    for (auto m1 = cell.begin(*_moleculeService); m1 != cell.end(); ++m1) {
+    for (auto m1 = cell.begin(_moleculeService); m1 != cell.end(); ++m1) {
       buffer = tarch::la::dot(_meanVelocity - (*m1)->getConstVelocity(), _meanVelocity - (*m1)->getConstVelocity());
       _temperature += buffer;
       _particleCounter++;
@@ -81,6 +77,7 @@ public:
   const double& getTemperature() const { return _temperature; }
 
 private:
+  simplemd::services::MoleculeService& _moleculeService;
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
   const simplemd::services::MolecularPropertiesService& _molecularPropertiesService;
   /** counts the global number of molecules */

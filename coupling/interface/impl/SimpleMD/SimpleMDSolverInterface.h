@@ -220,8 +220,8 @@ public:
   void setupPotentialEnergyLandscape(const tarch::la::Vector<MD_DIM, unsigned int>& indexOfFirstCouplingCell,
                                      const tarch::la::Vector<MD_DIM, unsigned int>& rangeCouplingCells,
                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerCouplingCell) {
-    simplemd::cellmappings::ResetPotentialEnergyMapping resetPotentialEnergyMapping;
-    simplemd::cellmappings::LennardJonesPotentialEnergyMapping potentialEnergyMapping(_molecularPropertiesService);
+    simplemd::cellmappings::ResetPotentialEnergyMapping resetPotentialEnergyMapping(_moleculeService);
+    simplemd::cellmappings::LennardJonesPotentialEnergyMapping potentialEnergyMapping(_molecularPropertiesService, _moleculeService);
     tarch::la::Vector<MD_DIM, unsigned int> rangeLinkedCellsExtended(0);
     tarch::la::Vector<MD_DIM, unsigned int> firstLinkedCell(0);
     // compute coordinates of the first linked cell and the range of linked cells to be considered

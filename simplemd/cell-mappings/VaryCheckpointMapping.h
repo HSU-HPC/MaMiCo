@@ -15,8 +15,8 @@ class VaryCheckpointMapping;
 class simplemd::cellmappings::VaryCheckpointMapping {
 public:
   VaryCheckpointMapping(const double& molecularMass, const double& kB, const double& temperature, const double& sigma,
-                        const tarch::la::Vector<MD_DIM, double>& meshSize)
-      : _molecularMass(molecularMass), _kB(kB), _temperature(temperature), _sigma(sigma), _meshSize(meshSize) {}
+                        const tarch::la::Vector<MD_DIM, double>& meshSize, simplemd::services::MoleculeService& moleculeService)
+      : _molecularMass(molecularMass), _kB(kB), _temperature(temperature), _sigma(sigma), _meshSize(meshSize), _moleculeService(moleculeService) {}
 
   void beginCellIteration() {}
 
@@ -28,15 +28,12 @@ public:
 
     tarch::la::Vector<MD_DIM, double> randomNumbers(0.0);
 
-    simplemd::services::MoleculeService* _moleculeService = nullptr;
-    throw "Not yet implemented: init _moleculeService";
-
-    for (auto molecule = cell.begin(*_moleculeService); molecule != cell.end(); ++molecule) {
+    for (auto molecule = cell.begin(_moleculeService); molecule != cell.end(); ++molecule) {
       meanVelocityForCell += (*molecule)->getVelocity();
     }
     meanVelocityForCell = meanVelocityForCell / (double)cell.getMoleculeCount() / _molecularMass;
 
-    for (auto molecule = cell.begin(*_moleculeService); molecule != cell.end(); ++molecule) {
+    for (auto molecule = cell.begin(_moleculeService); molecule != cell.end(); ++molecule) {
       randomNumbers[0] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
       for (unsigned int d = 1; d < MD_DIM; ++d) {
         randomNumbers[d] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
@@ -65,6 +62,7 @@ private:
   const double _temperature;
   const double _sigma;
   const tarch::la::Vector<MD_DIM, double> _meshSize;
+  simplemd::services::MoleculeService& _moleculeService;
 };
 
 #endif //_MOLECULARDYNAMICS_CELLMAPPINGS_VARYCHECKPOINTMAPPING_H_

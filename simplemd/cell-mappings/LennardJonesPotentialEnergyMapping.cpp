@@ -5,7 +5,7 @@
 #include "simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.h"
 
 simplemd::cellmappings::LennardJonesPotentialEnergyMapping::LennardJonesPotentialEnergyMapping(
-    const simplemd::services::MolecularPropertiesService& molecularPropertiesService)
+    const simplemd::services::MolecularPropertiesService& molecularPropertiesService, simplemd::services::MoleculeService& moleculeService)
     : _epsilon(molecularPropertiesService.getMolecularProperties().getEpsilon()),
       _sigma6(molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
               molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
@@ -13,18 +13,14 @@ simplemd::cellmappings::LennardJonesPotentialEnergyMapping::LennardJonesPotentia
       _cutOffRadiusSquared(molecularPropertiesService.getMolecularProperties().getCutOffRadius() *
                            molecularPropertiesService.getMolecularProperties().getCutOffRadius()),
       _cutOffEnergy(4.0 * _epsilon * _sigma6 / (_cutOffRadiusSquared * _cutOffRadiusSquared * _cutOffRadiusSquared) *
-                    (_sigma6 / (_cutOffRadiusSquared * _cutOffRadiusSquared * _cutOffRadiusSquared) - 1.0)) {}
+                    (_sigma6 / (_cutOffRadiusSquared * _cutOffRadiusSquared * _cutOffRadiusSquared) - 1.0)), _moleculeService(moleculeService) {}
 
 void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::beginCellIteration() {}
 
 void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-
-  simplemd::services::MoleculeService* _moleculeService = nullptr;
-  throw "Not yet implemented: init _moleculeService";
-
   // iterate over all molecules
   auto itEnd = cell.end();
-  auto itBegin = cell.begin(*_moleculeService);
+  auto itBegin = cell.begin(_moleculeService);
   for (auto m1 = itBegin; m1 != itEnd; ++m1) {
     auto m2 = m1;
     double& potentialEnergy1 = (*m1)->getPotentialEnergy();
@@ -59,15 +55,11 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
 
 void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1,
                                                                                 const unsigned int& cellIndex2) {
-
-  simplemd::services::MoleculeService* _moleculeService = nullptr;
-  throw "Not yet implemented: init _moleculeService";
-
   // iterate over pairs of molecules
   auto m1End = cell1.end();
   auto m2End = cell2.end();
-  auto m1Begin = cell1.begin(*_moleculeService);
-  auto m2Begin = cell2.begin(*_moleculeService);
+  auto m1Begin = cell1.begin(_moleculeService);
+  auto m2Begin = cell2.begin(_moleculeService);
   for (auto m1 = m1Begin; m1 != m1End; ++m1) {
     double& potentialEnergy1 = (*m1)->getPotentialEnergy();
 

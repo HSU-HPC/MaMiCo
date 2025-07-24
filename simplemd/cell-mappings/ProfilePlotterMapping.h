@@ -24,11 +24,12 @@ class ProfilePlotterMapping;
  */
 class simplemd::cellmappings::ProfilePlotterMapping {
 public:
-  ProfilePlotterMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService,
+  ProfilePlotterMapping(simplemd::services::MoleculeService& moleculeService,
+                        const simplemd::services::ParallelTopologyService& parallelTopologyService,
                         const simplemd::services::LinkedCellService& linkedCellService, const unsigned int& plotEveryTimestep,
                         const unsigned int& sampleEveryTimestep, const unsigned int& startAtTimestep, const double& linkedCellVolume,
                         const unsigned int& localMDSimulation)
-      : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService), _plotEveryTimestep(plotEveryTimestep),
+      : _moleculeService(moleculeService), _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService), _plotEveryTimestep(plotEveryTimestep),
         _sampleEveryTimestep(sampleEveryTimestep), _startAtTimestep(startAtTimestep), _linkedCellVolume(linkedCellVolume),
         _localMDSimulation(localMDSimulation), _currentTimestep(0), _cellCounter(0) {
     _velocityAndDensity.clear();
@@ -66,15 +67,11 @@ public:
         _velocityAndDensity[_cellCounter][d] = (double)globalCellIndexVector[d];
       }
     }
-
-    simplemd::services::MoleculeService* _moleculeService = nullptr;
-    throw "Not yet implemented: init _moleculeService";
-
     // loop over all molecules and add velocity and density contributions
     if ((_currentTimestep - _startAtTimestep) % _sampleEveryTimestep == 0) {
       tarch::la::Vector<MD_DIM, double> vel(0.0);
       double mass = 0.0;
-      for (auto m1 = cell.begin(*_moleculeService); m1 != cell.end(); ++m1) {
+      for (auto m1 = cell.begin(_moleculeService); m1 != cell.end(); ++m1) {
         vel += (*m1)->getConstVelocity();
         mass += 1.0;
       }
@@ -140,6 +137,7 @@ public:
   }
 
 private:
+  simplemd::services::MoleculeService& _moleculeService;
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
   const simplemd::services::LinkedCellService& _linkedCellService;
   const unsigned int _plotEveryTimestep;
