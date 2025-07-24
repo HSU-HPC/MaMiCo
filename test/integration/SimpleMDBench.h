@@ -58,6 +58,12 @@ private:
     _rank = 0;
 #if (MD_PARALLEL == MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
+    int size = 0;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if(size != 1){
+      std::cout << "ERROR SimpleMDBench: Must be run with exactly one MPI process!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
 #endif
 
     std::string fname = "mdconf.xml.tmp." + std::to_string(_rank);
