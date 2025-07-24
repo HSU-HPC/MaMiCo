@@ -333,12 +333,12 @@ void simplemd::services::MoleculeService::getInitialVelocity(const tarch::la::Ve
 #if (MD_DIM == 1)
   initialVelocity = meanVelocity + stdDeviation * randomNumbers;
 #elif (MD_DIM == 2)
-  initialVelocity[0] = meanVelocity[0] + stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));
-  initialVelocity[1] = meanVelocity[1] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]));
+  initialVelocity[0] = meanVelocity[0] + stdDeviation * (randomNumbers[0] * TARCH_COS(randomNumbers[1]));
+  initialVelocity[1] = meanVelocity[1] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]));
 #elif (MD_DIM == 3)
-  initialVelocity[0] = meanVelocity[0] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::cos(randomNumbers[2]));
-  initialVelocity[1] = meanVelocity[1] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::sin(randomNumbers[2]));
-  initialVelocity[2] = meanVelocity[2] + stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));
+  initialVelocity[0] = meanVelocity[0] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]) * TARCH_COS(randomNumbers[2]));
+  initialVelocity[1] = meanVelocity[1] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]) * TARCH_SIN(randomNumbers[2]));
+  initialVelocity[2] = meanVelocity[2] + stdDeviation * (randomNumbers[0] * TARCH_COS(randomNumbers[1]));
 #endif
 }
 
@@ -474,6 +474,14 @@ void simplemd::services::MoleculeService::resetMeanVelocity() {
 
   // check again
   iterateMolecules(compute, false);
+}
+
+bool simplemd::services::MoleculeService::tarchDebugIsOn() const {
+#if (TARCH_DEBUG == TARCH_YES)
+  return true;
+#else
+  return false;
+#endif
 }
 
 #pragma region TODO replace with Kokkos datastructure

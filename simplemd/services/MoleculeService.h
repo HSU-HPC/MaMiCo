@@ -109,6 +109,8 @@ public:
   /** resets the velocity over the whole molecule system to the mean velocity specified at the beginning */
   void resetMeanVelocity();
 
+  bool tarchDebugIsOn() const;
+
 #pragma region TODO replace with Kokkos datastructure
   Molecule* getCellMolecule(const unsigned int cellIndex, const unsigned int moleculeIndex);
   void addCellMolecule(Molecule& molecule, const unsigned int cellIndex);
