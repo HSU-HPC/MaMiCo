@@ -38,6 +38,12 @@ void simplemd::services::LinkedCellService::initCellStructure() {
     numberCells = numberCells * _totalNumberOfCells[d];
   }
   Kokkos::realloc(_cells, numberCells);
+  Kokkos::parallel_for(
+    numberCells,
+    KOKKOS_LAMBDA(const size_t index) {
+      _cells(index) = LinkedCell(index);
+    }
+  );
 }
 
 void simplemd::services::LinkedCellService::shutdown() {
@@ -83,12 +89,15 @@ void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& mo
                        + _totalNumberOfCells_X_By_totalNumberOfCells_Y * localCellIndex[2]
 #endif
       ;
-
-  _cells(index).addMolecule(&molecule);
+  addMoleculeToLinkedCell(molecule, index);
 }
 
 void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& molecule, const unsigned int& localCellIndex) {
-  _cells(localCellIndex).addMolecule(&molecule);
+  // TODO FIXME add molecule to 2D data structure
+  std::cout << __FILE__ << ":" << __LINE__ << " Not yet implemented" << std::endl; // FIXME TODO
+  throw "Not yet implemented!";
+
+  _cells(localCellIndex).addMolecule();
 }
 
 simplemd::LinkedCell& simplemd::services::LinkedCellService::getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex) {
@@ -123,7 +132,10 @@ void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecul
                        + localCellIndex[2] * _totalNumberOfCells_X_By_totalNumberOfCells_Y
 #endif
       ;
-  _cells(index).deleteMolecule(&molecule);
+  std::cout << __FILE__ << ":" << __LINE__ << " Not yet implemented" << std::endl; // FIXME TODO
+  throw "Not yet implemented";
+  
+  _cells(index).deleteMolecule();
 }
 
 bool simplemd::services::LinkedCellService::isGhostCell(const unsigned int& cellIndex) const {

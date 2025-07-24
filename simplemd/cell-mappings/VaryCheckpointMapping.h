@@ -28,12 +28,15 @@ public:
 
     tarch::la::Vector<MD_DIM, double> randomNumbers(0.0);
 
-    for (std::list<Molecule*>::iterator molecule = cell.begin(); molecule != cell.end(); molecule++) {
+    simplemd::services::MoleculeService* _moleculeService = nullptr;
+    throw "Not yet implemented: init _moleculeService";
+
+    for (auto molecule = cell.begin(*_moleculeService); molecule != cell.end(); ++molecule) {
       meanVelocityForCell += (*molecule)->getVelocity();
     }
-    meanVelocityForCell = meanVelocityForCell / (double)cell.getConstList().size() / _molecularMass;
+    meanVelocityForCell = meanVelocityForCell / (double)cell.getMoleculeCount() / _molecularMass;
 
-    for (std::list<Molecule*>::iterator molecule = cell.begin(); molecule != cell.end(); molecule++) {
+    for (auto molecule = cell.begin(*_moleculeService); molecule != cell.end(); ++molecule) {
       randomNumbers[0] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
       for (unsigned int d = 1; d < MD_DIM; ++d) {
         randomNumbers[d] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();

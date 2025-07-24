@@ -65,7 +65,11 @@ public:
 
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
     double buffer;
-    for (std::list<Molecule*>::const_iterator m1 = cell.begin(); m1 != cell.end(); m1++) {
+
+    simplemd::services::MoleculeService* _moleculeService = nullptr;
+    throw "Not yet implemented: init _moleculeService";
+
+    for (auto m1 = cell.begin(*_moleculeService); m1 != cell.end(); ++m1) {
       buffer = tarch::la::dot(_meanVelocity - (*m1)->getConstVelocity(), _meanVelocity - (*m1)->getConstVelocity());
       _temperature += buffer;
       _particleCounter++;

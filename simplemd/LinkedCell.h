@@ -6,6 +6,7 @@
 #define _MOLECULARDYNAMICS_LINKEDCELL_H_
 
 #include "simplemd/Molecule.h"
+#include "simplemd/services/MoleculeService.h"
 #include <cstdlib>
 #include <iostream>
 #include <list>
@@ -20,37 +21,51 @@ class LinkedCell;
 class simplemd::LinkedCell {
 public:
   /** initialises linked cell list with numberMolecules empty entries */
-  LinkedCell(const unsigned int numberMolecules = 0) : _molecules(numberMolecules) {}
-  ~LinkedCell() { _molecules.clear(); }
+  LinkedCell(const unsigned int index = -1) : _index(index), _moleculeCount(0) {}
 
-  /** iterators to begin and end position */
-  std::list<Molecule*>::iterator begin() { return _molecules.begin(); }
-  std::list<Molecule*>::const_iterator constBegin() const { return _molecules.begin(); }
-  std::list<Molecule*>::iterator end() { return _molecules.end(); }
-  std::list<Molecule*>::const_iterator constEnd() const { return _molecules.end(); }
-
-  std::list<Molecule*>& getList() { return _molecules; }
-  const std::list<Molecule*>& getConstList() { return _molecules; }
-
-  /** adds a molecule pointer */
-  void addMolecule(Molecule* molecule) { _molecules.push_back(molecule); }
-
-  /** deletes the molecule 'molecule' from the list, if it is contained */
-  void deleteMolecule(Molecule* molecule) {
-#if (MD_ERROR == MD_YES)
-    if (molecule == NULL) {
-      std::cout << "ERROR simplemd::LinkedCell::deleteMolecule: molecule==NULL!" << std::endl;
-      exit(EXIT_FAILURE);
+  class Iterator {
+  public:
+    Iterator() : Iterator(0, 0) {} // For "uninitialized" stack variables in other classes
+    Iterator(unsigned int cellIndex, unsigned int moleculeIndex, simplemd::services::MoleculeService* moleculeService = nullptr) :
+    _moleculeService(moleculeService), _cellIndex(cellIndex), _moleculeIndex(moleculeIndex) {}
+    Molecule* operator*() const {
+      if (_moleculeService == nullptr)
+        throw "Cannot get molecule from simplemd::LinkedCell::Iterator (Pointer to simplemd::services::MoleculeService is a nullptr)";
+      std::cout << __FILE__ << ":" << __LINE__ << ": Iterator function operator*() not yet implemented" << std::endl; // FIXME TODO implement
+      throw "Not yet implemented";
+      return nullptr;
     }
-#endif
-    _molecules.remove(molecule);
+    Iterator& operator++() { _moleculeIndex++; return *this; }
+    Iterator& operator--() { 
+      if (_moleculeIndex == 0)
+        throw "Cannot decrement simplemd::LinkedCell::Iterator (_moleculeIndex cannot be negative)";
+      _moleculeIndex--;
+      return *this;
+    }
+    bool operator!=(const Iterator& other) const {
+      if (_cellIndex != other._cellIndex) return true;
+      return _moleculeIndex != other._moleculeIndex;
+    }
+  private:
+    simplemd::services::MoleculeService* _moleculeService;
+    unsigned int _cellIndex;
+    unsigned int _moleculeIndex;
+  };
+  /** iterators to begin and end position */
+  Iterator begin (simplemd::services::MoleculeService& moleculeService) const {
+    return Iterator(_index, 0, &moleculeService);
   }
+  Iterator end() const { return Iterator(_index, _moleculeCount); }
 
-  /** initialises the molecule pointer at it with the value of molecule */
-  void setMolecule(std::list<Molecule*>::iterator& it, Molecule* molecule) { *it = molecule; }
+  void clear() { _moleculeCount = 0; }
+  void addMolecule() { _moleculeCount++; }
+  void deleteMolecule() { _moleculeCount--; }
+  unsigned int getMoleculeCount() const { return _moleculeCount; }
+  unsigned int getIndex() const { return _index; }
 
 private:
-  std::list<Molecule*> _molecules;
+  unsigned int _index;
+  unsigned int _moleculeCount;
 };
 
 #endif // _MOLECULARDYNAMICS_LINKEDCELL_H_

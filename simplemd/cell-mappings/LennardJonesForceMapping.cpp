@@ -24,11 +24,14 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
   // force buffer
   tarch::la::Vector<MD_DIM, double> forceBuffer(0.0);
 
+  simplemd::services::MoleculeService* _moleculeService = nullptr;
+  throw "Not yet implemented: init _moleculeService";
+
   // iterate over all molecules
-  const std::list<Molecule*>::const_iterator end = cell.constEnd();
-  const std::list<Molecule*>::const_iterator begin = cell.constBegin();
-  for (std::list<Molecule*>::const_iterator m1 = begin; m1 != end; m1++) {
-    std::list<Molecule*>::const_iterator m2 = m1;
+  auto end = cell.end();
+  auto begin = cell.begin(*_moleculeService);
+  for (auto m1 = begin; m1 != end; ++m1) {
+    auto m2 = m1;
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
 
@@ -36,7 +39,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
     _externalForceService.addExternalForce(force1);
 
     // iterate over all other molecules not touched so far
-    m2++;
+    ++m2;
     while (m2 != end) {
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
       forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
@@ -53,7 +56,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
       force1 += forceBuffer;
       force2 -= forceBuffer;
 
-      m2++;
+      ++m2;
     }
   }
 }
@@ -64,16 +67,19 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
   // force buffer
   tarch::la::Vector<MD_DIM, double> forceBuffer(0.0);
 
+  simplemd::services::MoleculeService* _moleculeService = nullptr;
+    throw "Not yet implemented: init _moleculeService";
+
   // iterate over pairs of molecules
-  const std::list<Molecule*>::const_iterator endCell1 = cell1.constEnd();
-  const std::list<Molecule*>::const_iterator endCell2 = cell2.constEnd();
-  const std::list<Molecule*>::const_iterator beginCell1 = cell1.constBegin();
-  const std::list<Molecule*>::const_iterator beginCell2 = cell2.constBegin();
-  for (std::list<Molecule*>::const_iterator m1 = beginCell1; m1 != endCell1; m1++) {
+  auto endCell1 = cell1.end();
+  auto endCell2 = cell2.end();
+  auto beginCell1 = cell1.begin(*_moleculeService);
+  auto beginCell2 = cell2.begin(*_moleculeService);
+  for (auto m1 = beginCell1; m1 != endCell1; ++m1) {
     tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
     const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
 
-    for (std::list<Molecule*>::const_iterator m2 = beginCell2; m2 != endCell2; m2++) {
+    for (auto m2 = beginCell2; m2 != endCell2; ++m2) {
       tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
       forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
 #if (MD_DEBUG == MD_YES)

@@ -67,11 +67,14 @@ public:
       }
     }
 
+    simplemd::services::MoleculeService* _moleculeService = nullptr;
+    throw "Not yet implemented: init _moleculeService";
+
     // loop over all molecules and add velocity and density contributions
     if ((_currentTimestep - _startAtTimestep) % _sampleEveryTimestep == 0) {
       tarch::la::Vector<MD_DIM, double> vel(0.0);
       double mass = 0.0;
-      for (std::list<Molecule*>::const_iterator m1 = cell.begin(); m1 != cell.end(); m1++) {
+      for (auto m1 = cell.begin(*_moleculeService); m1 != cell.end(); ++m1) {
         vel += (*m1)->getConstVelocity();
         mass += 1.0;
       }

@@ -268,8 +268,11 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
 #if (MD_DEBUG == MD_YES)
               std::cout << "Pack " << cell.getList().size() << " molecules in buffer " << bufferIndex << std::endl;
 #endif
+              simplemd::services::MoleculeService* _moleculeService = nullptr;
+              throw "Not yet implemented: init _moleculeService";
+
               // push molecules into buffer
-              for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
+              for (auto it = cell.begin(*_moleculeService); it != cell.end(); ++it) {
                 // for periodic boundaries: adapt position vector
                 tarch::la::Vector<MD_DIM, double> position((*it)->getConstPosition());
                 adaptPositionForPeriodicBoundaries(position, _boundary[help], x
@@ -299,8 +302,11 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
 #if (MD_DEBUG == MD_YES)
               std::cout << "Pack " << cell.getList().size() << " molecules in local buffer " << std::endl;
 #endif
+              simplemd::services::MoleculeService* _moleculeService = nullptr;
+              throw "Not yet implemented: init _moleculeService";
+
               // push molecules into buffer
-              for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
+              for (auto it = cell.begin(*_moleculeService); it != cell.end(); ++it) {
                 // for periodic boundaries: adapt position vector
                 tarch::la::Vector<MD_DIM, double> position((*it)->getConstPosition());
                 adaptPositionForPeriodicBoundaries(position, _boundary[help], x
@@ -413,9 +419,12 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
   // if this is a neighbour, push in send buffer
   if (isParallelNeighbour(neighbourRank)) {
 
+    simplemd::services::MoleculeService* _moleculeService = nullptr;
+    throw "Not yet implemented: init _moleculeService";
+
     // determine appropriate buffer index
     int bufferIndex = getCurrentBufferIndexFromNeighbourRank(neighbourRank);
-    for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
+    for (auto it = cell.begin(*_moleculeService); it != cell.end(); ++it) {
 #if (MD_DEBUG == MD_YES)
       std::cout << "Reduce molecule at position " << (*it)->getConstPosition() << ", velocity " << (*it)->getConstVelocity() << std::endl;
 #endif

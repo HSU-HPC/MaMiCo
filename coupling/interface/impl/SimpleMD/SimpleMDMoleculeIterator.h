@@ -18,11 +18,11 @@ namespace interface {
  */
 class SimpleMDMoleculeIterator : public MoleculeIterator<simplemd::LinkedCell, MD_DIM> {
 public:
-  SimpleMDMoleculeIterator(simplemd::LinkedCell& cell) : coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM>(cell), _buffer(NULL) {}
+  SimpleMDMoleculeIterator(simplemd::LinkedCell& cell, simplemd::services::MoleculeService& moleculeService) : coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM>(cell), _buffer(NULL), _moleculeService(moleculeService) {}
   virtual ~SimpleMDMoleculeIterator() {}
 
   /** sets the iterator to the first element */
-  void begin() { _it = _cell.begin(); }
+  void begin() { _it = _cell.begin(_moleculeService); }
 
   /** returns false, if the iterator reached the end of the molecule list */
   bool continueIteration() const { return (_it != _cell.end()); }
@@ -30,7 +30,7 @@ public:
   /** sets the iterator to the next molecule */
   void next() {
     // check if we need to update molecule information and reset flag in this case
-    _it++;
+    ++_it;
   }
 
   /** returns a reference to the molecule that this iterator currently points to */
@@ -45,8 +45,9 @@ public:
   }
 
 private:
-  std::list<simplemd::Molecule*>::iterator _it;
+  simplemd::LinkedCell::Iterator _it;
   coupling::interface::SimpleMDMolecule _buffer;
+  simplemd::services::MoleculeService& _moleculeService;
 };
 
 } // namespace interface

@@ -24,7 +24,11 @@ public:
   void beginCellIteration() {}
   void endCellIteration() {}
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-    for (std::list<Molecule*>::const_iterator it = cell.begin(); it != cell.end(); it++) {
+
+    simplemd::services::MoleculeService* _moleculeService = nullptr;
+    throw "Not yet implemented: init _moleculeService";
+
+    for (auto it = cell.begin(*_moleculeService); it != cell.end(); ++it) {
       (*it)->setPotentialEnergy(_zero);
     }
   }
