@@ -21,7 +21,7 @@ class LinkedCell;
 class simplemd::LinkedCell {
 public:
   /** initialises linked cell list with numberMolecules empty entries */
-  LinkedCell(const unsigned int index = -1) : _index(index), _moleculeCount(0) {}
+  LinkedCell(const unsigned int index = 0) : _index(index), _moleculeCount(0) {}
 
   class Iterator {
   public:
