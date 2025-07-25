@@ -240,10 +240,10 @@ public:
     }
 
     // reset potential energy first for the molecules in all relevant linked cells
-    _linkedCellService.iterateCells(resetPotentialEnergyMapping, firstLinkedCell, rangeLinkedCellsExtended, false);
+    _linkedCellService.iterateCells(resetPotentialEnergyMapping, firstLinkedCell, rangeLinkedCellsExtended);
 
     // compute potential energy in these cells
-    _linkedCellService.iterateCellPairs(potentialEnergyMapping, firstLinkedCell, rangeLinkedCellsExtended, false);
+    _linkedCellService.iterateCellPairs(potentialEnergyMapping, firstLinkedCell, rangeLinkedCellsExtended);
   }
 
   void calculateForceAndEnergy(coupling::interface::Molecule<MD_DIM>& molecule) {

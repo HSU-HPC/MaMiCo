@@ -30,6 +30,8 @@ public:
   void beginCellIteration() {}
   void endCellIteration() {}
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) { cell.getList().clear(); }
+
+  static const bool IsParallel = false;
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_EMPTYLINKEDLISTSMAPPING_H_

@@ -29,6 +29,8 @@ public:
     void endMoleculeIteration() {}
     unsigned long long checksum() const { return sum; }
 
+    static const bool IsParallel = false;
+
   private:
     void process(const double& data) { sum ^= *((unsigned long long*)&data); }
     unsigned long long sum = 0;
@@ -38,7 +40,7 @@ public:
 
   unsigned long long getChecksum() {
     ChecksumMapping mapping;
-    _moleculeService->iterateMolecules(mapping, false);
+    _moleculeService->iterateMolecules(mapping);
     return mapping.checksum();
   }
 };
@@ -170,7 +172,11 @@ private:
 
     unsigned long long sum = _simulation->getChecksum();
     std::cout << "INFO SimpleMDBench: Final XOR Checksum is " << sum << std::endl;
-    unsigned long long correct = 9224833478695498352u;
+    unsigned long long correct;
+    if (simplemd::cellmappings::LennardJonesForceMapping::IsParallel) // Different cell traversal
+      correct = 9224833478677969387u;
+    else
+      correct = 9224833478695498352u;
     if (sum == correct)
       std::cout << "INFO SimpleMDBench: SUCCESS Checksum is correct :-)" << std::endl;
     else {
