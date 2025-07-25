@@ -29,6 +29,8 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
+  static const bool IsParallel = false;
+
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) { cell.clear(_moleculeService); }
 
 private:

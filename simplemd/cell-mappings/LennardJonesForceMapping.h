@@ -38,6 +38,8 @@ public:
   tarch::la::Vector<MD_DIM, double> getLennardJonesForce(const tarch::la::Vector<MD_DIM, double>& position1,
                                                          const tarch::la::Vector<MD_DIM, double>& position2) const;
 
+  static const bool IsParallel = true;
+
 private:
   /** epsilon */
   const double _epsilon;

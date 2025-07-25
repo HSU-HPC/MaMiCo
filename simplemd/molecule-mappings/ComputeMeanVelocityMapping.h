@@ -37,6 +37,8 @@ public:
 
   tarch::la::Vector<MD_DIM, double> getMeanVelocity() const { return _meanVelocity; }
 
+  static const bool IsParallel = false;
+
 private:
   tarch::la::Vector<MD_DIM, double> _meanVelocity;
   unsigned int _particleCounter;

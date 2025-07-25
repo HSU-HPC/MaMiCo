@@ -40,6 +40,8 @@ public:
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
   void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2);
 
+  static const bool IsParallel = false;
+
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
   simplemd::services::MoleculeService& _moleculeService;

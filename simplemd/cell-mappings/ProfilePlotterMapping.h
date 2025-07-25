@@ -135,6 +135,8 @@ public:
     }
   }
 
+  static const bool IsParallel = false;
+
 private:
   simplemd::services::MoleculeService& _moleculeService;
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;

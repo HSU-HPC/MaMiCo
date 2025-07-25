@@ -47,6 +47,8 @@ public:
   void reset() { _molecules.clear(); }
   std::list<simplemd::Molecule> getCollectedMolecules() const { return _molecules; }
 
+  static const bool IsParallel = false;
+
 private:
   simplemd::services::MoleculeService& _moleculeService;
   std::list<simplemd::Molecule> _molecules;

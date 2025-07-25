@@ -18,7 +18,8 @@ simplemd::cellmappings::LennardJonesPotentialEnergyMapping::LennardJonesPotentia
 
 void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::beginCellIteration() {}
 
-void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) const {
+
   // iterate over all molecules
   auto itEnd = cell.end();
   auto itBegin = cell.begin(_moleculeService);
@@ -55,7 +56,8 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
 }
 
 void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1,
-                                                                                const unsigned int& cellIndex2) {
+                                                                                const unsigned int& cellIndex2) const {
+
   // iterate over pairs of molecules
   auto m1End = cell1.end();
   auto m2End = cell2.end();

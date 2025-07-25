@@ -74,6 +74,8 @@ public:
   /** returns the global number of particles. The local number can be retrieved from MoleculeService.getNumberMolecules(). */
   const unsigned int& getGlobalNumberMolecules() const { return _particleCounter; }
 
+  static const bool IsParallel = false;
+
 private:
   simplemd::services::MoleculeService& _moleculeService;
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
