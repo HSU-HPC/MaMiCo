@@ -107,6 +107,7 @@ endif()
 
 set(KOKKOS_TARGET OPENMP CACHE STRING "Choose CUDA, OPENMP, or SERIAL")
 set_property(CACHE KOKKOS_TARGET PROPERTY STRINGS CUDA OPENMP SERIAL)
+message(STATUS ">> KOKKOS_TARGET: " ${KOKKOS_TARGET})
 
 find_package(Kokkos CONFIG) # Try to find Kokkos externally
 if(Kokkos_FOUND)
@@ -118,7 +119,11 @@ else()
 
     # Backends
     set(Kokkos_ENABLE_SERIAL ON CACHE STRING "Always build Kokkos with Serial support" FORCE)
-    set(Kokkos_ENABLE_OPENMP ON CACHE STRING "Always build Kokkos with OpenMP support" FORCE)
+    if(KOKKOS_TARGET STREQUAL "SERIAL")
+      set(Kokkos_ENABLE_OPENMP OFF CACHE STRING "Build Kokkos without OpenMP support when targeting Serial" FORCE)
+    else()
+      set(Kokkos_ENABLE_OPENMP ON CACHE STRING "Build Kokkos with OpenMP support when not targeting Serial" FORCE)
+    endif()
     if(KOKKOS_TARGET STREQUAL "CUDA")
       set(Kokkos_ENABLE_CUDA ON CACHE STRING "Build MaMiCo/Kokkos with CUDA support" FORCE)
     else()
@@ -291,7 +296,9 @@ target_compile_definitions(simplemd_interface INTERFACE ${MDDim})
 target_compile_options(simplemd_interface INTERFACE -fpic)
 
 target_compile_definitions(simplemd_interface INTERFACE KOKKOS_TARGET_${KOKKOS_TARGET})
-target_compile_options(simplemd_interface INTERFACE -fopenmp) # Always build MaMiCo/Kokkos with OpenMP support
+if(NOT KOKKOS_TARGET STREQUAL "SERIAL")
+  target_compile_options(simplemd_interface INTERFACE -fopenmp)
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
   target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
@@ -423,7 +430,9 @@ if(BUILD_WITH_ADIOS2)
 endif()
 target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors)
-target_compile_options(mamico INTERFACE -fopenmp) # Always build MaMiCo/Kokkos with OpenMP support
+if(NOT KOKKOS_TARGET STREQUAL "SERIAL")
+  target_compile_options(mamico INTERFACE -fopenmp)
+endif()
 if(BUILD_WITH_MPI)
   target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MDParallel MPICH_IGNORE_CXX_SEEK)
   target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
