@@ -23,6 +23,7 @@ class InstanceHandlingTest : public CppUnit::TestFixture {
 
 public:
   void test() {
+    Kokkos::ScopeGuard kokkos;
 
     const char* filename("../test/unit/coupling/couette.xml");
     // std::string filename("../test/unit/coupling/couette.xml");
