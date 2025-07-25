@@ -375,7 +375,6 @@ template <class A> void simplemd::services::LinkedCellService::iterateCellPairsS
 template <class A>
 void simplemd::services::LinkedCellService::iterateCellsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
                                                                  const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) {
-  unsigned int index = 0;
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (cellRange[d] == 0) {
