@@ -107,6 +107,7 @@ endif()
 
 set(KOKKOS_TARGET OPENMP CACHE STRING "Choose CUDA, OPENMP, or SERIAL")
 set_property(CACHE KOKKOS_TARGET PROPERTY STRINGS CUDA OPENMP SERIAL)
+message(STATUS ">> KOKKOS_TARGET: " ${KOKKOS_TARGET})
 
 find_package(Kokkos CONFIG) # Try to find Kokkos externally
 if(Kokkos_FOUND)
