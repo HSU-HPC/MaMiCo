@@ -7,8 +7,8 @@ on:
   push:
     branches-ignore:
       # If you want the CI to not run, call your branch work-in-progress by naming it `something-WIP` or `something_WIP`  
-      - '*-WIP'
-      - '*_WIP'
+      - '**-WIP'
+      - '**_WIP'
   pull_request:
     types: [review_requested, ready_for_review]
     branches:
