@@ -39,6 +39,8 @@ public:
   void endCellIteration() {}
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
 
+  static const bool IsParallel = false;
+
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
   simplemd::services::MoleculeService& _moleculeService;

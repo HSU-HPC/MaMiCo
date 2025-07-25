@@ -6,6 +6,8 @@
 #include "test/integration/CellIdxIterBench.h"
 #include "test/integration/SimpleMDBench.h"
 
+#include <Kokkos_Core.hpp>
+
 void runTest(Test* test) {
   if (test == NULL) {
     std::cout << "ERROR executeTest: test==NULL!" << std::endl;
@@ -19,7 +21,6 @@ int main(int argc, char* argv[]) {
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Init(&argc, &argv);
 #endif
-
   {
     Kokkos::ScopeGuard kokkos(argc, argv);
     std::cout << "Kokkos using execution space \"" << MainExecSpace::name() << "\" with memory space \"" << MainExecSpace::memory_space::name() << "\""
@@ -31,7 +32,6 @@ int main(int argc, char* argv[]) {
     std::cout << std::endl << "==================== ==================== ====================" << std::endl << std::endl;
     runTest(new SimpleMDBench());
   }
-
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Finalize();
 #endif

@@ -136,6 +136,8 @@ public:
     }
   }
 
+  static const bool IsParallel = false;
+
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
   const simplemd::services::LinkedCellService& _linkedCellService;

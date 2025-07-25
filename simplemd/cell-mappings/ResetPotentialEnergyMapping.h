@@ -29,6 +29,8 @@ public:
     }
   }
 
+  static const bool IsParallel = false;
+
 private:
   const double _zero;
 };
