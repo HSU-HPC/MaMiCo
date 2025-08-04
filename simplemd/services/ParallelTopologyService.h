@@ -88,7 +88,28 @@ public:
   const tarch::la::Vector<MD_DIM, unsigned int>& getGlobalNumberOfCells() const { return _globalNumberOfCells; }
 
   /** returns the local number of cells in each spatial direction (i.e. only the cells of this process) */
-  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalNumberOfCells() const { return _localNumberOfCells; }
+  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalNumberOfCells(bool includingGhostCells = false) const {
+    auto numCells = _localNumberOfCells;
+    if (includingGhostCells) {
+      for(int d = 0; d < MD_DIM; d++) {
+        numCells[d] += 2 * _ghostCellLayerThickness;
+      }
+    }
+    return numCells;
+  }
+
+  /** returns the local number of cells (i.e. only the cells of this process) */
+  const unsigned int getLocalNumberOfCellsLinear(bool includingGhostCells = false) const {
+    unsigned int numCells = 1;
+    for(int d = 0; d < MD_DIM; d++) {
+      auto dNumCells = _localNumberOfCells[d];
+      if (includingGhostCells) {
+        dNumCells += 2 * _ghostCellLayerThickness;
+      }
+      numCells *= dNumCells;
+    }
+    return numCells;
+  }
 
   /** returns the number of processes used in each spatial direction */
   const tarch::la::Vector<MD_DIM, unsigned int>& getNumberOfProcesses() const { return _numberProcesses; }
@@ -330,6 +351,8 @@ private:
    * also equal to number of used buffers and MPI requests
    */
   unsigned int _numUniqueNeighbours;
+
+  const unsigned int _ghostCellLayerThickness = 1;
 
   /** how many cells a buffer is responsible for */
   unsigned int _numberOfCellsPerBuffer[MD_LINKED_CELL_NEIGHBOURS];

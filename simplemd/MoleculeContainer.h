@@ -12,6 +12,7 @@
 #include <simplemd/MolecularDynamicsDefinitions.h>
 #include <simplemd/Molecule.h>
 #include <simplemd/LinkedCell.h>
+#include <simplemd/services/ParallelTopologyService.h>
 
 namespace simplemd {
 class MoleculeContainer;
@@ -19,8 +20,19 @@ class MoleculeContainer;
 
 class simplemd::MoleculeContainer {
 public:
-  MoleculeContainer(int numCells, int cellSize)
-      : _numCells(numCells), _cellSize(cellSize), moleculeData("moleculeData", numCells, cellSize), linkedCellNumMolecules("linkedCellNumMolecules", numCells) {
+  MoleculeContainer(simplemd::services::ParallelTopologyService parallelTopologyService, int cellSize)
+      : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _cellSize(cellSize), moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellSize), linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)) {
+    tarch::la::Vector<MD_DIM, unsigned int> bufferGlobal(0);
+    tarch::la::Vector<MD_DIM, unsigned int> bufferLocal(0);
+    _domainOffset = parallelTopologyService.getGlobalDomainOffset();
+    _meshWidth = parallelTopologyService.getMeshWidth();
+    bufferGlobal = parallelTopologyService.getGlobalIndexOfFirstCell();
+    bufferLocal = tarch::la::Vector<MD_DIM, unsigned int>(1);
+    for (unsigned int d = 0; d < MD_DIM; d++) {
+      _globalIndexOfFirstCell[d] = (int)bufferGlobal[d];
+      _localIndexOfFirstCell[d] = (int)bufferLocal[d];
+    }
+
   }
 
   void insert(int cellIdx, Molecule& molecule) {
@@ -161,13 +173,74 @@ public:
     return simplemd::LinkedCell(lcSizeSlice, lcMoleculeSlice);
   }
 
-  int getNumCells() const { return _numCells; }
+  int getNumCells() const { return linkedCellNumMolecules.size(); }
 
   Kokkos::View<simplemd::Molecule**> moleculeData;
   Kokkos::View<int*> linkedCellNumMolecules;
 
 private:
-  int _numCells;
+  unsigned int positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const {
+    for (unsigned int d = 0; d < MD_DIM; d++) {
+  #if (MD_ERROR == MD_YES)
+      if ((position[d] < _domainOffset[d] - _meshWidth[d]) || (position[d] > _domainOffset[d] + _domainSize[d] + _meshWidth[d])) {
+        std::cout << "ERROR simplemd::MoleculeContainer::positionToCellIndex: Position ";
+        std::cout << d << " is out of range!" << std::endl;
+        std::cout << "Position: " << position << std::endl;
+        exit(EXIT_FAILURE);
+      }
+  #endif
+    }
+    tarch::la::Vector<MD_DIM, unsigned int> cellVectorIndex(0);
+
+    // determine current cell index (in serial, i.e. 1-D, form)
+    for (unsigned int d = 0; d < MD_DIM; d++) {
+      // find global cell index
+
+      int index = (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d]));
+      // shift into local cell index
+      index += _localIndexOfFirstCell[d];
+      index -= _globalIndexOfFirstCell[d];
+  #if (MD_ERROR == MD_YES)
+      if (index < 0) {
+        std::cout << "ERROR simplemd::MoleculeContainer::positionToCellIndex: index < 0: index=";
+        std::cout << index << std::endl;
+        std::cout << "Dimension : " << d << "," << _globalIndexOfFirstCell[d] << "," << _localIndexOfFirstCell[d] << std::endl;
+        std::cout << (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])) << std::endl;
+        for (unsigned int e = 0; e < d; e++) {
+          std::cout << cellVectorIndex[e] << std::endl;
+        }
+        std::cout << "Position: " << position << ", offset: " << _domainOffset << ", meshwidth: " << _meshWidth << std::endl;
+        exit(EXIT_FAILURE);
+      }
+  #endif
+      cellVectorIndex[d] = (unsigned int)index;
+    }
+    return vectorIndexToLinear(cellVectorIndex);
+  }
+
+  const unsigned int vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const {
+    unsigned int cellLinearIndex = 0;
+    unsigned int stepSize = 1;
+    for (int d = 0; d < MD_DIM; d++) {
+      cellLinearIndex += vectorIndex[d] * stepSize;
+      stepSize *= _numCells[d];
+    }
+    return cellLinearIndex;
+  }
+
+  tarch::la::Vector<MD_DIM, unsigned int> _numCells;
   int _cellSize;
+
+  /** global domain offset */
+  tarch::la::Vector<MD_DIM, double> _domainOffset;
+
+  /** mesh width of the linked cells */
+  tarch::la::Vector<MD_DIM, double> _meshWidth;
+
+  /** global index of the first cell of this domain */
+  tarch::la::Vector<MD_DIM, int> _globalIndexOfFirstCell;
+
+  /** local index of the first cell within this domain */
+  tarch::la::Vector<MD_DIM, int> _localIndexOfFirstCell;
 };
 #endif // _MOLECULARDYNAMICS_MOLECULARCONTAINER_H_
