@@ -885,6 +885,7 @@ set(CLANGFORMAT_SOURCES
   "simplemd/configurations/DomainDecompConfiguration.h"
   "simplemd/main.cpp"
   "simplemd/Molecule.h"
+  "simplemd/MoleculeContainer.h"
   "simplemd/ProfilePlotter.h"
   "simplemd/MolecularDynamicsUserInput.h"
 )

@@ -1,56 +1,86 @@
-// Copyright (C) 2015 Technische Universitaet Muenchen
-// This file is part of the Mamico project. For conditions of distribution
-// and use, please see the copyright notice in Mamico's main folder, or at
-// www5.in.tum.de/mamico
 #ifndef _MOLECULARDYNAMICS_LINKEDCELL_H_
 #define _MOLECULARDYNAMICS_LINKEDCELL_H_
 
 #include "simplemd/Molecule.h"
-#include <cstdlib>
+#include <Kokkos_Core.hpp>
 #include <iostream>
-#include <list>
 
 namespace simplemd {
 class LinkedCell;
 }
 
-/** describes a linked cell.
- *  @author Philipp Neumann
- */
 class simplemd::LinkedCell {
 public:
-  /** initialises linked cell list with numberMolecules empty entries */
-  LinkedCell(const unsigned int numberMolecules = 0) : _molecules(numberMolecules) {}
-  ~LinkedCell() { _molecules.clear(); }
+  KOKKOS_FUNCTION LinkedCell(Kokkos::View<int, Kokkos::LayoutRight, Kokkos::SharedSpace> nMolecules,
+                             Kokkos::View<Molecule*, Kokkos::LayoutRight, Kokkos::SharedSpace> moleculeSlice)
+      : numMolecules(nMolecules), moleculeData(moleculeSlice) {}
 
-  /** iterators to begin and end position */
-  std::list<Molecule*>::iterator begin() { return _molecules.begin(); }
-  std::list<Molecule*>::const_iterator constBegin() const { return _molecules.begin(); }
-  std::list<Molecule*>::iterator end() { return _molecules.end(); }
-  std::list<Molecule*>::const_iterator constEnd() const { return _molecules.end(); }
+  class Iterator {
+    using iterator_category = std::bidirectional_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+    using value_type = Molecule;
+    using pointer = value_type*;
+    using reference = value_type&;
 
-  std::list<Molecule*>& getList() { return _molecules; }
-  const std::list<Molecule*>& getConstList() { return _molecules; }
+  public:
+    KOKKOS_FUNCTION Iterator(pointer ptr) : _myPtr(ptr), _idx(0) {}
 
-  /** adds a molecule pointer */
-  void addMolecule(Molecule* molecule) { _molecules.push_back(molecule); }
-
-  /** deletes the molecule 'molecule' from the list, if it is contained */
-  void deleteMolecule(Molecule* molecule) {
-#if (MD_ERROR == MD_YES)
-    if (molecule == NULL) {
-      std::cout << "ERROR simplemd::LinkedCell::deleteMolecule: molecule==NULL!" << std::endl;
-      exit(EXIT_FAILURE);
+    KOKKOS_INLINE_FUNCTION reference operator*() const { return *_myPtr; }
+    KOKKOS_INLINE_FUNCTION pointer operator->() { return _myPtr; }
+    KOKKOS_INLINE_FUNCTION Iterator& operator++() {
+      _myPtr++;
+      _idx++;
+      return *this;
     }
-#endif
-    _molecules.remove(molecule);
+    KOKKOS_INLINE_FUNCTION Iterator operator++(int) {
+      Iterator temp = *this;
+      ++(*this);
+      _idx++;
+      return temp;
+    }
+    KOKKOS_INLINE_FUNCTION Iterator& operator--() {
+      _myPtr--;
+      _idx--;
+      return *this;
+    }
+    KOKKOS_INLINE_FUNCTION Iterator operator--(int) {
+      Iterator temp = *this;
+      --(*this);
+      _idx--;
+      return temp;
+    }
+
+    KOKKOS_INLINE_FUNCTION friend bool operator==(const Iterator& a, const Iterator& b) { return a._myPtr == b._myPtr; }
+    KOKKOS_INLINE_FUNCTION friend bool operator!=(const Iterator& a, const Iterator& b) { return a._myPtr != b._myPtr; }
+
+    KOKKOS_INLINE_FUNCTION unsigned int getIndex() const { return _idx; }
+
+  private:
+    pointer _myPtr;
+    unsigned int _idx;
+  };
+
+  KOKKOS_FUNCTION Iterator begin() { return Iterator(&moleculeData(0)); }
+  KOKKOS_FUNCTION Iterator end() { return Iterator(&moleculeData(numMolecules())); }
+
+  KOKKOS_FUNCTION void insert(Molecule& molecule) {
+    moleculeData(numMolecules()) = molecule;
+    numMolecules() += 1;
+  }
+  KOKKOS_FUNCTION void remove(int moleculeIdx) {
+    moleculeData(moleculeIdx) = moleculeData(numMolecules() - 1);
+    numMolecules() -= 1;
+  }
+  KOKKOS_FUNCTION void clear() { numMolecules() = 0; }
+
+  std::string to_string() const {
+    std::stringstream to_ret;
+    to_ret << " numMol: " << numMolecules() << std::endl;
+    return to_ret.str();
   }
 
-  /** initialises the molecule pointer at it with the value of molecule */
-  void setMolecule(std::list<Molecule*>::iterator& it, Molecule* molecule) { *it = molecule; }
-
-private:
-  std::list<Molecule*> _molecules;
+  Kokkos::View<int, Kokkos::LayoutRight, Kokkos::SharedSpace> numMolecules;
+  Kokkos::View<simplemd::Molecule*, Kokkos::LayoutRight, Kokkos::SharedSpace> moleculeData;
 };
 
 #endif // _MOLECULARDYNAMICS_LINKEDCELL_H_
