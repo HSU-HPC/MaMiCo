@@ -394,6 +394,12 @@ void simplemd::services::LinkedCellService::iterateCellsParallel(A& a, const tar
 
   // start iteration();
   a.beginCellIteration();
+  /**
+   * The size<> Vector stores the number of cells, plus ghost layer.
+   * If there are (1,1,1) ghost cells per dimension, getLocalIndexOfFirstCell will return (1,1,1)
+   * Thus this is multiplied by 2 to account for ghost cells in both locations (begin, end) per axis
+   * and then added to local number of cells
+   */
   const tarch::la::Vector<MD_DIM, unsigned int> size(getLocalNumberOfCells() + 2u * getLocalIndexOfFirstCell());
   const int length = cellRange[0]
 #if (MD_DIM > 1)
@@ -509,6 +515,12 @@ void simplemd::services::LinkedCellService::iterateCellPairsParallel(A& a, const
 
   // start iteration();
   a.beginCellIteration();
+  /**
+   * The size<> Vector stores the number of cells, plus ghost layer.
+   * If there are (1,1,1) ghost cells per dimension, getLocalIndexOfFirstCell will return (1,1,1)
+   * Thus this is multiplied by 2 to account for ghost cells in both locations (begin, end) per axis
+   * and then added to local number of cells
+   */
   const tarch::la::Vector<MD_DIM, unsigned int> size(getLocalNumberOfCells() + 2u * getLocalIndexOfFirstCell());
 
 // iterate over the domain in a red-black manner
