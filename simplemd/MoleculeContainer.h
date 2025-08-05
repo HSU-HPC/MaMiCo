@@ -20,8 +20,8 @@ class MoleculeContainer;
 
 class simplemd::MoleculeContainer {
 public:
-  MoleculeContainer(simplemd::services::ParallelTopologyService parallelTopologyService, int cellSize)
-      : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _cellSize(cellSize), moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellSize), linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)) {
+  MoleculeContainer(simplemd::services::ParallelTopologyService parallelTopologyService, int cellCapacity)
+      : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _cellCapacity(cellCapacity), moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity), linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)) {
     tarch::la::Vector<MD_DIM, unsigned int> bufferGlobal(0);
     tarch::la::Vector<MD_DIM, unsigned int> bufferLocal(0);
     _domainOffset = parallelTopologyService.getGlobalDomainOffset();
@@ -113,8 +113,6 @@ public:
                 int helpIndex1 = j;
                 int helpIndex2 = 0;
 #endif
-                unsigned int coordsCell1Buffer;
-                unsigned int coordsCell2Buffer;
 
 #if (MD_DIM > 2)
                 // determine plane within traversed block
@@ -227,9 +225,13 @@ private:
     }
     return cellLinearIndex;
   }
-
+  /** number of cells per direction in the domain */
   tarch::la::Vector<MD_DIM, unsigned int> _numCells;
-  int _cellSize;
+
+  /** maximum number of particles a cell (a row of the view) can contain
+   * if this is exceeded when writing to cell, the simulation is stopped
+   */
+  int _cellCapacity;
 
   /** global domain offset */
   tarch::la::Vector<MD_DIM, double> _domainOffset;
