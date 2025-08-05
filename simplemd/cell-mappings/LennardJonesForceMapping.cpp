@@ -25,12 +25,12 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
   tarch::la::Vector<MD_DIM, double> forceBuffer(0.0);
 
   // iterate over all molecules
-  const std::list<Molecule*>::const_iterator end = cell.constEnd();
-  const std::list<Molecule*>::const_iterator begin = cell.constBegin();
-  for (std::list<Molecule*>::const_iterator m1 = begin; m1 != end; m1++) {
-    std::list<Molecule*>::const_iterator m2 = m1;
-    tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
-    const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
+  const auto end = cell.end();
+  const auto begin = cell.begin();
+  for (auto m1 = begin; m1 != end; m1++) {
+    auto m2 = m1;
+    tarch::la::Vector<MD_DIM, double>& force1 = m1->getForce();
+    const tarch::la::Vector<MD_DIM, double>& position1 = m1->getConstPosition();
 
     // add external force
     _externalForceService.addExternalForce(force1);
@@ -38,15 +38,15 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
     // iterate over all other molecules not touched so far
     m2++;
     while (m2 != end) {
-      tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
-      forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
+      tarch::la::Vector<MD_DIM, double>& force2 = m2->getForce();
+      forceBuffer = getLennardJonesForce(position1, m2->getConstPosition());
 #if (MD_DEBUG == MD_YES)
       if (tarch::la::dot(forceBuffer, forceBuffer) > 1e12) {
         std::cout << "ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCell: Force " << forceBuffer << " out of range!" << std::endl;
         std::cout << "Position1: " << position1 << std::endl;
-        std::cout << "Position2: " << (*m2)->getConstPosition() << std::endl;
-        std::cout << "ID1: " << (*m1)->getID() << std::endl;
-        std::cout << "ID2: " << (*m2)->getID() << std::endl;
+        std::cout << "Position2: " << m2->getConstPosition() << std::endl;
+        std::cout << "ID1: " << m1->getID() << std::endl;
+        std::cout << "ID2: " << m2->getID() << std::endl;
         exit(EXIT_FAILURE);
       }
 #endif
@@ -65,24 +65,24 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
   tarch::la::Vector<MD_DIM, double> forceBuffer(0.0);
 
   // iterate over pairs of molecules
-  const std::list<Molecule*>::const_iterator endCell1 = cell1.constEnd();
-  const std::list<Molecule*>::const_iterator endCell2 = cell2.constEnd();
-  const std::list<Molecule*>::const_iterator beginCell1 = cell1.constBegin();
-  const std::list<Molecule*>::const_iterator beginCell2 = cell2.constBegin();
-  for (std::list<Molecule*>::const_iterator m1 = beginCell1; m1 != endCell1; m1++) {
-    tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
-    const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
+  const auto endCell1 = cell1.end();
+  const auto endCell2 = cell2.end();
+  const auto beginCell1 = cell1.begin();
+  const auto beginCell2 = cell2.begin();
+  for (auto m1 = beginCell1; m1 != endCell1; m1++) {
+    tarch::la::Vector<MD_DIM, double>& force1 = m1->getForce();
+    const tarch::la::Vector<MD_DIM, double>& position1 = m1->getConstPosition();
 
-    for (std::list<Molecule*>::const_iterator m2 = beginCell2; m2 != endCell2; m2++) {
-      tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
-      forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
+    for (auto m2 = beginCell2; m2 != endCell2; m2++) {
+      tarch::la::Vector<MD_DIM, double>& force2 = m2->getForce();
+      forceBuffer = getLennardJonesForce(position1, m2->getConstPosition());
 #if (MD_DEBUG == MD_YES)
       if (tarch::la::dot(forceBuffer, forceBuffer) > 1e12) {
         std::cout << "ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCellPair: Force " << forceBuffer << " out of range!" << std::endl;
         std::cout << "Position1: " << position1 << std::endl;
-        std::cout << "Position2: " << (*m2)->getConstPosition() << std::endl;
-        std::cout << "ID1: " << (*m1)->getID() << std::endl;
-        std::cout << "ID2: " << (*m2)->getID() << std::endl;
+        std::cout << "Position2: " << m2->getConstPosition() << std::endl;
+        std::cout << "ID1: " << m1->getID() << std::endl;
+        std::cout << "ID2: " << m2->getID() << std::endl;
         exit(EXIT_FAILURE);
       }
 #endif

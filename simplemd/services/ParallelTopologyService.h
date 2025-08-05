@@ -89,26 +89,17 @@ public:
 
   /** returns the local number of cells in each spatial direction (i.e. only the cells of this process) */
   const tarch::la::Vector<MD_DIM, unsigned int>& getLocalNumberOfCells(bool includingGhostCells = false) const {
-    auto numCells = _localNumberOfCells;
-    if (includingGhostCells) {
-      for(int d = 0; d < MD_DIM; d++) {
-        numCells[d] += 2 * _ghostCellLayerThickness;
-      }
-    }
-    return numCells;
+    return includingGhostCells ? _localNumberOfCellsWithGhostCells : _localNumberOfCells;
   }
 
   /** returns the local number of cells (i.e. only the cells of this process) */
   const unsigned int getLocalNumberOfCellsLinear(bool includingGhostCells = false) const {
-    unsigned int numCells = 1;
+    auto numCells = getLocalNumberOfCells(includingGhostCells);
+    unsigned int numCellsLinear = 1;
     for(int d = 0; d < MD_DIM; d++) {
-      auto dNumCells = _localNumberOfCells[d];
-      if (includingGhostCells) {
-        dNumCells += 2 * _ghostCellLayerThickness;
-      }
-      numCells *= dNumCells;
+      numCellsLinear *= numCells[d];
     }
-    return numCells;
+    return numCellsLinear;
   }
 
   /** returns the number of processes used in each spatial direction */
@@ -312,6 +303,9 @@ private:
 
   /** local number of cells (i.e. on each process) in all d directions */
   const tarch::la::Vector<MD_DIM, unsigned int> _localNumberOfCells;
+
+  /** local number of cells (i.e. on each process) in all d directions including ghost cells */
+  const tarch::la::Vector<MD_DIM, unsigned int> _localNumberOfCellsWithGhostCells;
 
   /** global number of cells in all d directions */
   const tarch::la::Vector<MD_DIM, unsigned int> _globalNumberOfCells;

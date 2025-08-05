@@ -24,12 +24,12 @@ void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handle
       }
     }
     // iterate over cell's molecules and add molecules to local ghost cell
-    for (std::list<Molecule*>::const_iterator it = cell.begin(); it != cell.end(); it++) {
-      positionBuffer = (*it)->getConstPosition();
+    for (auto it = cell.begin(); it != cell.end(); it++) {
+      positionBuffer = it->getConstPosition();
       positionBuffer += shift;
-      Molecule myMolecule(positionBuffer, (*it)->getConstVelocity());
-      myMolecule.setForceOld((*it)->getConstForceOld());
-      if ((*it)->isFixed())
+      Molecule myMolecule(positionBuffer, it->getConstVelocity());
+      myMolecule.setForceOld(it->getConstForceOld());
+      if (it->isFixed())
         myMolecule.fix();
       Molecule* myPtr = _moleculeService.addMolecule(myMolecule);
       _linkedCellService.addMoleculeToLinkedCell(*myPtr, localIndex[i]);

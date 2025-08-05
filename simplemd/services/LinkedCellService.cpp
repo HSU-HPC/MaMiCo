@@ -42,7 +42,9 @@ void simplemd::services::LinkedCellService::initCellStructure() {
     numberCells = numberCells * _totalNumberOfCells[d];
   }
 
-  _cells = new LinkedCell[numberCells];
+  // FIXME: This was just added to make the intermediate state of simpleMD compilable and should be removed
+  // This WILL crash, but we are about to remove this class anyway!
+  _cells = NULL; // new LinkedCell[numberCells];
   if (_cells == NULL) {
     std::cout << "ERROR simplemd::services::LinkedCellService::initCellStructure(): "
                  "_cells==NULL!"
@@ -98,11 +100,11 @@ void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& mo
 #endif
       ;
 
-  _cells[index].addMolecule(&molecule);
+  _cells[index].insert(molecule);
 }
 
 void simplemd::services::LinkedCellService::addMoleculeToLinkedCell(Molecule& molecule, const unsigned int& localCellIndex) {
-  _cells[localCellIndex].addMolecule(&molecule);
+  _cells[localCellIndex].insert(molecule);
 }
 
 simplemd::LinkedCell& simplemd::services::LinkedCellService::getLinkedCell(const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex) {
@@ -137,7 +139,8 @@ void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecul
                        + localCellIndex[2] * _totalNumberOfCells_X_By_totalNumberOfCells_Y
 #endif
       ;
-  _cells[index].deleteMolecule(&molecule);
+  // FIXME: This was just added to make the intermediate state of simpleMD compilable and should be removed
+  for(auto it = _cells[index].begin(); it != _cells[index].end(); it++) { if(molecule.getID() == (*it).getID()) { _cells[index].remove(it.getIndex()); break; } }
 }
 
 bool simplemd::services::LinkedCellService::isGhostCell(const unsigned int& cellIndex) const {

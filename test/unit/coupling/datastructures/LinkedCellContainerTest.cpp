@@ -29,7 +29,7 @@ private:
 
     virtual simplemd::LinkedCell& getLinkedCell(const I11& couplingCellIndex, const tarch::la::Vector<3, unsigned int>& linkedCellInCouplingCell,
                                                 const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell) {
-      return _linkedcell;
+      throw std::runtime_error("Not implemented!");
     }
 
     /** returns the global size of the box-shaped MD domain */
@@ -57,9 +57,6 @@ private:
     virtual void synchronizeMoleculesAfterMomentumModification() {}
     virtual double getDt() { return 1.0; }
     virtual coupling::interface::MoleculeIterator<simplemd::LinkedCell, 3>* getMoleculeIterator(simplemd::LinkedCell& cell) { return NULL; }
-
-  private:
-    simplemd::LinkedCell _linkedcell;
   };
 
   class LayerChecker {

@@ -28,18 +28,18 @@ public:
 
     tarch::la::Vector<MD_DIM, double> randomNumbers(0.0);
 
-    for (std::list<Molecule*>::iterator molecule = cell.begin(); molecule != cell.end(); molecule++) {
-      meanVelocityForCell += (*molecule)->getVelocity();
+    for (auto molecule = cell.begin(); molecule != cell.end(); molecule++) {
+      meanVelocityForCell += molecule->getVelocity();
     }
-    meanVelocityForCell = meanVelocityForCell / (double)cell.getConstList().size() / _molecularMass;
+    meanVelocityForCell = meanVelocityForCell / (double)cell.numMolecules() / _molecularMass;
 
-    for (std::list<Molecule*>::iterator molecule = cell.begin(); molecule != cell.end(); molecule++) {
+    for (auto molecule = cell.begin(); molecule != cell.end(); molecule++) {
       randomNumbers[0] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
       for (unsigned int d = 1; d < MD_DIM; ++d) {
         randomNumbers[d] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
       }
 
-      tarch::la::Vector<MD_DIM, double>& mVelocity = (*molecule)->getVelocity();
+      tarch::la::Vector<MD_DIM, double>& mVelocity = molecule->getVelocity();
 #if (MD_DIM == 1)
       mVelocity = meanVelocityForCell + stdDeviation * randomNumbers;
 #elif (MD_DIM == 2)
@@ -51,7 +51,7 @@ public:
       mVelocity[2] = meanVelocityForCell[2] + stdDeviation * (randomNumbers[0] * TARCH_COS(randomNumbers[1]));
 #endif
 
-      tarch::la::Vector<MD_DIM, double>& mPosition = (*molecule)->getPosition();
+      tarch::la::Vector<MD_DIM, double>& mPosition = molecule->getPosition();
       mPosition = mPosition + 1e-6 * mVelocity;
     }
   }

@@ -148,14 +148,13 @@ public:
   }
 
   void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<MD_DIM>& molecule, simplemd::LinkedCell& cell) {
-    std::list<simplemd::Molecule*>::iterator it = cell.begin();
+    auto it = cell.begin();
     const tarch::la::Vector<MD_DIM, double> moleculePosition = molecule.getPosition();
     while (it != cell.end()) {
-      const tarch::la::Vector<MD_DIM, double>& itPosition((*it)->getConstPosition());
+      const tarch::la::Vector<MD_DIM, double>& itPosition(it->getConstPosition());
       if (moleculePosition == itPosition) {
-        simplemd::Molecule* myMolecule = (*it);
-        cell.deleteMolecule(myMolecule);
-        _moleculeService.deleteMolecule(*myMolecule);
+        cell.remove(it.getIndex());
+        it--;
         return;
       }
       it++;
@@ -275,9 +274,9 @@ public:
 
           // loop over all molecules in each cell
           const simplemd::LinkedCell& thisCell = _linkedCellService.getLinkedCell(loopIndex);
-          for (std::list<simplemd::Molecule*>::const_iterator it = thisCell.constBegin(); it != thisCell.constEnd(); it++) {
-            forceOld += getLennardJonesForce(position, (*it)->getConstPosition());
-            energy += getPotentialEnergy(position, (*it)->getConstPosition());
+          for (auto it = thisCell.begin(); it != thisCell.end(); it++) {
+            forceOld += getLennardJonesForce(position, it->getConstPosition());
+            energy += getPotentialEnergy(position, it->getConstPosition());
           }
         }
 #if (MD_DIM > 1)

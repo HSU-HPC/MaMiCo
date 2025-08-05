@@ -107,6 +107,16 @@ public:
 #endif
     return _entries[i];
   }
+  /** @brief operator overloading; create a vector from the sum of this one (this) and another vector
+   * 	@param v vector that has to be summed with this
+   */
+  Vector<size, T> operator+(const Vector<size, T>& v) {
+    Vector<size, T> result;
+    for (int i = 0; i < size; i++) {
+      result[i] = _entries[i] + v[i];
+    }
+    return result;
+  }
   /** @brief operator overloading; add a vector to this existing one (this)
    * 	@param v vector that has to be added
    */

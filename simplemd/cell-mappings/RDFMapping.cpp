@@ -85,14 +85,14 @@ void simplemd::cellmappings::RDFMapping::handleCell(LinkedCell& cell, const unsi
   double dist;
   unsigned int interval;
 
-  for (std::list<Molecule*>::const_iterator m1 = cell.begin(); m1 != cell.end()--; m1++) {
-    std::list<Molecule*>::const_iterator m2 = m1;
+  for (auto m1 = cell.begin(); m1 != cell.end()--; m1++) {
+    auto m2 = m1;
 
     // iterate over all other molecules not touched so far
     m2++;
     while (m2 != cell.end()) {
 
-      dist = std::sqrt(tarch::la::dot(((*m2)->getConstPosition() - (*m1)->getConstPosition()), ((*m2)->getConstPosition() - (*m1)->getConstPosition())));
+      dist = std::sqrt(tarch::la::dot((m2->getConstPosition() - m1->getConstPosition()), (m2->getConstPosition() - m1->getConstPosition())));
 
       if (dist < _cutoffRadius) {
         interval = (unsigned int)(dist / _meshsize);
@@ -107,10 +107,10 @@ void simplemd::cellmappings::RDFMapping::handleCell(LinkedCell& cell, const unsi
 void simplemd::cellmappings::RDFMapping::handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) {
   double dist;
   unsigned int interval;
-  for (std::list<Molecule*>::const_iterator m1 = cell1.begin(); m1 != cell1.end(); m1++) {
+  for (auto m1 = cell1.begin(); m1 != cell1.end(); m1++) {
 
-    for (std::list<Molecule*>::const_iterator m2 = cell2.begin(); m2 != cell2.end(); m2++) {
-      dist = std::sqrt(tarch::la::dot(((*m2)->getConstPosition() - (*m1)->getConstPosition()), ((*m2)->getConstPosition() - (*m1)->getConstPosition())));
+    for (auto m2 = cell2.begin(); m2 != cell2.end(); m2++) {
+      dist = std::sqrt(tarch::la::dot((m2->getConstPosition() - m1->getConstPosition()), (m2->getConstPosition() - m1->getConstPosition())));
       interval = (unsigned int)(dist / _meshsize);
       if (dist < _cutoffRadius) {
         interval = (unsigned int)(dist / _meshsize);

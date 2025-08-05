@@ -48,8 +48,8 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
   }
 
   // now: iterate over all molecules within this cell and change position
-  for (std::list<Molecule*>::const_iterator it = cell.begin(); it != cell.end(); it++) {
-    tarch::la::Vector<MD_DIM, double>& position = (*it)->getPosition();
+  for (auto it = cell.begin(); it != cell.end(); it++) {
+    tarch::la::Vector<MD_DIM, double>& position = it->getPosition();
     for (unsigned int d = 0; d < MD_DIM; d++) {
       if ((outerCellCoords[d] == 0) && (_processCoordinates[d] == 0)) {
         position[d] += _domainSize[d];
@@ -61,23 +61,23 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
 
   // if the molecules need to be sent, they are sent and deleted from the local molecule service
   if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService)) {
-    for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
-      _moleculeService.deleteMolecule(*(*it));
+    for (auto it = cell.begin(); it != cell.end(); it++) {
+      _moleculeService.deleteMolecule(*it);
     }
     // if the molecules need to be placed somewhere on this process, do so...
   } else {
     innerCell = &_linkedCellService.getLinkedCell(coords);
     // iterate over molecules and either send them to other process or put them locally in the right cell
-    for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
-      Molecule myMolecule((*it)->getConstPosition(), (*it)->getConstVelocity());
-      myMolecule.setForceOld((*it)->getConstForceOld());
-      if ((*it)->isFixed())
+    for (auto it = cell.begin(); it != cell.end(); it++) {
+      Molecule myMolecule(it->getConstPosition(), it->getConstVelocity());
+      myMolecule.setForceOld(it->getConstForceOld());
+      if (it->isFixed())
         myMolecule.fix();
-      _moleculeService.deleteMolecule(*(*it));
+      _moleculeService.deleteMolecule(*it);
       Molecule* mPtr = _moleculeService.addMolecule(myMolecule);
-      innerCell->addMolecule(mPtr);
+      innerCell->insert(*mPtr);
     }
   }
   // in any case: clear list in this cell
-  cell.getList().clear();
+  cell.clear();
 }

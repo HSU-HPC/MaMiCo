@@ -71,8 +71,8 @@ public:
     if ((_currentTimestep - _startAtTimestep) % _sampleEveryTimestep == 0) {
       tarch::la::Vector<MD_DIM, double> vel(0.0);
       double mass = 0.0;
-      for (std::list<Molecule*>::const_iterator m1 = cell.begin(); m1 != cell.end(); m1++) {
-        vel += (*m1)->getConstVelocity();
+      for (auto m1 = cell.begin(); m1 != cell.end(); m1++) {
+        vel += m1->getConstVelocity();
         mass += 1.0;
       }
       // add mean velocity

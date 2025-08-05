@@ -34,10 +34,10 @@ public:
     // send molecules from this cell first...
     if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService)) {
       // ... and erase them afterwards
-      for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
-        _moleculeService.deleteMolecule(*(*it));
+      for (auto it = cell.begin(); it != cell.end(); it++) {
+        _moleculeService.deleteMolecule(*it);
       }
-      cell.getList().clear();
+      cell.clear();
     }
   }
   static const bool IsParallel = false;

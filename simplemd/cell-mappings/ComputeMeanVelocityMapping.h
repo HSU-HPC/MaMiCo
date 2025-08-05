@@ -61,8 +61,8 @@ public:
   }
 
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-    for (std::list<Molecule*>::const_iterator m1 = cell.begin(); m1 != cell.end(); m1++) {
-      _meanVelocity += (*m1)->getConstVelocity();
+    for (auto m1 = cell.begin(); m1 != cell.end(); m1++) {
+      _meanVelocity += m1->getConstVelocity();
       _particleCounter++;
     }
   }

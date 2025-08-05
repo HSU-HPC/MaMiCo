@@ -65,7 +65,7 @@ private:
     simplemd::LinkedCell& getLinkedCell(const typename coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>::CellIndex_T& couplingCellIndex,
                                         const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
                                         const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) override {
-      return _linkedcell;
+      throw std::runtime_error("Not implemented!");
     }
 
     virtual tarch::la::Vector<dim, double> getGlobalMDDomainSize() const override { return tarch::la::Vector<dim, double>(1.0); }
@@ -91,9 +91,6 @@ private:
     virtual void synchronizeMoleculesAfterMomentumModification() override {}
     virtual double getDt() override { return 1.0; }
     virtual coupling::interface::MoleculeIterator<simplemd::LinkedCell, dim>* getMoleculeIterator(simplemd::LinkedCell& cell) override { return NULL; }
-
-  private:
-    simplemd::LinkedCell _linkedcell;
   };
 
   template <unsigned int dim> class TestMacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {

@@ -13,7 +13,7 @@ class simplemd::LinkedCell {
 public:
   KOKKOS_FUNCTION LinkedCell(Kokkos::View<int, Kokkos::LayoutRight, Kokkos::SharedSpace> nMolecules,
                              Kokkos::View<Molecule*, Kokkos::LayoutRight, Kokkos::SharedSpace> moleculeSlice)
-      : numMolecules(nMolecules), moleculeData(moleculeSlice) {}
+      : _numMolecules(nMolecules), _moleculeData(moleculeSlice) {}
 
   class Iterator {
     using iterator_category = std::bidirectional_iterator_tag;
@@ -60,27 +60,30 @@ public:
     unsigned int _idx;
   };
 
-  KOKKOS_FUNCTION Iterator begin() { return Iterator(&moleculeData(0)); }
-  KOKKOS_FUNCTION Iterator end() { return Iterator(&moleculeData(numMolecules())); }
+  KOKKOS_FUNCTION Iterator begin() const { return Iterator(&_moleculeData(0)); }
+  KOKKOS_FUNCTION Iterator end() const { return Iterator(&_moleculeData(_numMolecules())); }
 
   KOKKOS_FUNCTION void insert(Molecule& molecule) {
-    moleculeData(numMolecules()) = molecule;
-    numMolecules() += 1;
+    _moleculeData(_numMolecules()) = molecule;
+    _numMolecules() += 1;
   }
   KOKKOS_FUNCTION void remove(int moleculeIdx) {
-    moleculeData(moleculeIdx) = moleculeData(numMolecules() - 1);
-    numMolecules() -= 1;
+    _moleculeData(moleculeIdx) = _moleculeData(_numMolecules() - 1);
+    _numMolecules() -= 1;
   }
-  KOKKOS_FUNCTION void clear() { numMolecules() = 0; }
+  KOKKOS_FUNCTION void clear() { _numMolecules() = 0; }
 
   std::string to_string() const {
     std::stringstream to_ret;
-    to_ret << " numMol: " << numMolecules() << std::endl;
+    to_ret << " numMol: " << _numMolecules() << std::endl;
     return to_ret.str();
   }
 
-  Kokkos::View<int, Kokkos::LayoutRight, Kokkos::SharedSpace> numMolecules;
-  Kokkos::View<simplemd::Molecule*, Kokkos::LayoutRight, Kokkos::SharedSpace> moleculeData;
+  KOKKOS_INLINE_FUNCTION unsigned int numMolecules() const { return _numMolecules(); }
+
+private:
+  Kokkos::View<int, Kokkos::LayoutRight, Kokkos::SharedSpace> _numMolecules;
+  Kokkos::View<simplemd::Molecule*, Kokkos::LayoutRight, Kokkos::SharedSpace> _moleculeData;
 };
 
 #endif // _MOLECULARDYNAMICS_LINKEDCELL_H_

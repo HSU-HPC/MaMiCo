@@ -31,14 +31,10 @@ public:
   void endCellIteration() {}
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
     // append molecules to list. Doing so, the molecules are sorted w.r.t. their linked cell structure
-    for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
-      _molecules.push_back(*(*it));
-      // reset pointer to this molecule in the linked cell
-      (*it) = NULL;
+    for (auto it = cell.begin(); it != cell.end(); it++) {
+      _molecules.push_back(*it);
     }
-
-    // delete molecules from the cell
-    cell.getList().clear();
+    cell.clear();
   }
 
   std::list<simplemd::Molecule>& getCopyOfMolecules() { return _molecules; }
