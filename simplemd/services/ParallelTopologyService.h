@@ -96,7 +96,7 @@ public:
   const unsigned int getLocalNumberOfCellsLinear(bool includingGhostCells = false) const {
     auto numCells = getLocalNumberOfCells(includingGhostCells);
     unsigned int numCellsLinear = 1;
-    for(int d = 0; d < MD_DIM; d++) {
+    for (int d = 0; d < MD_DIM; d++) {
       numCellsLinear *= numCells[d];
     }
     return numCellsLinear;

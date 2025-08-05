@@ -140,7 +140,12 @@ void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecul
 #endif
       ;
   // FIXME: This was just added to make the intermediate state of simpleMD compilable and should be removed
-  for(auto it = _cells[index].begin(); it != _cells[index].end(); it++) { if(molecule.getID() == (*it).getID()) { _cells[index].remove(it.getIndex()); break; } }
+  for (auto it = _cells[index].begin(); it != _cells[index].end(); it++) {
+    if (molecule.getID() == (*it).getID()) {
+      _cells[index].remove(it.getIndex());
+      break;
+    }
+  }
 }
 
 bool simplemd::services::LinkedCellService::isGhostCell(const unsigned int& cellIndex) const {
