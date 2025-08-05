@@ -21,7 +21,9 @@ class MoleculeContainer;
 class simplemd::MoleculeContainer {
 public:
   MoleculeContainer(simplemd::services::ParallelTopologyService parallelTopologyService, int cellCapacity)
-      : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _cellCapacity(cellCapacity), moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity), linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)) {
+      : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _cellCapacity(cellCapacity),
+        moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
+        linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)) {
     tarch::la::Vector<MD_DIM, unsigned int> bufferGlobal(0);
     tarch::la::Vector<MD_DIM, unsigned int> bufferLocal(0);
     _domainOffset = parallelTopologyService.getGlobalDomainOffset();
@@ -32,7 +34,6 @@ public:
       _globalIndexOfFirstCell[d] = (int)bufferGlobal[d];
       _localIndexOfFirstCell[d] = (int)bufferLocal[d];
     }
-
   }
 
   void insert(int cellIdx, Molecule& molecule) {
@@ -79,14 +80,14 @@ public:
           // For odd block sizes, we need to do some more work in the
           // x/y/z==0-traversals. The second x/y/z==1-traversals are reduced by
           // the normal integer-rounding in this case.
-          const tarch::la::Vector<MD_DIM, unsigned int> lengthVector((_numCells[0]-2 + ((_numCells[0]-2) % 2) * (x == 0)) / 2
+          const tarch::la::Vector<MD_DIM, unsigned int> lengthVector((_numCells[0] - 2 + ((_numCells[0] - 2) % 2) * (x == 0)) / 2
 #if (MD_DIM > 1)
                                                                      ,
-                                                                     (_numCells[1]-2 + ((_numCells[1]-2) % 2) * (y == 0)) / 2
+                                                                     (_numCells[1] - 2 + ((_numCells[1] - 2) % 2) * (y == 0)) / 2
 #endif
 #if (MD_DIM > 2)
                                                                      ,
-                                                                     (_numCells[2]-2 + ((_numCells[2]-2) % 2) * (z == 0)) / 2
+                                                                     (_numCells[2] - 2 + ((_numCells[2] - 2) % 2) * (z == 0)) / 2
 #endif
           );
           const int length = lengthVector[0]
@@ -173,14 +174,14 @@ public:
 private:
   unsigned int positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const {
     for (unsigned int d = 0; d < MD_DIM; d++) {
-  #if (MD_ERROR == MD_YES)
+#if (MD_ERROR == MD_YES)
       if ((position[d] < _domainOffset[d] - _meshWidth[d]) || (position[d] > _domainOffset[d] + _domainSize[d] + _meshWidth[d])) {
         std::cout << "ERROR simplemd::MoleculeContainer::positionToCellIndex: Position ";
         std::cout << d << " is out of range!" << std::endl;
         std::cout << "Position: " << position << std::endl;
         exit(EXIT_FAILURE);
       }
-  #endif
+#endif
     }
     tarch::la::Vector<MD_DIM, unsigned int> cellVectorIndex(0);
 
@@ -192,7 +193,7 @@ private:
       // shift into local cell index
       index += _localIndexOfFirstCell[d];
       index -= _globalIndexOfFirstCell[d];
-  #if (MD_ERROR == MD_YES)
+#if (MD_ERROR == MD_YES)
       if (index < 0) {
         std::cout << "ERROR simplemd::MoleculeContainer::positionToCellIndex: index < 0: index=";
         std::cout << index << std::endl;
@@ -204,7 +205,7 @@ private:
         std::cout << "Position: " << position << ", offset: " << _domainOffset << ", meshwidth: " << _meshWidth << std::endl;
         exit(EXIT_FAILURE);
       }
-  #endif
+#endif
       cellVectorIndex[d] = (unsigned int)index;
     }
     return vectorIndexToLinear(cellVectorIndex);
