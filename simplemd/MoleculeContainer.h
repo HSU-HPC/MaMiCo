@@ -47,9 +47,9 @@ public:
 
   void clearLinkedCell(int cellIdx) { linkedCellNumMolecules(cellIdx) = 0; }
 
-  void sort(int cellIdx, IndexConverter& indexConverter) { // set all outgoing molecules
+  void sort(int cellIdx) { // set all outgoing molecules
     for (size_t i = 0; i < linkedCellNumMolecules(cellIdx); i++) {
-      int curMolIdx = indexConverter.getIndex(moleculeData(cellIdx, i).pos);
+      int curMolIdx = positionToCellIndex(moleculeData(cellIdx, i).getPosition());
       if (curMolIdx != cellIdx) { // if molecule does not belong to current cell anymore
         // write data to target end
         moleculeData(curMolIdx, linkedCellNumMolecules(curMolIdx)) = moleculeData(cellIdx, i);
@@ -63,15 +63,9 @@ public:
     }
   }
 
-  void sort(IndexConverter& indexConverter) {
+  void sort() {
+    // sort all inner cells, exclude all ghost cells
     // find red-black cells
-    /**
-     * The size<> Vector stores the number of cells, plus ghost layer.
-     * If there are (1,1,1) ghost cells per dimension, getLocalIndexOfFirstCell will return (1,1,1)
-     * Thus this is multiplied by 2 to account for ghost cells in both locations (begin, end) per axis
-     * and then added to local number of cells
-     */
-    const tarch::la::Vector<MD_DIM, unsigned int> size(getLocalNumberOfCells() + 2u * getLocalIndexOfFirstCell());
 
 // iterate over the domain in a red-black manner
 #if (MD_DIM > 2)
@@ -85,14 +79,14 @@ public:
           // For odd block sizes, we need to do some more work in the
           // x/y/z==0-traversals. The second x/y/z==1-traversals are reduced by
           // the normal integer-rounding in this case.
-          const tarch::la::Vector<MD_DIM, unsigned int> lengthVector((cellRange[0] + (cellRange[0] % 2) * (x == 0)) / 2
+          const tarch::la::Vector<MD_DIM, unsigned int> lengthVector((_numCells[0]-2 + ((_numCells[0]-2) % 2) * (x == 0)) / 2
 #if (MD_DIM > 1)
                                                                      ,
-                                                                     (cellRange[1] + (cellRange[1] % 2) * (y == 0)) / 2
+                                                                     (_numCells[1]-2 + ((_numCells[1]-2) % 2) * (y == 0)) / 2
 #endif
 #if (MD_DIM > 2)
                                                                      ,
-                                                                     (cellRange[2] + (cellRange[2] % 2) * (z == 0)) / 2
+                                                                     (_numCells[2]-2 + ((_numCells[2]-2) % 2) * (z == 0)) / 2
 #endif
           );
           const int length = lengthVector[0]
@@ -119,8 +113,8 @@ public:
                 helpIndex2 = helpIndex1 / (lengthVector[0] * lengthVector[1]);
                 // save rest of index in helpIndex1
                 helpIndex1 = helpIndex1 - helpIndex2 * (lengthVector[0] * lengthVector[1]);
-                // compute contribution to index
-                index += (lowerLeftFrontCell[2] + 2 * helpIndex2 + z) * size[0] * size[1];
+                // compute contribution to index (the starting 1 is the z coordinate of the first cell)
+                index += (_localIndexOfFirstCell[2] + 2 * helpIndex2 + z) * _numCells[0] * _numCells[1];
 #endif
 #if (MD_DIM > 1)
                 // determine plane within traversed block
@@ -128,11 +122,11 @@ public:
                 // save rest of index in helpIndex1
                 helpIndex1 = helpIndex1 - helpIndex2 * lengthVector[0];
                 // compute contribution to index
-                index += (lowerLeftFrontCell[1] + 2 * helpIndex2 + y) * size[0];
+                index += (_localIndexOfFirstCell[1] + 2 * helpIndex2 + y) * _numCells[0];
                 // compute contribution for last dimension
-                index += (lowerLeftFrontCell[0] + 2 * helpIndex1 + x);
+                index += (_localIndexOfFirstCell[0] + 2 * helpIndex1 + x);
 #else
-        index = lowerLeftFrontCell[0] + 2 * j + x;
+        index = _localIndexOfFirstCell[0] + 2 * j + x;
 #endif
 #if (MD_DEBUG == MD_YES)
                 std::cout << "Handle cell " << index << std::endl;
@@ -140,7 +134,7 @@ public:
                 auto linkedCellLocal(linkedCellNumMolecules);
                 auto moleculeDataLocal(moleculeData);
                 for (size_t i = 0; i < linkedCellLocal(index); i++) {
-                  int curMolIdx = indexConverter.getIndex(moleculeDataLocal(index, i).pos);
+                  int curMolIdx = positionToCellIndex(moleculeDataLocal(index, i).getPosition());
                   if (curMolIdx != index) { // if molecule does not belong to current cell anymore
                     // write data to target end
                     moleculeDataLocal(curMolIdx, linkedCellLocal(curMolIdx)) = moleculeDataLocal(index, i);
@@ -225,7 +219,7 @@ private:
     }
     return cellLinearIndex;
   }
-  /** number of cells per direction in the domain */
+  /** number of cells per direction in the local domain */
   tarch::la::Vector<MD_DIM, unsigned int> _numCells;
 
   /** maximum number of particles a cell (a row of the view) can contain
