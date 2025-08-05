@@ -3,7 +3,7 @@
 simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService parallelTopologyService, int cellCapacity)
     : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _cellCapacity(cellCapacity),
       _moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
-      linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)) {
+      _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)) {
   tarch::la::Vector<MD_DIM, unsigned int> bufferGlobal(0);
   tarch::la::Vector<MD_DIM, unsigned int> bufferLocal(0);
   _domainOffset = parallelTopologyService.getGlobalDomainOffset();
@@ -17,27 +17,27 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
 }
 
 void simplemd::MoleculeContainer::insert(int cellIdx, simplemd::Molecule& molecule) {
-  _moleculeData(cellIdx, linkedCellNumMolecules(cellIdx)) = molecule;
-  linkedCellNumMolecules(cellIdx) += 1;
+  _moleculeData(cellIdx, _linkedCellNumMolecules(cellIdx)) = molecule;
+  _linkedCellNumMolecules(cellIdx) += 1;
 }
 
 void simplemd::MoleculeContainer::insert(simplemd::Molecule& molecule) { insert(positionToCellIndex(molecule.getPosition()), molecule); }
 
 void simplemd::MoleculeContainer::remove(int cellIdx, int moleculeIdx) {
-  _moleculeData(cellIdx, moleculeIdx) = _moleculeData(cellIdx, linkedCellNumMolecules(cellIdx) - 1);
-  linkedCellNumMolecules(cellIdx) -= 1;
+  _moleculeData(cellIdx, moleculeIdx) = _moleculeData(cellIdx, _linkedCellNumMolecules(cellIdx) - 1);
+  _linkedCellNumMolecules(cellIdx) -= 1;
 }
 
-void simplemd::MoleculeContainer::clearLinkedCell(int cellIdx) { linkedCellNumMolecules(cellIdx) = 0; }
+void simplemd::MoleculeContainer::clearLinkedCell(int cellIdx) { _linkedCellNumMolecules(cellIdx) = 0; }
 
 void simplemd::MoleculeContainer::sort(int cellIdx) { // set all outgoing molecules
-  for (size_t i = 0; i < linkedCellNumMolecules(cellIdx); i++) {
+  for (size_t i = 0; i < _linkedCellNumMolecules(cellIdx); i++) {
     int curMolIdx = positionToCellIndex(_moleculeData(cellIdx, i).getPosition());
     if (curMolIdx != cellIdx) { // if molecule does not belong to current cell anymore
       // write data to target end
-      _moleculeData(curMolIdx, linkedCellNumMolecules(curMolIdx)) = _moleculeData(cellIdx, i);
+      _moleculeData(curMolIdx, _linkedCellNumMolecules(curMolIdx)) = _moleculeData(cellIdx, i);
       // increment target end
-      linkedCellNumMolecules(curMolIdx)++;
+      _linkedCellNumMolecules(curMolIdx)++;
       // delete molecule at own position
       remove(cellIdx, i);
       // decrement iterator as the molecule at position i is now new
@@ -114,7 +114,7 @@ void simplemd::MoleculeContainer::sort() {
 #if (MD_DEBUG == MD_YES)
               std::cout << "Handle cell " << index << std::endl;
 #endif
-              auto linkedCellLocal(linkedCellNumMolecules);
+              auto linkedCellLocal(_linkedCellNumMolecules);
               auto moleculeDataLocal(_moleculeData);
               for (size_t i = 0; i < linkedCellLocal(index); i++) {
                 int curMolIdx = positionToCellIndex(moleculeDataLocal(index, i).getPosition());
@@ -143,12 +143,10 @@ void simplemd::MoleculeContainer::sort() {
 simplemd::Molecule& simplemd::MoleculeContainer::getMoleculeAt(int i, int j) const { return _moleculeData(i, j); }
 
 simplemd::LinkedCell simplemd::MoleculeContainer::operator[](int idx) {
-  Kokkos::View<Molecule*> lcMoleculeSlice(_moleculeData, idx, Kokkos::ALL);
-  Kokkos::View<int> lcSizeSlice(linkedCellNumMolecules, idx);
-  return simplemd::LinkedCell(lcSizeSlice, lcMoleculeSlice);
+  return simplemd::LinkedCell(_moleculeData, _linkedCellNumMolecules, idx);
 }
 
-int simplemd::MoleculeContainer::getNumCells() const { return linkedCellNumMolecules.size(); }
+int simplemd::MoleculeContainer::getNumCells() const { return _linkedCellNumMolecules.size(); }
 
 unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const {
   for (unsigned int d = 0; d < MD_DIM; d++) {

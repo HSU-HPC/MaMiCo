@@ -153,6 +153,6 @@ private:
   tarch::la::Vector<MD_DIM, int> _localIndexOfFirstCell;
 
   Kokkos::View<simplemd::Molecule**> _moleculeData;
-  Kokkos::View<int*> linkedCellNumMolecules;
+  Kokkos::View<int*> _linkedCellNumMolecules;
 };
 #endif // _MOLECULARDYNAMICS_MOLECULARCONTAINER_H_

@@ -11,9 +11,10 @@ class LinkedCell;
 
 class simplemd::LinkedCell {
 public:
-  KOKKOS_FUNCTION LinkedCell(Kokkos::View<int, Kokkos::LayoutRight, Kokkos::SharedSpace> nMolecules,
-                             Kokkos::View<Molecule*, Kokkos::LayoutRight, Kokkos::SharedSpace> moleculeSlice)
-      : _numMolecules(nMolecules), _moleculeData(moleculeSlice) {}
+  KOKKOS_FUNCTION LinkedCell(Kokkos::View<Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace>* moleculeData,
+                             Kokkos::View<int*, Kokkos::LayoutRight, Kokkos::SharedSpace>* nMolecules,
+                             unsigned int cellIndex)
+      : _moleculeData(moleculeData), _linkedCellNumMolecules(nMolecules), _cellIndex(cellIndex) {}
 
   class Iterator {
     using iterator_category = std::bidirectional_iterator_tag;
@@ -60,30 +61,39 @@ public:
     unsigned int _idx;
   };
 
-  KOKKOS_FUNCTION Iterator begin() const { return Iterator(&_moleculeData(0)); }
-  KOKKOS_FUNCTION Iterator end() const { return Iterator(&_moleculeData(_numMolecules())); }
+  KOKKOS_FUNCTION Iterator begin() const { return Iterator(getMolecule(0)); }
+  KOKKOS_FUNCTION Iterator end() const { return Iterator(getMolecule(numMolecules())); }
 
   KOKKOS_FUNCTION void insert(Molecule& molecule) {
-    _moleculeData(_numMolecules()) = molecule;
-    _numMolecules() += 1;
+    *getMolecule(numMolecules()) = molecule;
+    changeMoleculeCount(+1);
   }
   KOKKOS_FUNCTION void remove(int moleculeIdx) {
-    _moleculeData(moleculeIdx) = _moleculeData(_numMolecules() - 1);
-    _numMolecules() -= 1;
+    *getMolecule(moleculeIdx) = *getMolecule(numMolecules() - 1);
+    changeMoleculeCount(-1);
   }
-  KOKKOS_FUNCTION void clear() { _numMolecules() = 0; }
+  KOKKOS_FUNCTION void clear() { (*_linkedCellNumMolecules)(_cellIndex) = 0; }
 
   std::string to_string() const {
     std::stringstream to_ret;
-    to_ret << " numMol: " << _numMolecules() << std::endl;
+    to_ret << " numMol: " << numMolecules() << std::endl;
     return to_ret.str();
   }
 
-  KOKKOS_INLINE_FUNCTION unsigned int numMolecules() const { return _numMolecules(); }
+  KOKKOS_INLINE_FUNCTION unsigned int numMolecules() const { return (*_linkedCellNumMolecules)(_cellIndex); }
 
 private:
-  Kokkos::View<int, Kokkos::LayoutRight, Kokkos::SharedSpace> _numMolecules;
-  Kokkos::View<simplemd::Molecule*, Kokkos::LayoutRight, Kokkos::SharedSpace> _moleculeData;
+  KOKKOS_INLINE_FUNCTION void changeMoleculeCount(int by) {
+    (*_linkedCellNumMolecules)(_cellIndex) += by;
+  }
+
+  KOKKOS_INLINE_FUNCTION Molecule* getMolecule(unsigned int moleculeIndex) const {
+    return &(*_moleculeData)(_cellIndex, moleculeIndex);
+  }
+
+  Kokkos::View<Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace>* _moleculeData;
+  Kokkos::View<int*, Kokkos::LayoutRight, Kokkos::SharedSpace>* _linkedCellNumMolecules;
+  const unsigned int _cellIndex;
 };
 
 #endif // _MOLECULARDYNAMICS_LINKEDCELL_H_
