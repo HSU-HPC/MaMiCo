@@ -383,6 +383,7 @@ set(SIMPLE_MD_SOURCES
   "tarch/tinyxml2/tinyxml2.cpp"
   "tarch/utils/RandomNumberService.cpp"
   "simplemd/configurations/Adios2Configuration.cpp"
+  "simplemd/MoleculeContainer.cpp"
 )
 if(BUILD_WITH_ADIOS2)
   list(APPEND SIMPLE_MD_SOURCES "simplemd/molecule-mappings/Adios2Writer.cpp")
@@ -886,6 +887,7 @@ set(CLANGFORMAT_SOURCES
   "simplemd/main.cpp"
   "simplemd/Molecule.h"
   "simplemd/MoleculeContainer.h"
+  "simplemd/MoleculeContainer.cpp"
   "simplemd/ProfilePlotter.h"
   "simplemd/MolecularDynamicsUserInput.h"
 )
