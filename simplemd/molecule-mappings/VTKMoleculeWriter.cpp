@@ -5,8 +5,8 @@
 #include "simplemd/molecule-mappings/VTKMoleculeWriter.h"
 
 simplemd::moleculemappings::VTKMoleculeWriter::VTKMoleculeWriter(const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                                                 const simplemd::services::MoleculeService& moleculeService, const std::string& filename)
-    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _filename(filename), _timestep(0) {}
+                                                                 const simplemd::MoleculeContainer& moleculeContainer, const std::string& filename)
+    : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer), _filename(filename), _timestep(0) {}
 
 simplemd::moleculemappings::VTKMoleculeWriter::~VTKMoleculeWriter() {}
 
@@ -41,8 +41,8 @@ void simplemd::moleculemappings::VTKMoleculeWriter::beginMoleculeIteration() {
   _file << "DATASET UNSTRUCTURED_GRID" << std::endl;
   //_file << "DATASET POLYDATA" << std::endl;
 
-  _positions << "POINTS " << _moleculeService.getNumberMolecules() << " float" << std::endl;
-  _velocities << "POINT_DATA " << _moleculeService.getNumberMolecules() << std::endl;
+  _positions << "POINTS " << _moleculeContainer.getNumberMolecules() << " float" << std::endl;
+  _velocities << "POINT_DATA " << _moleculeContainer.getNumberMolecules() << std::endl;
   _velocities << "VECTORS velocities float" << std::endl;
   _forces << "VECTORS forces float" << std::endl;
   _fix << "SCALARS isFixed float" << std::endl;
