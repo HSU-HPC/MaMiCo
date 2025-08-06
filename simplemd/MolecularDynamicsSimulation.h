@@ -15,7 +15,6 @@
 #include "simplemd/cell-mappings/RDFMapping.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
 #include "simplemd/molecule-mappings/InitialPositionAndForceUpdate.h"
-#include "simplemd/molecule-mappings/UpdateLinkedCellListsMapping.h"
 #include "simplemd/molecule-mappings/VTKMoleculeWriter.h"
 #if BUILD_WITH_ADIOS2
 #include "simplemd/molecule-mappings/Adios2Writer.h"
@@ -28,6 +27,7 @@
 #include "simplemd/services/ParallelTopologyService.h"
 #include "tarch/utils/MultiMDService.h"
 #include "tarch/utils/RandomNumberService.h"
+#include "simplemd/MoleculeContainer.h"
 #include <iostream>
 #include <sstream>
 
@@ -73,7 +73,6 @@ protected:
 
   // molecule mappings
   simplemd::moleculemappings::VelocityStoermerVerletMapping* _timeIntegrator;
-  simplemd::moleculemappings::UpdateLinkedCellListsMapping* _updateLinkedCellListsMapping;
   simplemd::moleculemappings::VTKMoleculeWriter* _vtkMoleculeWriter;
   std::string _vtkFilestem;
 
@@ -98,6 +97,7 @@ protected:
   simplemd::services::ParallelTopologyService* _parallelTopologyService;
   // for molecule storage
   simplemd::services::MoleculeService* _moleculeService;
+  simplemd::MoleculeContainer* _moleculeContainer;
   std::string _checkpointFilestem;
   // for linked cell storage
   simplemd::services::LinkedCellService* _linkedCellService;

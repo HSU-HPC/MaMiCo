@@ -5,7 +5,6 @@
 
 #include "simplemd/services/MoleculeService.h"
 #include "simplemd/cell-mappings/CopyMoleculesMapping.h"
-#include "simplemd/molecule-mappings/UpdateLinkedCellListsMapping.h"
 #include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 #include "simplemd/services/LinkedCellService.h"
 
@@ -401,62 +400,7 @@ void simplemd::services::MoleculeService::deleteMolecule(Molecule& molecule) {
 
 void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::services::ParallelTopologyService& parallelTopologyService,
                                                            simplemd::services::LinkedCellService& linkedCellService) {
-  unsigned int numberBlocks = 0;
-  // loop counter
-  unsigned int i = 0;
-  simplemd::cellmappings::CopyMoleculesMapping copyMoleculesMapping;
-  simplemd::moleculemappings::UpdateLinkedCellListsMapping updateLinkedCellListsMapping(parallelTopologyService, linkedCellService);
-
-  // create copy of molecules and store the copies in a std::list
-  std::list<simplemd::Molecule>& copyBuffer = copyMoleculesMapping.getCopyOfMolecules();
-  linkedCellService.iterateCells(copyMoleculesMapping);
-  // std::cout <<  "Number molecules: " << copyBuffer.size() << std::endl;
-
-  // reset all values and delete molecules
-  _numberMolecules = (unsigned int)(copyBuffer.size());
-  _freeMoleculePositions.clear();
-  for (i = 0; i < _molecules.size(); i++) {
-    if (_molecules[i] != NULL) {
-      free(_molecules[i]);
-      _molecules[i] = NULL;
-    }
-  }
-  _molecules.clear();
-
-  // create new memory
-  numberBlocks = _numberMolecules / _blockSize + (_numberMolecules % _blockSize != 0);
-  for (i = 0; i < numberBlocks; i++) {
-    _molecules.push_back((Molecule*)NULL);
-    _molecules[i] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
-    if (_molecules[i] == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::reorganiseMemory(): _molecules == NULL!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-  }
-
-  // copy molecules into correct positions and delete temporary copies
-  i = 0;
-  for (std::list<simplemd::Molecule>::iterator it = copyBuffer.begin(); it != copyBuffer.end(); it++) {
-    const unsigned int block = i / _blockSize;
-    const unsigned int blockEntry = i % _blockSize;
-    // initialise object structure and memory
-    simplemd::Molecule* myMolecule = new (&_molecules[block][blockEntry]) Molecule();
-    *myMolecule = (*it);
-    // set current molecule ID
-    myMolecule->setID(i);
-
-    // increment counter
-    i++;
-  }
-  copyMoleculesMapping.removeCopy();
-
-  // add empty entries to list
-  for (i = _numberMolecules; i < _blockSize * _molecules.size(); i++) {
-    _freeMoleculePositions.push_back(i);
-  }
-
-  // populate linked cell lists again
-  iterateMolecules(updateLinkedCellListsMapping);
+  // NOTE: Functionality removed due to ongoing change of the architecture (Replace MoleculeService, LinkedCellService with MoleculeContainer)
 }
 
 void simplemd::services::MoleculeService::writeCheckPoint(const simplemd::services::ParallelTopologyService& parallelTopologyService,

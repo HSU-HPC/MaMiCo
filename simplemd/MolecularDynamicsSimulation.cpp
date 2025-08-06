@@ -6,7 +6,7 @@
 #include "simplemd/cell-mappings/VaryCheckpointMapping.h"
 
 simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
-    : _configuration(configuration), _timeIntegrator(NULL), _updateLinkedCellListsMapping(NULL), _vtkMoleculeWriter(NULL),
+    : _configuration(configuration), _timeIntegrator(NULL), _vtkMoleculeWriter(NULL),
 #if BUILD_WITH_ADIOS2
       _Adios2Writer(NULL),
 #endif
@@ -156,13 +156,6 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _updateLinkedCellListsMapping = new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService);
-    if (_updateLinkedCellListsMapping == NULL) {
-      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-                   "_updateLinkedCellListsMapping==NULL!"
-                << std::endl;
-      exit(EXIT_FAILURE);
-    }
     _vtkMoleculeWriter = new simplemd::moleculemappings::VTKMoleculeWriter(*_parallelTopologyService, *_moleculeService, _vtkFilestem);
     if (_vtkMoleculeWriter == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
@@ -241,7 +234,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     _moleculeService->iterateMolecules(initialPositionAndForceUpdate);
 
     // sort molecules into linked cells
-    _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping);
+    _moleculeContainer->sort();
 
     // -------------- do initial force computations and position update (end)
     // ----------
@@ -385,13 +378,6 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _updateLinkedCellListsMapping = new simplemd::moleculemappings::UpdateLinkedCellListsMapping(*_parallelTopologyService, *_linkedCellService);
-    if (_updateLinkedCellListsMapping == NULL) {
-      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-                   "_updateLinkedCellListsMapping==NULL!"
-                << std::endl;
-      exit(EXIT_FAILURE);
-    }
     _vtkMoleculeWriter = new simplemd::moleculemappings::VTKMoleculeWriter(*_parallelTopologyService, *_moleculeService, _vtkFilestem);
     if (_vtkMoleculeWriter == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
@@ -469,7 +455,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     _linkedCellService->iterateCells(*_emptyLinkedListsMapping);
     _moleculeService->iterateMolecules(initialPositionAndForceUpdate);
     // sort molecules into linked cells
-    _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping);
+    _moleculeContainer->sort();
     // -------------- do initial force computations and position update (end)
     // ----------
   } // end is process not idle
@@ -489,10 +475,6 @@ void simplemd::MolecularDynamicsSimulation::shutdownServices() {
   if (_timeIntegrator != NULL) {
     delete _timeIntegrator;
     _timeIntegrator = NULL;
-  }
-  if (_updateLinkedCellListsMapping != NULL) {
-    delete _updateLinkedCellListsMapping;
-    _updateLinkedCellListsMapping = NULL;
   }
   if (_vtkMoleculeWriter != NULL) {
     delete _vtkMoleculeWriter;
@@ -637,7 +619,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   _moleculeService->iterateMolecules(*_timeIntegrator);
 
   // sort molecules into linked cells
-  _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping);
+  _moleculeContainer->sort();
 
   if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
     if (t % 50 == 0)

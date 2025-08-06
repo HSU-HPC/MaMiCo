@@ -7,7 +7,6 @@
 
 #include "simplemd/LinkedCell.h"
 #include "simplemd/Molecule.h"
-#include "simplemd/molecule-mappings/UpdateLinkedCellListsMapping.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include "tarch/la/Vector.h"
 #include <iostream>

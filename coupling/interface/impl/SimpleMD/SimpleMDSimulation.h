@@ -101,7 +101,7 @@ public:
     _moleculeService->iterateMolecules(*_timeIntegrator);
 
     // sort molecules into linked cells
-    _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping);
+    _moleculeContainer->sort();
 
     if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
       // if(t%50==0) std::cout <<"Finish MD timestep " << t << "..." << std::endl;

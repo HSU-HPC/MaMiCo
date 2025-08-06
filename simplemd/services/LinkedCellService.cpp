@@ -22,8 +22,7 @@ simplemd::services::LinkedCellService::LinkedCellService(const tarch::la::Vector
   initCellStructure();
 
   // sort molecules into cells. This is done as an initial step.
-  simplemd::moleculemappings::UpdateLinkedCellListsMapping updateLinkedCellLists(parallelTopologyService, *this);
-  moleculeService.iterateMolecules(updateLinkedCellLists);
+  // NOTE: Here we also used to sort molecules into the correct linked cells using a mapping (this is no longer needed due to a change in architecture)
 }
 
 const tarch::la::Vector<MD_DIM, unsigned int>& simplemd::services::LinkedCellService::getLocalIndexOfFirstCell() const { return _indexOffset; }
