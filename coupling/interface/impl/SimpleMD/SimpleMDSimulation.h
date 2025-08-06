@@ -71,14 +71,14 @@ public:
     // plot VTK output
     if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
       _vtkMoleculeWriter->setTimestep(t);
-      _moleculeContainer->iterateMolecules(*_vtkMoleculeWriter);
+      _moleculeService->getContainer().iterateMolecules(*_vtkMoleculeWriter);
     }
 
 // plot ADIOS2 output
 #if BUILD_WITH_ADIOS2
     if ((_configuration.getAdios2Configuration().getWriteEveryTimestep() != 0) && (t % _configuration.getAdios2Configuration().getWriteEveryTimestep() == 0)) {
       _Adios2Writer->setTimestep(t);
-      _moleculeContainer->iterateMolecules(*_Adios2Writer);
+      _moleculeService->getContainer().iterateMolecules(*_Adios2Writer);
     }
 #endif
 
@@ -86,22 +86,22 @@ public:
     if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0) &&
         (t % _configuration.getCheckpointConfiguration().getWriteEveryTimestep() == 0)) {
       simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(*_parallelTopologyService, _configuration.getCheckpointConfiguration().getFilename(), t);
-      _moleculeContainer->iterateMolecules(writeCheckPointMapping);
+      _moleculeService->getContainer().iterateMolecules(writeCheckPointMapping);
     }
     // reorganise memory if needed
     if ((_configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() != 0) &&
         (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {
-      _moleculeContainer->sort();
+      _moleculeService->getContainer().sort();
     }
     // plot also coupling cell information
     _couplingCellService->plotEveryMicroscopicTimestep(t);
 
     // time integration. After this step, the velocities and the positions of the
     // molecules have been updated.
-    _moleculeContainer->iterateMolecules(*_timeIntegrator);
+    _moleculeService->getContainer().iterateMolecules(*_timeIntegrator);
 
     // sort molecules into linked cells
-    _moleculeContainer->sort();
+    _moleculeService->getContainer().sort();
 
     if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
       // if(t%50==0) std::cout <<"Finish MD timestep " << t << "..." << std::endl;
@@ -131,21 +131,21 @@ public:
 
   virtual void writeCheckpoint(const std::string& filestem, const unsigned int& t) {
     simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(getParallelTopologyService(), filestem, t);
-    _moleculeContainer->iterateMolecules(writeCheckPointMapping);
+    _moleculeService->getContainer().iterateMolecules(writeCheckPointMapping);
   }
 
   // function particularly needed to init MD solver interface -> should only be
   // called from factory
   simplemd::BoundaryTreatment& getBoundaryTreatment() { return *_boundaryTreatment; }
   simplemd::services::ParallelTopologyService& getParallelTopologyService() { return *_parallelTopologyService; }
-  simplemd::MoleculeContainer& getMoleculeContainer() {
+  simplemd::services::MoleculeService& getMoleculeService() {
     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(_moleculeContainer == NULL){
-      std::cout <<"ERROR coupling::interface::MDSimulation::getMoleculeContainer(): _moleculeContainer == NULL " << std::endl;
+    if(_moleculeService == NULL){
+      std::cout <<"ERROR coupling::interface::MDSimulation::getMoleculeService(): _moleculeService == NULL " << std::endl;
       exit(1);
     }
     #endif
-    return *_moleculeContainer;
+    return *_moleculeService;
   }
   simplemd::services::LinkedCellService& getLinkedCellService() { return *_linkedCellService; }
   const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() {

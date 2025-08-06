@@ -143,11 +143,6 @@ public:
    */
   template <class A> void iterateMolecules(A& a);
 
-  /** creates initial velocity for molecule from meanVelocity and given temperature and stores the result in initialVelocity */
-  void getInitialVelocity(const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
-                          const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
-                          tarch::la::Vector<MD_DIM, double>& initialVelocity) const;
-
 private:
 
   /** applies molecule mapping without any node-level parallelisation

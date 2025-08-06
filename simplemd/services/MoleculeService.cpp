@@ -5,6 +5,7 @@
 
 #include "simplemd/services/MoleculeService.h"
 #include "simplemd/services/LinkedCellService.h"
+#include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 
 simplemd::services::MoleculeService::~MoleculeService() {
   for (unsigned int i = 0; i < _molecules.size(); i++) {
@@ -17,6 +18,8 @@ simplemd::services::MoleculeService::~MoleculeService() {
   _freeMoleculePositions.clear();
   _numberMolecules = 0;
   _blockSize = 0;
+  delete _moleculeContainer;
+  _moleculeContainer = nullptr;
 }
 
 simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
@@ -396,15 +399,19 @@ void simplemd::services::MoleculeService::deleteMolecule(Molecule& molecule) {
   _numberMolecules--;
 }
 
-void simplemd::services::MoleculeService::resetMeanVelocity() {
-  simplemd::moleculemappings::ComputeMeanVelocityMapping compute;
-  // FIXME (moved to MoleculeContainer) iterateMolecules(compute);
-  tarch::la::Vector<MD_DIM, double> currentVel = compute.getMeanVelocity();
-  simplemd::moleculemappings::SetMeanVelocityMapping set(currentVel, _meanVelocity);
-  // FIXME (moved to MoleculeContainer) iterateMolecules(set);
-
-  // check again
-  // FIXME (moved to MoleculeContainer) iterateMolecules(compute);
+void simplemd::services::MoleculeService::writeCheckPoint(const simplemd::services::ParallelTopologyService& parallelTopologyService,
+                                                          const std::string& filestem, const unsigned int& t) {
+  simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(parallelTopologyService, filestem, t);
+  _moleculeContainer->iterateMolecules(writeCheckPointMapping);
 }
 
+void simplemd::services::MoleculeService::resetMeanVelocity() {
+  simplemd::moleculemappings::ComputeMeanVelocityMapping compute;
+  _moleculeContainer->iterateMolecules(compute);
+  tarch::la::Vector<MD_DIM, double> currentVel = compute.getMeanVelocity();
+  simplemd::moleculemappings::SetMeanVelocityMapping set(currentVel, _meanVelocity);
+  _moleculeContainer->iterateMolecules(set);
 
+  // check again
+  _moleculeContainer->iterateMolecules(compute);
+}

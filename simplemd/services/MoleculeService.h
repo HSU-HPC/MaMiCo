@@ -7,6 +7,7 @@
 
 #include "simplemd/MolecularDynamicsDefinitions.h"
 #include "simplemd/Molecule.h"
+#include "simplemd/MoleculeContainer.h"
 #include "simplemd/molecule-mappings/ComputeMeanVelocityMapping.h"
 #include "simplemd/molecule-mappings/SetMeanVelocityMapping.h"
 #include "simplemd/services/MolecularPropertiesService.h"
@@ -84,10 +85,21 @@ public:
                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
                           tarch::la::Vector<MD_DIM, double>& initialVelocity) const;
 
+  /** writes a checkpoint containing:
+   *  - the number of molecules and the dimension of the problem (1,2 or 3) in one line
+   *  - each molecule in one line consisting of position, velocity and force_old.
+   *  In parallel cases, each process writes its own checkpoint data. The file will be named
+   *  filestem_t_rank.dat in any case (rank=0 in the serial case).
+   *  The mapping WriteCheckPointMapping is used.
+   */
+  void writeCheckPoint(const simplemd::services::ParallelTopologyService& parallelTopologyService, const std::string& filestem, const unsigned int& t);
+
   /** resets the velocity over the whole molecule system to the mean velocity specified at the beginning */
   void resetMeanVelocity();
 
-  
+  simplemd::MoleculeContainer& getContainer() const {
+    return *_moleculeContainer;
+  }
 
 private:
 
@@ -105,6 +117,8 @@ private:
 
   /** number of molecules that are stored in one memory block */
   unsigned int _blockSize;
+
+  simplemd::MoleculeContainer* _moleculeContainer;
 };
 
 

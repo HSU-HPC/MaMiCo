@@ -4,7 +4,6 @@
 // www5.in.tum.de/mamico
 #include "simplemd/MolecularDynamicsSimulation.h"
 #include "simplemd/cell-mappings/VaryCheckpointMapping.h"
-#include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 
 simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
     : _configuration(configuration), _timeIntegrator(NULL), _vtkMoleculeWriter(NULL),
@@ -574,8 +573,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   // write checkpoint
   if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0) &&
       (t % _configuration.getCheckpointConfiguration().getWriteEveryTimestep() == 0)) {
-    simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(*_parallelTopologyService, _checkpointFilestem, t);
-    _moleculeContainer->iterateMolecules(writeCheckPointMapping);
+    _moleculeService->writeCheckPoint(*_parallelTopologyService, _checkpointFilestem, t);
   }
 
   // reorganise memory if needed
