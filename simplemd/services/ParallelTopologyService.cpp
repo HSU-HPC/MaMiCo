@@ -5,7 +5,6 @@
 #include "simplemd/services/ParallelTopologyService.h"
 
 #include "simplemd/services/LinkedCellService.h"
-#include "simplemd/services/MoleculeService.h"
 
 simplemd::services::ParallelTopologyService::ParallelTopologyService(const tarch::la::Vector<MD_DIM, double>& domainSize,
                                                                      const tarch::la::Vector<MD_DIM, double>& domainOffset,
@@ -432,9 +431,9 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::unpackLocalBuffer(simplemd::services::MoleculeService& moleculeService,
+void simplemd::services::ParallelTopologyService::unpackLocalBuffer(simplemd::MoleculeContainer& moleculeContainer,
                                                                     simplemd::services::LinkedCellService& linkedCellService) {
-  unpackBuffer(_bufferService.getLocalBuffer(), moleculeService, linkedCellService);
+  unpackBuffer(_bufferService.getLocalBuffer(), moleculeContainer, linkedCellService);
 }
 
 void simplemd::services::ParallelTopologyService::communicationSteps_1_2() {
@@ -451,7 +450,7 @@ void simplemd::services::ParallelTopologyService::communicationSteps_1_2() {
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplemd::services::MoleculeService& moleculeService,
+void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplemd::MoleculeContainer& moleculeContainer,
                                                                          simplemd::services::LinkedCellService& linkedCellService) {
 #if (MD_PARALLEL == MD_YES)
   // Steps 3 and 4 together:
@@ -530,7 +529,7 @@ void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplem
 
   // now unpack all buffers in a fixed order:
   for (i_buf = 0; i_buf < _numUniqueNeighbours; i_buf++) {
-    unpackBuffer(_bufferService.getReceiveBuffer(i_buf), moleculeService, linkedCellService);
+    unpackBuffer(_bufferService.getReceiveBuffer(i_buf), moleculeContainer, linkedCellService);
   }
 
 #endif
@@ -1098,7 +1097,7 @@ unsigned int simplemd::services::ParallelTopologyService::getCurrentBufferIndexF
 }
 
 void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf,
-                                                               simplemd::services::MoleculeService& moleculeService,
+                                                               simplemd::MoleculeContainer& moleculeContainer,
                                                                simplemd::services::LinkedCellService& linkedCellService) {
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
@@ -1158,17 +1157,15 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalB
       cellIndex[d] = (unsigned int)cell;
     }
 
-    // add molecule to MoleculeService and LinkedCellService
+    // add molecule to MoleculeContainer
     Molecule myMolecule(position, velocity);
     myMolecule.setForceOld(forceOld);
     if (isFixed)
       myMolecule.fix();
-
-    Molecule* mPtr = moleculeService.addMolecule(myMolecule);
 #if (MD_DEBUG == MD_YES)
     std::cout << "Rank " << _rank << ": unpacked molecule from buffer into cell " << cellIndex << std::endl;
 #endif
-    linkedCellService.addMoleculeToLinkedCell(*mPtr, cellIndex);
+    moleculeContainer.insert(cellIndex, myMolecule);
   }
 
   // clear the buffer

@@ -12,18 +12,17 @@
 #endif
 #include "simplemd/LinkedCell.h"
 #include "simplemd/Molecule.h"
-#include "simplemd/services/MoleculeService.h"
 #include "simplemd/services/ParallelAndLocalBufferService.h"
+#include "simplemd/MoleculeContainer.h"
 #include <cstdlib>
 #include <iostream>
 #include <vector>
 
 namespace simplemd {
+// forward declarations to circumvent circular includes
+class MoleculeContainer;
 namespace services {
 class ParallelTopologyService;
-
-// forward declarations to circumvent circular includes
-class MoleculeService;
 class LinkedCellService;
 } // namespace services
 } // namespace simplemd
@@ -59,7 +58,7 @@ public:
 
   /** finish initialization by allocating buffers
    *
-   *  Needs to be called after MoleculeService has been initialised.
+   *  Needs to be called after MoleculeContainer has been initialised.
    */
   void initBuffers(const unsigned int& localNumberOfMolecules);
 
@@ -154,7 +153,7 @@ public:
 
   /** unpack and resort local buffer
    */
-  void unpackLocalBuffer(simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService);
+  void unpackLocalBuffer(simplemd::MoleculeContainer& moleculeContainer, simplemd::services::LinkedCellService& linkedCellService);
 
   /** Communication schedule:
    * 1. Irecv on buffers
@@ -167,7 +166,7 @@ public:
   void communicationSteps_1_2();
 
   /** See comment of communicationSteps_1_2() */
-  void communicationSteps_3_4(simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService);
+  void communicationSteps_3_4(simplemd::MoleculeContainer& MoleculeContainer, simplemd::services::LinkedCellService& linkedCellService);
 
   /** Compute (non-overlapping) intersection of a global region of interest (ROI) with local domain.
       For example for purposes of profile plotter. */
@@ -263,7 +262,7 @@ private:
 
   /** Read off all molecules from buffer and resort them in the respective linked cells.
    */
-  void unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf, simplemd::services::MoleculeService& moleculeService,
+  void unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf, simplemd::MoleculeContainer& MoleculeContainer,
                     simplemd::services::LinkedCellService& linkedCellService);
 
   /** place position, velocity, forceOld and isFixed at the end of the respective local buffer.

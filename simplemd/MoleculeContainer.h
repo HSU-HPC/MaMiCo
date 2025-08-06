@@ -9,6 +9,11 @@
 #include <simplemd/services/ParallelTopologyService.h>
 
 namespace simplemd {
+namespace services {
+  // forward declarations to remove circular dependencies
+  class ParallelTopologyService;
+}
+
 class MoleculeContainer;
 }
 
@@ -32,7 +37,7 @@ public:
    * @param parallelTopologyService Used to extract and store local number of cells, domain offset etc.
    * @param cellCapacity The maximum capacity of any cell. Cannot be changed, must provide ample room at compiletime.
    */
-  MoleculeContainer(simplemd::services::ParallelTopologyService parallelTopologyService, int cellCapacity);
+  MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity);
 
   /**
    * @brief Inserts a molecule into a specific linked cell.
@@ -130,7 +135,23 @@ public:
    */
   const size_t getNumberMolecules () const;
 
+  bool tarchDebugIsOn() const;
+
+  /** can be used to apply a molecule-mapping which is iterated over all molecules of this process
+   *  uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
+   */
+  template <class A> void iterateMolecules(A& a);
+
 private:
+
+  /** applies molecule mapping without any node-level parallelisation
+   */
+  template <class A> void iterateMoleculesSerial(A& a);
+
+  /** applies molecule mapping while parallelising using Kokkos
+   */
+  template <class A> void iterateMoleculesParallel(A& a);
+
   /**
    * @brief Converts a global 3D spatial coordinate to a local 1D linked cell index.
    *
@@ -177,4 +198,43 @@ private:
   Kokkos::View<simplemd::Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace> _moleculeData;
   Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCellNumMolecules;
 };
+
+template <class A> void simplemd::MoleculeContainer::iterateMolecules(A& a) {
+  if constexpr (A::IsParallel) {
+    iterateMoleculesParallel(a);
+  } else {
+    iterateMoleculesSerial(a);
+  }
+}
+
+
+template <class A> void simplemd::MoleculeContainer::iterateMoleculesSerial(A& a) {
+  a.beginMoleculeIteration();
+  for(unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++)
+  {
+    for(unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
+#if (MD_DEBUG == MD_YES)
+      std::cout << "Handle molecule " << j << " in cell #" << i << std::endl;
+#endif
+      a.handleMolecule(getMoleculeAt(i, j));
+    }
+  }
+  a.endMoleculeIteration();
+}
+
+template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A& a) {
+#if (MD_DEBUG == MD_YES)
+  iterateMoleculesSerial(a);
+#else
+  a.beginMoleculeIteration();
+  Kokkos::parallel_for(_linkedCellNumMolecules.size(), KOKKOS_LAMBDA(const unsigned int i)
+  {
+    for(unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
+      a.handleMolecule(getMoleculeAt(i, j));
+    }
+  });
+  a.endMoleculeIteration();
+#endif
+}
+
 #endif // _MOLECULARDYNAMICS_MOLECULARCONTAINER_H_

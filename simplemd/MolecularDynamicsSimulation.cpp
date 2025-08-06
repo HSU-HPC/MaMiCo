@@ -137,7 +137,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     }
 
     // init boundary treatment
-    _boundaryTreatment = new simplemd::BoundaryTreatment(*_parallelTopologyService, *_moleculeService, *_moleculeContainer, *_linkedCellService);
+    _boundaryTreatment = new simplemd::BoundaryTreatment(*_parallelTopologyService, *_moleculeContainer, *_linkedCellService);
     if (_boundaryTreatment == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_boundaryTreatment==NULL!"
@@ -223,7 +223,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     // its neighbors.
     _linkedCellService->iterateCellPairs(*_lennardJonesForce);
     _boundaryTreatment->emptyGhostBoundaryCells();
-    _moleculeService->iterateMolecules(initialPositionAndForceUpdate);
+    _moleculeContainer->iterateMolecules(initialPositionAndForceUpdate);
 
     // sort molecules into linked cells
     _moleculeContainer->sort();
@@ -351,7 +351,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     }
 
     // init boundary treatment
-    _boundaryTreatment = new simplemd::BoundaryTreatment(*_parallelTopologyService, *_moleculeService, *_moleculeContainer, *_linkedCellService);
+    _boundaryTreatment = new simplemd::BoundaryTreatment(*_parallelTopologyService, *_moleculeContainer, *_linkedCellService);
     if (_boundaryTreatment == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_boundaryTreatment==NULL!"
@@ -437,7 +437,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     // its neighbors.
     _linkedCellService->iterateCellPairs(*_lennardJonesForce);
     _boundaryTreatment->emptyGhostBoundaryCells();
-    _moleculeService->iterateMolecules(initialPositionAndForceUpdate);
+    _moleculeContainer->iterateMolecules(initialPositionAndForceUpdate);
     // sort molecules into linked cells
     _moleculeContainer->sort();
     // -------------- do initial force computations and position update (end)
@@ -559,14 +559,14 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   // plot VTK output
   if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() > 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
     _vtkMoleculeWriter->setTimestep(t);
-    _moleculeService->iterateMolecules(*_vtkMoleculeWriter);
+    _moleculeContainer->iterateMolecules(*_vtkMoleculeWriter);
   }
 
 #if BUILD_WITH_ADIOS2
   // plot Adios2 output
   if ((_configuration.getAdios2Configuration().getWriteEveryTimestep() > 0) && (t % _configuration.getAdios2Configuration().getWriteEveryTimestep() == 0)) {
     _Adios2Writer->setTimestep(t);
-    _moleculeService->iterateMolecules(*_Adios2Writer);
+    _moleculeContainer->iterateMolecules(*_Adios2Writer);
   }
 #endif
 
@@ -593,7 +593,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
 
   // time integration. After this step, the velocities and the positions of the
   // molecules have been updated.
-  _moleculeService->iterateMolecules(*_timeIntegrator);
+  _moleculeContainer->iterateMolecules(*_timeIntegrator);
 
   // sort molecules into linked cells
   _moleculeContainer->sort();

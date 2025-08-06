@@ -36,11 +36,11 @@ public:
     unsigned long long sum = 0;
   };
 
-  bool tarchDebugIsOn() const { return _moleculeService->tarchDebugIsOn(); }
+  bool tarchDebugIsOn() const { return _moleculeContainer->tarchDebugIsOn(); }
 
   unsigned long long getChecksum() {
     ChecksumMapping mapping;
-    _moleculeService->iterateMolecules(mapping);
+    _moleculeContainer->iterateMolecules(mapping);
     return mapping.checksum();
   }
 };
@@ -161,7 +161,7 @@ private:
 #endif
 
     if (!_simulation->tarchDebugIsOn()) {
-      std::cout << "WARN SimpleMDBench: Result validity check FAILED: MoleculeService: TARCH_DEBUG is off!" << std::endl;
+      std::cout << "WARN SimpleMDBench: Result validity check FAILED: MoleculeContainer: TARCH_DEBUG is off!" << std::endl;
       return;
     }
 

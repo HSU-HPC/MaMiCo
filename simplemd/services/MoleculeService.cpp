@@ -405,24 +405,18 @@ void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::servi
 void simplemd::services::MoleculeService::writeCheckPoint(const simplemd::services::ParallelTopologyService& parallelTopologyService,
                                                           const std::string& filestem, const unsigned int& t) {
   simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(parallelTopologyService, filestem, t);
-  iterateMolecules(writeCheckPointMapping);
+  // FIXME (moved to MoleculeContainer) iterateMolecules(writeCheckPointMapping);
 }
 
 void simplemd::services::MoleculeService::resetMeanVelocity() {
   simplemd::moleculemappings::ComputeMeanVelocityMapping compute;
-  iterateMolecules(compute);
+  // FIXME (moved to MoleculeContainer) iterateMolecules(compute);
   tarch::la::Vector<MD_DIM, double> currentVel = compute.getMeanVelocity();
   simplemd::moleculemappings::SetMeanVelocityMapping set(currentVel, _meanVelocity);
-  iterateMolecules(set);
+  // FIXME (moved to MoleculeContainer) iterateMolecules(set);
 
   // check again
-  iterateMolecules(compute);
+  // FIXME (moved to MoleculeContainer) iterateMolecules(compute);
 }
 
-bool simplemd::services::MoleculeService::tarchDebugIsOn() const {
-#if (TARCH_DEBUG == TARCH_YES)
-  return true;
-#else
-  return false;
-#endif
-}
+

@@ -1,6 +1,6 @@
 #include "simplemd/MoleculeContainer.h"
 
-simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService parallelTopologyService, int cellCapacity)
+simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity)
     : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _cellCapacity(cellCapacity),
 #if (MD_ERROR == MD_YES)
       _domainSize(parallelTopologyService.getGlobalDomainSize()),
@@ -197,4 +197,12 @@ const size_t simplemd::MoleculeContainer::getNumberMolecules () const {
     moleculeCount += _linkedCellNumMolecules(i);
   }
   return moleculeCount;
+}
+
+bool simplemd::MoleculeContainer::tarchDebugIsOn() const {
+#if (TARCH_DEBUG == TARCH_YES)
+  return true;
+#else
+  return false;
+#endif
 }

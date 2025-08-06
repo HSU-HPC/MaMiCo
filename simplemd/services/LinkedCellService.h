@@ -8,6 +8,7 @@
 #include "simplemd/LinkedCell.h"
 #include "simplemd/Molecule.h"
 #include "simplemd/services/ParallelTopologyService.h"
+#include "simplemd/services/MoleculeService.h"
 #include "tarch/la/Vector.h"
 #include <iostream>
 
@@ -35,7 +36,7 @@ public:
   /** shuts down the service, frees memory and resets all variables */
   void shutdown();
 
-  /** puts the molecule into the cell defined by the local index (vector)
+  /** puts the molecule into the cell defined by the local index (vector)forward declarations to circumvent circular includes
    * coordinates localCellIndex */
   void addMoleculeToLinkedCell(Molecule& molecule, const tarch::la::Vector<MD_DIM, unsigned int>& localCellIndex);
   /** puts the molecule into the cell defined by the local index (scalar)

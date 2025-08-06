@@ -70,14 +70,14 @@ public:
     // plot VTK output
     if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
       _vtkMoleculeWriter->setTimestep(t);
-      _moleculeService->iterateMolecules(*_vtkMoleculeWriter);
+      _moleculeContainer->iterateMolecules(*_vtkMoleculeWriter);
     }
 
 // plot ADIOS2 output
 #if BUILD_WITH_ADIOS2
     if ((_configuration.getAdios2Configuration().getWriteEveryTimestep() != 0) && (t % _configuration.getAdios2Configuration().getWriteEveryTimestep() == 0)) {
       _Adios2Writer->setTimestep(t);
-      _moleculeService->iterateMolecules(*_Adios2Writer);
+      _moleculeContainer->iterateMolecules(*_Adios2Writer);
     }
 #endif
 
@@ -96,7 +96,7 @@ public:
 
     // time integration. After this step, the velocities and the positions of the
     // molecules have been updated.
-    _moleculeService->iterateMolecules(*_timeIntegrator);
+    _moleculeContainer->iterateMolecules(*_timeIntegrator);
 
     // sort molecules into linked cells
     _moleculeContainer->sort();
