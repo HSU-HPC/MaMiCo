@@ -2,18 +2,13 @@
 
 simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService parallelTopologyService, int cellCapacity)
     : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _cellCapacity(cellCapacity),
+#if (MD_ERROR == MD_YES)
+      _domainSize(parallelTopologyService.getGlobalDomainSize()),
+#endif
+      _domainOffset(parallelTopologyService.getGlobalDomainOffset()), _meshWidth(parallelTopologyService.getMeshWidth()),
+      _globalIndexOfFirstCell(parallelTopologyService.getGlobalIndexOfFirstCell()), _localIndexOfFirstCell(parallelTopologyService.getLocalIndexOfFirstCell()),
       _moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
       _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)) {
-  tarch::la::Vector<MD_DIM, unsigned int> bufferGlobal(0);
-  tarch::la::Vector<MD_DIM, unsigned int> bufferLocal(0);
-  _domainOffset = parallelTopologyService.getGlobalDomainOffset();
-  _meshWidth = parallelTopologyService.getMeshWidth();
-  bufferGlobal = parallelTopologyService.getGlobalIndexOfFirstCell();
-  bufferLocal = tarch::la::Vector<MD_DIM, unsigned int>(1);
-  for (unsigned int d = 0; d < MD_DIM; d++) {
-    _globalIndexOfFirstCell[d] = (int)bufferGlobal[d];
-    _localIndexOfFirstCell[d] = (int)bufferLocal[d];
-  }
 }
 
 void simplemd::MoleculeContainer::insert(int cellIdx, simplemd::Molecule& molecule) {
@@ -117,7 +112,7 @@ void simplemd::MoleculeContainer::sort() {
               auto linkedCellLocal(_linkedCellNumMolecules);
               auto moleculeDataLocal(_moleculeData);
               for (size_t i = 0; i < linkedCellLocal(index); i++) {
-                int curMolIdx = positionToCellIndex(moleculeDataLocal(index, i).getPosition());
+                unsigned int curMolIdx = positionToCellIndex(moleculeDataLocal(index, i).getPosition());
                 if (curMolIdx != index) { // if molecule does not belong to current cell anymore
                   // write data to target end
                   moleculeDataLocal(curMolIdx, linkedCellLocal(curMolIdx)) = moleculeDataLocal(index, i);
@@ -142,9 +137,7 @@ void simplemd::MoleculeContainer::sort() {
 
 simplemd::Molecule& simplemd::MoleculeContainer::getMoleculeAt(int i, int j) const { return _moleculeData(i, j); }
 
-simplemd::LinkedCell simplemd::MoleculeContainer::operator[](int idx) {
-  return simplemd::LinkedCell(_moleculeData, _linkedCellNumMolecules, idx);
-}
+simplemd::LinkedCell simplemd::MoleculeContainer::operator[](unsigned int idx) { return simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx); }
 
 int simplemd::MoleculeContainer::getNumCells() const { return _linkedCellNumMolecules.size(); }
 

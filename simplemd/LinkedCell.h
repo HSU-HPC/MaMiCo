@@ -12,8 +12,7 @@ class LinkedCell;
 class simplemd::LinkedCell {
 public:
   KOKKOS_FUNCTION LinkedCell(Kokkos::View<Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace>* moleculeData,
-                             Kokkos::View<int*, Kokkos::LayoutRight, Kokkos::SharedSpace>* nMolecules,
-                             unsigned int cellIndex)
+                             Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace>* nMolecules, unsigned int cellIndex)
       : _moleculeData(moleculeData), _linkedCellNumMolecules(nMolecules), _cellIndex(cellIndex) {}
 
   class Iterator {
@@ -83,16 +82,12 @@ public:
   KOKKOS_INLINE_FUNCTION unsigned int numMolecules() const { return (*_linkedCellNumMolecules)(_cellIndex); }
 
 private:
-  KOKKOS_INLINE_FUNCTION void changeMoleculeCount(int by) {
-    (*_linkedCellNumMolecules)(_cellIndex) += by;
-  }
+  KOKKOS_INLINE_FUNCTION void changeMoleculeCount(int by) { (*_linkedCellNumMolecules)(_cellIndex) += by; }
 
-  KOKKOS_INLINE_FUNCTION Molecule* getMolecule(unsigned int moleculeIndex) const {
-    return &(*_moleculeData)(_cellIndex, moleculeIndex);
-  }
+  KOKKOS_INLINE_FUNCTION Molecule* getMolecule(unsigned int moleculeIndex) const { return &(*_moleculeData)(_cellIndex, moleculeIndex); }
 
   Kokkos::View<Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace>* _moleculeData;
-  Kokkos::View<int*, Kokkos::LayoutRight, Kokkos::SharedSpace>* _linkedCellNumMolecules;
+  Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace>* _linkedCellNumMolecules;
   const unsigned int _cellIndex;
 };
 

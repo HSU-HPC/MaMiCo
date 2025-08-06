@@ -18,7 +18,8 @@ simplemd::services::ParallelTopologyService::ParallelTopologyService(const tarch
 #endif
                                                                      )
     : _domainSize(domainSize), _domainOffset(domainOffset), _meshWidth(computeMeshwidth(meshWidth, numberProcesses, domainSize)),
-      _numberProcesses(numberProcesses), _localNumberOfCells(computeNumberOfCells(meshWidth, numberProcesses, domainSize)),
+      _localIndexOfFirstCell(_ghostCellLayerThickness), _numberProcesses(numberProcesses),
+      _localNumberOfCells(computeNumberOfCells(meshWidth, numberProcesses, domainSize)),
       _localNumberOfCellsWithGhostCells(_localNumberOfCells + tarch::la::Vector<MD_DIM, unsigned int>(2 * _ghostCellLayerThickness)),
       _globalNumberOfCells(computeGlobalNumberOfCells(meshWidth, numberProcesses, domainSize))
 #if (MD_PARALLEL == MD_YES)

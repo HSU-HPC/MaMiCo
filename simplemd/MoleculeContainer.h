@@ -104,7 +104,7 @@ public:
    * @param idx
    * @return simplemd::LinkedCell
    */
-  simplemd::LinkedCell operator[](int idx);
+  simplemd::LinkedCell operator[](unsigned int idx);
 
   /**
    * @brief Get the total number of cells in the container
@@ -140,19 +140,24 @@ private:
    */
   int _cellCapacity;
 
+#if (MD_ERROR == MD_YES)
+  /** domain size */
+  const tarch::la::Vector<MD_DIM, double> _domainSize;
+#endif
+
   /** global domain offset */
-  tarch::la::Vector<MD_DIM, double> _domainOffset;
+  const tarch::la::Vector<MD_DIM, double> _domainOffset;
 
   /** mesh width of the linked cells */
-  tarch::la::Vector<MD_DIM, double> _meshWidth;
+  const tarch::la::Vector<MD_DIM, double> _meshWidth;
 
   /** global index of the first cell of this domain */
-  tarch::la::Vector<MD_DIM, int> _globalIndexOfFirstCell;
+  const tarch::la::Vector<MD_DIM, unsigned int> _globalIndexOfFirstCell;
 
   /** local index of the first cell within this domain */
-  tarch::la::Vector<MD_DIM, int> _localIndexOfFirstCell;
+  const tarch::la::Vector<MD_DIM, unsigned int> _localIndexOfFirstCell;
 
-  Kokkos::View<simplemd::Molecule**> _moleculeData;
-  Kokkos::View<int*> _linkedCellNumMolecules;
+  Kokkos::View<simplemd::Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace> _moleculeData;
+  Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCellNumMolecules;
 };
 #endif // _MOLECULARDYNAMICS_MOLECULARCONTAINER_H_

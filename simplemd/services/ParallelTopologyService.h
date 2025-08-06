@@ -114,6 +114,8 @@ public:
   /** returns the global index of the first (non-ghost) cell */
   const tarch::la::Vector<MD_DIM, unsigned int>& getGlobalIndexOfFirstCell() const { return _globalIndexOfFirstCell; }
 
+  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalIndexOfFirstCell() const { return _localIndexOfFirstCell; }
+
   /** returns true, if this process does not carry any work. This can be the case, if we have more ranks available
    *  in the NodePool than specified in the xml config.
    */
@@ -290,11 +292,18 @@ private:
   /** domain offset */
   const tarch::la::Vector<MD_DIM, double> _domainOffset;
 
+  /** The size of a linked cell along each axis */
   const tarch::la::Vector<MD_DIM, double> _meshWidth;
 
-  /** index of first cell w.r.t. to global grid
+  /** The number of ghost cells around the local domain along each axis */
+  const unsigned int _ghostCellLayerThickness = 1;
+
+  /** index of first cell w.r.t. global grid
    */
   tarch::la::Vector<MD_DIM, unsigned int> _globalIndexOfFirstCell;
+
+  /** index of first cell w.r.t. local grid (including ghost cells )*/
+  const tarch::la::Vector<MD_DIM, unsigned int> _localIndexOfFirstCell;
 
   /** definition of the process matrix, i.e. how many processes work in each
    *  spatial direction.
@@ -345,8 +354,6 @@ private:
    * also equal to number of used buffers and MPI requests
    */
   unsigned int _numUniqueNeighbours;
-
-  const unsigned int _ghostCellLayerThickness = 1;
 
   /** how many cells a buffer is responsible for */
   unsigned int _numberOfCellsPerBuffer[MD_LINKED_CELL_NEIGHBOURS];
