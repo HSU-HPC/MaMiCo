@@ -94,8 +94,6 @@ public:
     // plot also coupling cell information
     _couplingCellService->plotEveryMicroscopicTimestep(t);
 
-    _linkedCellService->iterateCells(*_emptyLinkedListsMapping);
-
     // time integration. After this step, the velocities and the positions of the
     // molecules have been updated.
     _moleculeService->iterateMolecules(*_timeIntegrator);

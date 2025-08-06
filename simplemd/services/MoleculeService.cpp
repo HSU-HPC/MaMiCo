@@ -4,7 +4,6 @@
 // www5.in.tum.de/mamico
 
 #include "simplemd/services/MoleculeService.h"
-#include "simplemd/cell-mappings/CopyMoleculesMapping.h"
 #include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 #include "simplemd/services/LinkedCellService.h"
 

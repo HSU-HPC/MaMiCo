@@ -5,7 +5,6 @@
 #ifndef _MOLECULARDYNAMICS_BOUNDARYTREATMENT_H_
 #define _MOLECULARDYNAMICS_BOUNDARYTREATMENT_H_
 
-#include "simplemd/cell-mappings/CollectMoleculesMapping.h"
 #include "simplemd/cell-mappings/DeleteMoleculesMapping.h"
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
 #include "simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.h"
@@ -17,6 +16,7 @@
 #include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/MoleculeService.h"
 #include "simplemd/services/ParallelTopologyService.h"
+#include "simplemd/MoleculeContainer.h"
 
 /** This file comprises some functions that are triggered in order to have consistent
  *  boundary cells in the ghost layer.
@@ -29,14 +29,14 @@ class BoundaryTreatment;
 
 class simplemd::BoundaryTreatment {
 public:
-  BoundaryTreatment(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
+  BoundaryTreatment(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService, simplemd::MoleculeContainer moleculeContainer,
                     simplemd::services::LinkedCellService& linkedCellService)
       : _moleculeService(moleculeService), _linkedCellService(linkedCellService),
-        _periodicBoundaryMapping(parallelTopologyService, moleculeService, linkedCellService), _deleteMoleculesMapping(moleculeService),
+        _periodicBoundaryMapping(parallelTopologyService, linkedCellService), _deleteMoleculesMapping(),
 #if (MD_PARALLEL == MD_YES)
-        _parallelBoundaryMapping(parallelTopologyService, moleculeService, linkedCellService),
+        _parallelBoundaryMapping(parallelTopologyService, linkedCellService),
 #endif
-        _fillCellsMapping(parallelTopologyService, moleculeService, linkedCellService), _collectMoleculesMapping(moleculeService) {
+        _fillCellsMapping(parallelTopologyService, moleculeContainer, linkedCellService) {
   }
   ~BoundaryTreatment() {}
 
@@ -78,9 +78,6 @@ public:
       const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
       simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::cellmappings::LennardJonesForceMapping& lennardJonesForce);
 
-  /** returns a list with all molecules from the open boundary cells */
-  std::list<simplemd::Molecule> getEscapedMolecules() const;
-
 private:
   /** applies the mapping myMapping to all boundaries of the domain which are of type
    *  boundaryType. Here, all cells in the respective ghost layer are traversed.
@@ -110,7 +107,6 @@ private:
   simplemd::cellmappings::ParallelBoundaryEmptyCellsMapping _parallelBoundaryMapping;
 #endif
   simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping _fillCellsMapping;
-  simplemd::cellmappings::CollectMoleculesMapping _collectMoleculesMapping;
 };
 
 template <class Mapping>

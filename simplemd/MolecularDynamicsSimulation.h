@@ -10,7 +10,6 @@
 #include "simplemd/ProfilePlotter.h"
 #include "simplemd/cell-mappings/ComputeMeanVelocityMapping.h"
 #include "simplemd/cell-mappings/ComputeTemperatureMapping.h"
-#include "simplemd/cell-mappings/EmptyLinkedListsMapping.h"
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
 #include "simplemd/cell-mappings/RDFMapping.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
@@ -82,7 +81,6 @@ protected:
 
   // cell mappings
   simplemd::cellmappings::LennardJonesForceMapping* _lennardJonesForce;
-  simplemd::cellmappings::EmptyLinkedListsMapping* _emptyLinkedListsMapping;
   simplemd::cellmappings::RDFMapping* _rdfMapping;
 
   // boundary treatment

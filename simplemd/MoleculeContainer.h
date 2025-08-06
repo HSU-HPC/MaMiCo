@@ -43,6 +43,16 @@ public:
   void insert(int cellIdx, simplemd::Molecule& molecule);
 
   /**
+   * @brief Inserts a molecule into a specific linked cell.
+   *
+   * @param cellIdx The vector index of the linked cell to insert the molecule into (ghost included).
+   * @param molecule The molecule to be inserted.
+   */
+  void insert(tarch::la::Vector<MD_DIM, unsigned int> cellIdx, simplemd::Molecule& molecule) {
+    insert(vectorIndexToLinear(cellIdx), molecule);
+  }
+
+  /**
    * @brief Inserts a molecule into the container.
    *
    * The function calculates the appropriate linked cell to insert the molecule into.
@@ -113,6 +123,13 @@ public:
    */
   int getNumCells() const;
 
+  /**
+   * @brief Returns the number of molecules in all cells
+   * 
+   * @return const size_t
+   */
+  const size_t getNumberMolecules () const;
+
 private:
   /**
    * @brief Converts a global 3D spatial coordinate to a local 1D linked cell index.
@@ -131,13 +148,6 @@ private:
    * @return const unsigned int
    */
   const unsigned int vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const;
-
-  /**
-   * @brief Returns the number of molecules in all cells
-   * 
-   * @return const size_t
-   */
-  const size_t getNumberMolecules () const;
 
   /** number of cells per direction in the local domain */
   tarch::la::Vector<MD_DIM, unsigned int> _numCells;

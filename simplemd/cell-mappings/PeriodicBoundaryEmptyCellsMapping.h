@@ -6,7 +6,6 @@
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_PERIODICBOUNDARYEMPTYCELLSMAPPING_H_
 
 #include "simplemd/services/LinkedCellService.h"
-#include "simplemd/services/MoleculeService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 
 namespace simplemd {
@@ -23,7 +22,7 @@ class PeriodicBoundaryEmptyCellsMapping;
  */
 class simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping {
 public:
-  PeriodicBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
+  PeriodicBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService,
                                     simplemd::services::LinkedCellService& linkedCellService);
   ~PeriodicBoundaryEmptyCellsMapping() {}
 
@@ -43,7 +42,6 @@ public:
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  simplemd::services::MoleculeService& _moleculeService;
   simplemd::services::LinkedCellService& _linkedCellService;
   /** domain size and offset */
   tarch::la::Vector<MD_DIM, double> _domainSize;

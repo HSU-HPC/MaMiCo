@@ -71,7 +71,7 @@ public:
 
   const tarch::la::Vector<MD_DIM, double>& getMeanVelocity() const { return _meanVelocity; }
 
-  /** returns the global number of particles. The local number can be retrieved from MoleculeService.getNumberMolecules(). */
+  /** returns the global number of particles. */
   const unsigned int& getGlobalNumberMolecules() const { return _particleCounter; }
 
   static const bool IsParallel = false;

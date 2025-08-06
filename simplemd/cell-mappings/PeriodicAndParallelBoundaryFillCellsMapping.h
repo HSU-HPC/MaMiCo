@@ -8,7 +8,7 @@
 #include "simplemd/LinkedCell.h"
 #include "simplemd/MolecularDynamicsDefinitions.h"
 #include "simplemd/services/LinkedCellService.h"
-#include "simplemd/services/MoleculeService.h"
+#include "simplemd/MoleculeContainer.h"
 #include "simplemd/services/ParallelTopologyService.h"
 
 namespace simplemd {
@@ -29,8 +29,8 @@ class PeriodicAndParallelBoundaryFillCellsMapping;
 class simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping {
 public:
   PeriodicAndParallelBoundaryFillCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                              simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService)
-      : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService) {}
+                                              simplemd::MoleculeContainer moleculeContainer, simplemd::services::LinkedCellService& linkedCellService)
+      : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer), _linkedCellService(linkedCellService) {}
   ~PeriodicAndParallelBoundaryFillCellsMapping() {}
 
   void setDomainSize(const tarch::la::Vector<MD_DIM, double>& domainSize) { _domainSize = domainSize; }
@@ -43,7 +43,7 @@ public:
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  simplemd::services::MoleculeService& _moleculeService;
+  simplemd::MoleculeContainer& _moleculeContainer;
   simplemd::services::LinkedCellService& _linkedCellService;
   /** domain size */
   tarch::la::Vector<MD_DIM, double> _domainSize;

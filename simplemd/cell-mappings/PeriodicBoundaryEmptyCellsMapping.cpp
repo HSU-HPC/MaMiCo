@@ -4,10 +4,8 @@
 // www5.in.tum.de/mamico
 #include "simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.h"
 
-simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::PeriodicBoundaryEmptyCellsMapping(
-    simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
-    simplemd::services::LinkedCellService& linkedCellService)
-    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService), _domainSize(0.0),
+simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::PeriodicBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::LinkedCellService& linkedCellService)
+    : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService), _domainSize(0.0),
       _processCoordinates(0), _numberProcesses(0) {}
 
 void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::setDomainSize(const tarch::la::Vector<MD_DIM, double>& domainSize) { _domainSize = domainSize; }
@@ -61,9 +59,7 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
 
   // if the molecules need to be sent, they are sent and deleted from the local molecule service
   if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService)) {
-    for (auto it = cell.begin(); it != cell.end(); it++) {
-      _moleculeService.deleteMolecule(*it);
-    }
+    cell.clear();
     // if the molecules need to be placed somewhere on this process, do so...
   } else {
     innerCell = &_linkedCellService.getLinkedCell(coords);
@@ -73,10 +69,9 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
       myMolecule.setForceOld(it->getConstForceOld());
       if (it->isFixed())
         myMolecule.fix();
-      _moleculeService.deleteMolecule(*it);
-      Molecule* mPtr = _moleculeService.addMolecule(myMolecule);
-      innerCell->insert(*mPtr);
+      innerCell->insert(myMolecule);
     }
+    cell.clear();
   }
   // in any case: clear list in this cell
   cell.clear();

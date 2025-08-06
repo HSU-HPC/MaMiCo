@@ -31,8 +31,8 @@ void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handle
       myMolecule.setForceOld(it->getConstForceOld());
       if (it->isFixed())
         myMolecule.fix();
-      Molecule* myPtr = _moleculeService.addMolecule(myMolecule);
-      _linkedCellService.addMoleculeToLinkedCell(*myPtr, localIndex[i]);
+      auto vectorCellIndex = localIndex[i];
+      _moleculeContainer.insert(vectorCellIndex, myMolecule);
     }
   }
 }

@@ -10,7 +10,7 @@ simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplem
 #if BUILD_WITH_ADIOS2
       _Adios2Writer(NULL),
 #endif
-      _lennardJonesForce(NULL), _emptyLinkedListsMapping(NULL), _rdfMapping(NULL), _boundaryTreatment(NULL), _localMDSimulation(0), _profilePlotter(NULL),
+      _lennardJonesForce(NULL), _rdfMapping(NULL), _boundaryTreatment(NULL), _localMDSimulation(0), _profilePlotter(NULL),
       _parallelTopologyService(NULL), _moleculeService(NULL), _linkedCellService(NULL), _molecularPropertiesService(NULL),
       // initialise external forces
       _externalForceService(configuration.getExternalForceConfigurations()) {
@@ -137,7 +137,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     }
 
     // init boundary treatment
-    _boundaryTreatment = new simplemd::BoundaryTreatment(*_parallelTopologyService, *_moleculeService, *_linkedCellService);
+    _boundaryTreatment = new simplemd::BoundaryTreatment(*_parallelTopologyService, *_moleculeService, *_moleculeContainer, *_linkedCellService);
     if (_boundaryTreatment == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_boundaryTreatment==NULL!"
@@ -156,7 +156,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _vtkMoleculeWriter = new simplemd::moleculemappings::VTKMoleculeWriter(*_parallelTopologyService, *_moleculeService, _vtkFilestem);
+    _vtkMoleculeWriter = new simplemd::moleculemappings::VTKMoleculeWriter(*_parallelTopologyService, *_moleculeContainer, _vtkFilestem);
     if (_vtkMoleculeWriter == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_vtkMoleculeWriter==NULL!"
@@ -184,13 +184,6 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     if (_lennardJonesForce == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_lennardJonesForce==NULL!"
-                << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    _emptyLinkedListsMapping = new simplemd::cellmappings::EmptyLinkedListsMapping();
-    if (_emptyLinkedListsMapping == NULL) {
-      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-                   "_emptyLinkedListsMapping==NULL!"
                 << std::endl;
       exit(EXIT_FAILURE);
     }
@@ -230,7 +223,6 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     // its neighbors.
     _linkedCellService->iterateCellPairs(*_lennardJonesForce);
     _boundaryTreatment->emptyGhostBoundaryCells();
-    _linkedCellService->iterateCells(*_emptyLinkedListsMapping);
     _moleculeService->iterateMolecules(initialPositionAndForceUpdate);
 
     // sort molecules into linked cells
@@ -359,7 +351,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     }
 
     // init boundary treatment
-    _boundaryTreatment = new simplemd::BoundaryTreatment(*_parallelTopologyService, *_moleculeService, *_linkedCellService);
+    _boundaryTreatment = new simplemd::BoundaryTreatment(*_parallelTopologyService, *_moleculeService, *_moleculeContainer, *_linkedCellService);
     if (_boundaryTreatment == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_boundaryTreatment==NULL!"
@@ -378,7 +370,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    _vtkMoleculeWriter = new simplemd::moleculemappings::VTKMoleculeWriter(*_parallelTopologyService, *_moleculeService, _vtkFilestem);
+    _vtkMoleculeWriter = new simplemd::moleculemappings::VTKMoleculeWriter(*_parallelTopologyService, *_moleculeContainer, _vtkFilestem);
     if (_vtkMoleculeWriter == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_vtkMoleculeWriter==NULL!"
@@ -406,13 +398,6 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     if (_lennardJonesForce == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_lennardJonesForce==NULL!"
-                << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    _emptyLinkedListsMapping = new simplemd::cellmappings::EmptyLinkedListsMapping();
-    if (_emptyLinkedListsMapping == NULL) {
-      std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
-                   "_emptyLinkedListsMapping==NULL!"
                 << std::endl;
       exit(EXIT_FAILURE);
     }
@@ -452,7 +437,6 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     // its neighbors.
     _linkedCellService->iterateCellPairs(*_lennardJonesForce);
     _boundaryTreatment->emptyGhostBoundaryCells();
-    _linkedCellService->iterateCells(*_emptyLinkedListsMapping);
     _moleculeService->iterateMolecules(initialPositionAndForceUpdate);
     // sort molecules into linked cells
     _moleculeContainer->sort();
@@ -489,10 +473,6 @@ void simplemd::MolecularDynamicsSimulation::shutdownServices() {
   if (_lennardJonesForce != NULL) {
     delete _lennardJonesForce;
     _lennardJonesForce = NULL;
-  }
-  if (_emptyLinkedListsMapping != NULL) {
-    delete _emptyLinkedListsMapping;
-    _emptyLinkedListsMapping = NULL;
   }
   if (_rdfMapping != NULL) {
     delete _rdfMapping;
@@ -610,9 +590,6 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
         _configuration.getDomainConfiguration().getMeshWidth());
     _linkedCellService->iterateCells(varyCheckpointMapping);
   }
-
-  // empty linked lists
-  _linkedCellService->iterateCells(*_emptyLinkedListsMapping);
 
   // time integration. After this step, the velocities and the positions of the
   // molecules have been updated.

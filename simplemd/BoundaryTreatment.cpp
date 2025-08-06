@@ -10,9 +10,8 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCells(const tarch::
   _periodicBoundaryMapping.setProcessCoordinates(parallelTopologyService.getProcessCoordinates());
   _periodicBoundaryMapping.setNumberOfProcesses(parallelTopologyService.getNumberOfProcesses());
   applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, _periodicBoundaryMapping);
-  // collect molecules in open-boundary region and remove them from the simulation.
-  _collectMoleculesMapping.reset();
-  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, _collectMoleculesMapping);
+  // delete molecules in open-boundary region from the simulation.
+  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, _deleteMoleculesMapping);
 
 #if (MD_PARALLEL == MD_YES)
   applyMappingToBoundaryCells(boundary, simplemd::PARALLEL_BOUNDARY, _parallelBoundaryMapping);
@@ -113,8 +112,6 @@ void simplemd::BoundaryTreatment::emptyGhostBoundaryCells() {
 #endif
 }
 
-std::list<simplemd::Molecule> simplemd::BoundaryTreatment::getEscapedMolecules() const { return _collectMoleculesMapping.getCollectedMolecules(); }
-
 void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsAndFillBoundaryCells(
     const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
     simplemd::services::ParallelTopologyService& parallelTopologyService) {
@@ -124,9 +121,8 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsAndFillBoundar
 
   // iterating with _fillCellsMapping, not _periodicBoundaryMapping or _parallelBoundaryMapping!
   applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, _fillCellsMapping);
-  // collect molecules in open-boundary region and remove them from the simulation.
-  _collectMoleculesMapping.reset();
-  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, _collectMoleculesMapping);
+  // remove molecules in open-boundary region from the simulation.
+  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, _deleteMoleculesMapping);
 
 #if (MD_PARALLEL == MD_YES)
   applyMappingToBoundaryCells(boundary, simplemd::PARALLEL_BOUNDARY, _fillCellsMapping);
@@ -164,9 +160,8 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
   _fillCellsMapping.setDomainSize(parallelTopologyService.getGlobalDomainSize());
 
   applyMappingToBoundaryCells(boundary, simplemd::PERIODIC_BOUNDARY, _fillCellsMapping);
-  // collect molecules in open-boundary region and remove them from the simulation.
-  _collectMoleculesMapping.reset();
-  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, _collectMoleculesMapping);
+  // delete molecules in open-boundary region from the simulation.
+  applyMappingToBoundaryCells(boundary, simplemd::OPEN_BOUNDARY, _deleteMoleculesMapping);
 
 #if (MD_PARALLEL == MD_YES)
   applyMappingToBoundaryCells(boundary, simplemd::PARALLEL_BOUNDARY, _fillCellsMapping);
