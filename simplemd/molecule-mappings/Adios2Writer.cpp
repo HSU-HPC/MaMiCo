@@ -22,14 +22,14 @@ uint64_t offset;
 int counter = 0;
 
 simplemd::moleculemappings::Adios2Writer::Adios2Writer(const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                                       const simplemd::services::MoleculeService& moleculeService,
+                                                       const simplemd::MoleculeContainer& MoleculeContainer,
                                                        const simplemd::configurations::MolecularDynamicsConfiguration& configuration
 #if (MD_PARALLEL == MD_YES)
                                                        ,
                                                        MPI_Comm communicator
 #endif
                                                        )
-    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _timestep(0), _configuration(configuration)
+    : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer), _timestep(0), _configuration(configuration)
 #if (MD_PARALLEL == MD_YES)
       ,
       _communicator(communicator)
@@ -93,7 +93,7 @@ void simplemd::moleculemappings::Adios2Writer::beginMoleculeIteration() {
   _engine->BeginStep();
   _io->RemoveAllVariables(); // empty buffer
 
-  local = _moleculeService.getNumberMolecules();
+  local = _moleculeContainer.getNumberMolecules();
   global = local; // valid for sequential execution, overwritten in parallel case
 
 #if (MD_PARALLEL == MD_YES)

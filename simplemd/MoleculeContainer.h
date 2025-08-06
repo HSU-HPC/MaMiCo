@@ -132,6 +132,13 @@ private:
    */
   const unsigned int vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const;
 
+  /**
+   * @brief Returns the number of molecules in all cells
+   * 
+   * @return const size_t
+   */
+  const size_t getNumberMolecules () const;
+
   /** number of cells per direction in the local domain */
   tarch::la::Vector<MD_DIM, unsigned int> _numCells;
 

@@ -189,3 +189,12 @@ const unsigned int simplemd::MoleculeContainer::vectorIndexToLinear(const tarch:
   }
   return cellLinearIndex;
 }
+
+const size_t simplemd::MoleculeContainer::getNumberMolecules () const {
+  Kokkos::fence(); // Ensure molecule count per cell is up to date
+  size_t moleculeCount = 0;
+  for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {
+    moleculeCount += _linkedCellNumMolecules(i);
+  }
+  return moleculeCount;
+}

@@ -296,7 +296,7 @@ private:
   const tarch::la::Vector<MD_DIM, double> _meshWidth;
 
   /** The number of ghost cells around the local domain along each axis */
-  const unsigned int _ghostCellLayerThickness = 1;
+  const unsigned int _ghostCellLayerThickness = 1; // NOTE: This MUST be 1 (otherwise nothing will work anymore)
 
   /** index of first cell w.r.t. global grid
    */
