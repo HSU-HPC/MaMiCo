@@ -84,23 +84,6 @@ public:
                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
                           tarch::la::Vector<MD_DIM, double>& initialVelocity) const;
 
-  /** reorganises the storage of the molecules. If a simulation requires a big number of
-   *  molecule deletions/ insertions, e.g., this might be useful to speed up the simulation.
-   *  Besides, the molecules are stored in memory such that those molecules belonging to the same linked cell are
-   *  located very closely in memory (actually, we sort the molecules according to their linked cell position, that is
-   *  lexicographically w.r.t. to the linked cell index, and store them in this sequence).
-   */
-  void reorganiseMemory(const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::LinkedCellService& linkedCellService);
-
-  /** writes a checkpoint containing:
-   *  - the number of molecules and the dimension of the problem (1,2 or 3) in one line
-   *  - each molecule in one line consisting of position, velocity and force_old.
-   *  In parallel cases, each process writes its own checkpoint data. The file will be named
-   *  filestem_t_rank.dat in any case (rank=0 in the serial case).
-   *  The mapping WriteCheckPointMapping is used.
-   */
-  void writeCheckPoint(const simplemd::services::ParallelTopologyService& parallelTopologyService, const std::string& filestem, const unsigned int& t);
-
   /** resets the velocity over the whole molecule system to the mean velocity specified at the beginning */
   void resetMeanVelocity();
 

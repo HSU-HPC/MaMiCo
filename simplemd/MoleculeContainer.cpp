@@ -1,4 +1,5 @@
 #include "simplemd/MoleculeContainer.h"
+#include "tarch/utils/RandomNumberService.h"
 
 simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity)
     : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _cellCapacity(cellCapacity),
@@ -204,5 +205,32 @@ bool simplemd::MoleculeContainer::tarchDebugIsOn() const {
   return true;
 #else
   return false;
+#endif
+}
+
+void simplemd::MoleculeContainer::getInitialVelocity(const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
+                                                             const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
+                                                             tarch::la::Vector<MD_DIM, double>& initialVelocity) const {
+  tarch::la::Vector<MD_DIM, double> randomNumbers(0.0);
+  // standard deviation for fluctuation of velocity around meanVelocity
+  double stdDeviation = std::sqrt(MD_DIM * kB * temperature / molecularPropertiesService.getMolecularProperties().getMass());
+
+  // random number (unit mean
+  randomNumbers[0] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
+  // then, get D-1 uniform random numbers over 2PI
+  for (unsigned int d = 1; d < MD_DIM; d++) {
+    randomNumbers[d] = 2.0 * MD_PI * tarch::utils::RandomNumberService::getInstance().getUniformRandomNumber();
+  }
+
+  // put initial velocity together. For 2D/ 3D, we use the polar/ spherical coordinates to generate the fluctuation around the mean velocity
+#if (MD_DIM == 1)
+  initialVelocity = meanVelocity + stdDeviation * randomNumbers;
+#elif (MD_DIM == 2)
+  initialVelocity[0] = meanVelocity[0] + stdDeviation * (randomNumbers[0] * TARCH_COS(randomNumbers[1]));
+  initialVelocity[1] = meanVelocity[1] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]));
+#elif (MD_DIM == 3)
+  initialVelocity[0] = meanVelocity[0] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]) * TARCH_COS(randomNumbers[2]));
+  initialVelocity[1] = meanVelocity[1] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]) * TARCH_SIN(randomNumbers[2]));
+  initialVelocity[2] = meanVelocity[2] + stdDeviation * (randomNumbers[0] * TARCH_COS(randomNumbers[1]));
 #endif
 }

@@ -27,7 +27,7 @@ namespace interface {
 class SimpleMDSolverInterface : public MDSolverInterface<simplemd::LinkedCell, MD_DIM> {
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  simplemd::services::MoleculeService& _moleculeService;
+  simplemd::MoleculeContainer& _moleculeContainer;
   simplemd::services::LinkedCellService& _linkedCellService;
   const simplemd::services::MolecularPropertiesService& _molecularPropertiesService;
   /** used for the synchronization of molecules in boundary regions and between different processes when
@@ -101,10 +101,10 @@ private:
 
 public:
   SimpleMDSolverInterface(simplemd::BoundaryTreatment& boundaryTreatment, simplemd::services::ParallelTopologyService& parallelTopologyService,
-                          simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService,
+                          simplemd::MoleculeContainer& moleculeContainer, simplemd::services::LinkedCellService& linkedCellService,
                           const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
                           const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& localBoundaryInformation, const double& dt)
-      : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService),
+      : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer), _linkedCellService(linkedCellService),
         _molecularPropertiesService(molecularPropertiesService), _boundaryTreatment(boundaryTreatment), _localBoundaryInformation(localBoundaryInformation),
         _sigma6(molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
                 molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
@@ -144,7 +144,7 @@ public:
 
   void getInitialVelocity(const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
                           tarch::la::Vector<MD_DIM, double>& initialVelocity) const {
-    _moleculeService.getInitialVelocity(meanVelocity, kB, temperature, _molecularPropertiesService, initialVelocity);
+    _moleculeContainer.getInitialVelocity(meanVelocity, kB, temperature, _molecularPropertiesService, initialVelocity);
   }
 
   void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<MD_DIM>& molecule, simplemd::LinkedCell& cell) {
@@ -172,10 +172,8 @@ public:
     simplemd::Molecule newMolecule(position, velocity);
     newMolecule.setForce(force);
     newMolecule.setPotentialEnergy(potentialEnergy);
-    // add molecule to MoleculeService and LinkedCellService
-    simplemd::Molecule* myMolecule = _moleculeService.addMolecule(newMolecule);
-    tarch::la::Vector<MD_DIM, unsigned int> linkedCellIndex(getLinkedCellIndexForMoleculePosition(myMolecule->getConstPosition()));
-    _linkedCellService.addMoleculeToLinkedCell(*myMolecule, linkedCellIndex);
+    // add molecule to MoleculeContainer
+    _moleculeContainer.insert(newMolecule);
   }
 
   tarch::la::Vector<MD_DIM, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<MD_DIM, double>& position) {

@@ -2,6 +2,7 @@
 #include "coupling/interface/MDSimulation.h"
 #include "coupling/interface/MamicoInterfaceProvider.h"
 #include "simplemd/MolecularDynamicsSimulation.h"
+#include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 
 namespace coupling {
 namespace interface {
@@ -84,12 +85,13 @@ public:
     // write checkpoint
     if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0) &&
         (t % _configuration.getCheckpointConfiguration().getWriteEveryTimestep() == 0)) {
-      _moleculeService->writeCheckPoint(*_parallelTopologyService, _configuration.getCheckpointConfiguration().getFilename(), t);
+      simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(*_parallelTopologyService, _configuration.getCheckpointConfiguration().getFilename(), t);
+      _moleculeContainer->iterateMolecules(writeCheckPointMapping);
     }
     // reorganise memory if needed
     if ((_configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() != 0) &&
         (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {
-      _moleculeService->reorganiseMemory(*_parallelTopologyService, *_linkedCellService);
+      _moleculeContainer->sort();
     }
     // plot also coupling cell information
     _couplingCellService->plotEveryMicroscopicTimestep(t);
@@ -128,21 +130,22 @@ public:
   virtual void shutdown() { shutdownServices(); }
 
   virtual void writeCheckpoint(const std::string& filestem, const unsigned int& t) {
-    getMoleculeService().writeCheckPoint(getParallelTopologyService(), filestem, t);
+    simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(getParallelTopologyService(), filestem, t);
+    _moleculeContainer->iterateMolecules(writeCheckPointMapping);
   }
 
   // function particularly needed to init MD solver interface -> should only be
   // called from factory
   simplemd::BoundaryTreatment& getBoundaryTreatment() { return *_boundaryTreatment; }
   simplemd::services::ParallelTopologyService& getParallelTopologyService() { return *_parallelTopologyService; }
-  simplemd::services::MoleculeService& getMoleculeService() {
+  simplemd::MoleculeContainer& getMoleculeContainer() {
     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(_moleculeService == NULL){
-      std::cout <<"ERROR coupling::interface::MDSimulation::getMoleculeService(): _moleculeService == NULL " << std::endl;
+    if(_moleculeContainer == NULL){
+      std::cout <<"ERROR coupling::interface::MDSimulation::getMoleculeContainer(): _moleculeContainer == NULL " << std::endl;
       exit(1);
     }
     #endif
-    return *_moleculeService;
+    return *_moleculeContainer;
   }
   simplemd::services::LinkedCellService& getLinkedCellService() { return *_linkedCellService; }
   const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() {

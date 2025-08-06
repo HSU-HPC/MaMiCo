@@ -7,6 +7,7 @@
 #include <simplemd/Molecule.h>
 #include <simplemd/LinkedCell.h>
 #include <simplemd/services/ParallelTopologyService.h>
+#include <simplemd/services/MolecularPropertiesService.h>
 
 namespace simplemd {
 namespace services {
@@ -141,6 +142,11 @@ public:
    *  uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
   template <class A> void iterateMolecules(A& a);
+
+  /** creates initial velocity for molecule from meanVelocity and given temperature and stores the result in initialVelocity */
+  void getInitialVelocity(const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
+                          const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
+                          tarch::la::Vector<MD_DIM, double>& initialVelocity) const;
 
 private:
 

@@ -4,7 +4,6 @@
 // www5.in.tum.de/mamico
 
 #include "simplemd/services/MoleculeService.h"
-#include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 #include "simplemd/services/LinkedCellService.h"
 
 simplemd::services::MoleculeService::~MoleculeService() {
@@ -395,17 +394,6 @@ void simplemd::services::MoleculeService::deleteMolecule(Molecule& molecule) {
   // add free position at the front
   _freeMoleculePositions.push_front(molecule.getID());
   _numberMolecules--;
-}
-
-void simplemd::services::MoleculeService::reorganiseMemory(const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                                           simplemd::services::LinkedCellService& linkedCellService) {
-  // NOTE: Functionality removed due to ongoing change of the architecture (Replace MoleculeService, LinkedCellService with MoleculeContainer)
-}
-
-void simplemd::services::MoleculeService::writeCheckPoint(const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                                          const std::string& filestem, const unsigned int& t) {
-  simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(parallelTopologyService, filestem, t);
-  // FIXME (moved to MoleculeContainer) iterateMolecules(writeCheckPointMapping);
 }
 
 void simplemd::services::MoleculeService::resetMeanVelocity() {
