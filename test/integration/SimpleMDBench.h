@@ -36,7 +36,7 @@ public:
     unsigned long long sum = 0;
   };
 
-  bool tarchDebugIsOn() const { return _moleculeContainer->tarchDebugIsOn(); }
+  bool tarchDebugIsOn() const { return simplemd::services::MoleculeService::tarchDebugIsOn(); }
 
   unsigned long long getChecksum() {
     ChecksumMapping mapping;
