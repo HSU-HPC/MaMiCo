@@ -78,14 +78,13 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
   resetMeanVelocity();
 }
 
-simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
-                                                     const std::string& checkPointFileStem, const unsigned int& blockSize,
+simplemd::services::MoleculeService::MoleculeService(const std::string& checkPointFileStem, const double capacityFactor,
                                                      const simplemd::services::ParallelTopologyService& parallelTopologyService) {
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
   tarch::la::Vector<MD_DIM, double> force(0.0);
   unsigned int idCounter = 0;
-  unsigned int numberBlocks = 0;
+  unsigned int dimensions = 0;
   std::stringstream ss;
   ss << checkPointFileStem;
 #if (MD_PARALLEL == MD_YES)
@@ -100,40 +99,18 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     exit(EXIT_FAILURE);
   }
 
-  // delete old stuff and set new variables
-  for (unsigned int i = 0; i < _molecules.size(); i++) {
-    if (_molecules[i] != NULL) {
-      free(_molecules[i]);
-      _molecules[i] = NULL;
-    }
-  }
-  _molecules.clear();
-  _freeMoleculePositions.clear();
-  _blockSize = blockSize;
-  file >> _numberMolecules;
-  file >> numberBlocks;
-  if (numberBlocks != MD_DIM) {
-    std::cout << "ERROR MoleculeService::MoleculeService: File " << ss.str() << " is meant for problems of dimension " << numberBlocks << "!" << std::endl;
+  unsigned int moleculeCount;
+  file >> moleculeCount;
+  initContainer(parallelTopologyService, moleculeCount, capacityFactor);
+  file >> dimensions;
+  if (dimensions != MD_DIM) {
+    std::cout << "ERROR MoleculeService::MoleculeService: File " << ss.str() << " is meant for problems of dimension " << dimensions << "!" << std::endl;
     exit(EXIT_FAILURE);
-  }
-  numberBlocks = _numberMolecules / _blockSize + (_numberMolecules % _blockSize != 0);
-  if (_numberMolecules < 1) {
-    std::cout << "ERROR MoleculeService::MoleculeService: _numberMolecules < 1!" << std::endl;
-    exit(EXIT_FAILURE);
-  }
-
-  // allocate memory and initialise it
-  for (unsigned int i = 0; i < numberBlocks; i++) {
-    _molecules.push_back((Molecule*)NULL);
-    _molecules[i] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
-    if (_molecules[i] == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): _molecules == NULL!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
   }
 
   idCounter = 0;
-  for (unsigned int i = 0; i < _numberMolecules; i++) {
+  Molecule tmpMolecule;
+  for (unsigned int i = 0; i < moleculeCount; i++) {
     for (unsigned int d = 0; d < MD_DIM; d++) {
       file >> position[d];
     }
@@ -144,24 +121,13 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
       file >> force[d];
     }
 
-    Molecule* myNewMolecule = NULL;
-    unsigned int blockId = idCounter / _blockSize;
-    unsigned int blockIndex = idCounter % _blockSize;
-    myNewMolecule = new (&_molecules[blockId][blockIndex]) Molecule(position, velocity);
-#if (MD_DEBUG == MD_YES)
-    if (myNewMolecule == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): myNewMolecule==NULL!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-#endif
-    myNewMolecule->setForceOld(force);
-    myNewMolecule->setID(idCounter);
+    tmpMolecule.setPosition(position);
+    tmpMolecule.setVelocity(velocity);
+    tmpMolecule.setForceOld(force);
+    tmpMolecule.setID(idCounter);
+    _moleculeContainer->insert(tmpMolecule);
+
     idCounter++;
-  }
-  file.close();
-  // add free molecule positions
-  for (unsigned int i = idCounter; i < _blockSize * _molecules.size(); i++) {
-    _freeMoleculePositions.push_back(i);
   }
 
   // _meanVelocity was not initialised!
@@ -170,13 +136,14 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
 
 simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double>& localDomainSize,
                                                      const tarch::la::Vector<MD_DIM, double>& localDomainOffset, const std::string& checkPointFileStem,
-                                                     const unsigned int& blockSize) {
+                                                     const double capacityFactor,
+                                                     const simplemd::services::ParallelTopologyService& parallelTopologyService) {
   // buffer for single molecule
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
   tarch::la::Vector<MD_DIM, double> force(0.0);
   unsigned int idCounter = 0;
-  unsigned int numberBlocks = 0;
+  unsigned int dimensions = 0;
   // buffer for all relevant molecules
   std::vector<tarch::la::Vector<MD_DIM, double>> positions;
   std::vector<tarch::la::Vector<MD_DIM, double>> velocities;
@@ -190,24 +157,16 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     exit(EXIT_FAILURE);
   }
 
-  // delete old stuff and set new variables
-  for (unsigned int i = 0; i < _molecules.size(); i++) {
-    if (_molecules[i] != NULL) {
-      free(_molecules[i]);
-      _molecules[i] = NULL;
-    }
-  }
-  _molecules.clear();
-  _freeMoleculePositions.clear();
-  _blockSize = blockSize;
-
-  file >> _numberMolecules;
-  file >> numberBlocks;
-  if (numberBlocks != MD_DIM) {
-    std::cout << "ERROR MoleculeService::MoleculeService: File " << ss.str() << " is meant for problems of dimension " << numberBlocks << "!" << std::endl;
+  unsigned int moleculeCount;
+  file >> moleculeCount;
+  initContainer(parallelTopologyService, moleculeCount, capacityFactor);
+  file >> dimensions;
+  if (dimensions != MD_DIM) {
+    std::cout << "ERROR MoleculeService::MoleculeService: File " << ss.str() << " is meant for problems of dimension " << dimensions << "!" << std::endl;
     exit(EXIT_FAILURE);
   }
-  for (unsigned int i = 0; i < _numberMolecules; i++) {
+
+  for (unsigned int i = 0; i < moleculeCount; i++) {
     for (unsigned int d = 0; d < MD_DIM; d++) {
       file >> position[d];
     }
@@ -231,26 +190,16 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
   }
   file.close();
   // update number of molecules
-  _numberMolecules = (unsigned int)positions.size();
-  numberBlocks = _numberMolecules / _blockSize + (_numberMolecules % _blockSize != 0);
-  if (_numberMolecules < 1) {
-    std::cout << "ERROR MoleculeService::MoleculeService: _numberMolecules < 1!" << std::endl;
+  moleculeCount = (unsigned int)positions.size();
+  if (moleculeCount < 1) {
+    std::cout << "ERROR MoleculeService::MoleculeService: moleculeCount < 1!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  // allocate memory and initialise it
-  for (unsigned int i = 0; i < numberBlocks; i++) {
-    _molecules.push_back((Molecule*)NULL);
-    _molecules[i] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
-    if (_molecules[i] == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): _molecules == NULL!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-  }
-
   idCounter = 0;
+  Molecule tmpMolecule;
   // write molecule data from dynamic vectors to allocated memory
-  for (unsigned int i = 0; i < _numberMolecules; i++) {
+  for (unsigned int i = 0; i < moleculeCount; i++) {
     position = positions[i];
     velocity = velocities[i];
     force = forces[i];
@@ -258,20 +207,12 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     Molecule* myNewMolecule = NULL;
     unsigned int blockId = idCounter / _blockSize;
     unsigned int blockIndex = idCounter % _blockSize;
-    myNewMolecule = new (&_molecules[blockId][blockIndex]) Molecule(position, velocity);
-#if (MD_DEBUG == MD_YES)
-    if (myNewMolecule == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::MoleculeService(): myNewMolecule==NULL!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-#endif
-    myNewMolecule->setForceOld(force);
-    myNewMolecule->setID(idCounter);
+    tmpMolecule.setPosition(position);
+    tmpMolecule.setVelocity(velocity);
+    tmpMolecule.setForceOld(force);
+    tmpMolecule.setID(idCounter);
+    _moleculeContainer->insert(tmpMolecule);
     idCounter++;
-  }
-  // add free molecule positions
-  for (unsigned int i = idCounter; i < _blockSize * _molecules.size(); i++) {
-    _freeMoleculePositions.push_back(i);
   }
 
   // empty vectors

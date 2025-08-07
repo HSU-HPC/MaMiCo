@@ -106,17 +106,17 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     // molecules per direction
     if (_configuration.getDomainConfiguration().initFromCheckpoint()) {
       _moleculeService =
-          new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, _configuration.getDomainConfiguration().getCheckpointFilestem(),
+          new simplemd::services::MoleculeService(_configuration.getDomainConfiguration().getCheckpointFilestem(),
                                                   _configuration.getDomainConfiguration().getCapacityFactor(), *_parallelTopologyService);
     } else if (_configuration.getDomainConfiguration().initFromSequentialCheckpoint()) {
       _moleculeService =
           new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, _configuration.getDomainConfiguration().getCheckpointFilestem(),
-                                                  _configuration.getDomainConfiguration().getBlockSize());
+                                                  _configuration.getDomainConfiguration().getCapacityFactor(), *_parallelTopologyService);
     } else {
       _moleculeService = new simplemd::services::MoleculeService(
           localDomainSize, localDomainOffset, moleculesPerDirection, _configuration.getMoleculeConfiguration().getMeanVelocity(),
           _configuration.getDomainConfiguration().getKB(), _configuration.getMoleculeConfiguration().getTemperature(),
-          _configuration.getDomainConfiguration().getBlockSize(), *_molecularPropertiesService);
+          _configuration.getDomainConfiguration().getCapacityFactor(), *_molecularPropertiesService);
     }
     if (_moleculeService == NULL) {
       std::cout << "ERROR MolecularDynamicsSimulation::initServices(): "

@@ -57,12 +57,11 @@ public:
    *  checkpoint files for each rank, respectively. If multiple MD simulations are executed, make sure that the rank of the current
    *  MD simulation matches the respective rank of the checkpoint file.
    */
-  MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
-                  const std::string& checkPointFileStem, const unsigned int& blockSize,
+  MoleculeService(const std::string& checkPointFileStem, const double capacityFactor,
                   const simplemd::services::ParallelTopologyService& parallelTopologyService);
   /** initialises a potentially parallel MD simulation from a sequential checkpoint file. */
   MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
-                  const std::string& checkPointFileStem, const unsigned int& blockSize);
+                  const std::string& checkPointFileStem, const double capacityFactor, const simplemd::services::ParallelTopologyService& parallelTopologyService);
 
   /** adds a molecule to the system. The molecule data are copied from the const. reference to a free position within the memory field
    *  or - in case no memory is available - new memory is allocated and the molecule is put in there. Besides, the list _freeMoleculePositions
