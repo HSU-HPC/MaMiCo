@@ -4,7 +4,6 @@
 // www5.in.tum.de/mamico
 
 #include "simplemd/services/MoleculeService.h"
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 
 simplemd::services::MoleculeService::~MoleculeService() { shutdown(); }
@@ -27,12 +26,14 @@ void simplemd::services::MoleculeService::initContainer(ParallelTopologyService 
 #endif
 }
 
-simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
+simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double>& localDomainSize,
+                                                     const tarch::la::Vector<MD_DIM, double>& domainOffset,
                                                      const tarch::la::Vector<MD_DIM, unsigned int>& moleculesPerDirection,
                                                      const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
                                                      const double capacityFactor,
                                                      const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
-                                                     const simplemd::services::ParallelTopologyService& parallelTopologyService) {
+                                                     const simplemd::services::ParallelTopologyService& parallelTopologyService)
+    : _localDomainSize(localDomainSize) {
   size_t moleculeCount = 1;
   for (int d = 0; d < MD_DIM; d++) {
     moleculeCount *= moleculesPerDirection[d];
@@ -46,14 +47,14 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
   // loop over domain and determine position vector (place molecules initially on a grid)
 #if (MD_DIM > 2)
   for (unsigned int z = 0; z < moleculesPerDirection[2]; z++) {
-    position[2] = (0.5 + z) * domainSize[2] / moleculesPerDirection[2] + domainOffset[2];
+    position[2] = (0.5 + z) * _localDomainSize[2] / moleculesPerDirection[2] + domainOffset[2];
 #endif
 #if (MD_DIM > 1)
     for (unsigned int y = 0; y < moleculesPerDirection[1]; y++) {
-      position[1] = (0.5 + y) * domainSize[1] / moleculesPerDirection[1] + domainOffset[1];
+      position[1] = (0.5 + y) * _localDomainSize[1] / moleculesPerDirection[1] + domainOffset[1];
 #endif
       for (unsigned int x = 0; x < moleculesPerDirection[0]; x++) {
-        position[0] = (0.5 + x) * domainSize[0] / moleculesPerDirection[0] + domainOffset[0];
+        position[0] = (0.5 + x) * _localDomainSize[0] / moleculesPerDirection[0] + domainOffset[0];
 
         // get initial velocity
         getInitialVelocity(meanVelocity, kB, temperature, molecularPropertiesService, velocity);
@@ -133,7 +134,8 @@ simplemd::services::MoleculeService::MoleculeService(const std::string& checkPoi
 
 simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double>& localDomainSize,
                                                      const tarch::la::Vector<MD_DIM, double>& localDomainOffset, const std::string& checkPointFileStem,
-                                                     const double capacityFactor, const simplemd::services::ParallelTopologyService& parallelTopologyService) {
+                                                     const double capacityFactor, const simplemd::services::ParallelTopologyService& parallelTopologyService)
+    : _localDomainSize(localDomainSize) {
   // buffer for single molecule
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
@@ -176,7 +178,7 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     // dynamic vectors
     bool isInside = true;
     for (unsigned d = 0; d < MD_DIM; d++) {
-      isInside = isInside && (position[d] >= localDomainOffset[d]) && (position[d] < localDomainOffset[d] + localDomainSize[d]);
+      isInside = isInside && (position[d] >= localDomainOffset[d]) && (position[d] < localDomainOffset[d] + _localDomainSize[d]);
     }
     if (isInside) {
       positions.push_back(position);

@@ -6,9 +6,9 @@
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_RDFMAPPING_H_
 
 #include "simplemd/LinkedCell.h"
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/MolecularPropertiesService.h"
 #include "simplemd/services/ParallelTopologyService.h"
+#include "simplemd/services/MoleculeService.h"
 #include <iostream>
 #include <sstream>
 
@@ -20,13 +20,13 @@ class RDFMapping;
 
 /** computes the radial distribution function for the molecules.
  *  Should be called using the iterateCellPairs()-method from the
- * LinkedCellService.
+ * MoleculeContainer.
  *
  *  @author Philipp Neumann
  */
 class simplemd::cellmappings::RDFMapping {
 public:
-  RDFMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::LinkedCellService& linkedCellService,
+  RDFMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
              const double& cutoffRadius, const unsigned int& numberIntervals);
 
   ~RDFMapping();
@@ -44,7 +44,7 @@ public:
 
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  simplemd::services::LinkedCellService& _linkedCellService;
+  simplemd::services::MoleculeService& _moleculeService;
   // cut-off radius
   const double _cutoffRadius;
   // number of shells that are considered

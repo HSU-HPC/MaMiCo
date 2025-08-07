@@ -7,7 +7,6 @@
 
 #include "simplemd/LinkedCell.h"
 #include "simplemd/MolecularDynamicsDefinitions.h"
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/MoleculeContainer.h"
 #include "simplemd/services/ParallelTopologyService.h"
 
@@ -29,8 +28,8 @@ class PeriodicAndParallelBoundaryFillCellsMapping;
 class simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping {
 public:
   PeriodicAndParallelBoundaryFillCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                              simplemd::MoleculeContainer moleculeContainer, simplemd::services::LinkedCellService& linkedCellService)
-      : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer), _linkedCellService(linkedCellService) {}
+                                              simplemd::MoleculeContainer moleculeContainer)
+      : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer) {}
   ~PeriodicAndParallelBoundaryFillCellsMapping() {}
 
   void setDomainSize(const tarch::la::Vector<MD_DIM, double>& domainSize) { _domainSize = domainSize; }
@@ -44,7 +43,6 @@ public:
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
   simplemd::MoleculeContainer& _moleculeContainer;
-  simplemd::services::LinkedCellService& _linkedCellService;
   /** domain size */
   tarch::la::Vector<MD_DIM, double> _domainSize;
 };

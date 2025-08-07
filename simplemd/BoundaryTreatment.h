@@ -13,7 +13,6 @@
 #include "simplemd/cell-mappings/ParallelBoundaryEmptyCellsMapping.h"
 #endif
 #include "simplemd/MolecularDynamicsDefinitions.h"
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include "simplemd/MoleculeContainer.h"
 
@@ -28,14 +27,12 @@ class BoundaryTreatment;
 
 class simplemd::BoundaryTreatment {
 public:
-  BoundaryTreatment(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::MoleculeContainer& moleculeContainer,
-                    simplemd::services::LinkedCellService& linkedCellService)
-      : _moleculeContainer(moleculeContainer), _linkedCellService(linkedCellService), _periodicBoundaryMapping(parallelTopologyService, moleculeContainer),
-        _deleteMoleculesMapping(),
+  BoundaryTreatment(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::MoleculeContainer& moleculeContainer)
+      : _moleculeContainer(moleculeContainer), _periodicBoundaryMapping(parallelTopologyService, moleculeContainer), _deleteMoleculesMapping(),
 #if (MD_PARALLEL == MD_YES)
         _parallelBoundaryMapping(parallelTopologyService, moleculeContainer),
 #endif
-        _fillCellsMapping(parallelTopologyService, moleculeContainer, linkedCellService) {
+        _fillCellsMapping(parallelTopologyService, moleculeContainer) {
   }
   ~BoundaryTreatment() {}
 
@@ -99,7 +96,6 @@ private:
   template <class Mapping> void applyMappingToCommunicationDependentCells(Mapping& myMapping) const;
 
   simplemd::MoleculeContainer& _moleculeContainer;
-  simplemd::services::LinkedCellService& _linkedCellService;
   simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping _periodicBoundaryMapping;
   simplemd::cellmappings::DeleteMoleculesMapping _deleteMoleculesMapping;
 #if (MD_PARALLEL == MD_YES)

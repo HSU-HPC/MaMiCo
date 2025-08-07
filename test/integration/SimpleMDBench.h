@@ -40,7 +40,7 @@ public:
 
   unsigned long long getChecksum() {
     ChecksumMapping mapping;
-    _moleculeContainer->iterateMolecules(mapping);
+    _moleculeService->getContainer().iterateMolecules(mapping);
     return mapping.checksum();
   }
 };

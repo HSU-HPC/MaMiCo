@@ -8,9 +8,9 @@
 #include <fstream>
 
 simplemd::cellmappings::RDFMapping::RDFMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                               simplemd::services::LinkedCellService& linkedCellService, const double& cutoffRadius,
+                                               simplemd::services::MoleculeService& moleculeService, const double& cutoffRadius,
                                                const unsigned int& numberIntervals)
-    : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService), _cutoffRadius(cutoffRadius), _numberIntervals(numberIntervals),
+    : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _cutoffRadius(cutoffRadius), _numberIntervals(numberIntervals),
       _meshsize(cutoffRadius / ((double)numberIntervals)), _particleCounter(0.0), _evaluationCounter(0.0) {
   _particlesPerInterval.clear();
   for (unsigned int i = 0; i < numberIntervals; i++) {
@@ -45,7 +45,7 @@ void simplemd::cellmappings::RDFMapping::evaluateRDF(const unsigned int& localMD
   // compute avg. number density so far
   double numberDensity = 1.0;
   for (unsigned int d = 0; d < MD_DIM; d++) {
-    numberDensity = numberDensity * _linkedCellService.getLocalDomainSize()[d];
+    numberDensity = numberDensity * _moleculeService.getLocalDomainSize()[d];
   }
   numberDensity = _particleCounter / (_evaluationCounter * numberDensity);
 

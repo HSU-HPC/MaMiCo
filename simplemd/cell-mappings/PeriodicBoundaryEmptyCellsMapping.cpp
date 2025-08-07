@@ -22,7 +22,6 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
   const tarch::la::Vector<MD_DIM, unsigned int> size(_moleculeContainer.getLocalNumberOfCells() + 2u * _moleculeContainer.getLocalIndexOfFirstCell());
   tarch::la::Vector<MD_DIM, unsigned int> outerCellCoords(0);
   tarch::la::Vector<MD_DIM, unsigned int> coords(0);
-  simplemd::LinkedCell* innerCell = NULL;
   unsigned int helpIndex = cellIndex;
 #if (MD_DIM > 2)
   coords[2] = helpIndex / (size[1] * size[0]);
@@ -62,14 +61,14 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
     cell.clear();
     // if the molecules need to be placed somewhere on this process, do so...
   } else {
-    innerCell = &_linkedCellService.getLinkedCell(coords);
+    LinkedCell innerCell = _moleculeContainer[coords];
     // iterate over molecules and either send them to other process or put them locally in the right cell
     for (auto it = cell.begin(); it != cell.end(); it++) {
       Molecule myMolecule(it->getConstPosition(), it->getConstVelocity());
       myMolecule.setForceOld(it->getConstForceOld());
       if (it->isFixed())
         myMolecule.fix();
-      innerCell->insert(myMolecule);
+      innerCell.insert(myMolecule);
     }
     cell.clear();
   }

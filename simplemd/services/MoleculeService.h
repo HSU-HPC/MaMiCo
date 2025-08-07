@@ -29,7 +29,6 @@ class MoleculeService;
 
 // forward declarations to remove circular dependencies
 class ParallelTopologyService;
-class LinkedCellService;
 } // namespace services
 } // namespace simplemd
 
@@ -89,6 +88,8 @@ public:
 
   simplemd::MoleculeContainer& getContainer() const { return *_moleculeContainer; }
 
+  tarch::la::Vector<MD_DIM, double> getLocalDomainSize() { return _localDomainSize; }
+
   static bool tarchDebugIsOn();
 
 private:
@@ -97,7 +98,8 @@ private:
   /** stores the mean velocity for normalisation */
   tarch::la::Vector<MD_DIM, double> _meanVelocity;
 
-  unsigned int _blockSize;
+  /** stores the spatial extent of the local domain */
+  const tarch::la::Vector<MD_DIM, double> _localDomainSize;
 
   simplemd::MoleculeContainer* _moleculeContainer;
 };

@@ -4,8 +4,6 @@
 // www5.in.tum.de/mamico
 #include "simplemd/services/ParallelTopologyService.h"
 
-#include "simplemd/services/LinkedCellService.h"
-
 simplemd::services::ParallelTopologyService::ParallelTopologyService(const tarch::la::Vector<MD_DIM, double>& domainSize,
                                                                      const tarch::la::Vector<MD_DIM, double>& domainOffset,
                                                                      const tarch::la::Vector<MD_DIM, double>& meshWidth,
@@ -431,9 +429,8 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::unpackLocalBuffer(simplemd::MoleculeContainer& moleculeContainer,
-                                                                    simplemd::services::LinkedCellService& linkedCellService) {
-  unpackBuffer(_bufferService.getLocalBuffer(), moleculeContainer, linkedCellService);
+void simplemd::services::ParallelTopologyService::unpackLocalBuffer(simplemd::MoleculeContainer& moleculeContainer) {
+  unpackBuffer(_bufferService.getLocalBuffer(), moleculeContainer);
 }
 
 void simplemd::services::ParallelTopologyService::communicationSteps_1_2() {
@@ -450,8 +447,7 @@ void simplemd::services::ParallelTopologyService::communicationSteps_1_2() {
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplemd::MoleculeContainer& moleculeContainer,
-                                                                         simplemd::services::LinkedCellService& linkedCellService) {
+void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplemd::MoleculeContainer& moleculeContainer) {
 #if (MD_PARALLEL == MD_YES)
   // Steps 3 and 4 together:
 
@@ -529,7 +525,7 @@ void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplem
 
   // now unpack all buffers in a fixed order:
   for (i_buf = 0; i_buf < _numUniqueNeighbours; i_buf++) {
-    unpackBuffer(_bufferService.getReceiveBuffer(i_buf), moleculeContainer, linkedCellService);
+    unpackBuffer(_bufferService.getReceiveBuffer(i_buf), moleculeContainer);
   }
 
 #endif
@@ -1096,8 +1092,8 @@ unsigned int simplemd::services::ParallelTopologyService::getCurrentBufferIndexF
   }
 }
 
-void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf, simplemd::MoleculeContainer& moleculeContainer,
-                                                               simplemd::services::LinkedCellService& linkedCellService) {
+void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf,
+                                                               simplemd::MoleculeContainer& moleculeContainer) {
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
   tarch::la::Vector<MD_DIM, double> forceOld(0.0);

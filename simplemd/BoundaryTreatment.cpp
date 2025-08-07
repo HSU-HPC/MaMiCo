@@ -19,7 +19,7 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCells(const tarch::
   // after data from periodic/ parallel boundaries have been sent, receive them and put them into the local
   // data management systems
   parallelTopologyService.communicationSteps_1_2();
-  parallelTopologyService.communicationSteps_3_4(_moleculeContainer, _linkedCellService);
+  parallelTopologyService.communicationSteps_3_4(_moleculeContainer);
 #endif
 }
 
@@ -33,7 +33,7 @@ void simplemd::BoundaryTreatment::fillBoundaryCells(const tarch::la::Vector<MD_L
 
 #if (MD_PARALLEL == MD_YES)
   parallelTopologyService.communicationSteps_1_2();
-  parallelTopologyService.communicationSteps_3_4(_moleculeContainer, _linkedCellService);
+  parallelTopologyService.communicationSteps_3_4(_moleculeContainer);
 #endif
 }
 
@@ -132,11 +132,11 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsAndFillBoundar
   applyMappingToOutermostNonBoundaryCells(_fillCellsMapping);
 
   // handle local periodic ghost cells
-  parallelTopologyService.unpackLocalBuffer(_moleculeContainer, _linkedCellService);
+  parallelTopologyService.unpackLocalBuffer(_moleculeContainer);
 
 #if (MD_PARALLEL == MD_YES)
   parallelTopologyService.communicationSteps_1_2();
-  parallelTopologyService.communicationSteps_3_4(_moleculeContainer, _linkedCellService);
+  parallelTopologyService.communicationSteps_3_4(_moleculeContainer);
 #endif
 }
 
@@ -184,7 +184,7 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
 #if (MD_DEBUG == MD_YES)
   std::cout << "BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations: unpacking local buffer" << std::endl;
 #endif
-  parallelTopologyService.unpackLocalBuffer(_moleculeContainer, _linkedCellService);
+  parallelTopologyService.unpackLocalBuffer(_moleculeContainer);
 
   // compute forces in inner cells, where boundary and process-leaving particles are not needed.
   applyMappingToCommunicationIndependentCells(lennardJonesForce);
@@ -196,7 +196,7 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
                "fulfilled."
             << std::endl;
 #endif
-  parallelTopologyService.communicationSteps_3_4(_moleculeContainer, _linkedCellService);
+  parallelTopologyService.communicationSteps_3_4(_moleculeContainer);
 #endif
 
   // compute rest of forces

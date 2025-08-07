@@ -5,7 +5,6 @@
 #ifndef _MOLECULARDYNAMICS_CELLMAPPINGS_PERIODICBOUNDARYEMPTYCELLSMAPPING_H_
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_PERIODICBOUNDARYEMPTYCELLSMAPPING_H_
 
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 
 namespace simplemd {
@@ -41,7 +40,6 @@ public:
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  simplemd::services::LinkedCellService& _linkedCellService = *((simplemd::services::LinkedCellService*)NULL); // TODO FIXME remove
   simplemd::MoleculeContainer& _moleculeContainer;
   /** domain size and offset */
   tarch::la::Vector<MD_DIM, double> _domainSize;

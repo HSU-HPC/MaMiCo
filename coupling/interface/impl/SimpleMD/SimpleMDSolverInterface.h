@@ -10,9 +10,9 @@
 #include "simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.h"
 #include "simplemd/cell-mappings/ResetPotentialEnergyMapping.h"
 #include "simplemd/services/ExternalForceService.h"
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/MolecularPropertiesService.h"
 #include "simplemd/services/ParallelTopologyService.h"
+#include "simplemd/services/MoleculeService.h"
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/interface/MDSolverInterface.h"
@@ -28,7 +28,6 @@ class SimpleMDSolverInterface : public MDSolverInterface<simplemd::LinkedCell, M
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
   simplemd::services::MoleculeService& _moleculeService;
-  simplemd::services::LinkedCellService& _linkedCellService = *((simplemd::services::LinkedCellService*)NULL); // FIXME TODO REMOVE
   const simplemd::services::MolecularPropertiesService& _molecularPropertiesService;
   /** used for the synchronization of molecules in boundary regions and between different processes when
    *  mass was inserted/ deleted by the coupling.
@@ -124,7 +123,7 @@ public:
     for (unsigned int d = 0; d < MD_DIM; d++) {
       index[d] = index[d] + couplingCellIndex.get()[d] * linkedCellsPerCouplingCell[d] + linkedCellInCouplingCell[d];
     }
-    return _linkedCellService.getLinkedCell(index);
+    return _moleculeService.getContainer()[index];
   }
 
   /** returns the global size of the box-shaped MD domain */
@@ -270,7 +269,7 @@ public:
         for (loopIndex[0] = linkedCellIndex[0] - 1; loopIndex[0] < linkedCellIndex[0] + 2; loopIndex[0]++) {
 
           // loop over all molecules in each cell
-          const simplemd::LinkedCell& thisCell = _linkedCellService.getLinkedCell(loopIndex);
+          const simplemd::LinkedCell& thisCell = _moleculeService.getContainer()[loopIndex];
           for (auto it = thisCell.begin(); it != thisCell.end(); it++) {
             forceOld += getLennardJonesForce(position, it->getConstPosition());
             energy += getPotentialEnergy(position, it->getConstPosition());

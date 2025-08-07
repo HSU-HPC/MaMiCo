@@ -6,7 +6,6 @@
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_PROFILEPLOTTERMAPPING_H_
 
 #include "simplemd/LinkedCell.h"
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include <fstream>
 #include <sstream>
