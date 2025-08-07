@@ -118,7 +118,7 @@ public:
    * @param idx
    * @return simplemd::LinkedCell
    */
-  simplemd::LinkedCell operator[](unsigned int idx);
+  simplemd::LinkedCell& operator[](unsigned int idx) const;
 
   /**
    * @brief Returns the linked cell at 3D index idx (ghost included)
@@ -126,7 +126,7 @@ public:
    * @param idx
    * @return simplemd::LinkedCell
    */
-  simplemd::LinkedCell operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx);
+  simplemd::LinkedCell& operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx) const;
 
   /**
    * @brief Get the total number of cells in the container
@@ -335,6 +335,7 @@ private:
 
   Kokkos::View<simplemd::Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace> _moleculeData;
   Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCellNumMolecules;
+  Kokkos::View<simplemd::LinkedCell*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCells;
 };
 
 template <class A> void simplemd::MoleculeContainer::iterateMolecules(A& a) {
