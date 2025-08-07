@@ -113,12 +113,20 @@ public:
   simplemd::Molecule& getMoleculeAt(int i, int j) const;
 
   /**
-   * @brief Returns the linked cell at index idx (ghost included)
+   * @brief Returns the linked cell at 1D index idx (ghost included)
    *
    * @param idx
    * @return simplemd::LinkedCell
    */
   simplemd::LinkedCell operator[](unsigned int idx);
+
+  /**
+   * @brief Returns the linked cell at 3D index idx (ghost included)
+   *
+   * @param idx
+   * @return simplemd::LinkedCell
+   */
+  simplemd::LinkedCell operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx);
 
   /**
    * @brief Get the total number of cells in the container
@@ -133,8 +141,6 @@ public:
    * @return const size_t
    */
   const size_t getNumberMolecules() const;
-
-  bool tarchDebugIsOn() const;
 
   /** can be used to apply a molecule-mapping which is iterated over all molecules of this process
    *  uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called

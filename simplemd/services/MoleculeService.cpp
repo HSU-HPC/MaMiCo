@@ -269,3 +269,11 @@ void simplemd::services::MoleculeService::resetMeanVelocity() {
   // check again
   _moleculeContainer->iterateMolecules(compute);
 }
+
+bool simplemd::services::MoleculeService::tarchDebugIsOn() const {
+#if (TARCH_DEBUG == TARCH_YES)
+  return true;
+#else
+  return false;
+#endif
+}

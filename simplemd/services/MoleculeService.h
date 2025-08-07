@@ -89,6 +89,8 @@ public:
 
   simplemd::MoleculeContainer& getContainer() const { return *_moleculeContainer; }
 
+  bool tarchDebugIsOn() const;
+
 private:
   void initContainer(ParallelTopologyService parallelTopologyService, size_t moleculeCount, double capacityFactor);
 

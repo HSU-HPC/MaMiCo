@@ -149,6 +149,10 @@ simplemd::LinkedCell simplemd::MoleculeContainer::operator[](unsigned int idx) {
   return simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx, isGhostCell(idx));
 }
 
+simplemd::LinkedCell simplemd::MoleculeContainer::operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx) {
+  return operator[](vectorIndexToLinear(cellIdx));
+}
+
 int simplemd::MoleculeContainer::getNumCells() const { return _linkedCellNumMolecules.size(); }
 
 unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const {
@@ -226,14 +230,6 @@ const size_t simplemd::MoleculeContainer::getNumberMolecules() const {
     moleculeCount += _linkedCellNumMolecules(i);
   }
   return moleculeCount;
-}
-
-bool simplemd::MoleculeContainer::tarchDebugIsOn() const {
-#if (TARCH_DEBUG == TARCH_YES)
-  return true;
-#else
-  return false;
-#endif
 }
 
 #if (MD_ERROR == MD_YES)
