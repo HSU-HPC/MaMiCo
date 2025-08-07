@@ -60,7 +60,7 @@ public:
    * We refer to the lexicographic ordering of the linked cells here.
    * @param cell the linked cell that should be inserted into the coupling
    * cell
-   * @param index specifies the position, at which cell shoeld be inserted
+   * @param index specifies the position, at which cell should be inserted
    */
   void addLinkedCell(LinkedCell& cell, const unsigned int& index) { _linkedCells[index] = &cell; }
 

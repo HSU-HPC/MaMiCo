@@ -158,7 +158,7 @@ simplemd::LinkedCell& simplemd::MoleculeContainer::operator[](unsigned int idx) 
    * The cell access operator needs to be const in order to capture the MoleculeContainer by value in a Kokkos macro.
    * This is not an issue, because it does not affect the modifiability of the content in the Kokkos::View.
    * The LinkedCell must be updated with the correct pointer to the molecule data/count, because the memory location might have changed (host vs. device).
-   * NOTE: Do NOT hold on to an instance of LinkedCell as it may point to outdated memory (or invalid memory in a different Kokkos memory space)
+   * NOTE: The context for a LinkedCell changes depending on where it was obtained. (E.g. When calling container[index] on the GPU, the LinkedCell "is moved" to the GPU context.)
    *
    * C++ is a wonderful language :,)
    */
