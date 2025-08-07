@@ -50,7 +50,7 @@ public:
     _cellCounter = 0;
   }
 
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     if (_currentTimestep < _startAtTimestep) {
       return;
     }
@@ -58,7 +58,7 @@ public:
     // if this is the first timestep in the sampling interval, create vector entry for this cell and store the cell index in vector form
     if ((_currentTimestep - _startAtTimestep) % _plotEveryTimestep == 0) {
       _velocityAndDensity.push_back(tarch::la::Vector<2 * MD_DIM + 1, double>(0.0));
-      const tarch::la::Vector<MD_DIM, unsigned int> localCellIndexVector = _moleculeContainer.getLocalCellIndexVector(cellIndex);
+      const tarch::la::Vector<MD_DIM, unsigned int> localCellIndexVector = _moleculeContainer.getLocalCellIndexVector(cell.getIndex());
       const tarch::la::Vector<MD_DIM, unsigned int> globalCellIndexVector = _parallelTopologyService.localToGlobalCellIndexVector(localCellIndexVector);
       for (unsigned int d = 0; d < MD_DIM; d++) {
         _velocityAndDensity[_cellCounter][d] = (double)globalCellIndexVector[d];

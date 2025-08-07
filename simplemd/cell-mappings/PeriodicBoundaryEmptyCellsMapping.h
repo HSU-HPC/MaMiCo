@@ -34,7 +34,7 @@ public:
   void beginCellIteration() {}
   void endCellIteration() {}
 
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
+  void handleCell(LinkedCell& cell);
 
   static const bool IsParallel = false;
 

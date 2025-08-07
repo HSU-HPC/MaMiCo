@@ -413,7 +413,7 @@ void simplemd::MoleculeContainer::iterateCellsSerial(A& a, const tarch::la::Vect
 #endif
         index = vectorIndexToLinear(coords);
         simplemd::LinkedCell cell = (*this)[index];
-        a.handleCell(cell, index);
+        a.handleCell(cell);
       }
 #if (MD_DIM > 1)
     }
@@ -509,7 +509,7 @@ void simplemd::MoleculeContainer::iterateCellPairsSerial(A& a, const tarch::la::
         std::cout << "iterateCellPairs: Single index " << index << std::endl;
 #endif
         simplemd::LinkedCell cell = (*this)[index];
-        a.handleCell(cell, index);
+        a.handleCell(cell);
         // handle pairs (lower,left,back-oriented cells)
         for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS / 2; i++) {
 #if (MD_DEBUG == MD_YES)
@@ -613,7 +613,7 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
 #endif
 
         // handle cell
-        a.handleCell(container[index], index);
+        a.handleCell(container[index]);
       });          // Kokkos::parallel_for
   Kokkos::fence(); // Ensure results are available on the host
   // end iteration();
@@ -761,7 +761,7 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
 #endif
 
               simplemd::LinkedCell cell = operator[](index);
-              a.handleCell(cell, index);
+              a.handleCell(cell);
               // handle pairs (lower,left,back-oriented cells)
               for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS / 2; i++) {
 #if (MD_DEBUG == MD_YES)

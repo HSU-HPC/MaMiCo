@@ -4,7 +4,7 @@
 // www5.in.tum.de/mamico
 #include "simplemd/cell-mappings/DeleteMoleculesMapping.h"
 
-void simplemd::cellmappings::DeleteMoleculesMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+void simplemd::cellmappings::DeleteMoleculesMapping::handleCell(LinkedCell& cell) {
   // clear cell list
   cell.clear();
 }

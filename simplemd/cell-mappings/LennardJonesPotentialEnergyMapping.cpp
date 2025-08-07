@@ -17,7 +17,7 @@ simplemd::cellmappings::LennardJonesPotentialEnergyMapping::LennardJonesPotentia
 
 void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::beginCellIteration() {}
 
-void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) const {
+void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(LinkedCell& cell) const {
 
   // iterate over all molecules
   const auto itEnd = cell.end();

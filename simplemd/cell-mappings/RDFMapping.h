@@ -37,7 +37,7 @@ public:
 
   void evaluateRDF(const unsigned int& localMDSimulation);
 
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
+  void handleCell(LinkedCell& cell);
   void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2);
 
   static const bool IsParallel = false;

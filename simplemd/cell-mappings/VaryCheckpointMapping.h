@@ -22,7 +22,7 @@ public:
 
   void endCellIteration() {}
 
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     tarch::la::Vector<MD_DIM, double> meanVelocityForCell(0.0);
     double stdDeviation = std::sqrt(MD_DIM * _kB * _temperature / _molecularMass);
 

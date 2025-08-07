@@ -76,7 +76,7 @@ void simplemd::cellmappings::RDFMapping::evaluateRDF(const unsigned int& localMD
   file.close();
 }
 
-void simplemd::cellmappings::RDFMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+void simplemd::cellmappings::RDFMapping::handleCell(LinkedCell& cell) {
   // only consider non-ghost cells
   if (cell.isGhostCell()) {
     return;

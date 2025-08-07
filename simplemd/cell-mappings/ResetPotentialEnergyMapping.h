@@ -23,7 +23,7 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     for (auto it = cell.begin(); it != cell.end(); it++) {
       it->setPotentialEnergy(_zero);
     }

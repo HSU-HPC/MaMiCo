@@ -20,7 +20,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
 #endif
 }
 
-void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCell& cell, const unsigned int& cellIndex) const {
+void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCell& cell) const {
   // force buffer
   tarch::la::Vector<MD_DIM, double> forceBuffer(0.0);
 

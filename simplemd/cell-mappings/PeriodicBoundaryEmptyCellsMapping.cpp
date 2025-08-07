@@ -18,11 +18,11 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::setNumberOfProce
   _numberProcesses = numberProcesses;
 }
 
-void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(LinkedCell& cell) {
   const tarch::la::Vector<MD_DIM, unsigned int> size(_moleculeContainer.getLocalNumberOfCells() + 2u * _moleculeContainer.getLocalIndexOfFirstCell());
   tarch::la::Vector<MD_DIM, unsigned int> outerCellCoords(0);
   tarch::la::Vector<MD_DIM, unsigned int> coords(0);
-  unsigned int helpIndex = cellIndex;
+  unsigned int helpIndex = cell.getIndex();
 #if (MD_DIM > 2)
   coords[2] = helpIndex / (size[1] * size[0]);
   helpIndex = helpIndex - coords[2] * (size[1] * size[0]);
@@ -57,7 +57,7 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
   }
 
   // if the molecules need to be sent, they are sent and deleted from the local molecule service
-  if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _moleculeContainer)) {
+  if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cell.getIndex(), _moleculeContainer)) {
     cell.clear();
     // if the molecules need to be placed somewhere on this process, do so...
   } else {

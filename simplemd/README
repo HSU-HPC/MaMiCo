@@ -13,7 +13,7 @@ cell-mappings/
 contains callback-classes which are used to execute linked-cell wise operations in SimpleMD. Each class in this folder implements methods
   beginCellIteration() -> called at the beginning of a linked cell traversal
   endCellIteration() -> called at the end of a linked cell traversal
-  handleCell(cell,index) -> called on a single linked cell
+  handleCell(cell) -> called on a single linked cell
 and--in case of pairwise molecule evaluations--
   handleCellPair(cell1,cell2,index1,index2) -> called once for each neighbouring cell pair cell1,cell2.
 Together with the traversal mechanism of the MoleculeContainer from MoleculeService (see services/ below), this allows to separate cellwise functionality from the storage and memory management.

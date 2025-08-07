@@ -28,7 +28,7 @@ public:
   void beginCellIteration();
 
   void endCellIteration() {}
-  void handleCell(const LinkedCell& cell, const unsigned int& cellIndex) const;
+  void handleCell(const LinkedCell& cell) const;
   void handleCellPair(const LinkedCell& cell1, const LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) const;
 
   /** returns the force acting on a particle placed at position1, resulting from an interaction of the particles at

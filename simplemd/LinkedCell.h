@@ -84,6 +84,8 @@ public:
 
   KOKKOS_INLINE_FUNCTION bool isGhostCell() const { return _isGhostCell; }
 
+  KOKKOS_INLINE_FUNCTION unsigned int getIndex() const { return _cellIndex; }
+
 private:
   KOKKOS_INLINE_FUNCTION void changeMoleculeCount(int by) { (*_linkedCellNumMolecules)(_cellIndex) += by; }
 

@@ -27,7 +27,7 @@ public:
   void beginCellIteration() {}
   void endCellIteration() {}
 
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     // send molecules from this cell first...
     if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _moleculeContainer)) {
       // ... and erase them afterwards
