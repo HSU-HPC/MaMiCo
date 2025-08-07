@@ -19,8 +19,7 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
   }
 }
 
-simplemd::MoleculeContainer::~MoleculeContainer() {
-}
+simplemd::MoleculeContainer::~MoleculeContainer() {}
 
 void simplemd::MoleculeContainer::insert(int cellIdx, simplemd::Molecule& molecule) {
 #if (MD_ERROR == MD_YES)
