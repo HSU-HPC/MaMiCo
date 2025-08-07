@@ -371,6 +371,7 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
           a.handleMolecule(getMoleculeAt(i, j));
         }
       });
+  Kokkos::fence(); // Ensure results are available on the host
   a.endMoleculeIteration();
 #endif
 }
@@ -577,6 +578,7 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
 #endif
       ;
   // loop over domain, but with a single loop
+  MoleculeContainer& container = (*this);
   Kokkos::parallel_for(
       length, KOKKOS_LAMBDA(const unsigned int i) {
 // compute index of the current cell
@@ -611,10 +613,9 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
 #endif
 
         // handle cell
-        simplemd::LinkedCell cell = (*this)[index];
-        a.handleCell(cell, index);
-      }); // Kokkos::parallel_for
-
+        a.handleCell(container[index], index);
+      });          // Kokkos::parallel_for
+  Kokkos::fence(); // Ensure results are available on the host
   // end iteration();
   a.endCellIteration();
 }
@@ -723,6 +724,7 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
             ;
 
         // parallelise loop for all cells that are to be traversed in this way
+        MoleculeContainer& container = (*this);
         Kokkos::parallel_for(
             length, KOKKOS_LAMBDA(const unsigned int j) {
               // compute index of the current cell
@@ -767,11 +769,10 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
 #endif
                 coordsCell1Buffer = index + indexOffset[i];
                 coordsCell2Buffer = index + neighbourOffset[i];
-                simplemd::LinkedCell cell1 = operator[](coordsCell1Buffer);
-                simplemd::LinkedCell cell2 = operator[](coordsCell2Buffer);
-                a.handleCellPair(cell1, cell2, coordsCell1Buffer, coordsCell2Buffer);
+                a.handleCellPair(container[coordsCell1Buffer], container[coordsCell2Buffer], coordsCell1Buffer, coordsCell2Buffer);
               }
-            }); // j, Kokkos::parallel_for
+            });          // j, Kokkos::parallel_for
+        Kokkos::fence(); // Ensure results are available on the host
       } // x
 #if (MD_DIM > 1)
     } // y

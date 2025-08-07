@@ -56,7 +56,7 @@ public:
       simplemd::services::ParallelTopologyService parallelTopologyService(numCellsTestInput, domainOffset, meshWidth, numberProcesses,
                                                                           simplemd::BoundaryType::PERIODIC_BOUNDARY);
       simplemd::MoleculeContainer moleculeContainer(parallelTopologyService, 20);
-      CPPUNIT_ASSERT((numTotalCells == moleculeContainer.getNumCells()));
+      CPPUNIT_ASSERT((numTotalCells == moleculeContainer.getLocalNumberOfCellsScalarWithGhost()));
       CPPUNIT_ASSERT(numInnerCells == vectorToScalar(moleculeContainer.getLocalNumberOfCells()));
     }
   }
