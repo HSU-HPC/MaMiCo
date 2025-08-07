@@ -56,7 +56,7 @@ public:
 
     // compute forces. After this step, each molecule has received all force
     // contributions from its neighbors.
-    _linkedCellService->iterateCellPairs(*_lennardJonesForce);
+    _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
 
     // distribute momentum -> some methods require modification of force terms,
     // therefore we call it AFTER the force computation and before everything else
@@ -147,7 +147,6 @@ public:
     #endif
     return *_moleculeService;
   }
-  simplemd::services::LinkedCellService& getLinkedCellService() { return *_linkedCellService; }
   const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() {
     #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if(_molecularPropertiesService == NULL){

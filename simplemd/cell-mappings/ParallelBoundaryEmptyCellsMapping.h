@@ -5,7 +5,6 @@
 #ifndef _MOLECULARDYNAMICS_CELLMAPPINGS_PARALLELBOUNDARYEMPTYCELLSMAPPING_H_
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_PARALLELBOUNDARYEMPTYCELLSMAPPING_H_
 
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 
 namespace simplemd {

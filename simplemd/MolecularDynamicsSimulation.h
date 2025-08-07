@@ -20,7 +20,6 @@
 #endif
 #include "simplemd/molecule-mappings/VelocityStoermerVerletMapping.h"
 #include "simplemd/services/ExternalForceService.h"
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/MolecularPropertiesService.h"
 #include "simplemd/services/MoleculeService.h"
 #include "simplemd/services/ParallelTopologyService.h"
@@ -95,10 +94,8 @@ protected:
   simplemd::services::ParallelTopologyService* _parallelTopologyService;
   // for molecule storage
   simplemd::services::MoleculeService* _moleculeService;
-  simplemd::MoleculeContainer* _moleculeContainer;
   std::string _checkpointFilestem;
   // for linked cell storage
-  simplemd::services::LinkedCellService* _linkedCellService;
   // molecular properties (potential parameters, mass etc)
   simplemd::services::MolecularPropertiesService* _molecularPropertiesService;
   // for external forces; has default constructor, hence we use it as object instead of ptr

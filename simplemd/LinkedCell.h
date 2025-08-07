@@ -11,8 +11,9 @@ class LinkedCell;
 
 class simplemd::LinkedCell {
 public:
-  KOKKOS_FUNCTION LinkedCell(Kokkos::View<Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace>* moleculeData,
-                             Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace>* nMolecules, unsigned int cellIndex, bool isGhostCell)
+  KOKKOS_FUNCTION LinkedCell() : _moleculeData(nullptr), _linkedCellNumMolecules(nullptr), _cellIndex(0), _isGhostCell(false) {}
+  KOKKOS_FUNCTION LinkedCell(const Kokkos::View<Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace>* moleculeData,
+                             const Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace>* nMolecules, unsigned int cellIndex, bool isGhostCell)
       : _moleculeData(moleculeData), _linkedCellNumMolecules(nMolecules), _cellIndex(cellIndex), _isGhostCell(isGhostCell) {}
 
   class Iterator {
@@ -88,8 +89,8 @@ private:
 
   KOKKOS_INLINE_FUNCTION Molecule* getMolecule(unsigned int moleculeIndex) const { return &(*_moleculeData)(_cellIndex, moleculeIndex); }
 
-  Kokkos::View<Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace>* _moleculeData;
-  Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace>* _linkedCellNumMolecules;
+  const Kokkos::View<Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace>* _moleculeData;
+  const Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace>* _linkedCellNumMolecules;
   const unsigned int _cellIndex;
   const bool _isGhostCell;
 };

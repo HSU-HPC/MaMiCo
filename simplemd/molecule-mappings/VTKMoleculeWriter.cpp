@@ -41,8 +41,8 @@ void simplemd::moleculemappings::VTKMoleculeWriter::beginMoleculeIteration() {
   _file << "DATASET UNSTRUCTURED_GRID" << std::endl;
   //_file << "DATASET POLYDATA" << std::endl;
 
-  _positions << "POINTS " << _moleculeContainer.getNumberMolecules() << " float" << std::endl;
-  _velocities << "POINT_DATA " << _moleculeContainer.getNumberMolecules() << std::endl;
+  _positions << "POINTS " << _moleculeContainer.getLocalNumberOfMoleculesWithGhost() << " float" << std::endl;
+  _velocities << "POINT_DATA " << _moleculeContainer.getLocalNumberOfMoleculesWithGhost() << std::endl;
   _velocities << "VECTORS velocities float" << std::endl;
   _forces << "VECTORS forces float" << std::endl;
   _fix << "SCALARS isFixed float" << std::endl;

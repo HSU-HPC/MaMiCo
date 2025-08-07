@@ -23,7 +23,6 @@ namespace simplemd {
 class MoleculeContainer;
 namespace services {
 class ParallelTopologyService;
-class LinkedCellService;
 } // namespace services
 } // namespace simplemd
 
@@ -153,7 +152,7 @@ public:
 
   /** unpack and resort local buffer
    */
-  void unpackLocalBuffer(simplemd::MoleculeContainer& moleculeContainer, simplemd::services::LinkedCellService& linkedCellService);
+  void unpackLocalBuffer(simplemd::MoleculeContainer& moleculeContainer);
 
   /** Communication schedule:
    * 1. Irecv on buffers
@@ -166,7 +165,7 @@ public:
   void communicationSteps_1_2();
 
   /** See comment of communicationSteps_1_2() */
-  void communicationSteps_3_4(simplemd::MoleculeContainer& MoleculeContainer, simplemd::services::LinkedCellService& linkedCellService);
+  void communicationSteps_3_4(simplemd::MoleculeContainer& MoleculeContainer);
 
   /** Compute (non-overlapping) intersection of a global region of interest (ROI) with local domain.
       For example for purposes of profile plotter. */
@@ -206,9 +205,7 @@ private:
                                                      const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses,
                                                      const tarch::la::Vector<MD_DIM, double>& domainSize) const;
 
-  /** computes the number of cells in each process block. The
-   *  number of cells computed by this service should also be used
-   *  by the LinkedCellService!
+  /** computes the number of cells in each process block.
    */
   tarch::la::Vector<MD_DIM, unsigned int> computeNumberOfCells(const tarch::la::Vector<MD_DIM, double>& meshWidth,
                                                                const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses,
@@ -264,8 +261,7 @@ private:
 
   /** Read off all molecules from buffer and resort them in the respective linked cells.
    */
-  void unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf, simplemd::MoleculeContainer& MoleculeContainer,
-                    simplemd::services::LinkedCellService& linkedCellService);
+  void unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf, simplemd::MoleculeContainer& MoleculeContainer);
 
   /** place position, velocity, forceOld and isFixed at the end of the respective local buffer.
    */

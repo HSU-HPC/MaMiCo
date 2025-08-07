@@ -6,9 +6,8 @@
 
 simplemd::ProfilePlotter::ProfilePlotter(const std::vector<simplemd::configurations::ProfilePlotterConfiguration>& configurations,
                                          const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                         simplemd::services::LinkedCellService& linkedCellService, const double& linkedCellVolume,
-                                         const unsigned int& localMDSimulation)
-    : _linkedCellService(linkedCellService) {
+                                         simplemd::MoleculeContainer& moleculeContainer, const double& linkedCellVolume, const unsigned int& localMDSimulation)
+    : _moleculeContainer(moleculeContainer) {
   for (unsigned int i = 0; i < _plotters.size(); i++) {
     if (_plotters[i] != NULL) {
       delete _plotters[i];
@@ -18,7 +17,7 @@ simplemd::ProfilePlotter::ProfilePlotter(const std::vector<simplemd::configurati
   _plotters.clear();
 
   for (unsigned int i = 0; i < configurations.size(); i++) {
-    _plotters.push_back(new simplemd::cellmappings::ProfilePlotterMapping(parallelTopologyService, linkedCellService, configurations[i].getWriteEveryTimestep(),
+    _plotters.push_back(new simplemd::cellmappings::ProfilePlotterMapping(parallelTopologyService, moleculeContainer, configurations[i].getWriteEveryTimestep(),
                                                                           configurations[i].getSampleEveryTimestep(), configurations[i].getStartAtTimestep(),
                                                                           linkedCellVolume, localMDSimulation));
     _ranges.push_back(configurations[i].getRange());
@@ -61,6 +60,6 @@ void simplemd::ProfilePlotter::accumulateAndPlotInformation(const unsigned int& 
       continue; // skip profiles which have no intersection with local domain
 #endif
     _plotters[i]->setCurrentTimestep(t);
-    _linkedCellService.iterateCells<simplemd::cellmappings::ProfilePlotterMapping>(*_plotters[i], _startCells[i], _ranges[i]);
+    _moleculeContainer.iterateCells<simplemd::cellmappings::ProfilePlotterMapping>(*_plotters[i], _startCells[i], _ranges[i]);
   }
 }

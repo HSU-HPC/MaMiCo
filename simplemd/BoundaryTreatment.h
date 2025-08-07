@@ -13,7 +13,6 @@
 #include "simplemd/cell-mappings/ParallelBoundaryEmptyCellsMapping.h"
 #endif
 #include "simplemd/MolecularDynamicsDefinitions.h"
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include "simplemd/MoleculeContainer.h"
 
@@ -28,14 +27,12 @@ class BoundaryTreatment;
 
 class simplemd::BoundaryTreatment {
 public:
-  BoundaryTreatment(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::MoleculeContainer& moleculeContainer,
-                    simplemd::services::LinkedCellService& linkedCellService)
-      : _moleculeContainer(moleculeContainer), _linkedCellService(linkedCellService), _periodicBoundaryMapping(parallelTopologyService, moleculeContainer),
-        _deleteMoleculesMapping(),
+  BoundaryTreatment(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::MoleculeContainer& moleculeContainer)
+      : _moleculeContainer(moleculeContainer), _periodicBoundaryMapping(parallelTopologyService, moleculeContainer), _deleteMoleculesMapping(),
 #if (MD_PARALLEL == MD_YES)
         _parallelBoundaryMapping(parallelTopologyService, moleculeContainer),
 #endif
-        _fillCellsMapping(parallelTopologyService, moleculeContainer, linkedCellService) {
+        _fillCellsMapping(parallelTopologyService, moleculeContainer) {
   }
   ~BoundaryTreatment() {}
 
@@ -99,7 +96,6 @@ private:
   template <class Mapping> void applyMappingToCommunicationDependentCells(Mapping& myMapping) const;
 
   simplemd::MoleculeContainer& _moleculeContainer;
-  simplemd::services::LinkedCellService& _linkedCellService;
   simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping _periodicBoundaryMapping;
   simplemd::cellmappings::DeleteMoleculesMapping _deleteMoleculesMapping;
 #if (MD_PARALLEL == MD_YES)
@@ -119,13 +115,13 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     // left outer corner
     numberCellsOuter[0] = 1;
     startOuter[0] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[1] == boundaryType) {
     // right outer corner
     numberCellsOuter[0] = 1;
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
 #endif
 
@@ -137,7 +133,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     numberCellsOuter[1] = 1;
     startOuter[0] = 0;
     startOuter[1] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[7] == boundaryType) {
     // right back corner
@@ -145,7 +141,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     numberCellsOuter[1] = 1;
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
     startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[2] == boundaryType) {
     // right front corner
@@ -153,7 +149,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     numberCellsOuter[1] = 1;
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
     startOuter[1] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[5] == boundaryType) {
     // left back corner
@@ -161,7 +157,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     numberCellsOuter[1] = 1;
     startOuter[0] = 0;
     startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   // edges -------------------------------------------------
   if (boundary[1] == boundaryType) {
@@ -170,7 +166,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     numberCellsOuter[1] = 1;
     startOuter[0] = 1;
     startOuter[1] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[6] == boundaryType) {
     // back edge
@@ -178,7 +174,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     numberCellsOuter[1] = 1;
     startOuter[0] = 1;
     startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[3] == boundaryType) {
     // left edge
@@ -186,7 +182,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     numberCellsOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1];
     startOuter[0] = 0;
     startOuter[1] = 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[4] == boundaryType) {
     // right edge
@@ -194,7 +190,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     numberCellsOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1];
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
     startOuter[1] = 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
 #endif
 
@@ -204,13 +200,13 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     // lower,left,front corner
     numberCellsOuter = tarch::la::Vector<MD_DIM, unsigned int>(1);
     startOuter = tarch::la::Vector<MD_DIM, unsigned int>(0);
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[25] == boundaryType) {
     // upper,right,back corner
     numberCellsOuter = tarch::la::Vector<MD_DIM, unsigned int>(1);
     startOuter = _moleculeContainer.getLocalNumberOfCells() + 2u * _moleculeContainer.getLocalIndexOfFirstCell() - tarch::la::Vector<MD_DIM, unsigned int>(1);
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[2] == boundaryType) {
     // lower,right,front corner
@@ -218,7 +214,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
     startOuter[1] = 0;
     startOuter[2] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[23] == boundaryType) {
     // upper,left,back corner
@@ -226,7 +222,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = 0;
     startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
     startOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[2] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[6] == boundaryType) {
     // lower,left,back corner
@@ -234,7 +230,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = 0;
     startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
     startOuter[2] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[19] == boundaryType) {
     // upper,right,front corner
@@ -242,7 +238,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
     startOuter[1] = 0;
     startOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[2] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[8] == boundaryType) {
     // lower,right,back corner
@@ -250,7 +246,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
     startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
     startOuter[2] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[17] == boundaryType) {
     // upper,left,front corner
@@ -258,7 +254,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = 0;
     startOuter[1] = 0;
     startOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[2] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
 
   // edges -------------------------------------------
@@ -270,7 +266,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalIndexOfFirstCell()[0];
     startOuter[1] = 0;
     startOuter[2] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[24] == boundaryType) {
     // upper,back edge
@@ -280,7 +276,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalIndexOfFirstCell()[0];
     startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
     startOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[2] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[7] == boundaryType) {
     // x-axis aligned: lower,back edge
@@ -290,7 +286,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalIndexOfFirstCell()[0];
     startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
     startOuter[2] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[18] == boundaryType) {
     // upper,front edge
@@ -300,7 +296,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalIndexOfFirstCell()[0];
     startOuter[1] = 0;
     startOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[2] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[3] == boundaryType) {
     // y-axis aligned: lower,left edge
@@ -310,7 +306,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = 0;
     startOuter[1] = _moleculeContainer.getLocalIndexOfFirstCell()[1];
     startOuter[2] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[22] == boundaryType) {
     // upper,right edge
@@ -320,7 +316,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
     startOuter[1] = _moleculeContainer.getLocalIndexOfFirstCell()[1];
     startOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[2] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[5] == boundaryType) {
     // y-axis aligned: lower,right edge
@@ -330,7 +326,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
     startOuter[1] = _moleculeContainer.getLocalIndexOfFirstCell()[1];
     startOuter[2] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[20] == boundaryType) {
     // upper,left edge
@@ -340,7 +336,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = 0;
     startOuter[1] = _moleculeContainer.getLocalIndexOfFirstCell()[1];
     startOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[2] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[9] == boundaryType) {
     // z-axis aligned: left,front edge
@@ -350,7 +346,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = 0;
     startOuter[1] = 0;
     startOuter[2] = _moleculeContainer.getLocalIndexOfFirstCell()[2];
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[16] == boundaryType) {
     // right,back edge
@@ -360,7 +356,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
     startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
     startOuter[2] = _moleculeContainer.getLocalIndexOfFirstCell()[2];
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[11] == boundaryType) {
     // z-axis aligned: right,front edge
@@ -370,7 +366,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
     startOuter[1] = 0;
     startOuter[2] = _moleculeContainer.getLocalIndexOfFirstCell()[2];
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[14] == boundaryType) {
     // left,back edge
@@ -380,7 +376,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = 0;
     startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
     startOuter[2] = _moleculeContainer.getLocalIndexOfFirstCell()[2];
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   // faces ---------------------------------------
   if (boundary[4] == boundaryType) {
@@ -391,7 +387,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalIndexOfFirstCell()[0];
     startOuter[1] = _moleculeContainer.getLocalIndexOfFirstCell()[1];
     startOuter[2] = 0;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[21] == boundaryType) {
     // top face
@@ -401,7 +397,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalIndexOfFirstCell()[0];
     startOuter[1] = _moleculeContainer.getLocalIndexOfFirstCell()[1];
     startOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[2] - 1;
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[12] == boundaryType) {
     // left face
@@ -411,7 +407,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = 0;
     startOuter[1] = _moleculeContainer.getLocalIndexOfFirstCell()[1];
     startOuter[2] = _moleculeContainer.getLocalIndexOfFirstCell()[2];
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[13] == boundaryType) {
     // right face
@@ -421,7 +417,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
     startOuter[1] = _moleculeContainer.getLocalIndexOfFirstCell()[1];
     startOuter[2] = _moleculeContainer.getLocalIndexOfFirstCell()[2];
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[10] == boundaryType) {
     // front face
@@ -431,7 +427,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalIndexOfFirstCell()[0];
     startOuter[1] = 0;
     startOuter[2] = _moleculeContainer.getLocalIndexOfFirstCell()[2];
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   if (boundary[15] == boundaryType) {
     // back face
@@ -441,7 +437,7 @@ void simplemd::BoundaryTreatment::applyMappingToBoundaryCells(const tarch::la::V
     startOuter[0] = _moleculeContainer.getLocalIndexOfFirstCell()[0];
     startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
     startOuter[2] = _moleculeContainer.getLocalIndexOfFirstCell()[2];
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
 #endif
 }
@@ -454,9 +450,9 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToOutermo
 #if (MD_DIM == 1)
   startOuter[0] = 1;
   numberCellsOuter[0] = 1;
-  _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+  _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
-  _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+  _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
 #endif
 
 #if (MD_DIM == 2)
@@ -465,11 +461,11 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToOutermo
   startOuter[1] = 1;
   numberCellsOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0];
   numberCellsOuter[1] = 1;
-  _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+  _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   // upper edge
   startOuter[0] = 1;
   startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
-  _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+  _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   // left edge
   startOuter[0] = 1;
   startOuter[1] = 2;
@@ -477,13 +473,13 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToOutermo
   numberCellsOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] - 2;
   emptySweep = (numberCellsOuter[1] < 1);
   if (!emptySweep) {
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   // right edge
   startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
   startOuter[1] = 2;
   if (!emptySweep) {
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
 #endif
 
@@ -493,12 +489,12 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToOutermo
   numberCellsOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1];
   numberCellsOuter[2] = 1;
   startOuter = tarch::la::Vector<MD_DIM, unsigned int>(1);
-  _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+  _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   // top face
   startOuter[0] = 1;
   startOuter[1] = 1;
   startOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2] + _moleculeContainer.getLocalIndexOfFirstCell()[2] - 1;
-  _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+  _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   // left face
   numberCellsOuter[0] = 1;
   numberCellsOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1];
@@ -508,14 +504,14 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToOutermo
   startOuter[1] = 1;
   startOuter[2] = 2;
   if (!emptySweep) {
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   // right face
   startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
   startOuter[1] = 1;
   startOuter[2] = 2;
   if (!emptySweep) {
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   // front face
   numberCellsOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] - 2;
@@ -526,14 +522,14 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToOutermo
   startOuter[1] = 1;
   startOuter[2] = 2;
   if (!emptySweep) {
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
   // back face
   startOuter[0] = 2;
   startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
   startOuter[2] = 2;
   if (!emptySweep) {
-    _linkedCellService.iterateCells(myMapping, startOuter, numberCellsOuter);
+    _moleculeContainer.iterateCells(myMapping, startOuter, numberCellsOuter);
   }
 #endif
 }
@@ -554,7 +550,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication independent cells on pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 }
 
 template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommunicationDependentCells(Mapping& myMapping) const {
@@ -571,7 +567,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 
   // right side
   // changing only necessary values:
@@ -580,7 +576,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 #endif
 #if (MD_DIM == 2)
   // whole lower edge
@@ -593,7 +589,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 
   // whole upper edge
   // changing only necessary values:
@@ -602,7 +598,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 
   // remaining of left edge
   pairIterationStart[0] = 0;
@@ -613,7 +609,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 
   // remaining of right edge
   // changing only necessary values:
@@ -622,7 +618,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 
 #endif
 #if (MD_DIM == 3)
@@ -639,7 +635,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 
   // whole top face
   // changing only necessary values
@@ -649,7 +645,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 
   // remaining of left face
   pairIterationStart[0] = 0;
@@ -664,7 +660,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 
   // remaining of right face
   pairIterationStart[0] = _moleculeContainer.getLocalIndexOfFirstCell()[0] + _moleculeContainer.getLocalNumberOfCells()[0] - 2;
@@ -673,7 +669,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 
   // remaining of front face
   pairIterationStart[0] = _moleculeContainer.getLocalIndexOfFirstCell()[0] + 1;
@@ -688,7 +684,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 
   // remaining of back face
   pairIterationStart[1] = _moleculeContainer.getLocalIndexOfFirstCell()[1] + _moleculeContainer.getLocalNumberOfCells()[1] - 2;
@@ -697,7 +693,7 @@ template <class Mapping> void simplemd::BoundaryTreatment::applyMappingToCommuni
   std::cout << "applying mapping on communication dependent cells with pairIterationStart: " << pairIterationStart
             << "\n with pairIterationLength: " << pairIterationLength << std::endl;
 #endif
-  _linkedCellService.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
+  _moleculeContainer.iterateCellPairs(myMapping, pairIterationStart, pairIterationLength);
 #endif
 }
 

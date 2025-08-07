@@ -4,14 +4,19 @@
 
 simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity)
     : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _ghostCellLayerThickness(parallelTopologyService.getGhostCellLayerThickness()),
-      _cellCapacity(cellCapacity),
+      _numLocalCellsNoGhost(_numCells - 2u * _ghostCellLayerThickness), _cellCapacity(cellCapacity),
 #if (MD_ERROR == MD_YES)
       _domainSize(parallelTopologyService.getGlobalDomainSize()),
 #endif
       _domainOffset(parallelTopologyService.getGlobalDomainOffset()), _meshWidth(parallelTopologyService.getMeshWidth()),
       _globalIndexOfFirstCell(parallelTopologyService.getGlobalIndexOfFirstCell()), _localIndexOfFirstCell(parallelTopologyService.getLocalIndexOfFirstCell()),
       _moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
-      _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)) {
+      _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)),
+      _linkedCells("linkedCells", _linkedCellNumMolecules.size()) {
+  for (unsigned int i = 0; i < _linkedCells.size(); i++) {
+    // Initialize ghost cell flags
+    new (&_linkedCells(i)) simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, i, isGhostCell(i));
+  }
 }
 
 simplemd::MoleculeContainer::~MoleculeContainer() {
@@ -149,15 +154,25 @@ void simplemd::MoleculeContainer::sort() {
 
 simplemd::Molecule& simplemd::MoleculeContainer::getMoleculeAt(int i, int j) const { return _moleculeData(i, j); }
 
-simplemd::LinkedCell simplemd::MoleculeContainer::operator[](unsigned int idx) {
-  return simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx, isGhostCell(idx));
+simplemd::LinkedCell& simplemd::MoleculeContainer::operator[](unsigned int idx) const {
+  /*
+   * The cell access operator needs to be const in order to capture the MoleculeContainer by value in a Kokkos macro.
+   * This is not an issue, because it does not affect the modifiability of the content in the Kokkos::View.
+   * The LinkedCell must be updated with the correct pointer to the molecule data/count, because the memory location might have changed (host vs. device).
+   * NOTE: Do NOT hold on to an instance of LinkedCell as it may point to outdated memory (or invalid memory of different space)
+   *
+   * C++ is a wonderful language :,)
+   */
+  bool cellIsGhostCell = _linkedCells(idx).isGhostCell();
+  simplemd::LinkedCell* cell = new (&_linkedCells(idx)) simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx, cellIsGhostCell);
+  return *cell;
 }
 
-simplemd::LinkedCell simplemd::MoleculeContainer::operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx) {
+simplemd::LinkedCell& simplemd::MoleculeContainer::operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx) const {
   return operator[](vectorIndexToLinear(cellIdx));
 }
 
-int simplemd::MoleculeContainer::getNumCells() const { return _linkedCellNumMolecules.size(); }
+int simplemd::MoleculeContainer::getLocalNumberOfCellsScalarWithGhost() const { return _linkedCells.size(); }
 
 unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const {
   for (unsigned int d = 0; d < MD_DIM; d++) {
@@ -208,26 +223,37 @@ const unsigned int simplemd::MoleculeContainer::vectorIndexToLinear(const tarch:
   return cellLinearIndex;
 }
 
-bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
+tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalCellIndexVector(const unsigned int cellIndex) const {
   unsigned int help = cellIndex;
+  tarch::la::Vector<MD_DIM, unsigned int> localCellIndexVector(0);
+
   for (int d = MD_DIM - 1; d > -1; d--) {
     unsigned int div = 1;
     for (int e = 0; e < d; e++) {
       div = div * _numCells[e];
     }
-    const unsigned int coord = help / div;
+    localCellIndexVector[d] = help / div;
+
+    help = help % div;
+  }
+  return localCellIndexVector;
+}
+
+bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
+  auto cellLocalVectorIndex = getLocalCellIndexVector(cellIndex);
+  for (int d = 0; d < MD_DIM; d++) {
     // if the coordinate is at the beginning or end within the ghost cell layer, return true; otherwise:
     // consider next coordinate
+    auto coord = cellLocalVectorIndex[d];
     if ((coord < _ghostCellLayerThickness[d]) || (coord >= _numCells[d] - _ghostCellLayerThickness[d])) {
       return true;
     }
-    help = help % div;
   }
   // return false if no ghost cell coordinate could be detected
   return false;
 }
 
-const size_t simplemd::MoleculeContainer::getNumberMolecules() const {
+const size_t simplemd::MoleculeContainer::getLocalNumberOfMoleculesWithGhost() const {
   Kokkos::fence(); // Ensure molecule count per cell is up to date
   size_t moleculeCount = 0;
   for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {
@@ -237,7 +263,7 @@ const size_t simplemd::MoleculeContainer::getNumberMolecules() const {
 }
 
 const tarch::la::Vector<MD_DIM, unsigned int>& simplemd::MoleculeContainer::getLocalIndexOfFirstCell() const { return _ghostCellLayerThickness; }
-const tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalNumberOfCells() const { return _numCells - 2u * _ghostCellLayerThickness; }
+const tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalNumberOfCells() const { return _numLocalCellsNoGhost; }
 
 #if (MD_ERROR == MD_YES)
 inline void simplemd::MoleculeContainer::checkOperationWouldExceedCapacity(int sizePostOp) const {

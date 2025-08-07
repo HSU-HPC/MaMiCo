@@ -16,7 +16,7 @@ contains callback-classes which are used to execute linked-cell wise operations 
   handleCell(cell,index) -> called on a single linked cell
 and--in case of pairwise molecule evaluations--
   handleCellPair(cell1,cell2,index1,index2) -> called once for each neighbouring cell pair cell1,cell2.
-Together with the traversal mechanism of the LinkedCellService (see services/ below), this allows to separate cellwise functionality from the storage and memory management.
+Together with the traversal mechanism of the MoleculeContainer from MoleculeService (see services/ below), this allows to separate cellwise functionality from the storage and memory management.
 
 configurations/
 contains different classes to read xml-based configuration files. General structure of configuration classes can be deduced from tarch/configuration/Configuration.h.
@@ -29,5 +29,5 @@ contains callback-classes to execute a particular functionality per molecule. Ea
 Together with the traversal mechanism provided by the MoleculeService (see services/ below), this allows to separate moleculewise functionality from storage and memory management.
 
 services/
-contains classes to provide singleton-like functionality. The MoleculeService provides access to the molecule memory management (e.g., adding/deleting molecules from the simulation), the LinkedCellService provides access to the linked-cell structure. Both services further provide traversal schemes to access the linked cells/molecules.
+contains classes to provide singleton-like functionality. The MoleculeService provides access to the molecule memory management (e.g., adding/deleting molecules from the simulation). This service further provides traversal schemes to access the linked cells/molecules.
 Besides, the molecular properties and the distributed parallel enhancements (domain decomposition and molecule exchange across domain boundaries) are implemented here (MolecularPropertiesService and ParallelTopologyService).
