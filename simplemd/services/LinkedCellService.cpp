@@ -147,25 +147,6 @@ void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecul
   }
 }
 
-bool simplemd::services::LinkedCellService::isGhostCell(const unsigned int& cellIndex) const {
-  unsigned int help = cellIndex;
-  for (int d = MD_DIM - 1; d > -1; d--) {
-    unsigned int div = 1;
-    for (int e = 0; e < d; e++) {
-      div = div * _totalNumberOfCells[e];
-    }
-    const unsigned int coord = help / div;
-    // if the coordinate is at the beginning or end, return true; otherwise:
-    // consider next coordinate
-    if ((coord == 0) || (coord == _totalNumberOfCells[d] - 1)) {
-      return true;
-    }
-    help = help % div;
-  }
-  // return false if no ghost cell coordinate could be detected
-  return false;
-}
-
 tarch::la::Vector<MD_DIM, unsigned int> simplemd::services::LinkedCellService::getLocalCellIndexVector(const unsigned int cellIndex) const {
   unsigned int help = cellIndex;
   tarch::la::Vector<MD_DIM, unsigned int> localCellIndexVector(0);

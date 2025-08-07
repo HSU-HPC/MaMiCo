@@ -197,6 +197,25 @@ const unsigned int simplemd::MoleculeContainer::vectorIndexToLinear(const tarch:
   return cellLinearIndex;
 }
 
+bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
+  unsigned int help = cellIndex;
+  for (int d = MD_DIM - 1; d > -1; d--) {
+    unsigned int div = 1;
+    for (int e = 0; e < d; e++) {
+      div = div * _numCells[e];
+    }
+    const unsigned int coord = help / div;
+    // if the coordinate is at the beginning or end, return true; otherwise:
+    // consider next coordinate
+    if ((coord == 0) || (coord == _numCells[d] - 1)) {
+      return true;
+    }
+    help = help % div;
+  }
+  // return false if no ghost cell coordinate could be detected
+  return false;
+}
+
 const size_t simplemd::MoleculeContainer::getNumberMolecules() const {
   Kokkos::fence(); // Ensure molecule count per cell is up to date
   size_t moleculeCount = 0;
@@ -217,7 +236,7 @@ bool simplemd::MoleculeContainer::tarchDebugIsOn() const {
 #if (MD_ERROR == MD_YES)
 inline void simplemd::MoleculeContainer::checkOperationWouldExceedCapacity(int sizePostOp) const {
   if (sizePostOp > _cellCapacity) {
-    std::cout << "Cell capacity=" << _cellCapatity << " would be exceeded by an operation! Exiting..." << std::endl;
+    std::cout << "Cell capacity=" << _cellCapacity << " would be exceeded by an operation! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
   }
 }

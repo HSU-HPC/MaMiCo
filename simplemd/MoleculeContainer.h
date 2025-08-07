@@ -168,6 +168,15 @@ private:
    */
   const unsigned int vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const;
 
+  /**
+   * @brief returns true if the local cell index cellIndex describes a linked cell
+   * within the ghost layer
+   *
+   * @param cellIndex The linear cell index
+   * @return bool
+   */
+  bool isGhostCell(const size_t cellIndex) const;
+
   /** number of cells per direction in the local domain */
   tarch::la::Vector<MD_DIM, unsigned int> _numCells;
 

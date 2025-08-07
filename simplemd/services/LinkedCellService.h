@@ -100,10 +100,6 @@ public:
   /** returns the local domain size (for the domain of this process) */
   const tarch::la::Vector<MD_DIM, double>& getLocalDomainSize() const;
 
-  /** returns true if the local cell index cellIndex describes a linked cell
-   * within the ghost layer */
-  bool isGhostCell(const unsigned int& cellIndex) const;
-
   /** returns the local cell index vector for the local cell index cellIndex */
   tarch::la::Vector<MD_DIM, unsigned int> getLocalCellIndexVector(const unsigned int cellIndex) const;
 
