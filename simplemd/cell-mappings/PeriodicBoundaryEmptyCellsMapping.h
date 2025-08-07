@@ -22,8 +22,7 @@ class PeriodicBoundaryEmptyCellsMapping;
  */
 class simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping {
 public:
-  PeriodicBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                    simplemd::services::LinkedCellService& linkedCellService);
+  PeriodicBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::MoleculeContainer& moleculeContainer);
   ~PeriodicBoundaryEmptyCellsMapping() {}
 
   /** sets the global domain size (hopefully received from the ParallelTopologyService...) */
@@ -42,7 +41,8 @@ public:
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  simplemd::services::LinkedCellService& _linkedCellService;
+  simplemd::services::LinkedCellService& _linkedCellService = *((simplemd::services::LinkedCellService*)NULL); // TODO FIXME remove
+  simplemd::MoleculeContainer& _moleculeContainer;
   /** domain size and offset */
   tarch::la::Vector<MD_DIM, double> _domainSize;
   tarch::la::Vector<MD_DIM, unsigned int> _processCoordinates;

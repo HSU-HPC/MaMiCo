@@ -44,7 +44,7 @@ void simplemd::BoundaryTreatment::emptyGhostBoundaryCells() {
   startOuter[0] = 0;
   numberCellsOuter[0] = 1;
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
-  startOuter[0] = _linkedCellService.getLocalNumberOfCells()[0] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[0] - 1;
+  startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
 #endif
 
@@ -52,61 +52,61 @@ void simplemd::BoundaryTreatment::emptyGhostBoundaryCells() {
   // lower edge
   startOuter[0] = 0;
   startOuter[1] = 0;
-  numberCellsOuter[0] = _linkedCellService.getLocalNumberOfCells()[0] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[0];
+  numberCellsOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0];
   numberCellsOuter[1] = 1;
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // upper edge
   startOuter[0] = 0;
-  startOuter[1] = _linkedCellService.getLocalNumberOfCells()[1] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[1] - 1;
+  startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // left edge
   startOuter[0] = 0;
   startOuter[1] = 1;
   numberCellsOuter[0] = 1;
-  numberCellsOuter[1] = _linkedCellService.getLocalNumberOfCells()[1];
+  numberCellsOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1];
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // right edge
-  startOuter[0] = _linkedCellService.getLocalNumberOfCells()[0] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[0] - 1;
+  startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
   startOuter[1] = 1;
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
 #endif
 
 #if (MD_DIM == 3)
   // lower face
-  numberCellsOuter[0] = _linkedCellService.getLocalNumberOfCells()[0] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[0];
-  numberCellsOuter[1] = _linkedCellService.getLocalNumberOfCells()[1] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[1];
+  numberCellsOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0];
+  numberCellsOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1];
   numberCellsOuter[2] = 1;
   startOuter = tarch::la::Vector<MD_DIM, unsigned int>(0);
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // top face
   startOuter[0] = 0;
   startOuter[1] = 0;
-  startOuter[2] = _linkedCellService.getLocalNumberOfCells()[2] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[2] - 1;
+  startOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[2] - 1;
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // left face
   numberCellsOuter[0] = 1;
-  numberCellsOuter[1] = _linkedCellService.getLocalNumberOfCells()[1] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[1];
-  numberCellsOuter[2] = _linkedCellService.getLocalNumberOfCells()[2];
+  numberCellsOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1];
+  numberCellsOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2];
   startOuter[0] = 0;
   startOuter[1] = 0;
   startOuter[2] = 1;
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // right face
-  startOuter[0] = _linkedCellService.getLocalNumberOfCells()[0] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[0] - 1;
+  startOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[0] - 1;
   startOuter[1] = 0;
   startOuter[2] = 1;
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // front face
-  numberCellsOuter[0] = _linkedCellService.getLocalNumberOfCells()[0];
+  numberCellsOuter[0] = _moleculeContainer.getLocalNumberOfCells()[0];
   numberCellsOuter[1] = 1;
-  numberCellsOuter[2] = _linkedCellService.getLocalNumberOfCells()[2];
+  numberCellsOuter[2] = _moleculeContainer.getLocalNumberOfCells()[2];
   startOuter[0] = 1;
   startOuter[1] = 0;
   startOuter[2] = 1;
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
   // back face
   startOuter[0] = 1;
-  startOuter[1] = _linkedCellService.getLocalNumberOfCells()[1] + 2 * _linkedCellService.getLocalIndexOfFirstCell()[1] - 1;
+  startOuter[1] = _moleculeContainer.getLocalNumberOfCells()[1] + 2 * _moleculeContainer.getLocalIndexOfFirstCell()[1] - 1;
   startOuter[2] = 1;
   _linkedCellService.iterateCells(_deleteMoleculesMapping, startOuter, numberCellsOuter);
 #endif
@@ -144,7 +144,7 @@ void simplemd::BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCe
     const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary, simplemd::services::ParallelTopologyService& parallelTopologyService,
     simplemd::cellmappings::LennardJonesForceMapping& lennardJonesForce) {
   // prevent execution in case domain is too small
-  const tarch::la::Vector<MD_DIM, unsigned int> localNumberOfCells(_linkedCellService.getLocalNumberOfCells());
+  const tarch::la::Vector<MD_DIM, unsigned int> localNumberOfCells(_moleculeContainer.getLocalNumberOfCells());
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (localNumberOfCells[d] < 3) {
       std::cout << "Fatal Error: BoundaryTreatment::putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations: " << std::endl;

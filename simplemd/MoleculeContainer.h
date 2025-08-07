@@ -142,6 +142,20 @@ public:
    */
   const size_t getNumberMolecules() const;
 
+  /**
+   * @brief returns the index of the first (non-ghost) cell along each dimension
+   *
+   * @return tarch::la::Vector
+   */
+  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalIndexOfFirstCell() const;
+
+  /**
+   * @brief returns the number of (non-ghost) cells along each dimension
+   *
+   * @return tarch::la::Vector
+   */
+  const tarch::la::Vector<MD_DIM, unsigned int> getLocalNumberOfCells() const;
+
   /** can be used to apply a molecule-mapping which is iterated over all molecules of this process
    *  uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
@@ -185,7 +199,7 @@ private:
 
   /** number of cells per direction in the local domain */
   tarch::la::Vector<MD_DIM, unsigned int> _numCells;
-  /** The number of ghost cells around the local domain along each axis */
+  /** The number of ghost cells around the local domain along each axis on each side*/
   const tarch::la::Vector<MD_DIM, unsigned int> _ghostCellLayerThickness;
 
   /** maximum number of particles a cell (a row of the view) can contain

@@ -85,11 +85,13 @@ public:
   void iterateCellPairs(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
                         const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) const;
 
+  // TODO REMOVE BELOW
   /** returns the index of the first (non-ghost) cell */
-  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalIndexOfFirstCell() const;
+  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalIndexOfFirstCell() const { return *((tarch::la::Vector<MD_DIM, unsigned int>*)NULL); };
 
   /** returns the number of (non-ghost) cells */
-  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalNumberOfCells() const;
+  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalNumberOfCells() const { return *((tarch::la::Vector<MD_DIM, unsigned int>*)NULL); };
+  // TODO REMOVE ABOVE
 
   /** returns the mesh width */
   const tarch::la::Vector<MD_DIM, double>& getMeshWidth() const;

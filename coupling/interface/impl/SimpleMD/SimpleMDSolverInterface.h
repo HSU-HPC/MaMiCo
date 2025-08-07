@@ -28,7 +28,7 @@ class SimpleMDSolverInterface : public MDSolverInterface<simplemd::LinkedCell, M
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
   simplemd::services::MoleculeService& _moleculeService;
-  simplemd::services::LinkedCellService& _linkedCellService;
+  simplemd::services::LinkedCellService& _linkedCellService = *((simplemd::services::LinkedCellService*)NULL); // FIXME TODO REMOVE
   const simplemd::services::MolecularPropertiesService& _molecularPropertiesService;
   /** used for the synchronization of molecules in boundary regions and between different processes when
    *  mass was inserted/ deleted by the coupling.
@@ -49,12 +49,12 @@ private:
   computeNumberOfLinkedCellsPerCouplingCells(const tarch::la::Vector<MD_DIM, unsigned int>& localNumberOfCouplingCells) const {
     tarch::la::Vector<MD_DIM, unsigned int> numberOfLinkedCells(0);
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      numberOfLinkedCells[d] = _linkedCellService.getLocalNumberOfCells()[d] / localNumberOfCouplingCells[d];
+      numberOfLinkedCells[d] = _moleculeService.getContainer().getLocalNumberOfCells()[d] / localNumberOfCouplingCells[d];
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-      if (numberOfLinkedCells[d] * localNumberOfCouplingCells[d] != _linkedCellService.getLocalNumberOfCells()[d]) {
+      if (numberOfLinkedCells[d] * localNumberOfCouplingCells[d] != _moleculeService.getContainer().getLocalNumberOfCells()[d]) {
         std::cout << "ERROR coupling::interface::SimpleMDSolverInterface: Number of linked cells is not a multiple of the coupling cells!" << std::endl;
         std::cout << "Number linked cells: " << numberOfLinkedCells << ", coupling cells: " << localNumberOfCouplingCells << std::endl;
-        std::cout << "Local number of linked cells: " << _linkedCellService.getLocalNumberOfCells() << std::endl;
+        std::cout << "Local number of linked cells: " << _moleculeService.getContainer().getLocalNumberOfCells() << std::endl;
         exit(EXIT_FAILURE);
       }
 #endif
@@ -101,11 +101,10 @@ private:
 
 public:
   SimpleMDSolverInterface(simplemd::BoundaryTreatment& boundaryTreatment, simplemd::services::ParallelTopologyService& parallelTopologyService,
-                          simplemd::services::MoleculeService moleculeService, simplemd::services::LinkedCellService& linkedCellService,
-                          const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
+                          simplemd::services::MoleculeService moleculeService, const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
                           const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& localBoundaryInformation, const double& dt)
-      : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService),
-        _molecularPropertiesService(molecularPropertiesService), _boundaryTreatment(boundaryTreatment), _localBoundaryInformation(localBoundaryInformation),
+      : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _molecularPropertiesService(molecularPropertiesService),
+        _boundaryTreatment(boundaryTreatment), _localBoundaryInformation(localBoundaryInformation),
         _sigma6(molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
                 molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma() *
                 molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma()),
@@ -121,7 +120,7 @@ public:
                                       const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerCouplingCell) {
     // no linked cells found in outer region!
 
-    tarch::la::Vector<MD_DIM, unsigned int> index(_linkedCellService.getLocalIndexOfFirstCell());
+    tarch::la::Vector<MD_DIM, unsigned int> index(_moleculeService.getContainer().getLocalIndexOfFirstCell());
     for (unsigned int d = 0; d < MD_DIM; d++) {
       index[d] = index[d] + couplingCellIndex.get()[d] * linkedCellsPerCouplingCell[d] + linkedCellInCouplingCell[d];
     }
@@ -180,7 +179,7 @@ public:
     tarch::la::Vector<MD_DIM, double> domainOffset = _parallelTopologyService.getGlobalDomainOffset();
     tarch::la::Vector<MD_DIM, double> meshWidth = _parallelTopologyService.getMeshWidth();
     tarch::la::Vector<MD_DIM, unsigned int> globalIndexOfFirstCell = _parallelTopologyService.getGlobalIndexOfFirstCell();
-    tarch::la::Vector<MD_DIM, unsigned int> localIndexOfFirstCell = _linkedCellService.getLocalIndexOfFirstCell();
+    tarch::la::Vector<MD_DIM, unsigned int> localIndexOfFirstCell = _moleculeService.getContainer().getLocalIndexOfFirstCell();
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     const tarch::la::Vector<MD_DIM, double> domainSize = _parallelTopologyService.getGlobalDomainSize();
@@ -233,7 +232,7 @@ public:
       firstLinkedCell[d] = (indexOfFirstCouplingCell[d] - 1) * linkedCellsPerCouplingCell[d];
       // we need to loop over one more layer of linked cells since firstLinkedCell(d) already starts one linked cell earlier
       // (e.g. already in linked cell ghost layer)
-      rangeLinkedCellsExtended[d] = rangeCouplingCells[d] * linkedCellsPerCouplingCell[d] + _linkedCellService.getLocalIndexOfFirstCell()[d];
+      rangeLinkedCellsExtended[d] = rangeCouplingCells[d] * linkedCellsPerCouplingCell[d] + _moleculeService.getContainer().getLocalIndexOfFirstCell()[d];
     }
 
     // reset potential energy first for the molecules in all relevant linked cells
@@ -248,7 +247,7 @@ public:
     const tarch::la::Vector<MD_DIM, unsigned int> linkedCellIndex = getLinkedCellIndexForMoleculePosition(position);
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      if ((linkedCellIndex[d] < 1) || (linkedCellIndex[d] > _linkedCellService.getLocalNumberOfCells()[d])) {
+      if ((linkedCellIndex[d] < 1) || (linkedCellIndex[d] > _moleculeService.getContainer().getLocalNumberOfCells()[d])) {
         std::cout << "ERROR coupling::interface/impl/SimpleMD/SimpleMDSolverInterface::calculateForceAndEnergy(): linkedCellIndex out of range!" << std::endl;
         std::cout << "LinkedCellIndex=" << linkedCellIndex << std::endl;
         exit(EXIT_FAILURE);

@@ -25,10 +25,6 @@ simplemd::services::LinkedCellService::LinkedCellService(const tarch::la::Vector
   // NOTE: Here we also used to sort molecules into the correct linked cells using a mapping (this is no longer needed due to a change in architecture)
 }
 
-const tarch::la::Vector<MD_DIM, unsigned int>& simplemd::services::LinkedCellService::getLocalIndexOfFirstCell() const { return _indexOffset; }
-
-const tarch::la::Vector<MD_DIM, unsigned int>& simplemd::services::LinkedCellService::getLocalNumberOfCells() const { return _numberOfCells; }
-
 void simplemd::services::LinkedCellService::initCellStructure() {
   unsigned int numberCells = 1;
   if (_cells != NULL) {

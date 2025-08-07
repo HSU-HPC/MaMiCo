@@ -5,8 +5,8 @@
 #include "simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.h"
 
 simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::PeriodicBoundaryEmptyCellsMapping(
-    simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::LinkedCellService& linkedCellService)
-    : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService), _domainSize(0.0), _processCoordinates(0), _numberProcesses(0) {}
+    simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::MoleculeContainer& moleculeContainer)
+    : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer), _domainSize(0.0), _processCoordinates(0), _numberProcesses(0) {}
 
 void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::setDomainSize(const tarch::la::Vector<MD_DIM, double>& domainSize) { _domainSize = domainSize; }
 
@@ -19,7 +19,7 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::setNumberOfProce
 }
 
 void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-  const tarch::la::Vector<MD_DIM, unsigned int> size(_linkedCellService.getLocalNumberOfCells() + 2u * _linkedCellService.getLocalIndexOfFirstCell());
+  const tarch::la::Vector<MD_DIM, unsigned int> size(_moleculeContainer.getLocalNumberOfCells() + 2u * _moleculeContainer.getLocalIndexOfFirstCell());
   tarch::la::Vector<MD_DIM, unsigned int> outerCellCoords(0);
   tarch::la::Vector<MD_DIM, unsigned int> coords(0);
   simplemd::LinkedCell* innerCell = NULL;
@@ -58,7 +58,7 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
   }
 
   // if the molecules need to be sent, they are sent and deleted from the local molecule service
-  if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService)) {
+  if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _moleculeContainer)) {
     cell.clear();
     // if the molecules need to be placed somewhere on this process, do so...
   } else {

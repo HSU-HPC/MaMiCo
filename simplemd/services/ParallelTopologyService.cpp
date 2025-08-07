@@ -148,13 +148,13 @@ bool simplemd::services::ParallelTopologyService::isIdle() const {
 
 std::vector<tarch::la::Vector<MD_DIM, unsigned int>>
 simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
-                                                                         const simplemd::services::LinkedCellService& linkedCellService) {
+                                                                         const simplemd::MoleculeContainer& moleculeContainer) {
 
   std::vector<tarch::la::Vector<MD_DIM, unsigned int>> localIndex;
 
   // determine cell index in vector form
   tarch::la::Vector<MD_DIM, int> cellCoords(0);
-  tarch::la::Vector<MD_DIM, unsigned int> size(linkedCellService.getLocalNumberOfCells() + 2u * linkedCellService.getLocalIndexOfFirstCell());
+  tarch::la::Vector<MD_DIM, unsigned int> size(moleculeContainer.getLocalNumberOfCells() + 2u * moleculeContainer.getLocalIndexOfFirstCell());
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, tarch::la::Vector<MD_DIM, int>> neighbours(0);
   int help = (int)cellIndex;
 
@@ -357,20 +357,20 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
 }
 
 bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
-                                                                           const simplemd::services::LinkedCellService& linkedCellService) {
+                                                                           const simplemd::MoleculeContainer& moleculeContainer) {
 #if (MD_PARALLEL == MD_YES)
   // determine neighbour rank (from position of the respective ghost cell cellIndex)
   int cellCoords = 0;
   unsigned int help = cellIndex;
   int neighbourRank = 0;
 #if (MD_DIM > 2)
-  cellCoords = help / ((linkedCellService.getLocalNumberOfCells()[1] + 2 * linkedCellService.getLocalIndexOfFirstCell()[1]) *
-                       (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]));
-  help = help - ((unsigned int)cellCoords) * ((linkedCellService.getLocalNumberOfCells()[1] + 2 * linkedCellService.getLocalIndexOfFirstCell()[1]) *
-                                              (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]));
+  cellCoords = help / ((moleculeContainer.getLocalNumberOfCells()[1] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[1]) *
+                       (moleculeContainer.getLocalNumberOfCells()[0] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[0]));
+  help = help - ((unsigned int)cellCoords) * ((moleculeContainer.getLocalNumberOfCells()[1] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[1]) *
+                                              (moleculeContainer.getLocalNumberOfCells()[0] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[0]));
   if (cellCoords == 0) {
     cellCoords = -1;
-  } else if (cellCoords == (int)(linkedCellService.getLocalNumberOfCells()[2] + 2 * linkedCellService.getLocalIndexOfFirstCell()[2] - 1)) {
+  } else if (cellCoords == (int)(moleculeContainer.getLocalNumberOfCells()[2] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[2] - 1)) {
     cellCoords = 1;
   } else {
     cellCoords = 0;
@@ -383,11 +383,11 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
   neighbourRank += cellCoords * _numberProcesses[0] * _numberProcesses[1];
 #endif
 #if (MD_DIM > 1)
-  cellCoords = help / (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]);
-  help = help - cellCoords * (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]);
+  cellCoords = help / (moleculeContainer.getLocalNumberOfCells()[0] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[0]);
+  help = help - cellCoords * (moleculeContainer.getLocalNumberOfCells()[0] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[0]);
   if (cellCoords == 0) {
     cellCoords = -1;
-  } else if (cellCoords == (int)(linkedCellService.getLocalNumberOfCells()[1] + 2 * linkedCellService.getLocalIndexOfFirstCell()[1] - 1)) {
+  } else if (cellCoords == (int)(moleculeContainer.getLocalNumberOfCells()[1] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[1] - 1)) {
     cellCoords = 1;
   } else {
     cellCoords = 0;
@@ -398,7 +398,7 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
   cellCoords = help;
   if (cellCoords == 0) {
     cellCoords = -1;
-  } else if (cellCoords == (int)(linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0] - 1)) {
+  } else if (cellCoords == (int)(moleculeContainer.getLocalNumberOfCells()[0] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[0] - 1)) {
     cellCoords = 1;
   } else {
     cellCoords = 0;
@@ -1143,7 +1143,7 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalB
     for (unsigned int d = 0; d < MD_DIM; d++) {
       int cell = (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d]));
       cell -= (int)(_processCoordinates[d] * _localNumberOfCells[d]);
-      cell += (int)linkedCellService.getLocalIndexOfFirstCell()[d];
+      cell += (int)moleculeContainer.getLocalIndexOfFirstCell()[d];
 #if (MD_ERROR == MD_YES)
       if (cell < 0) {
         std::cout << "ERROR simplemd::services::ParallelTopologyService::unpackBuffer:";

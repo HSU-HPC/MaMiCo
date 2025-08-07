@@ -6,9 +6,9 @@
 
 void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
   // size of the local domain
-  const tarch::la::Vector<MD_DIM, unsigned int> size(_linkedCellService.getLocalNumberOfCells() + 2u * _linkedCellService.getLocalIndexOfFirstCell());
+  const tarch::la::Vector<MD_DIM, unsigned int> size(_moleculeContainer.getLocalNumberOfCells() + 2u * _moleculeContainer.getLocalIndexOfFirstCell());
   // first: send molecules to neighboring ghost cells, if needed.
-  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> localIndex = _parallelTopologyService.broadcastInnerCellViaBuffer(cell, cellIndex, _linkedCellService);
+  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> localIndex = _parallelTopologyService.broadcastInnerCellViaBuffer(cell, cellIndex, _moleculeContainer);
 
   // now: run over the local periodic boundaries and update those
   const unsigned int localIndexSize = (unsigned int)localIndex.size();

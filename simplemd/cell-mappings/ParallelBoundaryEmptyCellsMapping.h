@@ -21,9 +21,8 @@ class ParallelBoundaryEmptyCellsMapping;
  */
 class simplemd::cellmappings::ParallelBoundaryEmptyCellsMapping {
 public:
-  ParallelBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                    const simplemd::services::LinkedCellService& linkedCellService)
-      : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService) {}
+  ParallelBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::MoleculeContainer& moleculeContainer)
+      : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer) {}
   ~ParallelBoundaryEmptyCellsMapping() {}
 
   void beginCellIteration() {}
@@ -31,7 +30,7 @@ public:
 
   void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
     // send molecules from this cell first...
-    if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService)) {
+    if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _moleculeContainer)) {
       // ... and erase them afterwards
       cell.clear();
     }
@@ -40,6 +39,6 @@ public:
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  const simplemd::services::LinkedCellService& _linkedCellService;
+  const simplemd::MoleculeContainer& _moleculeContainer;
 };
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_PARALLELBOUNDARYEMPTYCELLSMAPPING_H_

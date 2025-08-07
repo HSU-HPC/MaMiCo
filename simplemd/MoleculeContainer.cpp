@@ -232,6 +232,9 @@ const size_t simplemd::MoleculeContainer::getNumberMolecules() const {
   return moleculeCount;
 }
 
+const tarch::la::Vector<MD_DIM, unsigned int>& simplemd::MoleculeContainer::getLocalIndexOfFirstCell() const { return _ghostCellLayerThickness; }
+const tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalNumberOfCells() const { return _numCells - 2u * _ghostCellLayerThickness; }
+
 #if (MD_ERROR == MD_YES)
 inline void simplemd::MoleculeContainer::checkOperationWouldExceedCapacity(int sizePostOp) const {
   if (sizePostOp > _cellCapacity) {
