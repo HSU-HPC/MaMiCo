@@ -168,7 +168,7 @@ simplemd::LinkedCell& simplemd::MoleculeContainer::operator[](tarch::la::Vector<
   return operator[](vectorIndexToLinear(cellIdx));
 }
 
-int simplemd::MoleculeContainer::getNumCells() const { return _linkedCells.size(); }
+int simplemd::MoleculeContainer::getLocalNumberOfCellsScalarWithGhost() const { return _linkedCells.size(); }
 
 unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const {
   for (unsigned int d = 0; d < MD_DIM; d++) {
@@ -249,7 +249,7 @@ bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
   return false;
 }
 
-const size_t simplemd::MoleculeContainer::getNumberMolecules() const {
+const size_t simplemd::MoleculeContainer::getLocalNumberOfMoleculesWithGhost() const {
   Kokkos::fence(); // Ensure molecule count per cell is up to date
   size_t moleculeCount = 0;
   for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {

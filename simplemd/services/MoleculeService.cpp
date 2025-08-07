@@ -253,7 +253,9 @@ void simplemd::services::MoleculeService::shutdown() {
   }
 }
 
-const unsigned int simplemd::services::MoleculeService::getNumberMolecules() const { return _moleculeContainer->getNumberMolecules(); }
+const unsigned int simplemd::services::MoleculeService::getLocalNumberOfMoleculesWithGhost() const {
+  return _moleculeContainer->getLocalNumberOfMoleculesWithGhost();
+}
 
 void simplemd::services::MoleculeService::writeCheckPoint(const simplemd::services::ParallelTopologyService& parallelTopologyService,
                                                           const std::string& filestem, const unsigned int& t) {

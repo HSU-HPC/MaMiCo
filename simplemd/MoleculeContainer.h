@@ -133,14 +133,14 @@ public:
    *
    * @return int
    */
-  int getNumCells() const;
+  int getLocalNumberOfCellsScalarWithGhost() const;
 
   /**
    * @brief Returns the number of molecules in all cells
    *
    * @return const size_t
    */
-  const size_t getNumberMolecules() const;
+  const size_t getLocalNumberOfMoleculesWithGhost() const;
 
   /**
    * @brief returns the index of the first (non-ghost) cell along each dimension

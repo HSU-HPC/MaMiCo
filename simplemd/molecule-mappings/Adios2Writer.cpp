@@ -93,7 +93,7 @@ void simplemd::moleculemappings::Adios2Writer::beginMoleculeIteration() {
   _engine->BeginStep();
   _io->RemoveAllVariables(); // empty buffer
 
-  local = _moleculeContainer.getNumberMolecules();
+  local = _moleculeContainer.getLocalNumberOfMoleculesWithGhost();
   global = local; // valid for sequential execution, overwritten in parallel case
 
 #if (MD_PARALLEL == MD_YES)
