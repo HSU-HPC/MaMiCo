@@ -116,7 +116,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
       _moleculeService = new simplemd::services::MoleculeService(
           localDomainSize, localDomainOffset, moleculesPerDirection, _configuration.getMoleculeConfiguration().getMeanVelocity(),
           _configuration.getDomainConfiguration().getKB(), _configuration.getMoleculeConfiguration().getTemperature(),
-          _configuration.getDomainConfiguration().getCapacityFactor(), *_molecularPropertiesService);
+          _configuration.getDomainConfiguration().getCapacityFactor(), *_molecularPropertiesService, *_parallelTopologyService);
     }
     if (_moleculeService == NULL) {
       std::cout << "ERROR MolecularDynamicsSimulation::initServices(): "
@@ -321,16 +321,16 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     if (_configuration.getDomainConfiguration().initFromCheckpoint()) {
       _moleculeService =
           new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, _configuration.getDomainConfiguration().getCheckpointFilestem(),
-                                                  _configuration.getDomainConfiguration().getBlockSize(), *_parallelTopologyService);
+                                                  _configuration.getDomainConfiguration().getCapacityFactor(), *_parallelTopologyService);
     } else if (_configuration.getDomainConfiguration().initFromSequentialCheckpoint()) {
       _moleculeService =
           new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, _configuration.getDomainConfiguration().getCheckpointFilestem(),
-                                                  _configuration.getDomainConfiguration().getBlockSize());
+                                                  _configuration.getDomainConfiguration().getCapacityFactor(), *_parallelTopologyService);
     } else {
       _moleculeService = new simplemd::services::MoleculeService(
           localDomainSize, localDomainOffset, moleculesPerDirection, _configuration.getMoleculeConfiguration().getMeanVelocity(),
           _configuration.getDomainConfiguration().getKB(), _configuration.getMoleculeConfiguration().getTemperature(),
-          _configuration.getDomainConfiguration().getBlockSize(), *_molecularPropertiesService);
+          _configuration.getDomainConfiguration().getCapacityFactor(), *_molecularPropertiesService, *_parallelTopologyService);
     }
     if (_moleculeService == NULL) {
       std::cout << "ERROR MolecularDynamicsSimulation::initServices(): "

@@ -63,18 +63,8 @@ public:
   MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
                   const std::string& checkPointFileStem, const double capacityFactor, const simplemd::services::ParallelTopologyService& parallelTopologyService);
 
-  /** adds a molecule to the system. The molecule data are copied from the const. reference to a free position within the memory field
-   *  or - in case no memory is available - new memory is allocated and the molecule is put in there. Besides, the list _freeMoleculePositions
-   *  is adapted, accordingly (and _numberMolecules is incremented).
-   *  The function returns a pointer to the new molecule. If something goes wrong, NULL is returned.
-   */
-  Molecule* addMolecule(const Molecule& molecule);
-
   /** returns the number of molecules */
-  const unsigned int& getNumberMolecules() const;
-
-  /** deletes a molecule from the system by adding its position to the _freeMoleculePositions-list. */
-  void deleteMolecule(Molecule& molecule);
+  const unsigned int getNumberMolecules() const;
 
   /** shuts down the service */
   void shutdown();

@@ -8,8 +8,7 @@
 #include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 
 simplemd::services::MoleculeService::~MoleculeService() {
-  delete _moleculeContainer;
-  _moleculeContainer = nullptr;
+  shutdown();
 }
 
 void simplemd::services::MoleculeService::initContainer(ParallelTopologyService parallelTopologyService, size_t moleculeCount, double capacityFactor) {
@@ -204,9 +203,6 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     velocity = velocities[i];
     force = forces[i];
 
-    Molecule* myNewMolecule = NULL;
-    unsigned int blockId = idCounter / _blockSize;
-    unsigned int blockIndex = idCounter % _blockSize;
     tmpMolecule.setPosition(position);
     tmpMolecule.setVelocity(velocity);
     tmpMolecule.setForceOld(force);
@@ -252,61 +248,13 @@ void simplemd::services::MoleculeService::getInitialVelocity(const tarch::la::Ve
 }
 
 void simplemd::services::MoleculeService::shutdown() {
-  for (unsigned int i = 0; i < _molecules.size(); i++) {
-    if (_molecules[i] != NULL) {
-      free(_molecules[i]);
-      _molecules[i] = NULL;
-    }
-  }
-  _molecules.clear();
-  _freeMoleculePositions.clear();
-  _numberMolecules = 0;
-  _blockSize = 0;
-}
-
-simplemd::Molecule* simplemd::services::MoleculeService::addMolecule(const Molecule& molecule) {
-  _numberMolecules++;
-
-  // if there is a free position within the available memory, just put molecule to the last entry
-  // and erase that entry afterwards. Important: set ID of the new molecule to its current position.
-  if (!_freeMoleculePositions.empty()) {
-    // determine block and index within block
-    const unsigned int front = _freeMoleculePositions.front();
-    const unsigned int blockId = front / _blockSize;
-    const unsigned int blockIndex = front % _blockSize;
-    _molecules[blockId][blockIndex] = molecule;
-    _molecules[blockId][blockIndex].setID(front);
-    _freeMoleculePositions.pop_front();
-    return &_molecules[blockId][blockIndex];
-
-    // otherwise: reallocate memory and adapt _numberMolecules and _freeMoleculePositions respectively. Besides,
-    // set ID of the added molecule.
-  } else {
-    _molecules.push_back((Molecule*)NULL);
-    _molecules[_molecules.size() - 1] = (Molecule*)malloc(sizeof(Molecule) * _blockSize);
-    if (_molecules[_molecules.size() - 1] == NULL) {
-      std::cout << "ERROR simplemd::services::MoleculeService::addMolecule(): malloc!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    const unsigned int blockSize = _blockSize;
-    const unsigned int size = (unsigned int)(_molecules.size() - 1);
-    const unsigned int id = size * blockSize;
-    _molecules[size][0] = molecule;
-    _molecules[size][0].setID(id);
-    for (unsigned int i = 1; i < blockSize; i++) {
-      _freeMoleculePositions.push_back(i + id);
-    }
-    return &_molecules[size][0];
+  if (_moleculeContainer != nullptr) {
+    delete _moleculeContainer;
+    _moleculeContainer = nullptr;
   }
 }
 
-const unsigned int& simplemd::services::MoleculeService::getNumberMolecules() const { return _numberMolecules; }
-
-void simplemd::services::MoleculeService::deleteMolecule(Molecule& molecule) {
-  // add free position at the front
-  _freeMoleculePositions.push_front(molecule.getID());
-  _numberMolecules--;
-}
+const unsigned int simplemd::services::MoleculeService::getNumberMolecules() const { return _moleculeContainer->getNumberMolecules(); }
 
 void simplemd::services::MoleculeService::writeCheckPoint(const simplemd::services::ParallelTopologyService& parallelTopologyService,
                                                           const std::string& filestem, const unsigned int& t) {
