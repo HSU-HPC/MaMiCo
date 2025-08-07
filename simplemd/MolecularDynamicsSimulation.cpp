@@ -205,7 +205,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     for (unsigned int d = 0; d < MD_DIM; d++) {
       linkedCellVolume = linkedCellVolume * _linkedCellService->getMeshWidth()[d];
     }
-    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_linkedCellService,
+    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_moleculeContainer,
                                                    linkedCellVolume, _localMDSimulation);
     if (_profilePlotter == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initService(): "
@@ -220,7 +220,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     // compute forces between molecules.
     // After this step, each molecule has received all force contributions from
     // its neighbors.
-    _linkedCellService->iterateCellPairs(*_lennardJonesForce);
+    _moleculeContainer->iterateCellPairs(*_lennardJonesForce);
     _boundaryTreatment->emptyGhostBoundaryCells();
     _moleculeContainer->iterateMolecules(initialPositionAndForceUpdate);
 
@@ -419,7 +419,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     for (unsigned int d = 0; d < MD_DIM; d++) {
       linkedCellVolume = linkedCellVolume * _linkedCellService->getMeshWidth()[d];
     }
-    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_linkedCellService,
+    _profilePlotter = new simplemd::ProfilePlotter(_configuration.getProfilePlotterConfigurations(), *_parallelTopologyService, *_moleculeContainer,
                                                    linkedCellVolume, _localMDSimulation);
     if (_profilePlotter == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initService(): "
@@ -434,7 +434,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     // compute forces between molecules.
     // After this step, each molecule has received all force contributions from
     // its neighbors.
-    _linkedCellService->iterateCellPairs(*_lennardJonesForce);
+    _moleculeContainer->iterateCellPairs(*_lennardJonesForce);
     _boundaryTreatment->emptyGhostBoundaryCells();
     _moleculeContainer->iterateMolecules(initialPositionAndForceUpdate);
     // sort molecules into linked cells
@@ -545,7 +545,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   if (!_configuration.getSimulationConfiguration().useOverlappingCommunicationWithForceComputation()) {
     _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
     // compute forces between molecules.
-    _linkedCellService->iterateCellPairs(*_lennardJonesForce);
+    _moleculeContainer->iterateCellPairs(*_lennardJonesForce);
   } else {
     _boundaryTreatment->putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(_localBoundary, *_parallelTopologyService,
                                                                                                          *_lennardJonesForce);
@@ -587,7 +587,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
         _configuration.getMoleculeConfiguration().getMass(), _configuration.getDomainConfiguration().getKB(),
         _configuration.getMoleculeConfiguration().getTemperature(), _configuration.getMoleculeConfiguration().getSigma(),
         _configuration.getDomainConfiguration().getMeshWidth());
-    _linkedCellService->iterateCells(varyCheckpointMapping);
+    _moleculeContainer->iterateCells(varyCheckpointMapping);
   }
 
   // time integration. After this step, the velocities and the positions of the
@@ -620,7 +620,7 @@ void simplemd::MolecularDynamicsSimulation::evaluateStatistics(const unsigned in
   if (_configuration.getRDFConfiguration().isDefined()) {
     if (t >= _configuration.getRDFConfiguration().getStartAtTimestep()) {
       if ((t - _configuration.getRDFConfiguration().getStartAtTimestep()) % _configuration.getRDFConfiguration().getEvaluateEveryTimestep() == 0) {
-        _linkedCellService->iterateCellPairs(*_rdfMapping);
+        _moleculeContainer->iterateCellPairs(*_rdfMapping);
         if ((t - _configuration.getRDFConfiguration().getStartAtTimestep()) % _configuration.getRDFConfiguration().getWriteEveryTimestep() == 0) {
           _rdfMapping->evaluateRDF(_localMDSimulation);
         }
@@ -631,11 +631,11 @@ void simplemd::MolecularDynamicsSimulation::evaluateStatistics(const unsigned in
   if ((timeInterval != 0) && (t % timeInterval == 0)) {
     // compute average velocity
     simplemd::cellmappings::ComputeMeanVelocityMapping computeMeanVelocityMapping(*_parallelTopologyService, _localMDSimulation);
-    _linkedCellService->iterateCells(computeMeanVelocityMapping);
+    _moleculeContainer->iterateCells(computeMeanVelocityMapping);
     // compute average temperature
     simplemd::cellmappings::ComputeTemperatureMapping computeTemperatureMapping(*_parallelTopologyService, *_molecularPropertiesService,
                                                                                 computeMeanVelocityMapping.getMeanVelocity(), _localMDSimulation);
-    _linkedCellService->iterateCells(computeTemperatureMapping);
+    _moleculeContainer->iterateCells(computeTemperatureMapping);
   }
 
   // trigger profile plotting

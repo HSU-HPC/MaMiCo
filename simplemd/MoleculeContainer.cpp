@@ -3,7 +3,7 @@
 
 simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity)
     : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _ghostCellLayerThickness(parallelTopologyService.getGhostCellLayerThickness()),
-      _cellCapacity(cellCapacity),
+      _numLocalCellsNoGhost(_numCells - 2u * _ghostCellLayerThickness), _cellCapacity(cellCapacity),
 #if (MD_ERROR == MD_YES)
       _domainSize(parallelTopologyService.getGlobalDomainSize()),
 #endif
@@ -204,20 +204,31 @@ const unsigned int simplemd::MoleculeContainer::vectorIndexToLinear(const tarch:
   return cellLinearIndex;
 }
 
-bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
+tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalCellIndexVector(const unsigned int cellIndex) const {
   unsigned int help = cellIndex;
+  tarch::la::Vector<MD_DIM, unsigned int> localCellIndexVector(0);
+
   for (int d = MD_DIM - 1; d > -1; d--) {
     unsigned int div = 1;
     for (int e = 0; e < d; e++) {
       div = div * _numCells[e];
     }
-    const unsigned int coord = help / div;
+    localCellIndexVector[d] = help / div;
+
+    help = help % div;
+  }
+  return localCellIndexVector;
+}
+
+bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
+  auto cellLocalVectorIndex = getLocalCellIndexVector(cellIndex);
+  for (int d = 0; d < MD_DIM; d++) {
     // if the coordinate is at the beginning or end within the ghost cell layer, return true; otherwise:
     // consider next coordinate
+    auto coord = cellLocalVectorIndex[d];
     if ((coord < _ghostCellLayerThickness[d]) || (coord >= _numCells[d] - _ghostCellLayerThickness[d])) {
       return true;
     }
-    help = help % div;
   }
   // return false if no ghost cell coordinate could be detected
   return false;
@@ -233,7 +244,7 @@ const size_t simplemd::MoleculeContainer::getNumberMolecules() const {
 }
 
 const tarch::la::Vector<MD_DIM, unsigned int>& simplemd::MoleculeContainer::getLocalIndexOfFirstCell() const { return _ghostCellLayerThickness; }
-const tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalNumberOfCells() const { return _numCells - 2u * _ghostCellLayerThickness; }
+const tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalNumberOfCells() const { return _numLocalCellsNoGhost; }
 
 #if (MD_ERROR == MD_YES)
 inline void simplemd::MoleculeContainer::checkOperationWouldExceedCapacity(int sizePostOp) const {

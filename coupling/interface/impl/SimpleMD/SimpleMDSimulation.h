@@ -56,7 +56,7 @@ public:
 
     // compute forces. After this step, each molecule has received all force
     // contributions from its neighbors.
-    _linkedCellService->iterateCellPairs(*_lennardJonesForce);
+    _moleculeContainer->iterateCellPairs(*_lennardJonesForce);
 
     // distribute momentum -> some methods require modification of force terms,
     // therefore we call it AFTER the force computation and before everything else

@@ -143,22 +143,6 @@ void simplemd::services::LinkedCellService::deleteMoleculeFromLinkedCell(Molecul
   }
 }
 
-tarch::la::Vector<MD_DIM, unsigned int> simplemd::services::LinkedCellService::getLocalCellIndexVector(const unsigned int cellIndex) const {
-  unsigned int help = cellIndex;
-  tarch::la::Vector<MD_DIM, unsigned int> localCellIndexVector(0);
-
-  for (int d = MD_DIM - 1; d > -1; d--) {
-    unsigned int div = 1;
-    for (int e = 0; e < d; e++) {
-      div = div * _totalNumberOfCells[e];
-    }
-    localCellIndexVector[d] = help / div;
-
-    help = help % div;
-  }
-  return localCellIndexVector;
-}
-
 unsigned int simplemd::services::LinkedCellService::getLocalCellIndex(const tarch::la::Vector<MD_DIM, unsigned int>& cellIndexVector) const {
   unsigned int cellIndex = 0;
 

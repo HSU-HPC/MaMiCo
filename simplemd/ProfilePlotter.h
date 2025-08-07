@@ -8,7 +8,6 @@
 #include "simplemd/MolecularDynamicsUserInput.h"
 #include "simplemd/cell-mappings/ProfilePlotterMapping.h"
 #include "simplemd/configurations/ProfilePlotterConfiguration.h"
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include "tarch/la/Vector.h"
 #include <vector>
@@ -23,7 +22,7 @@ class ProfilePlotter;
 class simplemd::ProfilePlotter {
 public:
   ProfilePlotter(const std::vector<simplemd::configurations::ProfilePlotterConfiguration>& configurations,
-                 const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::LinkedCellService& linkedCellService,
+                 const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::MoleculeContainer& moleculeContainer,
                  const double& linkedCellVolume, const unsigned int& localMDSimulation);
   ~ProfilePlotter();
 
@@ -33,7 +32,7 @@ public:
   void accumulateAndPlotInformation(const unsigned int& t);
 
 private:
-  simplemd::services::LinkedCellService& _linkedCellService;
+  simplemd::MoleculeContainer& _moleculeContainer;
 #if (MD_PARALLEL == MD_YES)
   /** in parallel, the _startCell and _range need to be adjusted to the intersection of the global profile position
    *  with the local domain. If a profile does not intersect the local domain, it is marked as inactive
