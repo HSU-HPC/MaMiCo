@@ -182,6 +182,8 @@ public:
   }
 #endif
 
+  tarch::la::Vector<MD_DIM, unsigned int> getGhostCellLayerThickness() const { return _ghostCellLayerThickness; }
+
 private:
   /** computes all neighbour ranks and stores the results in neighbourRanks.
    * Computes _neighbourRanksUnique, _numUniqueNeighbours and cells per buffer -

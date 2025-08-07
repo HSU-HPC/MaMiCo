@@ -179,6 +179,8 @@ private:
 
   /** number of cells per direction in the local domain */
   tarch::la::Vector<MD_DIM, unsigned int> _numCells;
+  /** The number of ghost cells around the local domain along each axis */
+  const tarch::la::Vector<MD_DIM, unsigned int> _ghostCellLayerThickness;
 
   /** maximum number of particles a cell (a row of the view) can contain
    * if this is exceeded when writing to cell, the simulation behaviour is undefined

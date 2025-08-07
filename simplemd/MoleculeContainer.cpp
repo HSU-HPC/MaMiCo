@@ -2,7 +2,8 @@
 #include "tarch/utils/RandomNumberService.h"
 
 simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity)
-    : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _cellCapacity(cellCapacity),
+    : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _ghostCellLayerThickness(parallelTopologyService.getGhostCellLayerThickness()),
+      _cellCapacity(cellCapacity),
 #if (MD_ERROR == MD_YES)
       _domainSize(parallelTopologyService.getGlobalDomainSize()),
 #endif
@@ -144,7 +145,9 @@ void simplemd::MoleculeContainer::sort() {
 
 simplemd::Molecule& simplemd::MoleculeContainer::getMoleculeAt(int i, int j) const { return _moleculeData(i, j); }
 
-simplemd::LinkedCell simplemd::MoleculeContainer::operator[](unsigned int idx) { return simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx); }
+simplemd::LinkedCell simplemd::MoleculeContainer::operator[](unsigned int idx) {
+  return simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx, isGhostCell(idx));
+}
 
 int simplemd::MoleculeContainer::getNumCells() const { return _linkedCellNumMolecules.size(); }
 
@@ -205,9 +208,9 @@ bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
       div = div * _numCells[e];
     }
     const unsigned int coord = help / div;
-    // if the coordinate is at the beginning or end, return true; otherwise:
+    // if the coordinate is at the beginning or end within the ghost cell layer, return true; otherwise:
     // consider next coordinate
-    if ((coord == 0) || (coord == _numCells[d] - 1)) {
+    if ((coord < _ghostCellLayerThickness[d]) || (coord >= _numCells[d] - _ghostCellLayerThickness[d])) {
       return true;
     }
     help = help % div;

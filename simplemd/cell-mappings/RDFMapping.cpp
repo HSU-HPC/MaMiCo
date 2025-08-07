@@ -78,7 +78,7 @@ void simplemd::cellmappings::RDFMapping::evaluateRDF(const unsigned int& localMD
 
 void simplemd::cellmappings::RDFMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
   // only consider non-ghost cells
-  if (_linkedCellService.isGhostCell(cellIndex)) {
+  if (cell.isGhostCell()) {
     return;
   }
 
@@ -114,7 +114,7 @@ void simplemd::cellmappings::RDFMapping::handleCellPair(LinkedCell& cell1, Linke
       interval = (unsigned int)(dist / _meshsize);
       if (dist < _cutoffRadius) {
         interval = (unsigned int)(dist / _meshsize);
-        _particlesPerInterval[interval] += ((double)(!_linkedCellService.isGhostCell(cellIndex1)) + (double)(!_linkedCellService.isGhostCell(cellIndex2)));
+        _particlesPerInterval[interval] += ((double)(!cell1.isGhostCell()) + (double)(!cell2.isGhostCell()));
       }
     }
   }
