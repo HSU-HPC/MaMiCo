@@ -50,7 +50,8 @@ public:
    */
   MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
                   const tarch::la::Vector<MD_DIM, unsigned int>& moleculesPerDirection, const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB,
-                  const double& temperature, const unsigned int& blockSize, const simplemd::services::MolecularPropertiesService& molecularPropertiesService);
+                  const double& temperature, const double capacityFactor, const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
+                  const simplemd::services::ParallelTopologyService& parallelTopologyService);
 
   /** initialises the MD simulation from a checkpoint-file. For a parallel simulation, this method parses
    *  checkpoint files for each rank, respectively. If multiple MD simulations are executed, make sure that the rank of the current
@@ -102,20 +103,11 @@ public:
   }
 
 private:
-
-  /** pointer to all the molecules */
-  std::vector<simplemd::Molecule*> _molecules;
+  void initContainer(ParallelTopologyService parallelTopologyService, size_t moleculeCount, double capacityFactor);
 
   /** stores the mean velocity for normalisation */
   tarch::la::Vector<MD_DIM, double> _meanVelocity;
 
-  /** number of molecules stored in memory */
-  unsigned int _numberMolecules;
-
-  /** positions within the _molecules array where a molecule can be inserted */
-  std::list<unsigned int> _freeMoleculePositions;
-
-  /** number of molecules that are stored in one memory block */
   unsigned int _blockSize;
 
   simplemd::MoleculeContainer* _moleculeContainer;

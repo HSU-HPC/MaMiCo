@@ -107,7 +107,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     if (_configuration.getDomainConfiguration().initFromCheckpoint()) {
       _moleculeService =
           new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, _configuration.getDomainConfiguration().getCheckpointFilestem(),
-                                                  _configuration.getDomainConfiguration().getBlockSize(), *_parallelTopologyService);
+                                                  _configuration.getDomainConfiguration().getCapacityFactor(), *_parallelTopologyService);
     } else if (_configuration.getDomainConfiguration().initFromSequentialCheckpoint()) {
       _moleculeService =
           new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, _configuration.getDomainConfiguration().getCheckpointFilestem(),
