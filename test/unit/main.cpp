@@ -5,6 +5,7 @@
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TextTestProgressListener.h>
 #include "coupling/CouplingMDDefinitions.h"
+#include <Kokkos_Core.hpp>
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
 #include <mpi.h>
 #endif
@@ -21,6 +22,7 @@ int main( int argc, char **argv)
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Init(&argc, &argv);
 #endif
+    Kokkos::ScopeGuard kokkos(argc, argv);
     std::string testPath = (argc > 1) ? std::string(argv[1]) : "";
 
     // Create the event manager and test controller

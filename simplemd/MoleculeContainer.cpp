@@ -1,5 +1,6 @@
 #include "simplemd/MoleculeContainer.h"
 #include "tarch/utils/RandomNumberService.h"
+#include <iostream>
 
 simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity)
     : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _ghostCellLayerThickness(parallelTopologyService.getGhostCellLayerThickness()),
@@ -11,6 +12,9 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
       _globalIndexOfFirstCell(parallelTopologyService.getGlobalIndexOfFirstCell()), _localIndexOfFirstCell(parallelTopologyService.getLocalIndexOfFirstCell()),
       _moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
       _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)) {
+}
+
+simplemd::MoleculeContainer::~MoleculeContainer() {
 }
 
 void simplemd::MoleculeContainer::insert(int cellIdx, simplemd::Molecule& molecule) {
