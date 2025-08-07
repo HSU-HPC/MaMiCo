@@ -10,8 +10,8 @@ simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplem
 #if BUILD_WITH_ADIOS2
       _Adios2Writer(NULL),
 #endif
-      _lennardJonesForce(NULL), _rdfMapping(NULL), _boundaryTreatment(NULL), _localMDSimulation(0), _profilePlotter(NULL),
-      _parallelTopologyService(NULL), _moleculeService(NULL), _linkedCellService(NULL), _molecularPropertiesService(NULL),
+      _lennardJonesForce(NULL), _rdfMapping(NULL), _boundaryTreatment(NULL), _localMDSimulation(0), _profilePlotter(NULL), _parallelTopologyService(NULL),
+      _moleculeService(NULL), _linkedCellService(NULL), _molecularPropertiesService(NULL),
       // initialise external forces
       _externalForceService(configuration.getExternalForceConfigurations()) {
 }
@@ -105,9 +105,8 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     // either initialise from checkpoint data or via a certain number of
     // molecules per direction
     if (_configuration.getDomainConfiguration().initFromCheckpoint()) {
-      _moleculeService =
-          new simplemd::services::MoleculeService(_configuration.getDomainConfiguration().getCheckpointFilestem(),
-                                                  _configuration.getDomainConfiguration().getCapacityFactor(), *_parallelTopologyService);
+      _moleculeService = new simplemd::services::MoleculeService(_configuration.getDomainConfiguration().getCheckpointFilestem(),
+                                                                 _configuration.getDomainConfiguration().getCapacityFactor(), *_parallelTopologyService);
     } else if (_configuration.getDomainConfiguration().initFromSequentialCheckpoint()) {
       _moleculeService =
           new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, _configuration.getDomainConfiguration().getCheckpointFilestem(),

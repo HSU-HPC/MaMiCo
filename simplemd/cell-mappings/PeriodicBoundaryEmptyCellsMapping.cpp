@@ -4,9 +4,9 @@
 // www5.in.tum.de/mamico
 #include "simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.h"
 
-simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::PeriodicBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::LinkedCellService& linkedCellService)
-    : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService), _domainSize(0.0),
-      _processCoordinates(0), _numberProcesses(0) {}
+simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::PeriodicBoundaryEmptyCellsMapping(
+    simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::LinkedCellService& linkedCellService)
+    : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService), _domainSize(0.0), _processCoordinates(0), _numberProcesses(0) {}
 
 void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::setDomainSize(const tarch::la::Vector<MD_DIM, double>& domainSize) { _domainSize = domainSize; }
 

@@ -61,14 +61,14 @@ public:
                   const simplemd::services::ParallelTopologyService& parallelTopologyService);
   /** initialises a potentially parallel MD simulation from a sequential checkpoint file. */
   MoleculeService(const tarch::la::Vector<MD_DIM, double>& domainSize, const tarch::la::Vector<MD_DIM, double>& domainOffset,
-                  const std::string& checkPointFileStem, const double capacityFactor, const simplemd::services::ParallelTopologyService& parallelTopologyService);
+                  const std::string& checkPointFileStem, const double capacityFactor,
+                  const simplemd::services::ParallelTopologyService& parallelTopologyService);
 
   /** returns the number of molecules */
   const unsigned int getNumberMolecules() const;
 
   /** shuts down the service */
   void shutdown();
-
 
   /** creates initial velocity for molecule from meanVelocity and given temperature and stores the result in initialVelocity */
   void getInitialVelocity(const tarch::la::Vector<MD_DIM, double>& meanVelocity, const double& kB, const double& temperature,
@@ -87,9 +87,7 @@ public:
   /** resets the velocity over the whole molecule system to the mean velocity specified at the beginning */
   void resetMeanVelocity();
 
-  simplemd::MoleculeContainer& getContainer() const {
-    return *_moleculeContainer;
-  }
+  simplemd::MoleculeContainer& getContainer() const { return *_moleculeContainer; }
 
 private:
   void initContainer(ParallelTopologyService parallelTopologyService, size_t moleculeCount, double capacityFactor);
@@ -101,6 +99,5 @@ private:
 
   simplemd::MoleculeContainer* _moleculeContainer;
 };
-
 
 #endif // _MOLECULARDYNAMICS_SERVICES_MOLECULESERVICE_H_

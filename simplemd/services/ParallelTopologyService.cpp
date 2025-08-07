@@ -1096,8 +1096,7 @@ unsigned int simplemd::services::ParallelTopologyService::getCurrentBufferIndexF
   }
 }
 
-void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf,
-                                                               simplemd::MoleculeContainer& moleculeContainer,
+void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf, simplemd::MoleculeContainer& moleculeContainer,
                                                                simplemd::services::LinkedCellService& linkedCellService) {
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);

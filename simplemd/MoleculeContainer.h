@@ -11,12 +11,12 @@
 
 namespace simplemd {
 namespace services {
-  // forward declarations to remove circular dependencies
-  class ParallelTopologyService;
-}
+// forward declarations to remove circular dependencies
+class ParallelTopologyService;
+} // namespace services
 
 class MoleculeContainer;
-}
+} // namespace simplemd
 
 /**
  * @brief Contains molecules, creates linked cells and manages its own memory.
@@ -54,9 +54,7 @@ public:
    * @param cellIdx The vector index of the linked cell to insert the molecule into (ghost included).
    * @param molecule The molecule to be inserted.
    */
-  void insert(tarch::la::Vector<MD_DIM, unsigned int> cellIdx, simplemd::Molecule& molecule) {
-    insert(vectorIndexToLinear(cellIdx), molecule);
-  }
+  void insert(tarch::la::Vector<MD_DIM, unsigned int> cellIdx, simplemd::Molecule& molecule) { insert(vectorIndexToLinear(cellIdx), molecule); }
 
   /**
    * @brief Inserts a molecule into the container.
@@ -131,10 +129,10 @@ public:
 
   /**
    * @brief Returns the number of molecules in all cells
-   * 
+   *
    * @return const size_t
    */
-  const size_t getNumberMolecules () const;
+  const size_t getNumberMolecules() const;
 
   bool tarchDebugIsOn() const;
 
@@ -144,7 +142,6 @@ public:
   template <class A> void iterateMolecules(A& a);
 
 private:
-
   /** applies molecule mapping without any node-level parallelisation
    */
   template <class A> void iterateMoleculesSerial(A& a);
@@ -175,11 +172,13 @@ private:
   tarch::la::Vector<MD_DIM, unsigned int> _numCells;
 
   /** maximum number of particles a cell (a row of the view) can contain
-   * if this is exceeded when writing to cell, the simulation is stopped
+   * if this is exceeded when writing to cell, the simulation behaviour is undefined
    */
   int _cellCapacity;
 
 #if (MD_ERROR == MD_YES)
+  inline void checkOperationWouldExceedCapacity(int sizePostOp) const;
+
   /** domain size */
   const tarch::la::Vector<MD_DIM, double> _domainSize;
 #endif
@@ -208,12 +207,10 @@ template <class A> void simplemd::MoleculeContainer::iterateMolecules(A& a) {
   }
 }
 
-
 template <class A> void simplemd::MoleculeContainer::iterateMoleculesSerial(A& a) {
   a.beginMoleculeIteration();
-  for(unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++)
-  {
-    for(unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
+  for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {
+    for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
 #if (MD_DEBUG == MD_YES)
       std::cout << "Handle molecule " << j << " in cell #" << i << std::endl;
 #endif
@@ -228,12 +225,12 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
   iterateMoleculesSerial(a);
 #else
   a.beginMoleculeIteration();
-  Kokkos::parallel_for(_linkedCellNumMolecules.size(), KOKKOS_LAMBDA(const unsigned int i)
-  {
-    for(unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
-      a.handleMolecule(getMoleculeAt(i, j));
-    }
-  });
+  Kokkos::parallel_for(
+      _linkedCellNumMolecules.size(), KOKKOS_LAMBDA(const unsigned int i) {
+        for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
+          a.handleMolecule(getMoleculeAt(i, j));
+        }
+      });
   a.endMoleculeIteration();
 #endif
 }

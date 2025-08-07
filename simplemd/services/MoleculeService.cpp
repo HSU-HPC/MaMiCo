@@ -7,21 +7,19 @@
 #include "simplemd/services/LinkedCellService.h"
 #include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 
-simplemd::services::MoleculeService::~MoleculeService() {
-  shutdown();
-}
+simplemd::services::MoleculeService::~MoleculeService() { shutdown(); }
 
 void simplemd::services::MoleculeService::initContainer(ParallelTopologyService parallelTopologyService, size_t moleculeCount, double capacityFactor) {
-#if (MD_DEBUG  == MD_YES)
+#if (MD_DEBUG == MD_YES)
   if (_moleculeContainer != nullptr) {
     std::cout << "simplemd::services::MoleculeService::initContainer: _moleculeContainer has already been initialized." << std::endl;
     exit(1);
   }
 #endif
-  auto averageCellMoleculeCount = (double) moleculeCount / parallelTopologyService.getLocalNumberOfCellsLinear();
+  auto averageCellMoleculeCount = (double)moleculeCount / parallelTopologyService.getLocalNumberOfCellsLinear();
   unsigned int cellCapacity = averageCellMoleculeCount * capacityFactor;
   _moleculeContainer = new MoleculeContainer(parallelTopologyService, cellCapacity);
-#if (MD_DEBUG  == MD_YES)
+#if (MD_DEBUG == MD_YES)
   if (_moleculeContainer == nullptr) {
     std::cout << "simplemd::services::MoleculeService::initContainer: _moleculeContainer could not be initialized." << std::endl;
     exit(1);
@@ -135,8 +133,7 @@ simplemd::services::MoleculeService::MoleculeService(const std::string& checkPoi
 
 simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_DIM, double>& localDomainSize,
                                                      const tarch::la::Vector<MD_DIM, double>& localDomainOffset, const std::string& checkPointFileStem,
-                                                     const double capacityFactor,
-                                                     const simplemd::services::ParallelTopologyService& parallelTopologyService) {
+                                                     const double capacityFactor, const simplemd::services::ParallelTopologyService& parallelTopologyService) {
   // buffer for single molecule
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);

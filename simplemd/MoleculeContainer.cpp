@@ -13,6 +13,9 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
 }
 
 void simplemd::MoleculeContainer::insert(int cellIdx, simplemd::Molecule& molecule) {
+#if (MD_ERROR == MD_YES)
+  checkOperationWouldExceedCapacity(_linkedCellNumMolecules(cellIdx) + 1);
+#endif
   _moleculeData(cellIdx, _linkedCellNumMolecules(cellIdx)) = molecule;
   _linkedCellNumMolecules(cellIdx) += 1;
 }
@@ -115,7 +118,10 @@ void simplemd::MoleculeContainer::sort() {
               for (size_t i = 0; i < linkedCellLocal(index); i++) {
                 unsigned int curMolIdx = positionToCellIndex(moleculeDataLocal(index, i).getPosition());
                 if (curMolIdx != index) { // if molecule does not belong to current cell anymore
-                  // write data to target end
+                                          // write data to target end
+#if (MD_ERROR == MD_YES)
+                  checkOperationWouldExceedCapacity(linkedCellLocal(curMolIdx) + 1);
+#endif
                   moleculeDataLocal(curMolIdx, linkedCellLocal(curMolIdx)) = moleculeDataLocal(index, i);
                   // increment target end
                   linkedCellLocal(curMolIdx)++;
@@ -191,7 +197,7 @@ const unsigned int simplemd::MoleculeContainer::vectorIndexToLinear(const tarch:
   return cellLinearIndex;
 }
 
-const size_t simplemd::MoleculeContainer::getNumberMolecules () const {
+const size_t simplemd::MoleculeContainer::getNumberMolecules() const {
   Kokkos::fence(); // Ensure molecule count per cell is up to date
   size_t moleculeCount = 0;
   for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {
@@ -207,3 +213,12 @@ bool simplemd::MoleculeContainer::tarchDebugIsOn() const {
   return false;
 #endif
 }
+
+#if (MD_ERROR == MD_YES)
+inline void simplemd::MoleculeContainer::checkOperationWouldExceedCapacity(int sizePostOp) const {
+  if (sizePostOp > _cellCapacity) {
+    std::cout << "Cell capacity=" << _cellCapatity << " would be exceeded by an operation! Exiting..." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+#endif

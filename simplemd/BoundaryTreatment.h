@@ -30,8 +30,8 @@ class simplemd::BoundaryTreatment {
 public:
   BoundaryTreatment(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::MoleculeContainer& moleculeContainer,
                     simplemd::services::LinkedCellService& linkedCellService)
-      : _moleculeContainer(moleculeContainer), _linkedCellService(linkedCellService),
-        _periodicBoundaryMapping(parallelTopologyService, linkedCellService), _deleteMoleculesMapping(),
+      : _moleculeContainer(moleculeContainer), _linkedCellService(linkedCellService), _periodicBoundaryMapping(parallelTopologyService, linkedCellService),
+        _deleteMoleculesMapping(),
 #if (MD_PARALLEL == MD_YES)
         _parallelBoundaryMapping(parallelTopologyService, linkedCellService),
 #endif
