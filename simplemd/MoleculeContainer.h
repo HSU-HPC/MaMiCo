@@ -210,7 +210,6 @@ public:
   template <class A>
   void iterateCellPairs(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
-private:
   /**
    * @brief applies molecule mapping without any node-level parallelisation
    */
@@ -277,6 +276,7 @@ private:
   void iterateCellPairsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
                               const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
+private:
   /**
    * @brief Converts a global 3D spatial coordinate to a local 1D linked cell index.
    *
