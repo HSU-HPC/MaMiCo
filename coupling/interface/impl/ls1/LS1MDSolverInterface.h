@@ -14,6 +14,7 @@
 #include "ls1/src/parallel/DomainDecompBase.h"
 
 #include <cmath>
+#include <vector>
 
 namespace coupling {
 namespace interface {
@@ -28,6 +29,15 @@ public:
     _fullDomainWrapper.setupIDcounterForParticleAddition();
     for (int i = 0; i < 3; i++)
       _linkedCellSize[i] = couplingCellSize[i] / linkedCellsPerCouplingCell[i];
+  }
+  ~LS1MDSolverInterface() {
+    for (auto cell: _linkedCellPointers) {
+      if (cell != nullptr) {
+        delete cell;
+        cell = nullptr;
+      }
+    }
+    _linkedCellPointers.clear();
   }
   /** returns a particular linked cell inside a coupling cell.
    *  The coupling cells are currently located on the same process as the respective linked cells.
@@ -63,6 +73,8 @@ public:
 
     ls1::LS1RegionWrapper* cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint, global_simulation); // temporary till ls1 offset is natively supported
     // when offset is supported, the offset min will need to be added to both regions
+    // store pointer to delete later
+    _linkedCellPointers.push_back(cell);
     return *cell;
   }
 
@@ -207,5 +219,7 @@ public:
 private:
   ls1::LS1RegionWrapper _fullDomainWrapper;
   tarch::la::Vector<3, double> _linkedCellSize;
+  // take ownership of created cell pointers to delete later
+  std::vector<ls1::LS1RegionWrapper*> _linkedCellPointers;
 };
 #endif
