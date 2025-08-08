@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+#include <Kokkos_Core.hpp>
 
 namespace simplemd {
 namespace services {
@@ -26,7 +27,7 @@ public:
   /** initialises the properties */
   ExternalForceService(const std::vector<simplemd::configurations::ExternalForceConfiguration>& configs);
 
-  void addExternalForce(tarch::la::Vector<MD_DIM, double>& force);
+  KOKKOS_FUNCTION void addExternalForce(tarch::la::Vector<MD_DIM, double>& force);
 
   ~ExternalForceService() {}
 

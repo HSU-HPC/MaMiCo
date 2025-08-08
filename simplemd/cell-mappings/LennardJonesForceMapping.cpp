@@ -20,7 +20,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
 #endif
 }
 
-void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCell& cell) const {
+void simplemd::cellmappings::LennardJonesForceMapping::handleCell(LinkedCell& cell) const {
   // force buffer
   tarch::la::Vector<MD_DIM, double> forceBuffer(0.0);
 
@@ -99,8 +99,14 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
   const double rij2 = tarch::la::dot(rij, rij);
 #if (MD_ERROR == MD_YES)
   if (tarch::la::equals(rij2, 0.0, 1e-4)) {
-    std::cout << "ERROR simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(): Particle positions are identical!" << std::endl;
-    std::cout << "Position: " << position1 << "," << "Position2: " << position2 << std::endl;
+    Kokkos::printf("Position:");
+    for (int d = 0; d < MD_DIM; d++)
+      Kokkos::printf(" %f", position1[d]);
+    Kokkos::printf(",");
+    for (int d = 0; d < MD_DIM; d++)
+      Kokkos::printf(" %f", position2[d]);
+    Kokkos::printf("\n");
+    Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(): Particle positions are identical!");
   }
 #endif
 

@@ -64,7 +64,7 @@ public:
                   const simplemd::services::ParallelTopologyService& parallelTopologyService);
 
   /** returns the number of molecules */
-  const unsigned int getLocalNumberOfMoleculesWithGhost() const;
+  unsigned int getLocalNumberOfMoleculesWithGhost() const;
 
   /** shuts down the service */
   void shutdown();

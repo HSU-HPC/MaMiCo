@@ -30,15 +30,14 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
     m2++;
     while (m2 != itEnd) {
 #if (MD_DEBUG == MD_YES)
-      std::cout << "Compute potential energy " << m1->getID() << " <-> " << m2->getID() << std::endl;
+      Kokkos::printf("Compute potential energy %ld <-> %ld\n", m1->getID(), m2->getID());
 #endif
 
       double& potentialEnergy2 = m2->getPotentialEnergy();
       const double rij2 = tarch::la::dot((m2->getConstPosition() - m1->getConstPosition()), (m2->getConstPosition() - m1->getConstPosition()));
 #if (MD_ERROR == MD_YES)
       if (rij2 == 0.0) {
-        std::cout << "ERROR simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(): Particle positions are identical!" << std::endl;
-        exit(EXIT_FAILURE);
+        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(): Particle positions are identical!");
       }
 #endif
 
@@ -67,15 +66,14 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPair(
 
     for (auto m2 = m2Begin; m2 != m2End; m2++) {
 #if (MD_DEBUG == MD_YES)
-      std::cout << "Compute potential energy " << m1->getID() << " <-> " << m2->getID() << std::endl;
+      Kokkos::printf("Compute potential energy %ld <-> %ld\n", m1->getID(), m2->getID());
 #endif
 
       double& potentialEnergy2 = m2->getPotentialEnergy();
       const double rij2 = tarch::la::dot((m2->getConstPosition() - m1->getConstPosition()), (m2->getConstPosition() - m1->getConstPosition()));
 #if (MD_ERROR == MD_YES)
       if (rij2 == 0.0) {
-        std::cout << "ERROR simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPairs(): Particle positions are identical!" << std::endl;
-        exit(EXIT_FAILURE);
+        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPairs(): Particle positions are identical!");
       }
 #endif
 

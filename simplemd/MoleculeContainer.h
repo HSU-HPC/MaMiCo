@@ -39,7 +39,7 @@ public:
    * @param parallelTopologyService Used to extract and store local number of cells, domain offset etc.
    * @param cellCapacity The maximum capacity of any cell. Cannot be changed, must provide ample room at compiletime.
    */
-  KOKKOS_FUNCTION MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity);
+  MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity);
   
   /**
    * @brief Inserts a molecule into a specific linked cell.
@@ -47,7 +47,7 @@ public:
    * @param cellIdx The one-dimensional index of the linked cell to insert the molecule into (ghost included).
    * @param molecule The molecule to be inserted.
    */
-  KOKKOS_FUNCTION void insert(int cellIdx, simplemd::Molecule& molecule);
+  void insert(int cellIdx, simplemd::Molecule& molecule);
 
   /**
    * @brief Inserts a molecule into a specific linked cell.
@@ -55,7 +55,7 @@ public:
    * @param cellIdx The vector index of the linked cell to insert the molecule into (ghost included).
    * @param molecule The molecule to be inserted.
    */
-  KOKKOS_FUNCTION void insert(tarch::la::Vector<MD_DIM, unsigned int> cellIdx, simplemd::Molecule& molecule) { insert(vectorIndexToLinear(cellIdx), molecule); }
+  void insert(tarch::la::Vector<MD_DIM, unsigned int> cellIdx, simplemd::Molecule& molecule) { insert(vectorIndexToLinear(cellIdx), molecule); }
 
   /**
    * @brief Inserts a molecule into the container.
@@ -64,7 +64,7 @@ public:
    *
    * @param molecule The molecule to be inserted.
    */
-  KOKKOS_FUNCTION void insert(simplemd::Molecule& molecule);
+  void insert(simplemd::Molecule& molecule);
 
   /**
    * @brief Removes a molecule, given its ID and linked cell index.
@@ -75,7 +75,7 @@ public:
    * @param cellIdx 1D linked cell index of the molecule (ghost included).
    * @param moleculeIdx Index of the molecule within the linked cell.
    */
-  KOKKOS_FUNCTION void remove(int cellIdx, int moleculeIdx);
+  void remove(int cellIdx, int moleculeIdx);
 
   /**
    * @brief Clears a linked cell.
@@ -86,14 +86,14 @@ public:
    *
    * @param cellIdx 1D index of the linked cell to clear (ghost included).
    */
-  KOKKOS_FUNCTION void clearLinkedCell(int cellIdx);
+  void clearLinkedCell(int cellIdx);
 
   /**
    * @brief Removes all outgoing molecules from a linked cell and moves them to the appropriate destination.
    *
    * @param cellIdx 1D index of the linked cell to sort (ghost included).
    */
-  KOKKOS_FUNCTION void sort(int cellIdx);
+  void sort(int cellIdx);
 
   /**
    * @brief Puts all molecules into their appropriate linked cells.
@@ -102,7 +102,7 @@ public:
    * traversal of the whole domain (including ghost cells). This ensures that there are no concurrency issues since
    * no two linked cells should try to write to the same linked cell. Concurrency is implemented in quarter shells.
    */
-  KOKKOS_FUNCTION void sort();
+  void sort();
 
   /**
    * @brief Get the Molecule at linked cell index i (ghost included), position j
@@ -111,7 +111,7 @@ public:
    * @param j
    * @return simplemd::Molecule&
    */
-  KOKKOS_FUNCTION simplemd::Molecule& getMoleculeAt(int i, int j) const;
+  simplemd::Molecule& getMoleculeAt(int i, int j) const;
 
   /**
    * @brief Returns the linked cell at 1D index idx (ghost included)
@@ -134,41 +134,41 @@ public:
    *
    * @return int
    */
-  KOKKOS_FUNCTION int getLocalNumberOfCellsScalarWithGhost() const;
+  int getLocalNumberOfCellsScalarWithGhost() const;
 
   /**
    * @brief Returns the number of molecules in all cells
    *
    * @return const size_t
    */
-  KOKKOS_FUNCTION const size_t getLocalNumberOfMoleculesWithGhost() const;
+  size_t getLocalNumberOfMoleculesWithGhost() const;
 
   /**
    * @brief returns the index of the first (non-ghost) cell along each dimension
    *
    * @return tarch::la::Vector
    */
-  KOKKOS_FUNCTION const tarch::la::Vector<MD_DIM, unsigned int>& getLocalIndexOfFirstCell() const;
+  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalIndexOfFirstCell() const;
 
   /**
    * @brief returns the number of (non-ghost) cells along each dimension
    *
    * @return tarch::la::Vector
    */
-  KOKKOS_FUNCTION const tarch::la::Vector<MD_DIM, unsigned int> getLocalNumberOfCells() const;
+  const tarch::la::Vector<MD_DIM, unsigned int> getLocalNumberOfCells() const;
 
   /**
    * @brief returns the local cell index vector for the local cell index cellIndex
    *
    * @return tarch::la::Vector
    */
-  KOKKOS_FUNCTION tarch::la::Vector<MD_DIM, unsigned int> getLocalCellIndexVector(const unsigned int cellIndex) const;
+  tarch::la::Vector<MD_DIM, unsigned int> getLocalCellIndexVector(const unsigned int cellIndex) const;
 
   /**
    * @brief can be used to apply a molecule-mapping which is iterated over all molecules of this process
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
-  KOKKOS_FUNCTION template <class A> void iterateMolecules(A& a);
+  template <class A> void iterateMolecules(A& a);
 
   /**
    * @brief iterates over all cells in the range defined by the lower left front
@@ -179,7 +179,7 @@ public:
    *
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called.
    */
-  KOKKOS_FUNCTION template <class A>
+  template <class A>
   void iterateCells(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
   /**
@@ -188,7 +188,7 @@ public:
    *
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
-  KOKKOS_FUNCTION template <class A> void iterateCells(A& a);
+  template <class A> void iterateCells(A& a);
 
   /**
    * @brief iterates over all cell pairs for the cells in the inner region of each
@@ -196,7 +196,7 @@ public:
    *
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
-  KOKKOS_FUNCTION template <class A> void iterateCellPairs(A& a);
+  template <class A> void iterateCellPairs(A& a);
 
   /**
    * @brief iterates over all cell pairs cell1 and cell2 with cell1 in the range
@@ -207,36 +207,36 @@ public:
    *
    * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
    */
-  KOKKOS_FUNCTION template <class A>
+  template <class A>
   void iterateCellPairs(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
   /**
    * @brief applies molecule mapping without any node-level parallelisation
    */
-  KOKKOS_FUNCTION template <class A> void iterateMoleculesSerial(A& a);
+  template <class A> void iterateMoleculesSerial(A& a);
 
   /**
    * @brief applies molecule mapping while parallelising using Kokkos
    */
-  KOKKOS_FUNCTION template <class A> void iterateMoleculesParallel(A& a);
+  template <class A> void iterateMoleculesParallel(A& a);
 
   /**
    * @brief iterates over cells in parallel using Kokkos
    */
-  KOKKOS_FUNCTION template <class A>
+  template <class A>
   void iterateCellsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
   /**
    * @brief iterates over all cells in the inner part (i.e. does not consider the
    * ghost layer) in parallel using Kokkos
    */
-  KOKKOS_FUNCTION template <class A> void iterateCellsParallel(A& a);
+  template <class A> void iterateCellsParallel(A& a);
 
   /**
    * @brief iterates over all cell pairs for the cells in the inner region of each
    * local process in parallel using Kokkos
    */
-  KOKKOS_FUNCTION template <class A> void iterateCellPairsParallel(A& a);
+  template <class A> void iterateCellPairsParallel(A& a);
 
   /**
    * @brief iterates over all cell pairs cell1 and cell2 with cell1 in the range
@@ -245,25 +245,25 @@ public:
    * cellRange=(1,1,1). Then, we will consider amongst others the pair
    * (0,0,0),(1,1,1)).
    */
-  KOKKOS_FUNCTION template <class A>
+  template <class A>
   void iterateCellPairsParallel(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
                                 const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
   /**
    * @brief iterates over cells without parallelization
    */
-  KOKKOS_FUNCTION template <class A>
+  template <class A>
   void iterateCellsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell, const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
   /**
    * @brief iterates over all cells in the inner part (i.e. does not consider the
    * ghost layer) without parallelisation */
-  KOKKOS_FUNCTION template <class A> void iterateCellsSerial(A& a);
+  template <class A> void iterateCellsSerial(A& a);
 
   /**
    * @brief iterates over all cell pairs for the cells in the inner region of each
    * local process without parallelisation */
-  KOKKOS_FUNCTION template <class A> void iterateCellPairsSerial(A& a);
+  template <class A> void iterateCellPairsSerial(A& a);
 
   /**
    * @brief iterates over all cell pairs cell1 and cell2 with cell1 in the range
@@ -272,7 +272,7 @@ public:
    * cellRange=(1,1,1). Then, we will consider amongst others the pair
    * (0,0,0),(1,1,1)).
    */
-  KOKKOS_FUNCTION template <class A>
+  template <class A>
   void iterateCellPairsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
                               const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
@@ -293,7 +293,7 @@ private:
    * @param vectorIndex 3D local index of the linked cell.
    * @return const unsigned int
    */
-  KOKKOS_FUNCTION const unsigned int vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const;
+  unsigned int vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const;
 
   /**
    * @brief returns true if the local cell index cellIndex describes a linked cell
@@ -365,10 +365,12 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
   iterateMoleculesSerial(a);
 #else
   a.beginMoleculeIteration();
+  MoleculeContainer& container = (*this);
   Kokkos::parallel_for(
-      _linkedCellNumMolecules.size(), KOKKOS_LAMBDA(const unsigned int i) {
-        for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
-          a.handleMolecule(getMoleculeAt(i, j));
+      Kokkos::RangePolicy<MainExecSpace>(0, _linkedCellIsGhostCell.size()),
+      KOKKOS_LAMBDA(const unsigned int i) {
+        for (unsigned int j = 0; j < container._linkedCellNumMolecules(i); j++) {
+          a.handleMolecule(container.getMoleculeAt(i, j));
         }
       });
   Kokkos::fence(); // Ensure results are available on the host
@@ -383,16 +385,12 @@ void simplemd::MoleculeContainer::iterateCellsSerial(A& a, const tarch::la::Vect
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (cellRange[d] == 0) {
-      std::cout << "ERROR simplemd::MoleculeContainer::iterateCells: "
-                   "cellRange("
-                << d << ")==0!" << std::endl;
-      exit(EXIT_FAILURE);
+      Kokkos::printf("cellRange(%d)==0!\n", d);
+      Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells: zero in cell range");
     }
     if (lowerLeftFrontCell[d] + cellRange[d] > 2 * _ghostCellLayerThickness[d] + _numLocalCellsNoGhost[d]) {
-      std::cout << "ERROR simplemd::MoleculeContainer::iterateCells(): "
-                   "defined Range does not fit into local sub-domain!"
-                << std::endl;
-      exit(EXIT_FAILURE);
+     Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells(): "
+                   "defined Range does not fit into local sub-domain!");
     }
   }
 #endif
@@ -546,16 +544,12 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (cellRange[d] == 0) {
-      std::cout << "ERROR simplemd::MoleculeContainer::iterateCells: "
-                   "cellRange("
-                << d << ")==0!" << std::endl;
-      exit(EXIT_FAILURE);
+      Kokkos::printf("cellRange(%d)==0!\n", d);
+      Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells: zero in cell range");
     }
     if (lowerLeftFrontCell[d] + cellRange[d] > 2 * _ghostCellLayerThickness[d] + _numLocalCellsNoGhost[d]) {
-      std::cout << "ERROR simplemd::MoleculeContainer::iterateCells(): "
-                   "defined Range does not fit into local sub-domain!"
-                << std::endl;
-      exit(EXIT_FAILURE);
+      Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells(): "
+                   "defined Range does not fit into local sub-domain!");
     }
   }
 #endif
@@ -580,7 +574,8 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
   // loop over domain, but with a single loop
   MoleculeContainer& container = (*this);
   Kokkos::parallel_for(
-      length, KOKKOS_LAMBDA(const unsigned int i) {
+      Kokkos::RangePolicy<MainExecSpace>(0, length),
+      KOKKOS_LAMBDA(const unsigned int i) {
 // compute index of the current cell
 #if (MD_DIM > 1)
         int helpIndex1 = i;
@@ -613,7 +608,8 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
 #endif
 
         // handle cell
-        a.handleCell(container[index]);
+        auto cell = container[index];
+        a.handleCell(cell);
       });          // Kokkos::parallel_for
   Kokkos::fence(); // Ensure results are available on the host
   // end iteration();
@@ -674,10 +670,8 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (cellRange[d] > 2 * _ghostCellLayerThickness[d] + _numLocalCellsNoGhost[d] - 1) {
-      std::cout << "ERROR simplemd::MoleculeContainer::iterateCellPairs(): "
-                   "defined Range does not fit into local sub-domain!"
-                << std::endl;
-      exit(EXIT_FAILURE);
+      Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCellPairs(): "
+                   "defined Range does not fit into local sub-domain!\n");
     }
   }
 #endif
@@ -726,7 +720,8 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
         // parallelise loop for all cells that are to be traversed in this way
         MoleculeContainer& container = (*this);
         Kokkos::parallel_for(
-            length, KOKKOS_LAMBDA(const unsigned int j) {
+            Kokkos::RangePolicy<MainExecSpace>(0, length),
+            KOKKOS_LAMBDA(const unsigned int j) {
               // compute index of the current cell
               unsigned int index = 0;
 #if (MD_DIM > 1)
@@ -757,15 +752,15 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
         index = lowerLeftFrontCell[0] + 2 * j + x;
 #endif
 #if (MD_DEBUG == MD_YES)
-              std::cout << "Handle cell " << index << std::endl;
+              Kokkos::printf("Handle cell %d\n", index);
 #endif
 
-              simplemd::LinkedCell cell = operator[](index);
+              simplemd::LinkedCell cell = container[index];
               a.handleCell(cell);
               // handle pairs (lower,left,back-oriented cells)
               for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS / 2; i++) {
 #if (MD_DEBUG == MD_YES)
-                std::cout << "iterateCellPairs: Pair index " << index + indexOffset[i] << "," << index + neighbourOffset[i] << std::endl;
+                Kokkos::printf("iterateCellPairs: Pair index %d, %d\n", index + indexOffset[i], index + neighbourOffset[i]);
 #endif
                 coordsCell1Buffer = index + indexOffset[i];
                 coordsCell2Buffer = index + neighbourOffset[i];
