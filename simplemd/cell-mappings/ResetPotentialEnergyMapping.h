@@ -24,7 +24,7 @@ public:
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  KOKKOS_FUNCTION void handleCell(LinkedCell& cell) {
+  KOKKOS_FUNCTION void handleCell(LinkedCell& cell) const {
     for (auto it = cell.begin(); it != cell.end(); it++) {
       it->setPotentialEnergy(_zero);
     }

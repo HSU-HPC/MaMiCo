@@ -27,7 +27,7 @@ public:
   /** initialises the properties */
   ExternalForceService(const std::vector<simplemd::configurations::ExternalForceConfiguration>& configs);
 
-  KOKKOS_FUNCTION void addExternalForce(tarch::la::Vector<MD_DIM, double>& force);
+  void addExternalForce(tarch::la::Vector<MD_DIM, double>& force);
 
   ~ExternalForceService() {}
 

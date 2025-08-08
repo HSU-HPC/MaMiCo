@@ -49,7 +49,7 @@ private:
   /** cutOffRadius*cutOffRadius */
   const double _cutOffRadiusSquared;
   /** external forces*/
-  simplemd::services::ExternalForceService& _externalForceService;
+  tarch::la::Vector<MD_DIM, double> _externalForce;
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_LENNARDJONESFORCEMAPPING_H_

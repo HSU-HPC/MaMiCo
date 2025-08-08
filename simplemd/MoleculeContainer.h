@@ -162,7 +162,7 @@ public:
    *
    * @return tarch::la::Vector
    */
-  tarch::la::Vector<MD_DIM, unsigned int> getLocalCellIndexVector(const unsigned int cellIndex) const;
+  KOKKOS_FUNCTION tarch::la::Vector<MD_DIM, unsigned int> getLocalCellIndexVector(const unsigned int cellIndex) const;
 
   /**
    * @brief can be used to apply a molecule-mapping which is iterated over all molecules of this process
@@ -293,7 +293,7 @@ private:
    * @param vectorIndex 3D local index of the linked cell.
    * @return const unsigned int
    */
-  unsigned int vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const;
+  KOKKOS_FUNCTION unsigned int vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const;
 
   /**
    * @brief returns true if the local cell index cellIndex describes a linked cell

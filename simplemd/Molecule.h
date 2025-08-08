@@ -22,7 +22,7 @@ public:
   KOKKOS_FUNCTION Molecule(const tarch::la::Vector<MD_DIM, double>& position, const tarch::la::Vector<MD_DIM, double>& velocity)
       : _position(position), _velocity(velocity), _force(0.0), _forceOld(0.0), _potentialEnergy(0.0), _id(0), _isFixed(false) {}
   /** empty constructor */
-  Molecule() : _position(0.0), _velocity(0.0), _force(0.0), _forceOld(0.0), _potentialEnergy(0.0), _id(0), _isFixed(false) {}
+  KOKKOS_FUNCTION Molecule() : _position(0.0), _velocity(0.0), _force(0.0), _forceOld(0.0), _potentialEnergy(0.0), _id(0), _isFixed(false) {}
   KOKKOS_FUNCTION ~Molecule() {}
 
   /** fix position of particle. */
@@ -39,7 +39,7 @@ public:
   void setID(const unsigned int& id) { _id = id; }
 
   /** get/ set position */
-  tarch::la::Vector<MD_DIM, double>& getPosition() { return _position; }
+  KOKKOS_FUNCTION tarch::la::Vector<MD_DIM, double>& getPosition() { return _position; }
   KOKKOS_FUNCTION const tarch::la::Vector<MD_DIM, double>& getConstPosition() const { return _position; }
   void setPosition(const tarch::la::Vector<MD_DIM, double>& position) { _position = position; }
 
@@ -60,7 +60,7 @@ public:
 
   KOKKOS_FUNCTION double& getPotentialEnergy() { return _potentialEnergy; }
   KOKKOS_FUNCTION const double& getConstPotentialEnergy() const { return _potentialEnergy; }
-  void setPotentialEnergy(const double& potentialEnergy) { _potentialEnergy = potentialEnergy; }
+  KOKKOS_FUNCTION void setPotentialEnergy(const double& potentialEnergy) { _potentialEnergy = potentialEnergy; }
 
 private:
   tarch::la::Vector<MD_DIM, double> _position;

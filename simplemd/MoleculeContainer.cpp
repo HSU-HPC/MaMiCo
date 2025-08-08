@@ -269,8 +269,8 @@ const tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLo
 #if (MD_ERROR == MD_YES)
 inline void simplemd::MoleculeContainer::checkOperationWouldExceedCapacity(int sizePostOp) const {
   if (sizePostOp > _cellCapacity) {
-    std::cout << "Cell capacity=" << _cellCapacity << " would be exceeded by an operation! Exiting..." << std::endl;
-    exit(EXIT_FAILURE);
+    Kokkos::printf("Cell capacity=%d would be exceeded by an operation! Exiting...", _cellCapacity);
+    Kokkos::abort("simplemd::MoleculeContainer::checkOperationWouldExceedCapacity");
   }
 }
 #endif

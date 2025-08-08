@@ -12,7 +12,9 @@ simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simpl
               molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma()),
       _cutOffRadiusSquared(molecularPropertiesService.getMolecularProperties().getCutOffRadius() *
                            molecularPropertiesService.getMolecularProperties().getCutOffRadius()),
-      _externalForceService(externalForceService) {}
+      _externalForce(0) {
+        externalForceService.addExternalForce(_externalForce);
+      }
 
 void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
 #if (MD_DEBUG == MD_YES)
@@ -32,8 +34,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(LinkedCell& ce
     tarch::la::Vector<MD_DIM, double>& force1 = m1->getForce();
     const tarch::la::Vector<MD_DIM, double>& position1 = m1->getConstPosition();
 
-    // add external force
-    _externalForceService.addExternalForce(force1);
+    force1 += _externalForce;
 
     // iterate over all other molecules not touched so far
     m2++;
