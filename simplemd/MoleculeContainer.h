@@ -29,6 +29,7 @@ class MoleculeContainer;
  */
 class simplemd::MoleculeContainer {
 public:
+
   /**
    * @brief Construct a new MoleculeContainer object
    *
@@ -39,8 +40,7 @@ public:
    * @param cellCapacity The maximum capacity of any cell. Cannot be changed, must provide ample room at compiletime.
    */
   MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity);
-
-  ~MoleculeContainer();
+  
   /**
    * @brief Inserts a molecule into a specific linked cell.
    *

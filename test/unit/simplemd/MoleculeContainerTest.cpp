@@ -26,8 +26,21 @@ class MoleculeContainerTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  void setUp() {}
-  void tearDown() {}
+  void setUp() {
+    const tarch::la::Vector<MD_DIM, double> numCells = {100,60,50};
+    const tarch::la::Vector<MD_DIM, double> domainOffset(0);
+    const tarch::la::Vector<MD_DIM, double> meshWidth(1);
+    const tarch::la::Vector<MD_DIM, unsigned int> numberProcesses(1);
+    simplemd::services::ParallelTopologyService parallelTopologyService(numCells, domainOffset, meshWidth, numberProcesses,
+                                                                          simplemd::BoundaryType::PERIODIC_BOUNDARY);
+    _moleculeContainer = new simplemd::MoleculeContainer(parallelTopologyService, 20);
+  }
+  void tearDown() {
+    if(_moleculeContainer != nullptr) {
+      delete _moleculeContainer;
+      _moleculeContainer = nullptr;
+    }
+  }
   void testInsertRemove() {}
   void testSort() {}
   void testClearCell() {}
@@ -56,7 +69,7 @@ public:
       simplemd::services::ParallelTopologyService parallelTopologyService(numCellsTestInput, domainOffset, meshWidth, numberProcesses,
                                                                           simplemd::BoundaryType::PERIODIC_BOUNDARY);
       simplemd::MoleculeContainer moleculeContainer(parallelTopologyService, 20);
-      CPPUNIT_ASSERT((numTotalCells == moleculeContainer.getLocalNumberOfCellsScalarWithGhost()));
+      CPPUNIT_ASSERT(numTotalCells == moleculeContainer.getLocalNumberOfCellsScalarWithGhost());
       CPPUNIT_ASSERT(numInnerCells == vectorToScalar(moleculeContainer.getLocalNumberOfCells()));
     }
   }
@@ -68,6 +81,7 @@ public:
   void testIterationLinkedCellPairsSerial() {};
   void testIterationLinkedCellPairsParallel() {};
 
+private:
   int vectorToScalar(tarch::la::Vector<MD_DIM, unsigned int> vector) const {
     int toRet = 1;
     for (size_t i = 0; i < MD_DIM; i++) {
@@ -75,6 +89,9 @@ public:
     }
     return toRet;
   }
+
+  //use for persistent tests
+  simplemd::MoleculeContainer* _moleculeContainer;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(MoleculeContainerTest);

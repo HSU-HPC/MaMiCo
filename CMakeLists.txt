@@ -1003,7 +1003,7 @@ if (BUILD_TESTING)
     ${TEST_SOURCES}
   )
   set_target_properties(testmamico PROPERTIES CXX_STANDARD 17)
-  target_compile_definitions(testmamico PRIVATE MDCoupledError)
+  target_compile_definitions(testmamico PRIVATE MDCoupledError MDError)
   target_link_libraries(testmamico PRIVATE mamico)
   target_include_directories(testmamico PRIVATE ${CPPUNIT_INCLUDE_DIRS})
   target_link_directories(testmamico PRIVATE ${CPPUNIT_LIBRARY})

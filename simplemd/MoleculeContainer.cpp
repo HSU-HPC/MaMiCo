@@ -18,8 +18,6 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
   Kokkos::fence(); // Ensure results are available on the host
 }
 
-simplemd::MoleculeContainer::~MoleculeContainer() {}
-
 void simplemd::MoleculeContainer::insert(int cellIdx, simplemd::Molecule& molecule) {
 #if (MD_ERROR == MD_YES)
   checkOperationWouldExceedCapacity(_linkedCellNumMolecules(cellIdx) + 1);
