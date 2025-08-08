@@ -9,6 +9,11 @@ namespace simplemd {
 class LinkedCell;
 }
 
+/**
+ * A linked cell of a SimpleMD simulation for iterating the corresponding molecules.
+ * NOTE: Never hold on to an instance of this class, as they are short lived contextual objects (host vs. device memory).
+ * Always obtain them through simplemd::MoleculeContainer::operator[](int cellIndex).
+ */
 class simplemd::LinkedCell {
 public:
   KOKKOS_FUNCTION LinkedCell() : _moleculeData(nullptr), _linkedCellNumMolecules(nullptr), _cellIndex(0), _isGhostCell(false) {}

@@ -12,11 +12,10 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
       _globalIndexOfFirstCell(parallelTopologyService.getGlobalIndexOfFirstCell()), _localIndexOfFirstCell(parallelTopologyService.getLocalIndexOfFirstCell()),
       _moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
       _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)),
-      _linkedCells("linkedCells", _linkedCellNumMolecules.size()) {
-  for (unsigned int i = 0; i < _linkedCells.size(); i++) {
-    // Initialize ghost cell flags
-    new (&_linkedCells(i)) simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, i, isGhostCell(i));
-  }
+      _linkedCellIsGhostCell("linkedCellIsGhostCell", _linkedCellNumMolecules.size()) {
+
+  Kokkos::parallel_for(_linkedCellIsGhostCell.size(), KOKKOS_LAMBDA(const unsigned int i) { _linkedCellIsGhostCell(i) = isGhostCell(i); });
+  Kokkos::fence(); // Ensure results are available on the host
 }
 
 simplemd::MoleculeContainer::~MoleculeContainer() {}
@@ -141,7 +140,8 @@ void simplemd::MoleculeContainer::sort() {
                   i--;
                 }
               }
-            }); // j, Kokkos::parallel_for
+            });          // j, Kokkos::parallel_for
+        Kokkos::fence(); // Ensure results are available on the host
       } // x
 #if (MD_DIM > 1)
     } // y
@@ -153,25 +153,15 @@ void simplemd::MoleculeContainer::sort() {
 
 simplemd::Molecule& simplemd::MoleculeContainer::getMoleculeAt(int i, int j) const { return _moleculeData(i, j); }
 
-simplemd::LinkedCell& simplemd::MoleculeContainer::operator[](unsigned int idx) const {
-  /*
-   * The cell access operator needs to be const in order to capture the MoleculeContainer by value in a Kokkos macro.
-   * This is not an issue, because it does not affect the modifiability of the content in the Kokkos::View.
-   * The LinkedCell must be updated with the correct pointer to the molecule data/count, because the memory location might have changed (host vs. device).
-   * NOTE: The context for a LinkedCell changes depending on where it was obtained. (E.g. When calling container[index] on the GPU, the LinkedCell "is moved" to the GPU context.)
-   *
-   * C++ is a wonderful language :,)
-   */
-  bool cellIsGhostCell = _linkedCells(idx).isGhostCell();
-  simplemd::LinkedCell* cell = new (&_linkedCells(idx)) simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx, cellIsGhostCell);
-  return *cell;
+simplemd::LinkedCell simplemd::MoleculeContainer::operator[](unsigned int idx) const {
+  return simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx, isGhostCell(idx));
 }
 
-simplemd::LinkedCell& simplemd::MoleculeContainer::operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx) const {
-  return operator[](vectorIndexToLinear(cellIdx));
+simplemd::LinkedCell simplemd::MoleculeContainer::operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx) const {
+  return (*this)[vectorIndexToLinear(cellIdx)];
 }
 
-int simplemd::MoleculeContainer::getLocalNumberOfCellsScalarWithGhost() const { return _linkedCells.size(); }
+int simplemd::MoleculeContainer::getLocalNumberOfCellsScalarWithGhost() const { return _linkedCellNumMolecules.size(); }
 
 unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const {
   for (unsigned int d = 0; d < MD_DIM; d++) {

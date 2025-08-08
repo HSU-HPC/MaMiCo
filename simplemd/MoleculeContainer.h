@@ -119,7 +119,7 @@ public:
    * @param idx
    * @return simplemd::LinkedCell
    */
-  simplemd::LinkedCell& operator[](unsigned int idx) const;
+  simplemd::LinkedCell operator[](unsigned int idx) const;
 
   /**
    * @brief Returns the linked cell at 3D index idx (ghost included)
@@ -127,7 +127,7 @@ public:
    * @param idx
    * @return simplemd::LinkedCell
    */
-  simplemd::LinkedCell& operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx) const;
+  simplemd::LinkedCell operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx) const;
 
   /**
    * @brief Get the total number of cells in the container
@@ -336,7 +336,7 @@ private:
 
   Kokkos::View<simplemd::Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace> _moleculeData;
   Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCellNumMolecules;
-  Kokkos::View<simplemd::LinkedCell*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCells;
+  Kokkos::View<bool*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCellIsGhostCell;
 };
 
 template <class A> void simplemd::MoleculeContainer::iterateMolecules(A& a) {
@@ -769,7 +769,9 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
 #endif
                 coordsCell1Buffer = index + indexOffset[i];
                 coordsCell2Buffer = index + neighbourOffset[i];
-                a.handleCellPair(container[coordsCell1Buffer], container[coordsCell2Buffer], coordsCell1Buffer, coordsCell2Buffer);
+                auto cell1 = container[coordsCell1Buffer];
+                auto cell2 = container[coordsCell2Buffer];
+                a.handleCellPair(cell1, cell2, coordsCell1Buffer, coordsCell2Buffer);
               }
             });          // j, Kokkos::parallel_for
         Kokkos::fence(); // Ensure results are available on the host

@@ -26,6 +26,7 @@ namespace interface {
  */
 class SimpleMDSolverInterface : public MDSolverInterface<simplemd::LinkedCell, MD_DIM> {
 private:
+  std::vector<simplemd::LinkedCell> _linkedCells;
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
   simplemd::services::MoleculeService& _moleculeService;
   const simplemd::services::MolecularPropertiesService& _molecularPropertiesService;
@@ -113,7 +114,7 @@ public:
         _cutoffEnergy(4.0 * _epsilon * _sigma6 / (_cutoffRadiusSquared * _cutoffRadiusSquared * _cutoffRadiusSquared) *
                       (_sigma6 / (_cutoffRadiusSquared * _cutoffRadiusSquared * _cutoffRadiusSquared) - 1.0)),
         _dt(dt) {}
-  ~SimpleMDSolverInterface() {}
+  ~SimpleMDSolverInterface() { _linkedCells.clear(); }
 
   simplemd::LinkedCell& getLinkedCell(const CellIndex_T& couplingCellIndex, const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellInCouplingCell,
                                       const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerCouplingCell) {
@@ -123,7 +124,8 @@ public:
     for (unsigned int d = 0; d < MD_DIM; d++) {
       index[d] = index[d] + couplingCellIndex.get()[d] * linkedCellsPerCouplingCell[d] + linkedCellInCouplingCell[d];
     }
-    return _moleculeService.getContainer()[index];
+    _linkedCells.push_back(_moleculeService.getContainer()[index]);
+    return _linkedCells.back();
   }
 
   /** returns the global size of the box-shaped MD domain */
