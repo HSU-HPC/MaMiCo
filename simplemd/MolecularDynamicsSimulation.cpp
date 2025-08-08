@@ -4,6 +4,29 @@
 // www5.in.tum.de/mamico
 #include "simplemd/MolecularDynamicsSimulation.h"
 #include "simplemd/cell-mappings/VaryCheckpointMapping.h"
+#include <limits>
+
+/*
+ * fixed-point math for force accumulation
+ * only active in debug mode, useful for verification of simulation results
+ * because results do not depend on order of force summation
+ * this expects forces to contain long int and converts them back into double
+ */
+constexpr double maxF = 1e6;
+constexpr double stepF = std::numeric_limits<long long>::max() / maxF;
+constexpr double minF = 1 / stepF;
+class ConvertForcesMapping {
+public:
+  void beginMoleculeIteration() const {}
+  void handleMolecule(simplemd::Molecule& molecule) const {
+    tarch::la::Vector<MD_DIM, double>& force = molecule.getForce();
+    for (unsigned int d = 0; d < MD_DIM; d++) {
+      force[d] = *(long long*)(&force[d]) * minF;
+    }
+  }
+  void endMoleculeIteration() const {}
+  static const bool IsParallel = true;
+} convertForcesMapping;
 
 simplemd::MolecularDynamicsSimulation::MolecularDynamicsSimulation(const simplemd::configurations::MolecularDynamicsConfiguration& configuration)
     : _configuration(configuration), _timeIntegrator(NULL), _updateLinkedCellListsMapping(NULL), _vtkMoleculeWriter(NULL),
@@ -236,6 +259,9 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     // After this step, each molecule has received all force contributions from
     // its neighbors.
     _linkedCellService->iterateCellPairs(*_lennardJonesForce);
+#if (TARCH_DEBUG == TARCH_YES)
+    _moleculeService->iterateMolecules(convertForcesMapping);
+#endif
     _boundaryTreatment->emptyGhostBoundaryCells();
     _linkedCellService->iterateCells(*_emptyLinkedListsMapping);
     _moleculeService->iterateMolecules(initialPositionAndForceUpdate);
@@ -465,6 +491,9 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     // After this step, each molecule has received all force contributions from
     // its neighbors.
     _linkedCellService->iterateCellPairs(*_lennardJonesForce);
+#if (TARCH_DEBUG == TARCH_YES)
+    _moleculeService->iterateMolecules(convertForcesMapping);
+#endif
     _boundaryTreatment->emptyGhostBoundaryCells();
     _linkedCellService->iterateCells(*_emptyLinkedListsMapping);
     _moleculeService->iterateMolecules(initialPositionAndForceUpdate);
@@ -585,6 +614,9 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
     _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
     // compute forces between molecules.
     _linkedCellService->iterateCellPairs(*_lennardJonesForce);
+#if (TARCH_DEBUG == TARCH_YES)
+    _moleculeService->iterateMolecules(convertForcesMapping);
+#endif
   } else {
     _boundaryTreatment->putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(_localBoundary, *_parallelTopologyService,
                                                                                                          *_lennardJonesForce);
