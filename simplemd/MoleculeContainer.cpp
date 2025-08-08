@@ -24,6 +24,7 @@ void simplemd::MoleculeContainer::insert(int cellIdx, simplemd::Molecule& molecu
 #endif
   _moleculeData(cellIdx, _linkedCellNumMolecules(cellIdx)) = molecule;
   _linkedCellNumMolecules(cellIdx) += 1;
+  std::cout << "_linkedCellNumMolecules("<<cellIdx<<") = " << _linkedCellNumMolecules(cellIdx) << std::endl;
 }
 
 void simplemd::MoleculeContainer::insert(simplemd::Molecule& molecule) { insert(positionToCellIndex(molecule.getPosition()), molecule); }
@@ -36,7 +37,10 @@ void simplemd::MoleculeContainer::remove(int cellIdx, int moleculeIdx) {
 void simplemd::MoleculeContainer::clearLinkedCell(int cellIdx) { _linkedCellNumMolecules(cellIdx) = 0; }
 
 void simplemd::MoleculeContainer::sort(int cellIdx) { // set all outgoing molecules
+  std::cout << "sorting, cellIdx = " << cellIdx << std::endl;
+  std::cout << "_linkedCellNumMolecules(cellIdx) = " << _linkedCellNumMolecules(cellIdx) << std::endl;
   for (size_t i = 0; i < _linkedCellNumMolecules(cellIdx); i++) {
+    std::cout << "_moleculeData(cellIdx, "<<i<<").getPosition() = " << _moleculeData(cellIdx, i).getPosition() << std::endl;
     int curMolIdx = positionToCellIndex(_moleculeData(cellIdx, i).getPosition());
     if (curMolIdx != cellIdx) { // if molecule does not belong to current cell anymore
       // write data to target end
@@ -49,11 +53,14 @@ void simplemd::MoleculeContainer::sort(int cellIdx) { // set all outgoing molecu
       i--;
     }
   }
+  std::cout << "done sorting" << std::endl;
 }
 
 void simplemd::MoleculeContainer::sort() {
   // sort all inner cells, exclude all ghost cells
   // find red-black cells
+
+  std::cout << "simplemd::MoleculeContainer::sort() " << std::endl;
 
 // iterate over the domain in a red-black manner
 #if (MD_DIM > 2)
@@ -119,8 +126,18 @@ void simplemd::MoleculeContainer::sort() {
 #if (MD_DEBUG == MD_YES)
               std::cout << "Handle cell " << index << std::endl;
 #endif
+              std::cout << "MD_DIM = " << MD_DIM << std::endl;
               auto linkedCellLocal(_linkedCellNumMolecules);
               auto moleculeDataLocal(_moleculeData);
+              for (size_t i = 0; i < linkedCellLocal(index); i++) {
+                std::cout << "index = " << index << std::endl;
+                std::cout << "i = " << i << std::endl;
+                std::cout << "linkedCellLocal(index) = " << linkedCellLocal(index) << std::endl;
+                std::cout << "_linkedCellNumMolecules(index) = " << _linkedCellNumMolecules(index) << std::endl;
+                std::cout << "moleculeDataLocal(index, i).getPosition() = " << moleculeDataLocal(index, i).getPosition() << std::endl;
+                std::cout << "moleculeDataLocal(index, i).getVelocity() = " << moleculeDataLocal(index, i).getVelocity() << std::endl;
+                std::cout << "moleculeDataLocal(index, i).getForce() = " << moleculeDataLocal(index, i).getForce() << std::endl;
+              }
               for (size_t i = 0; i < linkedCellLocal(index); i++) {
                 unsigned int curMolIdx = positionToCellIndex(moleculeDataLocal(index, i).getPosition());
                 if (curMolIdx != index) { // if molecule does not belong to current cell anymore

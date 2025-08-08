@@ -43,6 +43,8 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
   unsigned int indexNumberMolecules = 0;
 
+  std::cout << "MoleculeService MD_DIM = " << MD_DIM << std::endl;
+
   Molecule tmpMolecule;
   // loop over domain and determine position vector (place molecules initially on a grid)
 #if (MD_DIM > 2)
@@ -58,11 +60,17 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
 
         // get initial velocity
         getInitialVelocity(meanVelocity, kB, temperature, molecularPropertiesService, velocity);
+
+        std::cout << "inserting at position " << position << std::endl;
+
         // initialise molecule in memory block and set ID
         tmpMolecule.setPosition(position);
         tmpMolecule.setVelocity(velocity);
         tmpMolecule.setID(indexNumberMolecules);
         _moleculeContainer->insert(tmpMolecule);
+
+        std::cout << "done" << std::endl;
+
         // increment index counter
         indexNumberMolecules++;
       }

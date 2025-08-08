@@ -127,6 +127,8 @@ private:
       exit(EXIT_FAILURE);
     }
 
+    std::cout << "INFO SimpleMDBench: MD_DIM = " << MD_DIM << std::endl;
+
     _simulation = std::make_unique<BenchSim>(_simpleMDConfig);
     _simulation->initServices();
     std::cout << "INFO SimpleMDBench: Initial Checksum is " << _simulation->getChecksum() << std::endl;
