@@ -20,7 +20,7 @@ class LS1MoleculeTest : public CppUnit::TestFixture {
 
 public:
   void setUp() {
-    Log::global_log = new Log::Logger(Log::None);
+    Log::global_log = std::make_unique<Log::Logger>(Log::None);
     Log::global_log->set_mpi_output_root(0);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, 0);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, 0);
