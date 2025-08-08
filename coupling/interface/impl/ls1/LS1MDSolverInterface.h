@@ -31,7 +31,7 @@ public:
       _linkedCellSize[i] = couplingCellSize[i] / linkedCellsPerCouplingCell[i];
   }
   ~LS1MDSolverInterface() {
-    for (auto cell: _linkedCellPointers) {
+    for (auto cell : _linkedCellPointers) {
       if (cell != nullptr) {
         delete cell;
         cell = nullptr;
