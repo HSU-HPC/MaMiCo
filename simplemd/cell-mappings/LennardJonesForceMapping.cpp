@@ -3,6 +3,7 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
+#include <limits>
 
 simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simplemd::services::ExternalForceService& externalForceService,
                                                                            const simplemd::services::MolecularPropertiesService& molecularPropertiesService)
@@ -19,6 +20,29 @@ simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simpl
 void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
 #if (MD_DEBUG == MD_YES)
   std::cout << "simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() " << std::endl;
+#endif
+}
+
+/*
+ * fixed-point math for force accumulation
+ * only active in debug mode, useful for verification of simulation results
+ * because results do not depend on order of force summation
+ * this expects force1, force2 and forceBuffer to contain correctly formatted long long data already, not double
+ */
+constexpr double maxF = 1e6;
+constexpr double stepF = std::numeric_limits<long long>::max() / maxF;
+constexpr double minF = 1 / stepF;
+inline void addForce(tarch::la::Vector<MD_DIM, double>& force1, tarch::la::Vector<MD_DIM, double>& force2, tarch::la::Vector<MD_DIM, double>& forceBuffer) {
+#if (TARCH_DEBUG == TARCH_YES)
+  *(long long*)(&force1[0]) += *(long long*)(&forceBuffer[0]);
+  *(long long*)(&force1[1]) += *(long long*)(&forceBuffer[1]);
+  *(long long*)(&force1[2]) += *(long long*)(&forceBuffer[2]);
+  *(long long*)(&force2[0]) -= *(long long*)(&forceBuffer[0]);
+  *(long long*)(&force2[1]) -= *(long long*)(&forceBuffer[1]);
+  *(long long*)(&force2[2]) -= *(long long*)(&forceBuffer[2]);
+#else
+  force1 += forceBuffer;
+  force2 -= forceBuffer;
 #endif
 }
 
@@ -51,9 +75,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(LinkedCell& ce
         exit(EXIT_FAILURE);
       }
 #endif
-      force1 += forceBuffer;
-      force2 -= forceBuffer;
-
+      addForce(force1, force2, forceBuffer);
       m2++;
     }
   }
@@ -87,8 +109,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
         exit(EXIT_FAILURE);
       }
 #endif
-      force1 += forceBuffer;
-      force2 -= forceBuffer;
+      addForce(force1, force2, forceBuffer);
     }
   }
 }
@@ -113,7 +134,22 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
 
   if (rij2 <= _cutOffRadiusSquared) {
     const double rij6 = rij2 * rij2 * rij2;
+#if (TARCH_DEBUG == TARCH_YES)
+    tarch::la::Vector<MD_DIM, double> res{24.0 * _epsilon / rij2 * (_sigma6 / rij6) * (1.0 - 2.0 * (_sigma6 / rij6)) * rij};
+    res = stepF * res;
+    long long fb0{(long long)(res[0])};
+    long long fb1{(long long)(res[1])};
+    long long fb2{(long long)(res[2])};
+    long long& fb0r = fb0;
+    long long& fb1r = fb1;
+    long long& fb2r = fb2;
+    res[0] = *(double*)(&fb0r);
+    res[1] = *(double*)(&fb1r);
+    res[2] = *(double*)(&fb2r);
+    return res;
+#else
     return 24.0 * _epsilon / rij2 * (_sigma6 / rij6) * (1.0 - 2.0 * (_sigma6 / rij6)) * rij;
+#endif
   } else {
     return tarch::la::Vector<MD_DIM, double>(0.0);
   }
