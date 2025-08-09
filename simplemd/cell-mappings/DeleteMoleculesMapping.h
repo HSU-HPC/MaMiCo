@@ -6,6 +6,7 @@
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_DELETEMOLECULESMAPPING_H_
 
 #include "simplemd/LinkedCell.h"
+#include <Kokkos_Core.hpp>
 
 namespace simplemd {
 namespace cellmappings {
@@ -22,13 +23,13 @@ class DeleteMoleculesMapping;
 class simplemd::cellmappings::DeleteMoleculesMapping {
 public:
   DeleteMoleculesMapping() {}
-  ~DeleteMoleculesMapping() {}
+  KOKKOS_FUNCTION ~DeleteMoleculesMapping() {}
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void handleCell(LinkedCell& cell);
+  KOKKOS_FUNCTION void handleCell(LinkedCell& cell) const { cell.clear(); }
 
-  static const bool IsParallel = false;
+  static const bool IsParallel = true;
 
 private:
 };

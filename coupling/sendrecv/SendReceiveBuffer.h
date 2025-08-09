@@ -161,7 +161,7 @@ private:
     std::set<unsigned int> cellIndices;
     unsigned int rootRank;
 
-    BufferCollective() : buffer(), nonRootRanks(), cellIndices(), rootRank(-1) {}
+    BufferCollective() : buffer(), nonRootRanks(), cellIndices(), rootRank(UINT_MAX) {}
   };
 
   /** deletes everything inside a given buffer

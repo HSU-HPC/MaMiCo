@@ -13,7 +13,9 @@ simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simpl
               molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma()),
       _cutOffRadiusSquared(molecularPropertiesService.getMolecularProperties().getCutOffRadius() *
                            molecularPropertiesService.getMolecularProperties().getCutOffRadius()),
-      _externalForceService(externalForceService) {}
+      _externalForce(0) {
+        externalForceService.addExternalForce(_externalForce);
+      }
 
 void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
 #if (MD_DEBUG == MD_YES)
@@ -44,7 +46,7 @@ inline void addForce(tarch::la::Vector<MD_DIM, double>& force1, tarch::la::Vecto
 #endif
 }
 
-void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCell& cell) const {
+void simplemd::cellmappings::LennardJonesForceMapping::handleCell(LinkedCell& cell) const {
   // force buffer
   tarch::la::Vector<MD_DIM, double> forceBuffer(0.0);
 
@@ -56,8 +58,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCe
     tarch::la::Vector<MD_DIM, double>& force1 = m1->getForce();
     const tarch::la::Vector<MD_DIM, double>& position1 = m1->getConstPosition();
 
-    // add external force
-    _externalForceService.addExternalForce(force1);
+    force1 += _externalForce;
 
     // iterate over all other molecules not touched so far
     m2++;
@@ -120,8 +121,14 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
   const double rij2 = tarch::la::dot(rij, rij);
 #if (MD_ERROR == MD_YES)
   if (tarch::la::equals(rij2, 0.0, 1e-4)) {
-    std::cout << "ERROR simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(): Particle positions are identical!" << std::endl;
-    std::cout << "Position: " << position1 << "," << "Position2: " << position2 << std::endl;
+    Kokkos::printf("Position:");
+    for (int d = 0; d < MD_DIM; d++)
+      Kokkos::printf(" %f", position1[d]);
+    Kokkos::printf(",");
+    for (int d = 0; d < MD_DIM; d++)
+      Kokkos::printf(" %f", position2[d]);
+    Kokkos::printf("\n");
+    Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(): Particle positions are identical!");
   }
 #endif
 

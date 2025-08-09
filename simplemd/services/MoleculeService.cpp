@@ -253,7 +253,7 @@ void simplemd::services::MoleculeService::shutdown() {
   }
 }
 
-const unsigned int simplemd::services::MoleculeService::getLocalNumberOfMoleculesWithGhost() const {
+unsigned int simplemd::services::MoleculeService::getLocalNumberOfMoleculesWithGhost() const {
   return _moleculeContainer->getLocalNumberOfMoleculesWithGhost();
 }
 

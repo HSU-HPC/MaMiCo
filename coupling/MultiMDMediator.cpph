@@ -203,7 +203,7 @@ template <class LinkedCell, unsigned int dim> unsigned int coupling::MultiMDMedi
 template <class LinkedCell, unsigned int dim> unsigned int coupling::MultiMDMediator<LinkedCell, dim>::findFirstCommWithLowLoad() {
   // Starting at the end
   unsigned int avg = getAvgNumberOfActiveMDSimulations();
-  for (unsigned int i = _listActiveMDSimulations.size() - 1; i >= 0; --i) {
+  for (long int i = _listActiveMDSimulations.size() - 1; i >= 0; --i) {
     if (getNumberOfActiveMDSimulations(i) <= avg)
       return i;
   }
@@ -231,7 +231,7 @@ unsigned int coupling::MultiMDMediator<LinkedCell, dim>::findInactiveLocalIndex(
 }
 
 template <class LinkedCell, unsigned int dim> unsigned int coupling::MultiMDMediator<LinkedCell, dim>::findActiveLocalIndex(const unsigned int& communicator) {
-  for (unsigned int i = _listActiveMDSimulations[communicator].size() - 1; i >= 0; --i) {
+  for (long int i = _listActiveMDSimulations[communicator].size() - 1; i >= 0; --i) {
     if (_listActiveMDSimulations[communicator][i])
       return i;
   }

@@ -91,7 +91,7 @@ public:
   }
 
   /** returns the local number of cells (i.e. only the cells of this process) */
-  const unsigned int getLocalNumberOfCellsLinear(bool includingGhostCells = false) const {
+  unsigned int getLocalNumberOfCellsLinear(bool includingGhostCells = false) const {
     auto numCells = getLocalNumberOfCells(includingGhostCells);
     unsigned int numCellsLinear = 1;
     for (int d = 0; d < MD_DIM; d++) {
