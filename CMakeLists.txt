@@ -39,6 +39,23 @@ if(NOT CMAKE_BUILD_TYPE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS DebugMD Debug DebugOptimized RelWithDebInfo Release)
 endif()
 message(STATUS ">> Build type: " ${CMAKE_BUILD_TYPE})
+
+# Enable address sanitization for debug builds using clang
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_BUILD_TYPE MATCHES "^Debug")
+    option(ENABLE_SANITIZERS "Enable Address/Undefined sanitizers for Clang Debug builds" OFF)
+endif()
+if(DEFINED ENABLE_SANITIZERS AND ENABLE_SANITIZERS)
+      message(STATUS ">> Enabling sanitizers: ASan + UBSan + pointer checks")
+      add_compile_options(
+          -fsanitize=address,undefined,pointer-compare,pointer-subtract
+          -fno-omit-frame-pointer
+          -g
+      )
+      add_link_options(
+          -fsanitize=address,undefined,pointer-compare,pointer-subtract
+      )
+endif()
+
 # Automatically add the current source and build directories to the include path
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Enable the MPI library for parallel build, default is OFF
