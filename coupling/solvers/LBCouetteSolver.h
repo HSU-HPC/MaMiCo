@@ -65,15 +65,16 @@ public:
    *  @param kinVisc the kinematic viscosity of the fluid
    *  @param plotEveryTimestep the time step interval for plotting data;
    *                           4 means, every 4th time step is plotted
+   *  @param plotAverageVelocity writes average velocity for all time steps into CSV file
    *  @param filestem the name of the plotted file
    *  @param processes defines on how many processes the solver will run;
    *                   1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes
    *  @param numThreads number of OpenMP threads */
   LBCouetteSolver(const double channelheight, tarch::la::Vector<3, double> wallVelocity, const double kinVisc, const double dx, const double dt,
-                  const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes,
+                  const int plotEveryTimestep, const bool plotAverageVelocity, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes,
                   const unsigned int numThreads = 1, const Scenario* scen = nullptr)
       : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes, scen), _mode(Mode::coupling), _dt_pint(dt),
-        _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)), _wallVelocity((dt / dx) * wallVelocity) {
+        _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)), _wallVelocity((dt / dx) * wallVelocity), _plotAverageVelocity(plotAverageVelocity) {
     // return if required
     if (skipRank()) {
       return;
@@ -184,6 +185,7 @@ public:
       if (_plotEveryTimestep >= 1 && _counter % _plotEveryTimestep == 0)
         computeDensityAndVelocityEverywhere();
       plot();
+      plot_avg_vel();
       collidestream();
       communicate(); // exchange between neighbouring MPI subdomains
       _counter++;
@@ -373,7 +375,7 @@ public:
     numThreads = omp_get_num_threads();
 #endif
 
-    auto res = std::make_unique<LBCouetteSolver>(_channelheight, _wallVelocity * _dx / _dt, _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep,
+    auto res = std::make_unique<LBCouetteSolver>(_channelheight, _wallVelocity * _dx / _dt, _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep, _plotAverageVelocity,
                                                  _filestem + std::string("_supervising"), _processes, numThreads, _scen);
 
     res->_mode = Mode::supervising;
@@ -424,6 +426,40 @@ private:
         }
       }
     }
+  }
+
+  void plot_avg_vel(){
+    if (!_plotAverageVelocity) return;
+
+    int rank = 0;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
+#endif
+    std::stringstream ss;
+    ss << _filestem << "_r" << rank;
+    if (_scen != nullptr) {
+      auto ts = _scen->getTimeIntegrationService();
+      if (ts != nullptr) {
+        if (ts->isPintEnabled())
+          ss << "_i" << ts->getInteration();
+      }
+    }
+    ss << ".csv";
+    std::string filename = ss.str();
+    std::ofstream file(filename.c_str(), _counter==0 ? std::ofstream::out : std::ofstream::app);
+    if (!file.is_open()) {
+      std::cout << "ERROR LBCouetteSolver::plot_avg_vel(): Could not open file " << filename << "!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    if(_counter == 0){
+      file << "coupling_cycle ; avg_vel" << std::endl;
+    }
+
+    std::unique_ptr<State> s = std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
+    double vel = get_avg_vel(s);
+    file << _counter << " ; " << vel << std::endl;
+    file.close();
   }
 
   /// ------------------------------------------------------------------------------------------------------
@@ -740,6 +776,8 @@ private:
   /** @brief lattice weights */
   const double _W[19]{1.0 / 36.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 3.0,
                       1.0 / 18.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 36.0};
+  /** @brief enables avg_vel CSV output */
+  const bool _plotAverageVelocity;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_
