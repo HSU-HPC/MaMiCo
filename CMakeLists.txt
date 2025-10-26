@@ -355,6 +355,9 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 # MaMiCo interface
 #
 add_library(mamico INTERFACE)
+execute_process(COMMAND git rev-parse HEAD OUTPUT_VARIABLE MAMICO_COMMIT_HASH OUTPUT_STRIP_TRAILING_WHITESPACE)
+message(STATUS ">> MAMICO_COMMIT_HASH: " ${MAMICO_COMMIT_HASH})
+target_compile_definitions(mamico INTERFACE MAMICO_COMMIT_HASH=${MAMICO_COMMIT_HASH})
 if(BUILD_WITH_MPI)
   option(USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
   if(USE_COLLECTIVE_MPI)
