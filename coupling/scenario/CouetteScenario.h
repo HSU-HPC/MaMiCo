@@ -881,7 +881,7 @@ protected:
 #endif
     // LB solver: active on lbNumberProcesses
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
-      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "LBCouette",
+      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, _cfg.plotAverageVelocity, "LBCouette",
                                                       _cfg.lbNumberProcesses, 1, this);
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): LB solver==NULL!" << std::endl;
