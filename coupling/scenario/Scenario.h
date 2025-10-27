@@ -12,8 +12,8 @@ class Scenario;
 #include <iostream>
 #include <string>
 
-#define STRINGIFY_EXPAND(x) #x
-#define STRINGIFY(x) STRINGIFY_EXPAND(x)
+#define __STRINGIFY_EXPAND(x) #x
+#define STRINGIFY(x) __STRINGIFY_EXPAND(x)
 
 class Scenario {
 public:
