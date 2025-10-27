@@ -12,14 +12,14 @@ class Scenario;
 #include <iostream>
 #include <string>
 
-#define __STRINGIFY_EXPAND(x) #x
-#define STRINGIFY(x) __STRINGIFY_EXPAND(x)
+#define __MAMICO_STRINGIFY_EXPAND(x) #x
+#define MAMICO_STRINGIFY(x) __MAMICO_STRINGIFY_EXPAND(x)
 
 class Scenario {
 public:
   Scenario(std::string scenarioname) : _scenarioname(scenarioname) {
     std::cout << "Run " << scenarioname << "..." << std::endl;
-    std::cout << "MaMiCo git commit hash = " << STRINGIFY(MAMICO_COMMIT_HASH) << std::endl;
+    std::cout << "MaMiCo git commit hash = " << MAMICO_STRINGIFY(MAMICO_COMMIT_HASH) << std::endl;
   }
   virtual ~Scenario() { std::cout << "Shut down " << _scenarioname << std::endl; }
 
