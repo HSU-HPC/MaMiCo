@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2025-08-08 11:37:20</td>
+            <td class="headerValue">2025-10-27 17:40:52</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -244,52 +244,57 @@
 <a name="182"><span class="lineNum">     182 </span>            :         while(_iteration &lt; iterations){</a>
 <a name="183"><span class="lineNum">     183 </span>            :             // Correction step</a>
 <a name="184"><span class="lineNum">     184 </span>            :             auto delta = _F(_u_last_past) - _G(_u_last_past);</a>
-<a name="185"><span class="lineNum">     185 </span>            : </a>
-<a name="186"><span class="lineNum">     186 </span>            :             _iteration++;</a>
-<a name="187"><span class="lineNum">     187 </span>            : </a>
-<a name="188"><span class="lineNum">     188 </span>            :             // Prediction step</a>
-<a name="189"><span class="lineNum">     189 </span>            :             get_past_state(_u_next_past);</a>
-<a name="190"><span class="lineNum">     190 </span>            :             auto prediction = _G(_u_next_past);</a>
-<a name="191"><span class="lineNum">     191 </span>            : </a>
-<a name="192"><span class="lineNum">     192 </span>            :             // Refinement step</a>
-<a name="193"><span class="lineNum">     193 </span>            :             _u_next_future = prediction + delta;</a>
-<a name="194"><span class="lineNum">     194 </span>            :             if( !isLast() )</a>
-<a name="195"><span class="lineNum">     195 </span>            :                 send(_u_next_future);</a>
-<a name="196"><span class="lineNum">     196 </span>            :             </a>
-<a name="197"><span class="lineNum">     197 </span>            :             // move for next iteration</a>
-<a name="198"><span class="lineNum">     198 </span>            :             _u_last_past   = std::move(_u_next_past);</a>
-<a name="199"><span class="lineNum">     199 </span>            :             _u_last_future = std::move(_u_next_future);</a>
-<a name="200"><span class="lineNum">     200 </span>            :         }</a>
-<a name="201"><span class="lineNum">     201 </span>            : </a>
-<a name="202"><span class="lineNum">     202 </span>            :         #ifdef PINT_DEBUG</a>
-<a name="203"><span class="lineNum">     203 </span>            :         std::cout &lt;&lt; &quot;PINT_DEBUG: Finished all PinT iterations. &quot; &lt;&lt; std::endl;</a>
-<a name="204"><span class="lineNum">     204 </span>            :         #endif</a>
-<a name="205"><span class="lineNum">     205 </span>            :     }</a>
+<a name="185"><span class="lineNum">     185 </span>            :             // Alternative variant, together with second _u_last_future line below. </a>
+<a name="186"><span class="lineNum">     186 </span>            :             // Better scalability, should yield the same results. TODO test and verify.</a>
+<a name="187"><span class="lineNum">     187 </span>            :             //auto delta = _F(_u_last_past) - _u_last_future;</a>
+<a name="188"><span class="lineNum">     188 </span>            : </a>
+<a name="189"><span class="lineNum">     189 </span>            :             _iteration++;</a>
+<a name="190"><span class="lineNum">     190 </span>            : </a>
+<a name="191"><span class="lineNum">     191 </span>            :             // Prediction step</a>
+<a name="192"><span class="lineNum">     192 </span>            :             get_past_state(_u_next_past);</a>
+<a name="193"><span class="lineNum">     193 </span>            :             auto prediction = _G(_u_next_past);</a>
+<a name="194"><span class="lineNum">     194 </span>            : </a>
+<a name="195"><span class="lineNum">     195 </span>            :             // Refinement step</a>
+<a name="196"><span class="lineNum">     196 </span>            :             _u_next_future = prediction + delta;</a>
+<a name="197"><span class="lineNum">     197 </span>            :             if( !isLast() )</a>
+<a name="198"><span class="lineNum">     198 </span>            :                 send(_u_next_future);</a>
+<a name="199"><span class="lineNum">     199 </span>            :             </a>
+<a name="200"><span class="lineNum">     200 </span>            :             // move for next iteration</a>
+<a name="201"><span class="lineNum">     201 </span>            :             _u_last_past   = std::move(_u_next_past);</a>
+<a name="202"><span class="lineNum">     202 </span>            :             _u_last_future = std::move(_u_next_future);</a>
+<a name="203"><span class="lineNum">     203 </span>            :             // Alternative variant</a>
+<a name="204"><span class="lineNum">     204 </span>            :             //_u_last_future = std::move(prediction);</a>
+<a name="205"><span class="lineNum">     205 </span>            :         }</a>
 <a name="206"><span class="lineNum">     206 </span>            : </a>
-<a name="207"><span class="lineNum">     207 </span>            :     int _pint_domain;       // the index of the time domain to which this process belongs to</a>
-<a name="208"><span class="lineNum">     208 </span>            :     int _rank;              // rank of current process in _local_pint_comm</a>
-<a name="209"><span class="lineNum">     209 </span>            :     int _ranks_per_domain;  // number of MPI ranks in each time domain</a>
-<a name="210"><span class="lineNum">     210 </span>            :     int _world_rank;        // rank of current process in MPI_COMM_WORLD</a>
-<a name="211"><span class="lineNum">     211 </span>            :     #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</a>
-<a name="212"><span class="lineNum">     212 </span>            :     MPI_Comm _local_pint_comm; // the communicator of the local time domain of this rank</a>
-<a name="213"><span class="lineNum">     213 </span>            :     #endif</a>
-<a name="214"><span class="lineNum">     214 </span>            :     coupling::configurations::TimeIntegrationConfiguration _cfg;</a>
-<a name="215"><span class="lineNum">     215 </span>            :     Scenario* _scenario;</a>
-<a name="216"><span class="lineNum">     216 </span>            :     std::unique_ptr&lt;Solver&gt; _supervisor;  // The supervisor, i.e. the coarse predictor</a>
-<a name="217"><span class="lineNum">     217 </span>            :     std::function&lt;std::unique_ptr&lt;State&gt;(const std::unique_ptr&lt;State&gt;&amp;)&gt; _F;</a>
-<a name="218"><span class="lineNum">     218 </span>            :     std::function&lt;std::unique_ptr&lt;State&gt;(const std::unique_ptr&lt;State&gt;&amp;)&gt; _G;</a>
-<a name="219"><span class="lineNum">     219 </span>            : </a>
-<a name="220"><span class="lineNum">     220 </span>            :     // These objects represent coupled simulation states. There are used by the supervised parallel in time algorithm for operations</a>
-<a name="221"><span class="lineNum">     221 </span>            :     // &quot;last&quot; and &quot;next&quot; describe two consecutive parareal iterations</a>
-<a name="222"><span class="lineNum">     222 </span>            :     // &quot;past&quot; and &quot;future&quot; describe two points in simulation time, one pint time domain apart</a>
-<a name="223"><span class="lineNum">     223 </span>            :     std::unique_ptr&lt;State&gt; _u_0;       // initial state</a>
-<a name="224"><span class="lineNum">     224 </span>            :     std::unique_ptr&lt;State&gt; _u_last_past;</a>
-<a name="225"><span class="lineNum">     225 </span>            :     std::unique_ptr&lt;State&gt; _u_last_future;</a>
-<a name="226"><span class="lineNum">     226 </span>            :     std::unique_ptr&lt;State&gt; _u_next_past;</a>
-<a name="227"><span class="lineNum">     227 </span>            :     std::unique_ptr&lt;State&gt; _u_next_future;</a>
-<a name="228"><span class="lineNum">     228 </span>            : </a>
-<a name="229"><span class="lineNum">     229 </span>            :     int _iteration{0};</a>
-<a name="230"><span class="lineNum">     230 </span>            : };</a>
+<a name="207"><span class="lineNum">     207 </span>            :         #ifdef PINT_DEBUG</a>
+<a name="208"><span class="lineNum">     208 </span>            :         std::cout &lt;&lt; &quot;PINT_DEBUG: Finished all PinT iterations. &quot; &lt;&lt; std::endl;</a>
+<a name="209"><span class="lineNum">     209 </span>            :         #endif</a>
+<a name="210"><span class="lineNum">     210 </span>            :     }</a>
+<a name="211"><span class="lineNum">     211 </span>            : </a>
+<a name="212"><span class="lineNum">     212 </span>            :     int _pint_domain;       // the index of the time domain to which this process belongs to</a>
+<a name="213"><span class="lineNum">     213 </span>            :     int _rank;              // rank of current process in _local_pint_comm</a>
+<a name="214"><span class="lineNum">     214 </span>            :     int _ranks_per_domain;  // number of MPI ranks in each time domain</a>
+<a name="215"><span class="lineNum">     215 </span>            :     int _world_rank;        // rank of current process in MPI_COMM_WORLD</a>
+<a name="216"><span class="lineNum">     216 </span>            :     #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</a>
+<a name="217"><span class="lineNum">     217 </span>            :     MPI_Comm _local_pint_comm; // the communicator of the local time domain of this rank</a>
+<a name="218"><span class="lineNum">     218 </span>            :     #endif</a>
+<a name="219"><span class="lineNum">     219 </span>            :     coupling::configurations::TimeIntegrationConfiguration _cfg;</a>
+<a name="220"><span class="lineNum">     220 </span>            :     Scenario* _scenario;</a>
+<a name="221"><span class="lineNum">     221 </span>            :     std::unique_ptr&lt;Solver&gt; _supervisor;  // The supervisor, i.e. the coarse predictor</a>
+<a name="222"><span class="lineNum">     222 </span>            :     std::function&lt;std::unique_ptr&lt;State&gt;(const std::unique_ptr&lt;State&gt;&amp;)&gt; _F;</a>
+<a name="223"><span class="lineNum">     223 </span>            :     std::function&lt;std::unique_ptr&lt;State&gt;(const std::unique_ptr&lt;State&gt;&amp;)&gt; _G;</a>
+<a name="224"><span class="lineNum">     224 </span>            : </a>
+<a name="225"><span class="lineNum">     225 </span>            :     // These objects represent coupled simulation states. There are used by the supervised parallel in time algorithm for operations</a>
+<a name="226"><span class="lineNum">     226 </span>            :     // &quot;last&quot; and &quot;next&quot; describe two consecutive parareal iterations</a>
+<a name="227"><span class="lineNum">     227 </span>            :     // &quot;past&quot; and &quot;future&quot; describe two points in simulation time, one pint time domain apart</a>
+<a name="228"><span class="lineNum">     228 </span>            :     std::unique_ptr&lt;State&gt; _u_0;       // initial state</a>
+<a name="229"><span class="lineNum">     229 </span>            :     std::unique_ptr&lt;State&gt; _u_last_past;</a>
+<a name="230"><span class="lineNum">     230 </span>            :     std::unique_ptr&lt;State&gt; _u_last_future;</a>
+<a name="231"><span class="lineNum">     231 </span>            :     std::unique_ptr&lt;State&gt; _u_next_past;</a>
+<a name="232"><span class="lineNum">     232 </span>            :     std::unique_ptr&lt;State&gt; _u_next_future;</a>
+<a name="233"><span class="lineNum">     233 </span>            : </a>
+<a name="234"><span class="lineNum">     234 </span>            :     int _iteration{0};</a>
+<a name="235"><span class="lineNum">     235 </span>            : };</a>
 </pre>
       </td>
     </tr>

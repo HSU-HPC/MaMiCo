@@ -143,9 +143,9 @@ Collaboration diagram for coupling::solvers::LBCouetteSolver:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af10faf0866b869f325e6acee3b131e5d" id="r_af10faf0866b869f325e6acee3b131e5d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af10faf0866b869f325e6acee3b131e5d">LBCouetteSolver</a> (const double channelheight, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; wallVelocity, const double kinVisc, const double dx, const double dt, const int plotEveryTimestep, const std::string filestem, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, const unsigned int numThreads=1, const <a class="el" href="classScenario.html">Scenario</a> *scen=nullptr)</td></tr>
-<tr class="memdesc:af10faf0866b869f325e6acee3b131e5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
-<tr class="separator:af10faf0866b869f325e6acee3b131e5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9628998145318f08bd65520c478c406" id="r_ae9628998145318f08bd65520c478c406"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae9628998145318f08bd65520c478c406">LBCouetteSolver</a> (const double channelheight, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; wallVelocity, const double kinVisc, const double dx, const double dt, const int plotEveryTimestep, const bool plotAverageVelocity, const std::string filestem, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, const unsigned int numThreads=1, const <a class="el" href="classScenario.html">Scenario</a> *scen=nullptr)</td></tr>
+<tr class="memdesc:ae9628998145318f08bd65520c478c406"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
+<tr class="separator:ae9628998145318f08bd65520c478c406"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4865583dba58b9b3542ee7e836866be" id="r_aa4865583dba58b9b3542ee7e836866be"><td class="memItemLeft" align="right" valign="top"><a id="aa4865583dba58b9b3542ee7e836866be" name="aa4865583dba58b9b3542ee7e836866be"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~LBCouetteSolver</b> ()</td></tr>
 <tr class="memdesc:aa4865583dba58b9b3542ee7e836866be"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple destructor <br /></td></tr>
@@ -212,6 +212,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:af7a8b2bf1178adc65e4c8bbf165c339b" id="r_af7a8b2bf1178adc65e4c8bbf165c339b"><td class="memItemLeft" align="right" valign="top"><a id="af7a8b2bf1178adc65e4c8bbf165c339b" name="af7a8b2bf1178adc65e4c8bbf165c339b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>computeDensityAndVelocityEverywhere</b> ()</td></tr>
 <tr class="separator:af7a8b2bf1178adc65e4c8bbf165c339b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6b65eaded4d0c0c31d9271f963bfcdf" id="r_ad6b65eaded4d0c0c31d9271f963bfcdf"><td class="memItemLeft" align="right" valign="top"><a id="ad6b65eaded4d0c0c31d9271f963bfcdf" name="ad6b65eaded4d0c0c31d9271f963bfcdf"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>plot_avg_vel</b> ()</td></tr>
+<tr class="separator:ad6b65eaded4d0c0c31d9271f963bfcdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc742469952320d1b444cd3b2c1d33f0" id="r_acc742469952320d1b444cd3b2c1d33f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc742469952320d1b444cd3b2c1d33f0">collidestream</a> ()</td></tr>
 <tr class="memdesc:acc742469952320d1b444cd3b2c1d33f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">collide-stream algorithm for the Lattice-Boltzmann method  <br /></td></tr>
 <tr class="separator:acc742469952320d1b444cd3b2c1d33f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -270,6 +273,10 @@ double *&#160;</td><td class="memItemRight" valign="bottom"><b>_pdf2</b> {NULL}<
 <tr class="memitem:a75eb2c128da79bf512cbe3f5317c4a18" id="r_a75eb2c128da79bf512cbe3f5317c4a18"><td class="memItemLeft" align="right" valign="top">const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75eb2c128da79bf512cbe3f5317c4a18">_W</a> [19]</td></tr>
 <tr class="memdesc:a75eb2c128da79bf512cbe3f5317c4a18"><td class="mdescLeft">&#160;</td><td class="mdescRight">lattice weights  <br /></td></tr>
 <tr class="separator:a75eb2c128da79bf512cbe3f5317c4a18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac54dd64d02c3b67930bfe6a8c3a1a93a" id="r_ac54dd64d02c3b67930bfe6a8c3a1a93a"><td class="memItemLeft" align="right" valign="top"><a id="ac54dd64d02c3b67930bfe6a8c3a1a93a" name="ac54dd64d02c3b67930bfe6a8c3a1a93a"></a>
+const bool&#160;</td><td class="memItemRight" valign="bottom"><b>_plotAverageVelocity</b></td></tr>
+<tr class="memdesc:ac54dd64d02c3b67930bfe6a8c3a1a93a"><td class="mdescLeft">&#160;</td><td class="mdescRight">enables avg_vel CSV output <br /></td></tr>
+<tr class="separator:ac54dd64d02c3b67930bfe6a8c3a1a93a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -454,8 +461,8 @@ const <a class="el" href="classScenario.html">Scenario</a> *&#160;</td><td class
 <div class="textblock"><p>implements a three-dimensional Lattice-Boltzmann Couette flow solver. </p>
 <p>In our scenario, the lower wall is accelerated and the upper wall stands still. The lower wall is located at zero height. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="af10faf0866b869f325e6acee3b131e5d" name="af10faf0866b869f325e6acee3b131e5d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af10faf0866b869f325e6acee3b131e5d">&#9670;&#160;</a></span>LBCouetteSolver()</h2>
+<a id="ae9628998145318f08bd65520c478c406" name="ae9628998145318f08bd65520c478c406"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9628998145318f08bd65520c478c406">&#9670;&#160;</a></span>LBCouetteSolver()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -496,6 +503,11 @@ const <a class="el" href="classScenario.html">Scenario</a> *&#160;</td><td class
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const bool</td>          <td class="paramname"><span class="paramname"><em>plotAverageVelocity</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const std::string</td>          <td class="paramname"><span class="paramname"><em>filestem</em></span>, </td>
         </tr>
         <tr>
@@ -530,6 +542,7 @@ const <a class="el" href="classScenario.html">Scenario</a> *&#160;</td><td class
     <tr><td class="paramname">dt</td><td>the time step </td></tr>
     <tr><td class="paramname">kinVisc</td><td>the kinematic viscosity of the fluid </td></tr>
     <tr><td class="paramname">plotEveryTimestep</td><td>the time step interval for plotting data; 4 means, every 4th time step is plotted </td></tr>
+    <tr><td class="paramname">plotAverageVelocity</td><td>writes average velocity for all time steps into CSV file </td></tr>
     <tr><td class="paramname">filestem</td><td>the name of the plotted file </td></tr>
     <tr><td class="paramname">processes</td><td>defines on how many processes the solver will run; 1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes </td></tr>
     <tr><td class="paramname">numThreads</td><td>number of OpenMP threads </td></tr>

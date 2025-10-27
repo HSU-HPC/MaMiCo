@@ -32,17 +32,17 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">71</td>
-            <td class="headerCovTableEntry">91</td>
-            <td class="headerCovTableEntryMed">78.0 %</td>
+            <td class="headerCovTableEntry">105</td>
+            <td class="headerCovTableEntryLo">67.6 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2025-08-08 11:37:20</td>
+            <td class="headerValue">2025-10-27 17:40:52</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">18</td>
-            <td class="headerCovTableEntry">18</td>
-            <td class="headerCovTableEntryHi">100.0 %</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntryHi">94.7 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -236,23 +236,23 @@
 <a name="174"><span class="lineNum">     174 </span>            :    *    @param node</a>
 <a name="175"><span class="lineNum">     175 </span>            :    *    @param tag</a>
 <a name="176"><span class="lineNum">     176 </span>            :    */</a>
-<a name="177"><span class="lineNum">     177 </span>            :   static void readBoolOptional(bool&amp; storage, tinyxml2::XMLElement* node, std::string tag) {</a>
-<a name="178"><span class="lineNum">     178 </span>            :     const char* myTextChar = node-&gt;Attribute(tag.c_str());</a>
-<a name="179"><span class="lineNum">     179 </span>            :     if (myTextChar == NULL) {</a>
-<a name="180"><span class="lineNum">     180 </span>            :       return;</a>
+<a name="177"><span class="lineNum">     177 </span><span class="lineNoCov">          0 :   static void readBoolOptional(bool&amp; storage, tinyxml2::XMLElement* node, std::string tag) {</span></a>
+<a name="178"><span class="lineNum">     178 </span><span class="lineNoCov">          0 :     const char* myTextChar = node-&gt;Attribute(tag.c_str());</span></a>
+<a name="179"><span class="lineNum">     179 </span><span class="lineNoCov">          0 :     if (myTextChar == NULL) {</span></a>
+<a name="180"><span class="lineNum">     180 </span><span class="lineNoCov">          0 :       return;</span></a>
 <a name="181"><span class="lineNum">     181 </span>            :     }</a>
-<a name="182"><span class="lineNum">     182 </span>            :     std::string myText(myTextChar);</a>
-<a name="183"><span class="lineNum">     183 </span>            :     if (myText == &quot;yes&quot;) {</a>
-<a name="184"><span class="lineNum">     184 </span>            :       storage = true;</a>
-<a name="185"><span class="lineNum">     185 </span>            :     } else if (myText == &quot;no&quot;) {</a>
-<a name="186"><span class="lineNum">     186 </span>            :       storage = false;</a>
+<a name="182"><span class="lineNum">     182 </span><span class="lineNoCov">          0 :     std::string myText(myTextChar);</span></a>
+<a name="183"><span class="lineNum">     183 </span><span class="lineNoCov">          0 :     if (myText == &quot;yes&quot;) {</span></a>
+<a name="184"><span class="lineNum">     184 </span><span class="lineNoCov">          0 :       storage = true;</span></a>
+<a name="185"><span class="lineNum">     185 </span><span class="lineNoCov">          0 :     } else if (myText == &quot;no&quot;) {</span></a>
+<a name="186"><span class="lineNum">     186 </span><span class="lineNoCov">          0 :       storage = false;</span></a>
 <a name="187"><span class="lineNum">     187 </span>            :     } else {</a>
-<a name="188"><span class="lineNum">     188 </span>            :       std::cout &lt;&lt; &quot;Error while reading bool optional argument: Argument can &quot;</a>
-<a name="189"><span class="lineNum">     189 </span>            :                    &quot;only be yes or no!&quot;</a>
-<a name="190"><span class="lineNum">     190 </span>            :                 &lt;&lt; std::endl;</a>
-<a name="191"><span class="lineNum">     191 </span>            :       exit(EXIT_FAILURE);</a>
+<a name="188"><span class="lineNum">     188 </span><span class="lineNoCov">          0 :       std::cout &lt;&lt; &quot;Error while reading bool optional argument: Argument can &quot;</span></a>
+<a name="189"><span class="lineNum">     189 </span><span class="lineNoCov">          0 :                    &quot;only be yes or no!&quot;</span></a>
+<a name="190"><span class="lineNum">     190 </span><span class="lineNoCov">          0 :                 &lt;&lt; std::endl;</span></a>
+<a name="191"><span class="lineNum">     191 </span><span class="lineNoCov">          0 :       exit(EXIT_FAILURE);</span></a>
 <a name="192"><span class="lineNum">     192 </span>            :     }</a>
-<a name="193"><span class="lineNum">     193 </span>            :   }</a>
+<a name="193"><span class="lineNum">     193 </span><span class="lineNoCov">          0 :   }</span></a>
 <a name="194"><span class="lineNum">     194 </span>            : </a>
 <a name="195"><span class="lineNum">     195 </span>            :   /** reads a string value at node &quot;node&quot; with tag &quot;tag&quot; and stores the result</a>
 <a name="196"><span class="lineNum">     196 </span>            :    *in &quot;storage&quot;. the program is exited if the value cannot be read.</a>
