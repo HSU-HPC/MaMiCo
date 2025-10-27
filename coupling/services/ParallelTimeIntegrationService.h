@@ -182,6 +182,8 @@ private:
         while(_iteration < iterations){
             // Correction step
             auto delta = _F(_u_last_past) - _G(_u_last_past);
+            // Alternative variant, together with line 202. Better scalability, should yield the same results. TODO test and verify.
+            //auto delta = _F(_u_last_past) - _u_last_future;
 
             _iteration++;
 
@@ -197,6 +199,7 @@ private:
             // move for next iteration
             _u_last_past   = std::move(_u_next_past);
             _u_last_future = std::move(_u_next_future);
+            //_u_last_future = std::move(prediction);
         }
 
         #ifdef PINT_DEBUG
