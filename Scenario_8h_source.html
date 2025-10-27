@@ -105,15 +105,15 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;string&gt;</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#define __STRINGIFY_EXPAND(x) #x</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#define STRINGIFY(x) __STRINGIFY_EXPAND(x)</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#define __MAMICO_STRINGIFY_EXPAND(x) #x</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#define MAMICO_STRINGIFY(x) __MAMICO_STRINGIFY_EXPAND(x)</span></div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
 <div class="foldopen" id="foldopen00018" data-start="{" data-end="};">
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classScenario.html">   18</a></span><span class="keyword">class </span>Scenario {</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">public</span>:</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  Scenario(std::string scenarioname) : _scenarioname(scenarioname) {</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;Run &quot;</span> &lt;&lt; scenarioname &lt;&lt; <span class="stringliteral">&quot;...&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;MaMiCo git commit hash = &quot;</span> &lt;&lt; STRINGIFY(MAMICO_COMMIT_HASH) &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;MaMiCo git commit hash = &quot;</span> &lt;&lt; MAMICO_STRINGIFY(MAMICO_COMMIT_HASH) &lt;&lt; std::endl;</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  }</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  <span class="keyword">virtual</span> ~Scenario() { std::cout &lt;&lt; <span class="stringliteral">&quot;Shut down &quot;</span> &lt;&lt; _scenarioname &lt;&lt; std::endl; }</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>

@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2025-10-27 17:40:52</td>
+            <td class="headerValue">2025-10-27 21:19:12</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -74,14 +74,14 @@
 <a name="12"><span class="lineNum">      12 </span>            : #include &lt;iostream&gt;</a>
 <a name="13"><span class="lineNum">      13 </span>            : #include &lt;string&gt;</a>
 <a name="14"><span class="lineNum">      14 </span>            : </a>
-<a name="15"><span class="lineNum">      15 </span>            : #define __STRINGIFY_EXPAND(x) #x</a>
-<a name="16"><span class="lineNum">      16 </span>            : #define STRINGIFY(x) __STRINGIFY_EXPAND(x)</a>
+<a name="15"><span class="lineNum">      15 </span>            : #define __MAMICO_STRINGIFY_EXPAND(x) #x</a>
+<a name="16"><span class="lineNum">      16 </span>            : #define MAMICO_STRINGIFY(x) __MAMICO_STRINGIFY_EXPAND(x)</a>
 <a name="17"><span class="lineNum">      17 </span>            : </a>
 <a name="18"><span class="lineNum">      18 </span>            : class Scenario {</a>
 <a name="19"><span class="lineNum">      19 </span>            : public:</a>
 <a name="20"><span class="lineNum">      20 </span>            :   Scenario(std::string scenarioname) : _scenarioname(scenarioname) {</a>
 <a name="21"><span class="lineNum">      21 </span>            :     std::cout &lt;&lt; &quot;Run &quot; &lt;&lt; scenarioname &lt;&lt; &quot;...&quot; &lt;&lt; std::endl;</a>
-<a name="22"><span class="lineNum">      22 </span>            :     std::cout &lt;&lt; &quot;MaMiCo git commit hash = &quot; &lt;&lt; STRINGIFY(MAMICO_COMMIT_HASH) &lt;&lt; std::endl;</a>
+<a name="22"><span class="lineNum">      22 </span>            :     std::cout &lt;&lt; &quot;MaMiCo git commit hash = &quot; &lt;&lt; MAMICO_STRINGIFY(MAMICO_COMMIT_HASH) &lt;&lt; std::endl;</a>
 <a name="23"><span class="lineNum">      23 </span>            :   }</a>
 <a name="24"><span class="lineNum">      24 </span>            :   virtual ~Scenario() { std::cout &lt;&lt; &quot;Shut down &quot; &lt;&lt; _scenarioname &lt;&lt; std::endl; }</a>
 <a name="25"><span class="lineNum">      25 </span>            : </a>
