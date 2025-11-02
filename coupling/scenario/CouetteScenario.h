@@ -801,7 +801,10 @@ protected:
       return;
     // form file name and open file
     std::stringstream ss;
-    ss << "CouetteAvgMultiMDCells_" << _timeIntegrationService->getPintDomain() << "_" << _rank << "_" << couplingCycle << ".csv";
+    ss << "CouetteAvgMultiMDCells_d" << _timeIntegrationService->getPintDomain() << "_r" << _rank << "_c" << couplingCycle;
+    if (_timeIntegrationService->isPintEnabled())
+      ss << "_i" << _timeIntegrationService->getIteration();
+    ss << ".csv";
     std::ofstream file(ss.str().c_str());
     if (!file.is_open()) {
       std::cout << "ERROR CouetteScenario::write2CSV(): Could not open file " << ss.str() << "!" << std::endl;

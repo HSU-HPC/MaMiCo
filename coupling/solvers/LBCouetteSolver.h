@@ -441,7 +441,7 @@ private:
       auto ts = _scen->getTimeIntegrationService();
       if (ts != nullptr) {
         if (ts->isPintEnabled())
-          ss << "_i" << ts->getInteration();
+          ss << "_i" << ts->getIteration();
       }
     }
     ss << ".csv";

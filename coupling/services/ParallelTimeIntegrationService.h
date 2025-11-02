@@ -84,7 +84,7 @@ public:
     int getPintDomain() const { return _pint_domain; }
     int getRank() const { return _rank; }
     bool isPintEnabled() const { return _cfg.isPintEnabled(); }
-    int getInteration() const { return _iteration; }
+    int getIteration() const { return _iteration; }
 
     #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm getPintComm() const { return _local_pint_comm; }
