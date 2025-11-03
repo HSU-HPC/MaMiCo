@@ -321,10 +321,15 @@ public:
 
   std::unique_ptr<State> getState() override {
     computeDensityAndVelocityEverywhere();
+    if (skipRank())
+      return std::make_unique<LBCouetteSolverState>(0);
     return std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
   }
 
   void setState(const std::unique_ptr<State>& input, int cycle) override {
+    if (skipRank())
+      return;
+
     const LBCouetteSolverState* state = dynamic_cast<const LBCouetteSolverState*>(input.get());
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
@@ -392,6 +397,8 @@ public:
   }
 
   double get_avg_vel(const std::unique_ptr<State>& state) const override {
+    if (skipRank())
+      return 0;
     double vel[3];
     double density;
     double res[3]{0, 0, 0};
