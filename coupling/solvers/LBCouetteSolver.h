@@ -416,6 +416,22 @@ public:
     return std::sqrt(res[0] * res[0] + res[1] * res[1] + res[2] * res[2]);
   }
 
+  double get_avg_velX(const std::unique_ptr<State>& state) const {
+    if (skipRank())
+      return 0;
+    double vel[3];
+    double density;
+    double res{0};
+    for (int i = 0; i < _pdfsize; i += 19) {
+      LBCouetteSolver::computeDensityAndVelocity(vel, density, state->getData() + i);
+      res += vel[0];
+    }
+    if (_pdfsize > 0) {
+      res /= (_pdfsize / 19);
+    }
+    return res;
+  }
+
 private:
   Mode _mode;
   double _dt_pint;
@@ -460,12 +476,13 @@ private:
     }
 
     if(_counter == 0){
-      file << "coupling_cycle ; avg_vel" << std::endl;
+      file << "coupling_cycle ; avg_vel ; avg_velX" << std::endl;
     }
 
     std::unique_ptr<State> s = std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
     double vel = get_avg_vel(s);
-    file << _counter << " ; " << vel << std::endl;
+    double velX = get_avg_velX(s);
+    file << _counter << " ; " << vel << " ; " << velX << std::endl;
     file.close();
   }
 
