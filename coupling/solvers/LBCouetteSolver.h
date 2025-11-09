@@ -206,6 +206,7 @@ public:
       exit(EXIT_FAILURE);
     }
 #endif
+    computeDensityAndVelocityEverywhere();
 
     // loop over all received cells
     for (auto pair : md2macroBuffer) {

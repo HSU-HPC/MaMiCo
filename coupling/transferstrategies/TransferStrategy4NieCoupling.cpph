@@ -123,7 +123,15 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>
   // average sampled data from MD
   if (_timestepCounter != 0) {
     const double mass = cell.getMacroscopicMass() / ((double)_timestepCounter);
-    const tarch::la::Vector<dim, double> momentum = (1.0 / ((double)_timestepCounter)) * cell.getMacroscopicMomentum();
+
+    // TODO: get actual density from configuration instead of 0.813037037 constant
+    const double mass_macro = IDXS.getCouplingCellSize()[0]*IDXS.getCouplingCellSize()[1]*IDXS.getCouplingCellSize()[2]*0.813037037;
+    // computes energy conservation correction factor
+    // based on assumption mass/2*vel_micro^2 = mass_macro/2*vel_macro^2
+    // Note: In MD-60 scenario, energy_correction factor is on average ca. 0.9998
+    const double energy_correction = sqrt( mass / mass_macro );
+
+    const tarch::la::Vector<dim, double> momentum = (1.0 / ((double)_timestepCounter)) * energy_correction * cell.getMacroscopicMomentum();
     cell.setMacroscopicMass(mass);
     cell.setMacroscopicMomentum(momentum);
   } else {
