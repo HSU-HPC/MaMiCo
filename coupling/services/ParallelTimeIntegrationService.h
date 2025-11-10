@@ -205,7 +205,9 @@ private:
         }
 
         #ifdef PINT_DEBUG
-        std::cout << "PINT_DEBUG: Finished all PinT iterations. " << std::endl;
+        if(_world_rank == 0){
+            std::cout << "PINT_DEBUG: Finished all PinT iterations. " << std::endl;
+        }
         #endif
     }
 
