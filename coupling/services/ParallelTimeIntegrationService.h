@@ -117,8 +117,10 @@ private:
         if( isLast() ) 
             res.maxCycle = num_cycles;
         #ifdef PINT_DEBUG
-        std::cout << "PINT_DEBUG: _pint_domain " << _pint_domain << " has minCycle " << res.minCycle 
-            << " and maxCycle " << res.maxCycle << std::endl;
+        if(_rank == 0){
+            std::cout << "PINT_DEBUG: _pint_domain " << _pint_domain << " has minCycle " << res.minCycle 
+                << " and maxCycle " << res.maxCycle << std::endl;
+        }
         #endif
         return res;
     }
@@ -132,7 +134,9 @@ private:
         }
         #ifdef PINT_DEBUG
         if(_cfg.getViscMultiplier() != 1.0)
-            std::cout << "PINT_DEBUG: Starting supervisor with viscosity modified by " << _cfg.getViscMultiplier() << std::endl;
+            if(_world_rank == 0){
+                std::cout << "PINT_DEBUG: Starting supervisor with viscosity modified by " << _cfg.getViscMultiplier() << std::endl;
+            }
         #endif
         _supervisor = solver->getSupervisor(domain.size, _cfg.getViscMultiplier() );
         _F = [this, solver, domain](const std::unique_ptr<State>& s){
