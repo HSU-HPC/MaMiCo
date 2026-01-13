@@ -196,7 +196,7 @@ protected:
 
 #if defined(LS1_MARDYN)
     auto offset = _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset();
-    coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
+    coupling::interface::LS1StaticCommData::getInstance().setConfigFilename(_cfg.ls1config);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
