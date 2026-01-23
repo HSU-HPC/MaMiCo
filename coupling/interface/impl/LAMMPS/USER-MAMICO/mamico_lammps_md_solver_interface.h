@@ -263,7 +263,7 @@ public:
     // method...
     if (indexAtom == -1) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "Molecule not found on rank " << indexConversion.getThisRank() << std::endl;
+      std::cout << "Molecule not found on rank " << IDXS.getRank() << std::endl;
 #endif
       return;
     }

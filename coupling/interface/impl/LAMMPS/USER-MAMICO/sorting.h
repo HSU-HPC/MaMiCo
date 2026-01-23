@@ -87,7 +87,7 @@ public:
 
             for (it->begin(); it->continueIteration(); it->next()) {
               const coupling::interface::Molecule<dim>& molecule = it->getConst();
-              std::cout << "Rank " << indexConversion.getThisRank() << ", cell " << coupling::initDimVector<dim>(loop) << ", molecule "
+              std::cout << "Rank " << IDXS.getRank() << ", cell " << coupling::initDimVector<dim>(loop) << ", molecule "
                         << molecule.getPosition() << std::endl;
             }
             delete it;
