@@ -17,6 +17,7 @@ void simplemd::services::MoleculeService::initContainer(ParallelTopologyService 
 #endif
   auto averageCellMoleculeCount = (double)moleculeCount / parallelTopologyService.getLocalNumberOfCellsLinear();
   unsigned int cellCapacity = averageCellMoleculeCount * capacityFactor;
+  cellCapacity = cellCapacity < 5 ? 5 : cellCapacity; // let the capacity be at least 5
   _moleculeContainer = new MoleculeContainer(parallelTopologyService, cellCapacity);
 #if (MD_DEBUG == MD_YES)
   if (_moleculeContainer == nullptr) {
