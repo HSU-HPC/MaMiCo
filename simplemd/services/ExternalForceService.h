@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+#include <Kokkos_Core.hpp>
 
 namespace simplemd {
 namespace services {

@@ -15,10 +15,11 @@
 constexpr double maxF = 1e6;
 constexpr double stepF = std::numeric_limits<long long>::max() / maxF;
 constexpr double minF = 1 / stepF;
+// TODO move mapping to separate file in molecule-mappings folder
 class ConvertForcesMapping {
 public:
   void beginMoleculeIteration() const {}
-  void handleMolecule(simplemd::Molecule& molecule) const {
+  KOKKOS_FUNCTION void handleMolecule(simplemd::Molecule& molecule) const {
     tarch::la::Vector<MD_DIM, double>& force = molecule.getForce();
     for (unsigned int d = 0; d < MD_DIM; d++) {
       force[d] = *(long long*)(&force[d]) * minF;

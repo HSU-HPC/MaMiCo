@@ -170,8 +170,8 @@ public:
   double distance(const coupling::filtering::Patch<dim>& other) {
     unsigned int size = _flowfield.getScalarSize() * (dim + 1);
 
-    double* const my_data = reinterpret_cast<double* const>(_flowfield._data);
-    double* const other_data = reinterpret_cast<double* const>(other._flowfield._data);
+    double* const my_data = reinterpret_cast<double*>(_flowfield._data);
+    double* const other_data = reinterpret_cast<double*>(other._flowfield._data);
 
     double res = 0;
     for (unsigned int i = 0; i < size; i += 1) {

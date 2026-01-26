@@ -126,6 +126,7 @@ else()
     endif()
     if(KOKKOS_TARGET STREQUAL "CUDA")
       set(Kokkos_ENABLE_CUDA ON CACHE STRING "Build MaMiCo/Kokkos with CUDA support" FORCE)
+      set(Kokkos_ENABLE_CUDA_RELOCATABLE_DEVICE_CODE ON CACHE STRING "MaMiCo requires CUDA relocatable device code (RDC)" FORCE)
     else()
       set(Kokkos_ENABLE_CUDA OFF CACHE STRING "Build MaMiCo/Kokkos without CUDA support" FORCE)
     endif()
@@ -138,6 +139,9 @@ else()
     endif()
     set(Kokkos_ENABLE_DEBUG ${KOKKOS_DEBUG} CACHE STRING "Debug builds only" FORCE)
     set(Kokkos_ENABLE_DEBUG_BOUNDS_CHECK ${KOKKOS_DEBUG} CACHE STRING "Debug builds only" FORCE)
+    if(CMAKE_BUILD_TYPE MATCHES "^Debug" AND (${KOKKOS_TARGET} STREQUAL "CUDA"))
+      set(Kokkos_ENABLE_CUDA_CONSTEXPR ON CACHE STRING "Allow host constexpr code for CUDA" FORCE)
+    endif()
 
     FetchContent_Declare(
         Kokkos
@@ -354,7 +358,6 @@ set(SIMPLE_MD_SOURCES
   "simplemd/BoundaryTreatment.cpp"
   "simplemd/MolecularDynamicsSimulation.cpp"
   "simplemd/ProfilePlotter.cpp"
-  "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
   "simplemd/cell-mappings/LennardJonesForceMapping.cpp"
   "simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.cpp"
   "simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.cpp"
@@ -828,7 +831,6 @@ set(CLANGFORMAT_SOURCES
   "simplemd/cell-mappings/ComputeTemperatureMapping.h"
   "simplemd/cell-mappings/ComputeMeanVelocityMapping.h"
   "simplemd/cell-mappings/VaryCheckpointMapping.h"
-  "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
   "simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.h"
   "simplemd/cell-mappings/LennardJonesForceMapping.h"
   "simplemd/cell-mappings/RDFMapping.cpp"

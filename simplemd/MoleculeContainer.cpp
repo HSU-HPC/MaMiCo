@@ -13,9 +13,8 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
       _moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
       _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)),
       _linkedCellIsGhostCell("linkedCellIsGhostCell", _linkedCellNumMolecules.size()) {
-
-  Kokkos::parallel_for(_linkedCellIsGhostCell.size(), KOKKOS_LAMBDA(const unsigned int i) { _linkedCellIsGhostCell(i) = isGhostCell(i); });
-  Kokkos::fence(); // Ensure results are available on the host
+  for(unsigned int i = 0; i < _linkedCellIsGhostCell.size(); i++)
+    _linkedCellIsGhostCell(i) = isGhostCell(i);
 }
 
 void simplemd::MoleculeContainer::insert(int cellIdx, simplemd::Molecule& molecule) {
@@ -87,8 +86,10 @@ void simplemd::MoleculeContainer::sort() {
             ;
 
         // parallelise loop for all cells that are to be traversed in this way
+        MoleculeContainer& container = (*this);
         Kokkos::parallel_for(
-            length, KOKKOS_LAMBDA(const unsigned int j) {
+          Kokkos::RangePolicy<MainExecSpace>(0,length),
+          KOKKOS_LAMBDA(const unsigned int j) {
               // compute index of the current cell
               unsigned int index = 0;
 #if (MD_DIM > 1)
@@ -102,7 +103,7 @@ void simplemd::MoleculeContainer::sort() {
               // save rest of index in helpIndex1
               helpIndex1 = helpIndex1 - helpIndex2 * (lengthVector[0] * lengthVector[1]);
               // compute contribution to index (the starting 1 is the z coordinate of the first cell)
-              index += (2 * helpIndex2 + z) * _numCells[0] * _numCells[1];
+              index += (2 * helpIndex2 + z) * container._numCells[0] * container._numCells[1];
 #endif
 #if (MD_DIM > 1)
               // determine plane within traversed block
@@ -110,7 +111,7 @@ void simplemd::MoleculeContainer::sort() {
               // save rest of index in helpIndex1
               helpIndex1 = helpIndex1 - helpIndex2 * lengthVector[0];
               // compute contribution to index
-              index += (2 * helpIndex2 + y) * _numCells[0];
+              index += (2 * helpIndex2 + y) * container._numCells[0];
               // compute contribution for last dimension
               index += (2 * helpIndex1 + x);
 #else
@@ -119,14 +120,14 @@ void simplemd::MoleculeContainer::sort() {
 #if (MD_DEBUG == MD_YES)
               std::cout << "Handle cell " << index << std::endl;
 #endif
-              auto linkedCellLocal(_linkedCellNumMolecules);
-              auto moleculeDataLocal(_moleculeData);
+              auto linkedCellLocal(container._linkedCellNumMolecules);
+              auto moleculeDataLocal(container._moleculeData);
               for (size_t i = 0; i < linkedCellLocal(index); i++) {
-                unsigned int curMolIdx = positionToCellIndex(moleculeDataLocal(index, i).getPosition());
+                unsigned int curMolIdx = container.positionToCellIndex(moleculeDataLocal(index, i).getPosition());
                 if (curMolIdx != index) { // if molecule does not belong to current cell anymore
                                           // write data to target end
 #if (MD_ERROR == MD_YES)
-                  checkOperationWouldExceedCapacity(linkedCellLocal(curMolIdx) + 1);
+                  container.checkOperationWouldExceedCapacity(linkedCellLocal(curMolIdx) + 1);
 #endif
                   moleculeDataLocal(curMolIdx, linkedCellLocal(curMolIdx)) = moleculeDataLocal(index, i);
                   // increment target end
@@ -165,10 +166,15 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
   for (unsigned int d = 0; d < MD_DIM; d++) {
 #if (MD_ERROR == MD_YES)
     if ((position[d] < _domainOffset[d] - _meshWidth[d]) || (position[d] > _domainOffset[d] + _domainSize[d] + _meshWidth[d])) {
-      std::cout << "ERROR simplemd::MoleculeContainer::positionToCellIndex: Position ";
-      std::cout << d << " is out of range!" << std::endl;
-      std::cout << "Position: " << position << std::endl;
-      exit(EXIT_FAILURE);
+      Kokkos::printf("Position:");
+      for (unsigned int e = 0; e < MD_DIM; e++) {
+        Kokkos::printf(" %f", position[e]);
+        if (e == d) {
+          Kokkos::printf("(<- !!!)");
+        }
+      }
+      Kokkos::printf("\n");
+      Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex: Position is out of range!");
     }
 #endif
   }
@@ -184,15 +190,26 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
     index -= _globalIndexOfFirstCell[d];
 #if (MD_ERROR == MD_YES)
     if (index < 0) {
-      std::cout << "ERROR simplemd::MoleculeContainer::positionToCellIndex: index < 0: index=";
-      std::cout << index << std::endl;
-      std::cout << "Dimension : " << d << "," << _globalIndexOfFirstCell[d] << "," << _localIndexOfFirstCell[d] << std::endl;
-      std::cout << (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])) << std::endl;
+      Kokkos::printf("index < 0: index=%d\n", index);
+      Kokkos::printf("Dimension : %d, %d, %d\n", d, _globalIndexOfFirstCell[d], _localIndexOfFirstCell[d]);
+      Kokkos::printf("%d\n", (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])));
       for (unsigned int e = 0; e < d; e++) {
-        std::cout << cellVectorIndex[e] << std::endl;
+        Kokkos::printf("%u\n", cellVectorIndex[e]);
       }
-      std::cout << "Position: " << position << ", offset: " << _domainOffset << ", meshwidth: " << _meshWidth << std::endl;
-      exit(EXIT_FAILURE);
+      Kokkos::printf("Position:");
+      for (unsigned int e = 0; e < MD_DIM; e++) {
+        Kokkos::printf(" %f", position[e]);
+      }
+      Kokkos::printf(", offset: ");
+      for (unsigned int e = 0; e < MD_DIM; e++) {
+        Kokkos::printf(" %f", _domainOffset[e]);
+      }
+      Kokkos::printf(", meshwidth: ");
+      for (unsigned int e = 0; e < MD_DIM; e++) {
+        Kokkos::printf(" %f", _meshWidth[e]);
+      }
+      Kokkos::printf("\n");
+      Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex");
     }
 #endif
     cellVectorIndex[d] = (unsigned int)index;
@@ -200,7 +217,7 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
   return vectorIndexToLinear(cellVectorIndex);
 }
 
-const unsigned int simplemd::MoleculeContainer::vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const {
+unsigned int simplemd::MoleculeContainer::vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const {
   unsigned int cellLinearIndex = 0;
   unsigned int stepSize = 1;
   for (int d = 0; d < MD_DIM; d++) {
@@ -240,7 +257,7 @@ bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
   return false;
 }
 
-const size_t simplemd::MoleculeContainer::getLocalNumberOfMoleculesWithGhost() const {
+size_t simplemd::MoleculeContainer::getLocalNumberOfMoleculesWithGhost() const {
   Kokkos::fence(); // Ensure molecule count per cell is up to date
   size_t moleculeCount = 0;
   for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {
@@ -255,8 +272,8 @@ const tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLo
 #if (MD_ERROR == MD_YES)
 inline void simplemd::MoleculeContainer::checkOperationWouldExceedCapacity(int sizePostOp) const {
   if (sizePostOp > _cellCapacity) {
-    std::cout << "Cell capacity=" << _cellCapacity << " would be exceeded by an operation! Exiting..." << std::endl;
-    exit(EXIT_FAILURE);
+    Kokkos::printf("Cell capacity=%d would be exceeded by an operation! Exiting...", _cellCapacity);
+    Kokkos::abort("simplemd::MoleculeContainer::checkOperationWouldExceedCapacity");
   }
 }
 #endif
