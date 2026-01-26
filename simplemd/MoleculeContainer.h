@@ -111,7 +111,7 @@ public:
    * @param j
    * @return simplemd::Molecule&
    */
-  simplemd::Molecule& getMoleculeAt(int i, int j) const;
+  KOKKOS_FUNCTION simplemd::Molecule& getMoleculeAt(int i, int j) const;
 
   /**
    * @brief Returns the linked cell at 1D index idx (ghost included)

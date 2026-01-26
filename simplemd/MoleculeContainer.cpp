@@ -168,7 +168,10 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
     if ((position[d] < _domainOffset[d] - _meshWidth[d]) || (position[d] > _domainOffset[d] + _domainSize[d] + _meshWidth[d])) {
       Kokkos::printf("Position:");
       for (unsigned int e = 0; e < MD_DIM; e++) {
-        Kokkos::printf(" %d%s", position[e], e == d ? "(<- !!!)" : "");
+        Kokkos::printf(" %f", position[e]);
+        if (e == d) {
+          Kokkos::printf("(<- !!!)");
+        }
       }
       Kokkos::printf("\n");
       Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex: Position is out of range!");

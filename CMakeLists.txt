@@ -139,6 +139,9 @@ else()
     endif()
     set(Kokkos_ENABLE_DEBUG ${KOKKOS_DEBUG} CACHE STRING "Debug builds only" FORCE)
     set(Kokkos_ENABLE_DEBUG_BOUNDS_CHECK ${KOKKOS_DEBUG} CACHE STRING "Debug builds only" FORCE)
+    if(CMAKE_BUILD_TYPE MATCHES "^Debug" AND (${KOKKOS_TARGET} STREQUAL "CUDA"))
+      set(Kokkos_ENABLE_CUDA_CONSTEXPR ON CACHE STRING "Allow host constexpr code for CUDA" FORCE)
+    endif()
 
     FetchContent_Declare(
         Kokkos

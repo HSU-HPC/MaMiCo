@@ -29,10 +29,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
  * because results do not depend on order of force summation
  * this expects force1, force2 and forceBuffer to contain correctly formatted long long data already, not double
  */
-constexpr double maxF = 1e6;
-constexpr double stepF = std::numeric_limits<long long>::max() / maxF;
-constexpr double minF = 1 / stepF;
-inline void addForce(tarch::la::Vector<MD_DIM, double>& force1, tarch::la::Vector<MD_DIM, double>& force2, tarch::la::Vector<MD_DIM, double>& forceBuffer) {
+KOKKOS_INLINE_FUNCTION void addForce(tarch::la::Vector<MD_DIM, double>& force1, tarch::la::Vector<MD_DIM, double>& force2, tarch::la::Vector<MD_DIM, double>& forceBuffer) {
 #if (TARCH_DEBUG == TARCH_YES)
   *(long long*)(&force1[0]) += *(long long*)(&forceBuffer[0]);
   *(long long*)(&force1[1]) += *(long long*)(&forceBuffer[1]);
@@ -136,6 +133,8 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
     const double rij6 = rij2 * rij2 * rij2;
 #if (TARCH_DEBUG == TARCH_YES)
     tarch::la::Vector<MD_DIM, double> res{24.0 * _epsilon / rij2 * (_sigma6 / rij6) * (1.0 - 2.0 * (_sigma6 / rij6)) * rij};
+    constexpr double maxF = 1e6;
+    constexpr double stepF = std::numeric_limits<long long>::max() / maxF;
     res = stepF * res;
     long long fb0{(long long)(res[0])};
     long long fb1{(long long)(res[1])};
