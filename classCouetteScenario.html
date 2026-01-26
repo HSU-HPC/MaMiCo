@@ -216,10 +216,6 @@ const <a class="el" href="classcoupling_1_1services_1_1ParallelTimeIntegrationSe
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:abb9756896f41e58692b4da288d0eb25b" id="r_abb9756896f41e58692b4da288d0eb25b"><td class="memItemLeft" align="right" valign="top"><a id="abb9756896f41e58692b4da288d0eb25b" name="abb9756896f41e58692b4da288d0eb25b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>getRootRank</b> ()</td></tr>
-<tr class="memdesc:abb9756896f41e58692b4da288d0eb25b"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialises all MPI variables <br /></td></tr>
-<tr class="separator:abb9756896f41e58692b4da288d0eb25b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a434ab00124be51cb5b781c017a3b5e4e" id="r_a434ab00124be51cb5b781c017a3b5e4e"><td class="memItemLeft" align="right" valign="top"><a id="a434ab00124be51cb5b781c017a3b5e4e" name="a434ab00124be51cb5b781c017a3b5e4e"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>twsLoop</b> ()</td></tr>
 <tr class="memdesc:a434ab00124be51cb5b781c017a3b5e4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the entire test several times for a range of time-window-size parameters. <br /></td></tr>
@@ -269,6 +265,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>shutdown</b> ()</td><
 <tr class="separator:a00819b416dfec7577e6ece9cadcd6bed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f266f2b58a17f24b755cd6bfd8c1693" id="r_a8f266f2b58a17f24b755cd6bfd8c1693"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html">coupling::interface::MacroscopicSolverInterface</a>&lt; 3 &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8f266f2b58a17f24b755cd6bfd8c1693">getCouetteSolverInterface</a> (const double dx, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; mdOffset, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; mamicoMeshsize, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; globalNumberCouplingCells, unsigned int outerRegion)</td></tr>
 <tr class="separator:a8f266f2b58a17f24b755cd6bfd8c1693"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_classScenario"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_methods_classScenario')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classScenario.html">Scenario</a></td></tr>
+<tr class="memitem:a1cbdd3f5c70b0335dae602aa0e0d5a81 inherit pro_methods_classScenario" id="r_a1cbdd3f5c70b0335dae602aa0e0d5a81"><td class="memItemLeft" align="right" valign="top">
+void&#160;</td><td class="memItemRight" valign="bottom"><b>getRootRank</b> ()</td></tr>
+<tr class="memdesc:a1cbdd3f5c70b0335dae602aa0e0d5a81 inherit pro_methods_classScenario"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialises all MPI variables <br /></td></tr>
+<tr class="separator:a1cbdd3f5c70b0335dae602aa0e0d5a81 inherit pro_methods_classScenario"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -276,10 +277,6 @@ Protected Attributes</h2></td></tr>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>_rank</b></td></tr>
 <tr class="memdesc:aca162baa0ea126e3e3f4680d5f9991bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">the rank of the current MPI process in the local time domain <br /></td></tr>
 <tr class="separator:aca162baa0ea126e3e3f4680d5f9991bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93d2986e9bf25b5f9e6ad496af696f01" id="r_a93d2986e9bf25b5f9e6ad496af696f01"><td class="memItemLeft" align="right" valign="top"><a id="a93d2986e9bf25b5f9e6ad496af696f01" name="a93d2986e9bf25b5f9e6ad496af696f01"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>_isRootRank</b></td></tr>
-<tr class="memdesc:a93d2986e9bf25b5f9e6ad496af696f01"><td class="mdescLeft">&#160;</td><td class="mdescRight">if this is the world global root process <br /></td></tr>
-<tr class="separator:a93d2986e9bf25b5f9e6ad496af696f01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d6ca54bf529c9508b82c460f3b59480" id="r_a6d6ca54bf529c9508b82c460f3b59480"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6d6ca54bf529c9508b82c460f3b59480">_tws</a></td></tr>
 <tr class="separator:a6d6ca54bf529c9508b82c460f3b59480"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a890ff98344c41388f5719d68be0d247a" id="r_a890ff98344c41388f5719d68be0d247a"><td class="memItemLeft" align="right" valign="top"><a id="a890ff98344c41388f5719d68be0d247a" name="a890ff98344c41388f5719d68be0d247a"></a>
@@ -337,6 +334,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>_MDBoundarySetupDone<
 <tr class="memitem:af71eb63183673f5e74df857054f26096 inherit pro_attribs_classScenario" id="r_af71eb63183673f5e74df857054f26096"><td class="memItemLeft" align="right" valign="top">
 std::unique_ptr&lt; <a class="el" href="classcoupling_1_1services_1_1ParallelTimeIntegrationService.html">coupling::services::ParallelTimeIntegrationService</a>&lt; 3 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_timeIntegrationService</b></td></tr>
 <tr class="separator:af71eb63183673f5e74df857054f26096 inherit pro_attribs_classScenario"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff1db6bc80a99fbc3fd3a83abe3f51f1 inherit pro_attribs_classScenario" id="r_aff1db6bc80a99fbc3fd3a83abe3f51f1"><td class="memItemLeft" align="right" valign="top">
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>_isRootRank</b></td></tr>
+<tr class="memdesc:aff1db6bc80a99fbc3fd3a83abe3f51f1 inherit pro_attribs_classScenario"><td class="mdescLeft">&#160;</td><td class="mdescRight">if this is the world global root process <br /></td></tr>
+<tr class="separator:aff1db6bc80a99fbc3fd3a83abe3f51f1 inherit pro_attribs_classScenario"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Versatile configurable Couette flow test for noise-filtered multi-instance Nie coupling. </p>

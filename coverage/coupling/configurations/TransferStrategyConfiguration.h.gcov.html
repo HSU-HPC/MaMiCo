@@ -31,13 +31,13 @@
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">26</td>
-            <td class="headerCovTableEntry">46</td>
-            <td class="headerCovTableEntryLo">56.5 %</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntry">51</td>
+            <td class="headerCovTableEntryLo">58.8 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-26 12:18:48</td>
+            <td class="headerValue">2026-01-26 13:19:06</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -151,71 +151,80 @@
 <a name="89"><span class="lineNum">      89 </span>            :                      &quot;shift-by-timesteps=&quot;</a>
 <a name="90"><span class="lineNum">      90 </span><span class="lineNoCov">          0 :                   &lt;&lt; _shiftTimestep &lt;&lt; &quot;; typical values range between 0 and 1!&quot; &lt;&lt; std::endl;</span></a>
 <a name="91"><span class="lineNum">      91 </span>            :       }</a>
-<a name="92"><span class="lineNum">      92 </span><span class="lineCov">         28 :     }</span></a>
-<a name="93"><span class="lineNum">      93 </span><span class="lineCov">          4 :   }</span></a>
-<a name="94"><span class="lineNum">      94 </span>            : </a>
-<a name="95"><span class="lineNum">      95 </span>            :   /** Returns name of xml tag that is associated to the configuration.</a>
-<a name="96"><span class="lineNum">      96 </span>            :    *    @return name of xml tag that is associated to the configuration</a>
-<a name="97"><span class="lineNum">      97 </span>            :    */</a>
-<a name="98"><span class="lineNum">      98 </span><span class="lineCov">         16 :   std::string getTag() const { return &quot;transfer-strategy&quot;; }</span></a>
-<a name="99"><span class="lineNum">      99 </span>            : </a>
-<a name="100"><span class="lineNum">     100 </span>            :   /** checks if the configuration is valid. This operation usually fails, if</a>
-<a name="101"><span class="lineNum">     101 </span>            :    *e.g.</a>
-<a name="102"><span class="lineNum">     102 </span>            :    *    1. parseSubtag() hasn't been called, i.e. configuration has not been</a>
-<a name="103"><span class="lineNum">     103 </span>            :    *used, or</a>
-<a name="104"><span class="lineNum">     104 </span>            :    *  2. parseSubtag() failed due to a wrong file.</a>
-<a name="105"><span class="lineNum">     105 </span>            :    *  3. If a tag ain't optional and parseSubtag() was not called (first case)</a>
-<a name="106"><span class="lineNum">     106 </span>            :    *    @return _isValid</a>
-<a name="107"><span class="lineNum">     107 </span>            :    */</a>
-<a name="108"><span class="lineNum">     108 </span><span class="lineCov">          4 :   bool isValid() const { return _isValid; }</span></a>
-<a name="109"><span class="lineNum">     109 </span>            : </a>
-<a name="110"><span class="lineNum">     110 </span>            :   /** Returns transfer strategy configuration.</a>
-<a name="111"><span class="lineNum">     111 </span>            :    *    @tparam LinkedCell type of the cell</a>
-<a name="112"><span class="lineNum">     112 </span>            :    *    @param mdSolverInterface</a>
-<a name="113"><span class="lineNum">     113 </span>            :    *    @param numberOfMDTimesteps</a>
-<a name="114"><span class="lineNum">     114 </span>            :    *    @return transfer strategy config</a>
-<a name="115"><span class="lineNum">     115 </span>            :    */</a>
-<a name="116"><span class="lineNum">     116 </span>            :   template &lt;class LinkedCell&gt;</a>
-<a name="117"><span class="lineNum">     117 </span>            :   coupling::transferstrategies::TransferStrategy&lt;LinkedCell, dim&gt;*</a>
-<a name="118"><span class="lineNum">     118 </span><span class="lineCov">          4 :   interpreteConfiguration(coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const mdSolverInterface, unsigned int numberOfMDTimesteps) const {</span></a>
-<a name="119"><span class="lineNum">     119 </span><span class="lineCov">          4 :     if (_type == DirectTransferStrategy) {</span></a>
-<a name="120"><span class="lineNum">     120 </span><span class="lineCov">          4 :       return new coupling::transferstrategies::DirectTransferStrategy&lt;LinkedCell, dim&gt;(mdSolverInterface);</span></a>
-<a name="121"><span class="lineNum">     121 </span><span class="lineNoCov">          0 :     } else if (_type == DifferenceTransferStrategy) {</span></a>
-<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :       return new coupling::transferstrategies::DifferenceTransferStrategy&lt;LinkedCell, dim&gt;(mdSolverInterface, numberOfMDTimesteps);</span></a>
-<a name="123"><span class="lineNum">     123 </span><span class="lineNoCov">          0 :     } else if (_type == TransferStrategy4SchwarzCoupling) {</span></a>
-<a name="124"><span class="lineNum">     124 </span><span class="lineNoCov">          0 :       return new coupling::transferstrategies::TransferStrategy4SchwarzCoupling&lt;LinkedCell, dim&gt;(mdSolverInterface, numberOfMDTimesteps);</span></a>
-<a name="125"><span class="lineNum">     125 </span><span class="lineNoCov">          0 :     } else if (_type == TransferStrategy4NieCoupling) {</span></a>
-<a name="126"><span class="lineNum">     126 </span><span class="lineNoCov">          0 :       return new coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell, dim&gt;(mdSolverInterface, numberOfMDTimesteps, _shiftTimestep,</span></a>
-<a name="127"><span class="lineNum">     127 </span><span class="lineNoCov">          0 :                                                                                              _massFluxBoundary);</span></a>
-<a name="128"><span class="lineNum">     128 </span><span class="lineNoCov">          0 :     } else if (_type == AveragingTransferStrategy) {</span></a>
-<a name="129"><span class="lineNum">     129 </span><span class="lineNoCov">          0 :       return new coupling::transferstrategies::AveragingTransferStrategy&lt;LinkedCell, dim&gt;(mdSolverInterface);</span></a>
-<a name="130"><span class="lineNum">     130 </span>            :     } else {</a>
-<a name="131"><span class="lineNum">     131 </span>            :       return NULL;</a>
-<a name="132"><span class="lineNum">     132 </span>            :     }</a>
-<a name="133"><span class="lineNum">     133 </span>            :   }</a>
-<a name="134"><span class="lineNum">     134 </span>            : </a>
-<a name="135"><span class="lineNum">     135 </span>            :   /** Returns the transfer strategy type.</a>
-<a name="136"><span class="lineNum">     136 </span>            :    *    @return _type</a>
-<a name="137"><span class="lineNum">     137 </span>            :    */</a>
-<a name="138"><span class="lineNum">     138 </span>            :   StrategyType getStrategyType() const { return _type; }</a>
-<a name="139"><span class="lineNum">     139 </span>            : </a>
-<a name="140"><span class="lineNum">     140 </span>            : protected:</a>
-<a name="141"><span class="lineNum">     141 </span><span class="lineCov">          4 :   TransferStrategyConfiguration(StrategyType type, tarch::la::Vector&lt;2 * dim, bool&gt; massFluxBoundary, double shiftTimestep)</span></a>
-<a name="142"><span class="lineNum">     142 </span><span class="lineCov">          4 :       : _type(type), _massFluxBoundary(massFluxBoundary), _shiftTimestep(shiftTimestep), _isValid(true) {}</span></a>
-<a name="143"><span class="lineNum">     143 </span>            : </a>
-<a name="144"><span class="lineNum">     144 </span>            : private:</a>
-<a name="145"><span class="lineNum">     145 </span>            :   StrategyType _type;</a>
-<a name="146"><span class="lineNum">     146 </span>            :   tarch::la::Vector&lt;2 * dim, bool&gt; _massFluxBoundary; // true in each component, if one of the 2*dim</a>
-<a name="147"><span class="lineNum">     147 </span>            :                                                       // boundaries allows for mass flux</a>
-<a name="148"><span class="lineNum">     148 </span>            :   double _shiftTimestep;                              // used for Nie coupling: time interval by which the</a>
-<a name="149"><span class="lineNum">     149 </span>            :                                                       // evaluation of the continuum flow field should be</a>
-<a name="150"><span class="lineNum">     150 </span>            :                                                       // shifted. See also TransferStrategy4NieCoupling for</a>
-<a name="151"><span class="lineNum">     151 </span>            :                                                       // more details.</a>
-<a name="152"><span class="lineNum">     152 </span>            : </a>
-<a name="153"><span class="lineNum">     153 </span>            :   bool _isValid;</a>
-<a name="154"><span class="lineNum">     154 </span>            : };</a>
-<a name="155"><span class="lineNum">     155 </span>            : </a>
-<a name="156"><span class="lineNum">     156 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_STRATEGYCONFIGURATION_H_</a>
+<a name="92"><span class="lineNum">      92 </span>            : </a>
+<a name="93"><span class="lineNum">      93 </span><span class="lineCov">          4 :       _energyCorrection = false;</span></a>
+<a name="94"><span class="lineNum">      94 </span><span class="lineCov">          4 :       _density = 1;</span></a>
+<a name="95"><span class="lineNum">      95 </span><span class="lineCov">          4 :       tarch::configuration::ParseConfiguration::readBoolOptional(_energyCorrection, node, &quot;energy-correction&quot;);</span></a>
+<a name="96"><span class="lineNum">      96 </span><span class="lineCov">          4 :       if (_energyCorrection){</span></a>
+<a name="97"><span class="lineNum">      97 </span><span class="lineNoCov">          0 :         tarch::configuration::ParseConfiguration::readDoubleMandatory(_density, node, &quot;density&quot;);</span></a>
+<a name="98"><span class="lineNum">      98 </span>            :       }</a>
+<a name="99"><span class="lineNum">      99 </span><span class="lineCov">         28 :     }</span></a>
+<a name="100"><span class="lineNum">     100 </span><span class="lineCov">          4 :   }</span></a>
+<a name="101"><span class="lineNum">     101 </span>            : </a>
+<a name="102"><span class="lineNum">     102 </span>            :   /** Returns name of xml tag that is associated to the configuration.</a>
+<a name="103"><span class="lineNum">     103 </span>            :    *    @return name of xml tag that is associated to the configuration</a>
+<a name="104"><span class="lineNum">     104 </span>            :    */</a>
+<a name="105"><span class="lineNum">     105 </span><span class="lineCov">         16 :   std::string getTag() const { return &quot;transfer-strategy&quot;; }</span></a>
+<a name="106"><span class="lineNum">     106 </span>            : </a>
+<a name="107"><span class="lineNum">     107 </span>            :   /** checks if the configuration is valid. This operation usually fails, if</a>
+<a name="108"><span class="lineNum">     108 </span>            :    *e.g.</a>
+<a name="109"><span class="lineNum">     109 </span>            :    *    1. parseSubtag() hasn't been called, i.e. configuration has not been</a>
+<a name="110"><span class="lineNum">     110 </span>            :    *used, or</a>
+<a name="111"><span class="lineNum">     111 </span>            :    *  2. parseSubtag() failed due to a wrong file.</a>
+<a name="112"><span class="lineNum">     112 </span>            :    *  3. If a tag ain't optional and parseSubtag() was not called (first case)</a>
+<a name="113"><span class="lineNum">     113 </span>            :    *    @return _isValid</a>
+<a name="114"><span class="lineNum">     114 </span>            :    */</a>
+<a name="115"><span class="lineNum">     115 </span><span class="lineCov">          4 :   bool isValid() const { return _isValid; }</span></a>
+<a name="116"><span class="lineNum">     116 </span>            : </a>
+<a name="117"><span class="lineNum">     117 </span>            :   /** Returns transfer strategy configuration.</a>
+<a name="118"><span class="lineNum">     118 </span>            :    *    @tparam LinkedCell type of the cell</a>
+<a name="119"><span class="lineNum">     119 </span>            :    *    @param mdSolverInterface</a>
+<a name="120"><span class="lineNum">     120 </span>            :    *    @param numberOfMDTimesteps</a>
+<a name="121"><span class="lineNum">     121 </span>            :    *    @return transfer strategy config</a>
+<a name="122"><span class="lineNum">     122 </span>            :    */</a>
+<a name="123"><span class="lineNum">     123 </span>            :   template &lt;class LinkedCell&gt;</a>
+<a name="124"><span class="lineNum">     124 </span>            :   coupling::transferstrategies::TransferStrategy&lt;LinkedCell, dim&gt;*</a>
+<a name="125"><span class="lineNum">     125 </span><span class="lineCov">          4 :   interpreteConfiguration(coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const mdSolverInterface, unsigned int numberOfMDTimesteps) const {</span></a>
+<a name="126"><span class="lineNum">     126 </span><span class="lineCov">          4 :     if (_type == DirectTransferStrategy) {</span></a>
+<a name="127"><span class="lineNum">     127 </span><span class="lineCov">          4 :       return new coupling::transferstrategies::DirectTransferStrategy&lt;LinkedCell, dim&gt;(mdSolverInterface);</span></a>
+<a name="128"><span class="lineNum">     128 </span><span class="lineNoCov">          0 :     } else if (_type == DifferenceTransferStrategy) {</span></a>
+<a name="129"><span class="lineNum">     129 </span><span class="lineNoCov">          0 :       return new coupling::transferstrategies::DifferenceTransferStrategy&lt;LinkedCell, dim&gt;(mdSolverInterface, numberOfMDTimesteps);</span></a>
+<a name="130"><span class="lineNum">     130 </span><span class="lineNoCov">          0 :     } else if (_type == TransferStrategy4SchwarzCoupling) {</span></a>
+<a name="131"><span class="lineNum">     131 </span><span class="lineNoCov">          0 :       return new coupling::transferstrategies::TransferStrategy4SchwarzCoupling&lt;LinkedCell, dim&gt;(mdSolverInterface, numberOfMDTimesteps);</span></a>
+<a name="132"><span class="lineNum">     132 </span><span class="lineNoCov">          0 :     } else if (_type == TransferStrategy4NieCoupling) {</span></a>
+<a name="133"><span class="lineNum">     133 </span><span class="lineNoCov">          0 :       return new coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell, dim&gt;(mdSolverInterface, numberOfMDTimesteps, _shiftTimestep,</span></a>
+<a name="134"><span class="lineNum">     134 </span><span class="lineNoCov">          0 :                                                                                              _massFluxBoundary, _energyCorrection, _density);</span></a>
+<a name="135"><span class="lineNum">     135 </span><span class="lineNoCov">          0 :     } else if (_type == AveragingTransferStrategy) {</span></a>
+<a name="136"><span class="lineNum">     136 </span><span class="lineNoCov">          0 :       return new coupling::transferstrategies::AveragingTransferStrategy&lt;LinkedCell, dim&gt;(mdSolverInterface);</span></a>
+<a name="137"><span class="lineNum">     137 </span>            :     } else {</a>
+<a name="138"><span class="lineNum">     138 </span>            :       return NULL;</a>
+<a name="139"><span class="lineNum">     139 </span>            :     }</a>
+<a name="140"><span class="lineNum">     140 </span>            :   }</a>
+<a name="141"><span class="lineNum">     141 </span>            : </a>
+<a name="142"><span class="lineNum">     142 </span>            :   /** Returns the transfer strategy type.</a>
+<a name="143"><span class="lineNum">     143 </span>            :    *    @return _type</a>
+<a name="144"><span class="lineNum">     144 </span>            :    */</a>
+<a name="145"><span class="lineNum">     145 </span>            :   StrategyType getStrategyType() const { return _type; }</a>
+<a name="146"><span class="lineNum">     146 </span>            : </a>
+<a name="147"><span class="lineNum">     147 </span>            : protected:</a>
+<a name="148"><span class="lineNum">     148 </span><span class="lineCov">          4 :   TransferStrategyConfiguration(StrategyType type, tarch::la::Vector&lt;2 * dim, bool&gt; massFluxBoundary, double shiftTimestep)</span></a>
+<a name="149"><span class="lineNum">     149 </span><span class="lineCov">          4 :       : _type(type), _massFluxBoundary(massFluxBoundary), _shiftTimestep(shiftTimestep), _isValid(true) {}</span></a>
+<a name="150"><span class="lineNum">     150 </span>            : </a>
+<a name="151"><span class="lineNum">     151 </span>            : private:</a>
+<a name="152"><span class="lineNum">     152 </span>            :   StrategyType _type;</a>
+<a name="153"><span class="lineNum">     153 </span>            :   tarch::la::Vector&lt;2 * dim, bool&gt; _massFluxBoundary; // true in each component, if one of the 2*dim</a>
+<a name="154"><span class="lineNum">     154 </span>            :                                                       // boundaries allows for mass flux</a>
+<a name="155"><span class="lineNum">     155 </span>            :   double _shiftTimestep;                              // used for Nie coupling: time interval by which the</a>
+<a name="156"><span class="lineNum">     156 </span>            :                                                       // evaluation of the continuum flow field should be</a>
+<a name="157"><span class="lineNum">     157 </span>            :                                                       // shifted. See also TransferStrategy4NieCoupling for</a>
+<a name="158"><span class="lineNum">     158 </span>            :                                                       // more details.</a>
+<a name="159"><span class="lineNum">     159 </span>            : </a>
+<a name="160"><span class="lineNum">     160 </span>            :   bool _isValid;</a>
+<a name="161"><span class="lineNum">     161 </span>            :   bool _energyCorrection;</a>
+<a name="162"><span class="lineNum">     162 </span>            :   double _density;</a>
+<a name="163"><span class="lineNum">     163 </span>            : };</a>
+<a name="164"><span class="lineNum">     164 </span>            : </a>
+<a name="165"><span class="lineNum">     165 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_STRATEGYCONFIGURATION_H_</a>
 </pre>
       </td>
     </tr>

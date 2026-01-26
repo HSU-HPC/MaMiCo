@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-26 12:18:48</td>
+            <td class="headerValue">2026-01-26 13:19:06</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">4</td>
@@ -109,9 +109,9 @@
 <a name="47"><span class="lineNum">      47 </span>            :  */</a>
 <a name="48"><span class="lineNum">      48 </span><span class="lineCov">        184 : template &lt;unsigned int dim&gt; class coupling::indexing::IndexingService {</span></a>
 <a name="49"><span class="lineNum">      49 </span>            : public:</a>
-<a name="50"><span class="lineNum">      50 </span><span class="lineCov">   14295443 :   static IndexingService&amp; getInstance() {</span></a>
-<a name="51"><span class="lineNum">      51 </span><span class="lineCov">   14295627 :     static IndexingService singleton{};</span></a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineCov">   14295443 :     return singleton;</span></a>
+<a name="50"><span class="lineNum">      50 </span><span class="lineCov">   14295560 :   static IndexingService&amp; getInstance() {</span></a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">   14295744 :     static IndexingService singleton{};</span></a>
+<a name="52"><span class="lineNum">      52 </span><span class="lineCov">   14295560 :     return singleton;</span></a>
 <a name="53"><span class="lineNum">      53 </span>            :   }</a>
 <a name="54"><span class="lineNum">      54 </span>            : </a>
 <a name="55"><span class="lineNum">      55 </span><span class="lineCov">        748 :   void initWithCells(tarch::la::Vector&lt;dim, unsigned int&gt; globalNumberCouplingCells, tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,</span></a>
@@ -221,14 +221,14 @@
 <a name="159"><span class="lineNum">     159 </span>            :   unsigned int getUniqueRankForCouplingCell(const BaseIndex&lt;dim&gt;&amp; globalCellIndex, unsigned int topologyOffset) const;</a>
 <a name="160"><span class="lineNum">     160 </span>            : </a>
 <a name="161"><span class="lineNum">     161 </span>            : #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario</a>
-<a name="162"><span class="lineNum">     162 </span><span class="lineCov">       1535 :   MPI_Comm getComm() const {</span></a>
+<a name="162"><span class="lineNum">     162 </span><span class="lineCov">       1652 :   MPI_Comm getComm() const {</span></a>
 <a name="163"><span class="lineNum">     163 </span>            : #if (COUPLING_MD_ERROR == COUPLING_MD_YES)</a>
-<a name="164"><span class="lineNum">     164 </span><span class="lineCov">       1535 :     if (!_isInitialized) {</span></a>
+<a name="164"><span class="lineNum">     164 </span><span class="lineCov">       1652 :     if (!_isInitialized) {</span></a>
 <a name="165"><span class="lineNum">     165 </span><span class="lineCov">          8 :       throw std::runtime_error(std::string(&quot;IndexingService: Called index system getComm() before initialization! &quot;));</span></a>
 <a name="166"><span class="lineNum">     166 </span>            :     }</a>
 <a name="167"><span class="lineNum">     167 </span>            : #endif</a>
 <a name="168"><span class="lineNum">     168 </span>            : </a>
-<a name="169"><span class="lineNum">     169 </span><span class="lineCov">       1531 :     return _comm;</span></a>
+<a name="169"><span class="lineNum">     169 </span><span class="lineCov">       1648 :     return _comm;</span></a>
 <a name="170"><span class="lineNum">     170 </span>            :   }</a>
 <a name="171"><span class="lineNum">     171 </span>            : #endif</a>
 <a name="172"><span class="lineNum">     172 </span>            : </a>

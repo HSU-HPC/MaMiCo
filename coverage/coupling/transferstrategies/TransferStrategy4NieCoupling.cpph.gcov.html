@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">91</td>
+            <td class="headerCovTableEntry">96</td>
             <td class="headerCovTableEntryLo">0.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-26 12:18:48</td>
+            <td class="headerValue">2026-01-26 13:19:06</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -68,10 +68,10 @@
 <a name="6"><span class="lineNum">       6 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
 <a name="7"><span class="lineNum">       7 </span><span class="lineNoCov">          0 : coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell, dim&gt;::TransferStrategy4NieCoupling(</span></a>
 <a name="8"><span class="lineNum">       8 </span>            :     coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* const mdSolverInterface, unsigned int numberMDSteps, double shiftTimestep,</a>
-<a name="9"><span class="lineNum">       9 </span>            :     tarch::la::Vector&lt;2 * dim, bool&gt; massFluxBoundary)</a>
+<a name="9"><span class="lineNum">       9 </span>            :     tarch::la::Vector&lt;2 * dim, bool&gt; massFluxBoundary, bool energyCorrection, double density)</a>
 <a name="10"><span class="lineNum">      10 </span><span class="lineNoCov">          0 :     : coupling::transferstrategies::TransferStrategy&lt;LinkedCell, dim&gt;(mdSolverInterface), _massMapping(mdSolverInterface), _momentumMapping(mdSolverInterface),</span></a>
 <a name="11"><span class="lineNum">      11 </span><span class="lineNoCov">          0 :       _oldSolution(NULL), _newSolution(NULL), _numberMDSteps(numberMDSteps), _shiftTimestep(shiftTimestep), _numberLocalCells(I02::linearNumberCellsInDomain),</span></a>
-<a name="12"><span class="lineNum">      12 </span><span class="lineNoCov">          0 :       _excessMass(NULL), _massFluxBoundary(massFluxBoundary) {</span></a>
+<a name="12"><span class="lineNum">      12 </span><span class="lineNoCov">          0 :       _excessMass(NULL), _massFluxBoundary(massFluxBoundary), _enableEnergyCorrection(energyCorrection), _density(density) {</span></a>
 <a name="13"><span class="lineNum">      13 </span>            :   // allocate arrays for old and new solution (required for linear time</a>
 <a name="14"><span class="lineNum">      14 </span>            :   // interpolation) and init. them with zero vectors</a>
 <a name="15"><span class="lineNum">      15 </span><span class="lineNoCov">          0 :   _oldSolution = new tarch::la::Vector&lt;dim, double&gt;[_numberLocalCells];</span></a>
@@ -185,115 +185,126 @@
 <a name="123"><span class="lineNum">     123 </span>            :   // average sampled data from MD</a>
 <a name="124"><span class="lineNum">     124 </span><span class="lineNoCov">          0 :   if (_timestepCounter != 0) {</span></a>
 <a name="125"><span class="lineNum">     125 </span><span class="lineNoCov">          0 :     const double mass = cell.getMacroscopicMass() / ((double)_timestepCounter);</span></a>
-<a name="126"><span class="lineNum">     126 </span><span class="lineNoCov">          0 :     const tarch::la::Vector&lt;dim, double&gt; momentum = (1.0 / ((double)_timestepCounter)) * cell.getMacroscopicMomentum();</span></a>
-<a name="127"><span class="lineNum">     127 </span><span class="lineNoCov">          0 :     cell.setMacroscopicMass(mass);</span></a>
-<a name="128"><span class="lineNum">     128 </span><span class="lineNoCov">          0 :     cell.setMacroscopicMomentum(momentum);</span></a>
-<a name="129"><span class="lineNum">     129 </span>            :   } else {</a>
-<a name="130"><span class="lineNum">     130 </span><span class="lineNoCov">          0 :     cell.setMacroscopicMass(0.0);</span></a>
-<a name="131"><span class="lineNum">     131 </span><span class="lineNoCov">          0 :     cell.setMacroscopicMomentum(tarch::la::Vector&lt;dim, double&gt;(0.0));</span></a>
-<a name="132"><span class="lineNum">     132 </span>            :   }</a>
-<a name="133"><span class="lineNum">     133 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="134"><span class="lineNum">     134 </span>            :   std::cout &lt;&lt; &quot;Time step counter=&quot; &lt;&lt; _timestepCounter &lt;&lt; std::endl;</a>
-<a name="135"><span class="lineNum">     135 </span>            :   std::cout &lt;&lt; &quot;processInnerCouplingCellBeforeSendingMDSolverData(): Data &quot;</a>
-<a name="136"><span class="lineNum">     136 </span>            :                &quot;from cell &quot;</a>
-<a name="137"><span class="lineNum">     137 </span>            :             &lt;&lt; index &lt;&lt; &quot;Mass: &quot; &lt;&lt; cell.getMacroscopicMass() &lt;&lt; &quot; , momentum: &quot; &lt;&lt; cell.getMacroscopicMomentum() &lt;&lt; std::endl;</a>
-<a name="138"><span class="lineNum">     138 </span>            : #endif</a>
-<a name="139"><span class="lineNum">     139 </span>            : </a>
-<a name="140"><span class="lineNum">     140 </span>            :   // cell.iterateConstCells(_massMapping);</a>
-<a name="141"><span class="lineNum">     141 </span>            :   // _totalMass += _massMapping.getMass();</a>
-<a name="142"><span class="lineNum">     142 </span>            :   // _totalMass +=  cell.getMicroscopicMass();</a>
-<a name="143"><span class="lineNum">     143 </span><span class="lineNoCov">          0 : }</span></a>
-<a name="144"><span class="lineNum">     144 </span>            : </a>
-<a name="145"><span class="lineNum">     145 </span>            : // template&lt;class LinkedCell,unsigned int dim&gt;</a>
-<a name="146"><span class="lineNum">     146 </span>            : // void</a>
-<a name="147"><span class="lineNum">     147 </span>            : // coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell,dim&gt;::</a>
-<a name="148"><span class="lineNum">     148 </span>            : // endProcessInnerCouplingCellsBeforeSendingMDSolverData(){</a>
-<a name="149"><span class="lineNum">     149 </span>            : // std::cout &lt;&lt; &quot;Avg massFluxBoundary MD density: &quot; &lt;&lt;</a>
-<a name="150"><span class="lineNum">     150 </span>            : // _totalMass/(_cellCount*15.625) &lt;&lt; std::endl;</a>
-<a name="151"><span class="lineNum">     151 </span>            : //}</a>
-<a name="152"><span class="lineNum">     152 </span>            : </a>
-<a name="153"><span class="lineNum">     153 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="154"><span class="lineNum">     154 </span><span class="lineNoCov">          0 : void coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell, dim&gt;::beginProcessInnerCouplingCellsAfterMDTimestep() {</span></a>
-<a name="155"><span class="lineNum">     155 </span>            :   // increment time step counter</a>
-<a name="156"><span class="lineNum">     156 </span><span class="lineNoCov">          0 :   _timestepCounter++;</span></a>
-<a name="157"><span class="lineNum">     157 </span><span class="lineNoCov">          0 : }</span></a>
-<a name="158"><span class="lineNum">     158 </span>            : </a>
-<a name="159"><span class="lineNum">     159 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="160"><span class="lineNum">     160 </span><span class="lineNoCov">          0 : void coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell, dim&gt;::processInnerCouplingCellAfterMDTimestep(</span></a>
-<a name="161"><span class="lineNum">     161 </span>            :     coupling::datastructures::CouplingCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell, I02 index) {</a>
-<a name="162"><span class="lineNum">     162 </span>            :   // sampling: add up mass and momentum in macroscopic buffers</a>
-<a name="163"><span class="lineNum">     163 </span><span class="lineNoCov">          0 :   cell.iterateConstCells(_massMapping);</span></a>
-<a name="164"><span class="lineNum">     164 </span><span class="lineNoCov">          0 :   const double mass = _massMapping.getMass();</span></a>
-<a name="165"><span class="lineNum">     165 </span>            :   //_totalMass += mass;</a>
-<a name="166"><span class="lineNum">     166 </span>            :   //_cellCount++;</a>
-<a name="167"><span class="lineNum">     167 </span><span class="lineNoCov">          0 :   cell.iterateConstCells(_momentumMapping);</span></a>
-<a name="168"><span class="lineNum">     168 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; momentum(_momentumMapping.getMomentum());</span></a>
-<a name="169"><span class="lineNum">     169 </span><span class="lineNoCov">          0 :   cell.addMacroscopicMass(mass);</span></a>
-<a name="170"><span class="lineNum">     170 </span><span class="lineNoCov">          0 :   cell.addMacroscopicMomentum(momentum);</span></a>
-<a name="171"><span class="lineNum">     171 </span>            : </a>
-<a name="172"><span class="lineNum">     172 </span>            :   // interpolation of velocity value from old and new solution</a>
-<a name="173"><span class="lineNum">     173 </span>            :   // we shift the factor by _shiftTimestep time steps and inter- or extrapolate</a>
-<a name="174"><span class="lineNum">     174 </span>            :   // velocities. A CFD solver will deliver values at t and t+dt and we want to</a>
-<a name="175"><span class="lineNum">     175 </span>            :   // advance the simulation potentially differently</a>
-<a name="176"><span class="lineNum">     176 </span><span class="lineNoCov">          0 :   const double factor = _shiftTimestep + ((double)_timestepCounter) / ((double)_numberMDSteps);</span></a>
-<a name="177"><span class="lineNum">     177 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="178"><span class="lineNum">     178 </span>            :   if (factor &lt; _shiftTimestep || factor &gt; 1.0 + _shiftTimestep) {</a>
-<a name="179"><span class="lineNum">     179 </span>            :     std::cout &lt;&lt; &quot;ERROR &quot;</a>
-<a name="180"><span class="lineNum">     180 </span>            :                  &quot;coupling::transferstrategies::TransferStrategy4NieCoupling&lt;&quot;</a>
-<a name="181"><span class="lineNum">     181 </span>            :                  &quot;LinkedCell,dim&gt;::processInnerCouplingCellAfterMDTimestep(.&quot;</a>
-<a name="182"><span class="lineNum">     182 </span>            :                  &quot;.): factor out of range!&quot;</a>
-<a name="183"><span class="lineNum">     183 </span>            :               &lt;&lt; std::endl;</a>
-<a name="184"><span class="lineNum">     184 </span>            :     exit(EXIT_FAILURE);</a>
-<a name="185"><span class="lineNum">     185 </span>            :   }</a>
-<a name="186"><span class="lineNum">     186 </span>            : #endif</a>
-<a name="187"><span class="lineNum">     187 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; velocity = (1.0 - factor) * _oldSolution[index.get()] + factor * _newSolution[index.get()];</span></a>
-<a name="188"><span class="lineNum">     188 </span><span class="lineNoCov">          0 :   cell.setMicroscopicMomentum(velocity);</span></a>
-<a name="189"><span class="lineNum">     189 </span><span class="lineNoCov">          0 : }</span></a>
-<a name="190"><span class="lineNum">     190 </span>            : </a>
-<a name="191"><span class="lineNum">     191 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
-<a name="192"><span class="lineNum">     192 </span><span class="lineNoCov">          0 : double coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell, dim&gt;::computeMassFlux(const double&amp; mass,</span></a>
-<a name="193"><span class="lineNum">     193 </span>            :                                                                                                     const tarch::la::Vector&lt;dim, double&gt;&amp; velocity,</a>
-<a name="194"><span class="lineNum">     194 </span>            :                                                                                                     const I01 index) {</a>
-<a name="195"><span class="lineNum">     195 </span>            :   // meshsize and volume of cell</a>
-<a name="196"><span class="lineNum">     196 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; meshsize(IDXS.getCouplingCellSize());</span></a>
-<a name="197"><span class="lineNum">     197 </span>            :   double volume = 1.0;</a>
-<a name="198"><span class="lineNum">     198 </span><span class="lineNoCov">          0 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="199"><span class="lineNum">     199 </span><span class="lineNoCov">          0 :     volume = volume * meshsize[d];</span></a>
-<a name="200"><span class="lineNum">     200 </span>            :   }</a>
+<a name="126"><span class="lineNum">     126 </span><span class="lineNoCov">          0 :     double momentumFactor = (1.0 / ((double)_timestepCounter));</span></a>
+<a name="127"><span class="lineNum">     127 </span>            : </a>
+<a name="128"><span class="lineNum">     128 </span><span class="lineNoCov">          0 :     if(_enableEnergyCorrection){</span></a>
+<a name="129"><span class="lineNum">     129 </span><span class="lineNoCov">          0 :       const double mass_macro = IDXS.getCouplingCellSize()[0]*IDXS.getCouplingCellSize()[1]*IDXS.getCouplingCellSize()[2]*_density;</span></a>
+<a name="130"><span class="lineNum">     130 </span>            :       // computes energy conservation correction factor</a>
+<a name="131"><span class="lineNum">     131 </span>            :       // based on assumption mass/2*vel_micro^2 = mass_macro/2*vel_macro^2</a>
+<a name="132"><span class="lineNum">     132 </span>            :       // Note: In MD-60 scenario, energy_correction factor is on average ca. 0.9998</a>
+<a name="133"><span class="lineNum">     133 </span><span class="lineNoCov">          0 :       const double energy_correction = sqrt( mass / mass_macro );</span></a>
+<a name="134"><span class="lineNum">     134 </span><span class="lineNoCov">          0 :       momentumFactor *= energy_correction;</span></a>
+<a name="135"><span class="lineNum">     135 </span>            :     }</a>
+<a name="136"><span class="lineNum">     136 </span>            : </a>
+<a name="137"><span class="lineNum">     137 </span><span class="lineNoCov">          0 :     const tarch::la::Vector&lt;dim, double&gt; momentum = momentumFactor * cell.getMacroscopicMomentum();</span></a>
+<a name="138"><span class="lineNum">     138 </span><span class="lineNoCov">          0 :     cell.setMacroscopicMass(mass);</span></a>
+<a name="139"><span class="lineNum">     139 </span><span class="lineNoCov">          0 :     cell.setMacroscopicMomentum(momentum);</span></a>
+<a name="140"><span class="lineNum">     140 </span>            :   } else {</a>
+<a name="141"><span class="lineNum">     141 </span><span class="lineNoCov">          0 :     cell.setMacroscopicMass(0.0);</span></a>
+<a name="142"><span class="lineNum">     142 </span><span class="lineNoCov">          0 :     cell.setMacroscopicMomentum(tarch::la::Vector&lt;dim, double&gt;(0.0));</span></a>
+<a name="143"><span class="lineNum">     143 </span>            :   }</a>
+<a name="144"><span class="lineNum">     144 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
+<a name="145"><span class="lineNum">     145 </span>            :   std::cout &lt;&lt; &quot;Time step counter=&quot; &lt;&lt; _timestepCounter &lt;&lt; std::endl;</a>
+<a name="146"><span class="lineNum">     146 </span>            :   std::cout &lt;&lt; &quot;processInnerCouplingCellBeforeSendingMDSolverData(): Data &quot;</a>
+<a name="147"><span class="lineNum">     147 </span>            :                &quot;from cell &quot;</a>
+<a name="148"><span class="lineNum">     148 </span>            :             &lt;&lt; index &lt;&lt; &quot;Mass: &quot; &lt;&lt; cell.getMacroscopicMass() &lt;&lt; &quot; , momentum: &quot; &lt;&lt; cell.getMacroscopicMomentum() &lt;&lt; std::endl;</a>
+<a name="149"><span class="lineNum">     149 </span>            : #endif</a>
+<a name="150"><span class="lineNum">     150 </span>            : </a>
+<a name="151"><span class="lineNum">     151 </span>            :   // cell.iterateConstCells(_massMapping);</a>
+<a name="152"><span class="lineNum">     152 </span>            :   // _totalMass += _massMapping.getMass();</a>
+<a name="153"><span class="lineNum">     153 </span>            :   // _totalMass +=  cell.getMicroscopicMass();</a>
+<a name="154"><span class="lineNum">     154 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="155"><span class="lineNum">     155 </span>            : </a>
+<a name="156"><span class="lineNum">     156 </span>            : // template&lt;class LinkedCell,unsigned int dim&gt;</a>
+<a name="157"><span class="lineNum">     157 </span>            : // void</a>
+<a name="158"><span class="lineNum">     158 </span>            : // coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell,dim&gt;::</a>
+<a name="159"><span class="lineNum">     159 </span>            : // endProcessInnerCouplingCellsBeforeSendingMDSolverData(){</a>
+<a name="160"><span class="lineNum">     160 </span>            : // std::cout &lt;&lt; &quot;Avg massFluxBoundary MD density: &quot; &lt;&lt;</a>
+<a name="161"><span class="lineNum">     161 </span>            : // _totalMass/(_cellCount*15.625) &lt;&lt; std::endl;</a>
+<a name="162"><span class="lineNum">     162 </span>            : //}</a>
+<a name="163"><span class="lineNum">     163 </span>            : </a>
+<a name="164"><span class="lineNum">     164 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="165"><span class="lineNum">     165 </span><span class="lineNoCov">          0 : void coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell, dim&gt;::beginProcessInnerCouplingCellsAfterMDTimestep() {</span></a>
+<a name="166"><span class="lineNum">     166 </span>            :   // increment time step counter</a>
+<a name="167"><span class="lineNum">     167 </span><span class="lineNoCov">          0 :   _timestepCounter++;</span></a>
+<a name="168"><span class="lineNum">     168 </span><span class="lineNoCov">          0 : }</span></a>
+<a name="169"><span class="lineNum">     169 </span>            : </a>
+<a name="170"><span class="lineNum">     170 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="171"><span class="lineNum">     171 </span><span class="lineNoCov">          0 : void coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell, dim&gt;::processInnerCouplingCellAfterMDTimestep(</span></a>
+<a name="172"><span class="lineNum">     172 </span>            :     coupling::datastructures::CouplingCellWithLinkedCells&lt;LinkedCell, dim&gt;&amp; cell, I02 index) {</a>
+<a name="173"><span class="lineNum">     173 </span>            :   // sampling: add up mass and momentum in macroscopic buffers</a>
+<a name="174"><span class="lineNum">     174 </span><span class="lineNoCov">          0 :   cell.iterateConstCells(_massMapping);</span></a>
+<a name="175"><span class="lineNum">     175 </span><span class="lineNoCov">          0 :   const double mass = _massMapping.getMass();</span></a>
+<a name="176"><span class="lineNum">     176 </span>            :   //_totalMass += mass;</a>
+<a name="177"><span class="lineNum">     177 </span>            :   //_cellCount++;</a>
+<a name="178"><span class="lineNum">     178 </span><span class="lineNoCov">          0 :   cell.iterateConstCells(_momentumMapping);</span></a>
+<a name="179"><span class="lineNum">     179 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; momentum(_momentumMapping.getMomentum());</span></a>
+<a name="180"><span class="lineNum">     180 </span><span class="lineNoCov">          0 :   cell.addMacroscopicMass(mass);</span></a>
+<a name="181"><span class="lineNum">     181 </span><span class="lineNoCov">          0 :   cell.addMacroscopicMomentum(momentum);</span></a>
+<a name="182"><span class="lineNum">     182 </span>            : </a>
+<a name="183"><span class="lineNum">     183 </span>            :   // interpolation of velocity value from old and new solution</a>
+<a name="184"><span class="lineNum">     184 </span>            :   // we shift the factor by _shiftTimestep time steps and inter- or extrapolate</a>
+<a name="185"><span class="lineNum">     185 </span>            :   // velocities. A CFD solver will deliver values at t and t+dt and we want to</a>
+<a name="186"><span class="lineNum">     186 </span>            :   // advance the simulation potentially differently</a>
+<a name="187"><span class="lineNum">     187 </span><span class="lineNoCov">          0 :   const double factor = _shiftTimestep + ((double)_timestepCounter) / ((double)_numberMDSteps);</span></a>
+<a name="188"><span class="lineNum">     188 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
+<a name="189"><span class="lineNum">     189 </span>            :   if (factor &lt; _shiftTimestep || factor &gt; 1.0 + _shiftTimestep) {</a>
+<a name="190"><span class="lineNum">     190 </span>            :     std::cout &lt;&lt; &quot;ERROR &quot;</a>
+<a name="191"><span class="lineNum">     191 </span>            :                  &quot;coupling::transferstrategies::TransferStrategy4NieCoupling&lt;&quot;</a>
+<a name="192"><span class="lineNum">     192 </span>            :                  &quot;LinkedCell,dim&gt;::processInnerCouplingCellAfterMDTimestep(.&quot;</a>
+<a name="193"><span class="lineNum">     193 </span>            :                  &quot;.): factor out of range!&quot;</a>
+<a name="194"><span class="lineNum">     194 </span>            :               &lt;&lt; std::endl;</a>
+<a name="195"><span class="lineNum">     195 </span>            :     exit(EXIT_FAILURE);</a>
+<a name="196"><span class="lineNum">     196 </span>            :   }</a>
+<a name="197"><span class="lineNum">     197 </span>            : #endif</a>
+<a name="198"><span class="lineNum">     198 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; velocity = (1.0 - factor) * _oldSolution[index.get()] + factor * _newSolution[index.get()];</span></a>
+<a name="199"><span class="lineNum">     199 </span><span class="lineNoCov">          0 :   cell.setMicroscopicMomentum(velocity);</span></a>
+<a name="200"><span class="lineNum">     200 </span><span class="lineNoCov">          0 : }</span></a>
 <a name="201"><span class="lineNum">     201 </span>            : </a>
-<a name="202"><span class="lineNum">     202 </span>            :   // mass density of cell</a>
-<a name="203"><span class="lineNum">     203 </span><span class="lineNoCov">          0 :   const double density = mass / volume;</span></a>
-<a name="204"><span class="lineNum">     204 </span>            :   // coupling time interval</a>
-<a name="205"><span class="lineNum">     205 </span><span class="lineNoCov">          0 :   const double couplingTimeInterval = coupling::transferstrategies::TransferStrategy&lt;LinkedCell, dim&gt;::_mdSolverInterface-&gt;getDt() * _numberMDSteps;</span></a>
-<a name="206"><span class="lineNum">     206 </span>            : </a>
-<a name="207"><span class="lineNum">     207 </span><span class="lineNoCov">          0 :   double massFlux = 0.0;</span></a>
-<a name="208"><span class="lineNum">     208 </span>            : </a>
-<a name="209"><span class="lineNum">     209 </span>            :   // compute normal vector for this cell, checking whether there is mass flux or</a>
-<a name="210"><span class="lineNum">     210 </span>            :   // not</a>
-<a name="211"><span class="lineNum">     211 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, int&gt; n(0);</span></a>
-<a name="212"><span class="lineNum">     212 </span><span class="lineNoCov">          0 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="213"><span class="lineNum">     213 </span>            :     // compute normal vector (pointing inwards MD domain)</a>
-<a name="214"><span class="lineNum">     214 </span><span class="lineNoCov">          0 :     if ((index.get()[d] == 1) &amp;&amp; _massFluxBoundary[2 * d]) {</span></a>
-<a name="215"><span class="lineNum">     215 </span><span class="lineNoCov">          0 :       n[d] = 1; /*_totalMass+=mass;_cellCount++;*/</span></a>
-<a name="216"><span class="lineNum">     216 </span><span class="lineNoCov">          0 :     } else if ((index.get()[d] == (int)I09::numberCellsInDomain[d]) &amp;&amp; _massFluxBoundary[2 * d + 1]) {</span></a>
-<a name="217"><span class="lineNum">     217 </span><span class="lineNoCov">          0 :       n[d] = -1; /*_totalMass+=mass;_cellCount++;*/</span></a>
-<a name="218"><span class="lineNum">     218 </span>            :     }</a>
-<a name="219"><span class="lineNum">     219 </span>            :   }</a>
-<a name="220"><span class="lineNum">     220 </span>            : </a>
-<a name="221"><span class="lineNum">     221 </span>            :   // compute mass flux for each boundary</a>
-<a name="222"><span class="lineNum">     222 </span><span class="lineNoCov">          0 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="223"><span class="lineNum">     223 </span>            :     double surface = 1.0;</a>
-<a name="224"><span class="lineNum">     224 </span><span class="lineNoCov">          0 :     for (unsigned int e = 0; e &lt; d; e++) {</span></a>
-<a name="225"><span class="lineNum">     225 </span><span class="lineNoCov">          0 :       surface = surface * meshsize[e];</span></a>
-<a name="226"><span class="lineNum">     226 </span>            :     }</a>
-<a name="227"><span class="lineNum">     227 </span><span class="lineNoCov">          0 :     for (unsigned int e = d + 1; e &lt; dim; e++) {</span></a>
-<a name="228"><span class="lineNum">     228 </span><span class="lineNoCov">          0 :       surface = surface * meshsize[e];</span></a>
+<a name="202"><span class="lineNum">     202 </span>            : template &lt;class LinkedCell, unsigned int dim&gt;</a>
+<a name="203"><span class="lineNum">     203 </span><span class="lineNoCov">          0 : double coupling::transferstrategies::TransferStrategy4NieCoupling&lt;LinkedCell, dim&gt;::computeMassFlux(const double&amp; mass,</span></a>
+<a name="204"><span class="lineNum">     204 </span>            :                                                                                                     const tarch::la::Vector&lt;dim, double&gt;&amp; velocity,</a>
+<a name="205"><span class="lineNum">     205 </span>            :                                                                                                     const I01 index) {</a>
+<a name="206"><span class="lineNum">     206 </span>            :   // meshsize and volume of cell</a>
+<a name="207"><span class="lineNum">     207 </span><span class="lineNoCov">          0 :   const tarch::la::Vector&lt;dim, double&gt; meshsize(IDXS.getCouplingCellSize());</span></a>
+<a name="208"><span class="lineNum">     208 </span>            :   double volume = 1.0;</a>
+<a name="209"><span class="lineNum">     209 </span><span class="lineNoCov">          0 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="210"><span class="lineNum">     210 </span><span class="lineNoCov">          0 :     volume = volume * meshsize[d];</span></a>
+<a name="211"><span class="lineNum">     211 </span>            :   }</a>
+<a name="212"><span class="lineNum">     212 </span>            : </a>
+<a name="213"><span class="lineNum">     213 </span>            :   // mass density of cell</a>
+<a name="214"><span class="lineNum">     214 </span><span class="lineNoCov">          0 :   const double density = mass / volume;</span></a>
+<a name="215"><span class="lineNum">     215 </span>            :   // coupling time interval</a>
+<a name="216"><span class="lineNum">     216 </span><span class="lineNoCov">          0 :   const double couplingTimeInterval = coupling::transferstrategies::TransferStrategy&lt;LinkedCell, dim&gt;::_mdSolverInterface-&gt;getDt() * _numberMDSteps;</span></a>
+<a name="217"><span class="lineNum">     217 </span>            : </a>
+<a name="218"><span class="lineNum">     218 </span><span class="lineNoCov">          0 :   double massFlux = 0.0;</span></a>
+<a name="219"><span class="lineNum">     219 </span>            : </a>
+<a name="220"><span class="lineNum">     220 </span>            :   // compute normal vector for this cell, checking whether there is mass flux or</a>
+<a name="221"><span class="lineNum">     221 </span>            :   // not</a>
+<a name="222"><span class="lineNum">     222 </span><span class="lineNoCov">          0 :   tarch::la::Vector&lt;dim, int&gt; n(0);</span></a>
+<a name="223"><span class="lineNum">     223 </span><span class="lineNoCov">          0 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="224"><span class="lineNum">     224 </span>            :     // compute normal vector (pointing inwards MD domain)</a>
+<a name="225"><span class="lineNum">     225 </span><span class="lineNoCov">          0 :     if ((index.get()[d] == 1) &amp;&amp; _massFluxBoundary[2 * d]) {</span></a>
+<a name="226"><span class="lineNum">     226 </span><span class="lineNoCov">          0 :       n[d] = 1; /*_totalMass+=mass;_cellCount++;*/</span></a>
+<a name="227"><span class="lineNum">     227 </span><span class="lineNoCov">          0 :     } else if ((index.get()[d] == (int)I09::numberCellsInDomain[d]) &amp;&amp; _massFluxBoundary[2 * d + 1]) {</span></a>
+<a name="228"><span class="lineNum">     228 </span><span class="lineNoCov">          0 :       n[d] = -1; /*_totalMass+=mass;_cellCount++;*/</span></a>
 <a name="229"><span class="lineNum">     229 </span>            :     }</a>
-<a name="230"><span class="lineNum">     230 </span>            : </a>
-<a name="231"><span class="lineNum">     231 </span><span class="lineNoCov">          0 :     massFlux += n[d] * surface * density * velocity[d] * couplingTimeInterval;</span></a>
-<a name="232"><span class="lineNum">     232 </span>            :   }</a>
-<a name="233"><span class="lineNum">     233 </span><span class="lineNoCov">          0 :   return massFlux;</span></a>
-<a name="234"><span class="lineNum">     234 </span>            : }</a>
+<a name="230"><span class="lineNum">     230 </span>            :   }</a>
+<a name="231"><span class="lineNum">     231 </span>            : </a>
+<a name="232"><span class="lineNum">     232 </span>            :   // compute mass flux for each boundary</a>
+<a name="233"><span class="lineNum">     233 </span><span class="lineNoCov">          0 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
+<a name="234"><span class="lineNum">     234 </span>            :     double surface = 1.0;</a>
+<a name="235"><span class="lineNum">     235 </span><span class="lineNoCov">          0 :     for (unsigned int e = 0; e &lt; d; e++) {</span></a>
+<a name="236"><span class="lineNum">     236 </span><span class="lineNoCov">          0 :       surface = surface * meshsize[e];</span></a>
+<a name="237"><span class="lineNum">     237 </span>            :     }</a>
+<a name="238"><span class="lineNum">     238 </span><span class="lineNoCov">          0 :     for (unsigned int e = d + 1; e &lt; dim; e++) {</span></a>
+<a name="239"><span class="lineNum">     239 </span><span class="lineNoCov">          0 :       surface = surface * meshsize[e];</span></a>
+<a name="240"><span class="lineNum">     240 </span>            :     }</a>
+<a name="241"><span class="lineNum">     241 </span>            : </a>
+<a name="242"><span class="lineNum">     242 </span><span class="lineNoCov">          0 :     massFlux += n[d] * surface * density * velocity[d] * couplingTimeInterval;</span></a>
+<a name="243"><span class="lineNum">     243 </span>            :   }</a>
+<a name="244"><span class="lineNum">     244 </span><span class="lineNoCov">          0 :   return massFlux;</span></a>
+<a name="245"><span class="lineNum">     245 </span>            : }</a>
 </pre>
       </td>
     </tr>

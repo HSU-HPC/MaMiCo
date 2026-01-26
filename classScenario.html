@@ -86,6 +86,7 @@ $(function(){ initResizable(false); });
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classScenario-members.html">List of all members</a>  </div>
@@ -123,11 +124,22 @@ virtual <a class="el" href="classcoupling_1_1solvers_1_1AbstractCouetteSolver.ht
 const <a class="el" href="classcoupling_1_1services_1_1ParallelTimeIntegrationService.html">coupling::services::ParallelTimeIntegrationService</a>&lt; 3 &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>getTimeIntegrationService</b> () const</td></tr>
 <tr class="separator:a4064ca23fec4408112ca87155de3b3ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a1cbdd3f5c70b0335dae602aa0e0d5a81" id="r_a1cbdd3f5c70b0335dae602aa0e0d5a81"><td class="memItemLeft" align="right" valign="top"><a id="a1cbdd3f5c70b0335dae602aa0e0d5a81" name="a1cbdd3f5c70b0335dae602aa0e0d5a81"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>getRootRank</b> ()</td></tr>
+<tr class="memdesc:a1cbdd3f5c70b0335dae602aa0e0d5a81"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialises all MPI variables <br /></td></tr>
+<tr class="separator:a1cbdd3f5c70b0335dae602aa0e0d5a81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:af71eb63183673f5e74df857054f26096" id="r_af71eb63183673f5e74df857054f26096"><td class="memItemLeft" align="right" valign="top"><a id="af71eb63183673f5e74df857054f26096" name="af71eb63183673f5e74df857054f26096"></a>
 std::unique_ptr&lt; <a class="el" href="classcoupling_1_1services_1_1ParallelTimeIntegrationService.html">coupling::services::ParallelTimeIntegrationService</a>&lt; 3 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_timeIntegrationService</b></td></tr>
 <tr class="separator:af71eb63183673f5e74df857054f26096"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff1db6bc80a99fbc3fd3a83abe3f51f1" id="r_aff1db6bc80a99fbc3fd3a83abe3f51f1"><td class="memItemLeft" align="right" valign="top"><a id="aff1db6bc80a99fbc3fd3a83abe3f51f1" name="aff1db6bc80a99fbc3fd3a83abe3f51f1"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>_isRootRank</b></td></tr>
+<tr class="memdesc:aff1db6bc80a99fbc3fd3a83abe3f51f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">if this is the world global root process <br /></td></tr>
+<tr class="separator:aff1db6bc80a99fbc3fd3a83abe3f51f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>

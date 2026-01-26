@@ -125,9 +125,9 @@ Collaboration diagram for coupling::transferstrategies::TransferStrategy4NieCoup
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:add1d957c8f555600a562b0d51d07b1b1" id="r_add1d957c8f555600a562b0d51d07b1b1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add1d957c8f555600a562b0d51d07b1b1">TransferStrategy4NieCoupling</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface, unsigned int numberMDSteps, double shiftTimestep, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt; massFluxBoundary)</td></tr>
-<tr class="memdesc:add1d957c8f555600a562b0d51d07b1b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple  <br /></td></tr>
-<tr class="separator:add1d957c8f555600a562b0d51d07b1b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e71766c731a1f9424cd8a3fe897791c" id="r_a4e71766c731a1f9424cd8a3fe897791c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4e71766c731a1f9424cd8a3fe897791c">TransferStrategy4NieCoupling</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface, unsigned int numberMDSteps, double shiftTimestep, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt; massFluxBoundary, bool energyCorrection, double density)</td></tr>
+<tr class="memdesc:a4e71766c731a1f9424cd8a3fe897791c"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple  <br /></td></tr>
+<tr class="separator:a4e71766c731a1f9424cd8a3fe897791c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52488330b3d6a14dd8c7c3a8e7cff827" id="r_a52488330b3d6a14dd8c7c3a8e7cff827"><td class="memItemLeft" align="right" valign="top"><a id="a52488330b3d6a14dd8c7c3a8e7cff827" name="a52488330b3d6a14dd8c7c3a8e7cff827"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~TransferStrategy4NieCoupling</b> ()</td></tr>
 <tr class="memdesc:a52488330b3d6a14dd8c7c3a8e7cff827"><td class="mdescLeft">&#160;</td><td class="mdescRight">a dummy destructor <br /></td></tr>
@@ -231,6 +231,12 @@ Private Attributes</h2></td></tr>
 <tr class="separator:aabb666a6e2d11cd001a949e310524a80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62949a074e6a1714361ea906377ddc83" id="r_a62949a074e6a1714361ea906377ddc83"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a62949a074e6a1714361ea906377ddc83">_massFluxBoundary</a></td></tr>
 <tr class="separator:a62949a074e6a1714361ea906377ddc83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a190d589bd402882b3ce4c82722393f78" id="r_a190d589bd402882b3ce4c82722393f78"><td class="memItemLeft" align="right" valign="top"><a id="a190d589bd402882b3ce4c82722393f78" name="a190d589bd402882b3ce4c82722393f78"></a>
+const bool&#160;</td><td class="memItemRight" valign="bottom"><b>_enableEnergyCorrection</b></td></tr>
+<tr class="separator:a190d589bd402882b3ce4c82722393f78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0095eb088f6a52f9407ffc1184acacb0" id="r_a0095eb088f6a52f9407ffc1184acacb0"><td class="memItemLeft" align="right" valign="top"><a id="a0095eb088f6a52f9407ffc1184acacb0" name="a0095eb088f6a52f9407ffc1184acacb0"></a>
+const double&#160;</td><td class="memItemRight" valign="bottom"><b>_density</b></td></tr>
+<tr class="separator:a0095eb088f6a52f9407ffc1184acacb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -249,8 +255,8 @@ class coupling::transferstrategies::TransferStrategy4NieCoupling&lt; LinkedCell,
   </dd>
 </dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="add1d957c8f555600a562b0d51d07b1b1" name="add1d957c8f555600a562b0d51d07b1b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add1d957c8f555600a562b0d51d07b1b1">&#9670;&#160;</a></span>TransferStrategy4NieCoupling()</h2>
+<a id="a4e71766c731a1f9424cd8a3fe897791c" name="a4e71766c731a1f9424cd8a3fe897791c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e71766c731a1f9424cd8a3fe897791c">&#9670;&#160;</a></span>TransferStrategy4NieCoupling()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -275,7 +281,17 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt;</td>          <td class="paramname"><span class="paramname"><em>massFluxBoundary</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt;</td>          <td class="paramname"><span class="paramname"><em>massFluxBoundary</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>energyCorrection</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>density</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">

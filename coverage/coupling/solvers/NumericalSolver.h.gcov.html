@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-26 12:18:48</td>
+            <td class="headerValue">2026-01-26 13:19:06</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">9</td>
@@ -493,7 +493,7 @@
 <a name="431"><span class="lineNum">     431 </span><span class="lineNoCov">          0 :       auto ts = _scen-&gt;getTimeIntegrationService();</span></a>
 <a name="432"><span class="lineNum">     432 </span><span class="lineNoCov">          0 :       if (ts != nullptr) {</span></a>
 <a name="433"><span class="lineNum">     433 </span><span class="lineNoCov">          0 :         if (ts-&gt;isPintEnabled())</span></a>
-<a name="434"><span class="lineNum">     434 </span><span class="lineNoCov">          0 :           ss &lt;&lt; &quot;_i&quot; &lt;&lt; ts-&gt;getInteration();</span></a>
+<a name="434"><span class="lineNum">     434 </span><span class="lineNoCov">          0 :           ss &lt;&lt; &quot;_i&quot; &lt;&lt; ts-&gt;getIteration();</span></a>
 <a name="435"><span class="lineNum">     435 </span>            :       }</a>
 <a name="436"><span class="lineNum">     436 </span>            :     }</a>
 <a name="437"><span class="lineNum">     437 </span><span class="lineCov">         51 :     ss &lt;&lt; &quot;.vtk&quot;;</span></a>
@@ -568,12 +568,12 @@
 <a name="506"><span class="lineNum">     506 </span>            :    * simulation</a>
 <a name="507"><span class="lineNum">     507 </span>            :    *  @returns a bool, which indicates if the rank shall not do anything (true)</a>
 <a name="508"><span class="lineNum">     508 </span>            :    * or not (false) */</a>
-<a name="509"><span class="lineNum">     509 </span><span class="lineCov">        284 :   bool skipRank() const {</span></a>
-<a name="510"><span class="lineNum">     510 </span><span class="lineCov">        284 :     int rank = 0;</span></a>
+<a name="509"><span class="lineNum">     509 </span><span class="lineCov">        401 :   bool skipRank() const {</span></a>
+<a name="510"><span class="lineNum">     510 </span><span class="lineCov">        401 :     int rank = 0;</span></a>
 <a name="511"><span class="lineNum">     511 </span>            : #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)</a>
-<a name="512"><span class="lineNum">     512 </span><span class="lineCov">        284 :     MPI_Comm_rank(coupling::indexing::IndexingService&lt;3&gt;::getInstance().getComm(), &amp;rank);</span></a>
+<a name="512"><span class="lineNum">     512 </span><span class="lineCov">        401 :     MPI_Comm_rank(coupling::indexing::IndexingService&lt;3&gt;::getInstance().getComm(), &amp;rank);</span></a>
 <a name="513"><span class="lineNum">     513 </span>            : #endif</a>
-<a name="514"><span class="lineNum">     514 </span><span class="lineCov">        284 :     return ((unsigned int)rank &gt; _processes[0] * _processes[1] * _processes[2] - 1);</span></a>
+<a name="514"><span class="lineNum">     514 </span><span class="lineCov">        401 :     return ((unsigned int)rank &gt; _processes[0] * _processes[1] * _processes[2] - 1);</span></a>
 <a name="515"><span class="lineNum">     515 </span>            :   }</a>
 <a name="516"><span class="lineNum">     516 </span>            : </a>
 <a name="517"><span class="lineNum">     517 </span>            :   /** @brief for every cell exists a flag entry, upon this is defined how the</a>
