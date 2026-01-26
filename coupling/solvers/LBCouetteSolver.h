@@ -234,10 +234,7 @@ public:
       // relations only. determine local velocity received from MaMiCo and
       // convert it to LB units; store the velocity in _vel
       // massFactor is used to ensure conservation of energy
-      double massMD = couplingCell->getMacroscopicMass() / (_md_density * _dx * _dx * _dx);
-      double massFactor = sqrt(massMD / _density[index]);
-      tarch::la::Vector<3, double> velMD((1.0 / couplingCell->getMacroscopicMass()) * (_dt / _dx) * couplingCell->getMacroscopicMomentum());
-      tarch::la::Vector<3, double> localVel(massFactor * velMD);
+      tarch::la::Vector<3, double> localVel((1.0 / couplingCell->getMacroscopicMass()) * (_dt / _dx) * couplingCell->getMacroscopicMomentum());
       for (unsigned int d = 0; d < 3; d++) {
         _vel[3 * index + d] = localVel[d];
       }
@@ -794,7 +791,6 @@ private:
   const double _omega;
   /** @brief velocity of moving wall of Couette flow */
   tarch::la::Vector<3, double> _wallVelocity;
-  double _md_density;
   int _pdfsize{0};
   /** @brief partical distribution function field */
   double* _pdf1{NULL};
