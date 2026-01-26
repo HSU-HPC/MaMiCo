@@ -14,6 +14,7 @@ simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simpl
       _cutOffRadiusSquared(molecularPropertiesService.getMolecularProperties().getCutOffRadius() *
                            molecularPropertiesService.getMolecularProperties().getCutOffRadius()),
       _externalForce(0) {
+        // Note: This copies the (static) external force from the configuration
         externalForceService.addExternalForce(_externalForce);
       }
 

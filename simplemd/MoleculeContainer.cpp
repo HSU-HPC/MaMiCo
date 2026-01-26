@@ -198,15 +198,15 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
       }
       Kokkos::printf("Position:");
       for (unsigned int e = 0; e < MD_DIM; e++) {
-        Kokkos::printf(" %d", position[e]);
+        Kokkos::printf(" %f", position[e]);
       }
       Kokkos::printf(", offset: ");
       for (unsigned int e = 0; e < MD_DIM; e++) {
-        Kokkos::printf(" %d", _domainOffset[e]);
+        Kokkos::printf(" %f", _domainOffset[e]);
       }
       Kokkos::printf(", meshwidth: ");
       for (unsigned int e = 0; e < MD_DIM; e++) {
-        Kokkos::printf(" %d", _meshWidth[e]);
+        Kokkos::printf(" %f", _meshWidth[e]);
       }
       Kokkos::printf("\n");
       Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex");
