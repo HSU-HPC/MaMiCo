@@ -34,6 +34,7 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
                                                      const simplemd::services::MolecularPropertiesService& molecularPropertiesService,
                                                      const simplemd::services::ParallelTopologyService& parallelTopologyService)
     : _localDomainSize(localDomainSize) {
+  _meanVelocity = meanVelocity;
   size_t moleculeCount = 1;
   for (int d = 0; d < MD_DIM; d++) {
     moleculeCount *= moleculesPerDirection[d];
