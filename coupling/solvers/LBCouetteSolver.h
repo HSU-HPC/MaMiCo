@@ -206,6 +206,7 @@ public:
       exit(EXIT_FAILURE);
     }
 #endif
+    computeDensityAndVelocityEverywhere();
 
     // loop over all received cells
     for (auto pair : md2macroBuffer) {
@@ -321,10 +322,15 @@ public:
 
   std::unique_ptr<State> getState() override {
     computeDensityAndVelocityEverywhere();
+    if (skipRank())
+      return std::make_unique<LBCouetteSolverState>(0);
     return std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
   }
 
   void setState(const std::unique_ptr<State>& input, int cycle) override {
+    if (skipRank())
+      return;
+
     const LBCouetteSolverState* state = dynamic_cast<const LBCouetteSolverState*>(input.get());
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
@@ -392,6 +398,8 @@ public:
   }
 
   double get_avg_vel(const std::unique_ptr<State>& state) const override {
+    if (skipRank())
+      return 0;
     double vel[3];
     double density;
     double res[3]{0, 0, 0};
@@ -407,6 +415,22 @@ public:
       res[2] /= (_pdfsize / 19);
     }
     return std::sqrt(res[0] * res[0] + res[1] * res[1] + res[2] * res[2]);
+  }
+
+  double get_avg_velX(const std::unique_ptr<State>& state) const {
+    if (skipRank())
+      return 0;
+    double vel[3];
+    double density;
+    double res{0};
+    for (int i = 0; i < _pdfsize; i += 19) {
+      LBCouetteSolver::computeDensityAndVelocity(vel, density, state->getData() + i);
+      res += vel[0];
+    }
+    if (_pdfsize > 0) {
+      res /= (_pdfsize / 19);
+    }
+    return res;
   }
 
 private:
@@ -441,7 +465,7 @@ private:
       auto ts = _scen->getTimeIntegrationService();
       if (ts != nullptr) {
         if (ts->isPintEnabled())
-          ss << "_i" << ts->getInteration();
+          ss << "_i" << ts->getIteration();
       }
     }
     ss << ".csv";
@@ -453,12 +477,13 @@ private:
     }
 
     if(_counter == 0){
-      file << "coupling_cycle ; avg_vel" << std::endl;
+      file << "coupling_cycle ; avg_vel ; avg_velX" << std::endl;
     }
 
     std::unique_ptr<State> s = std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
     double vel = get_avg_vel(s);
-    file << _counter << " ; " << vel << std::endl;
+    double velX = get_avg_velX(s);
+    file << _counter << " ; " << vel << " ; " << velX << std::endl;
     file.close();
   }
 

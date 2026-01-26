@@ -639,7 +639,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping, false);
 
   if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
-    if (t % 50 == 0)
+    if (t % 50 == 0 && _localMDSimulation == 0)
       std::cout << "Finish MD timestep " << t << "..." << std::endl;
   }
 }
