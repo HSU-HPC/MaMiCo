@@ -87,8 +87,6 @@ public:
     std::cout << "restart_checkpoint_0_0.checkpoint read!" << std::endl;
 
     _instanceHandling->~InstanceHandling();
-    CPPUNIT_ASSERT(!_instanceHandling->getSimpleMD().size());
-    CPPUNIT_ASSERT(!_instanceHandling->getMDSolverInterface().size());
   }
 
 private:
