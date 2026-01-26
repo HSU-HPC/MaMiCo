@@ -6,10 +6,10 @@
 template <class LinkedCell, unsigned int dim>
 coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>::TransferStrategy4NieCoupling(
     coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberMDSteps, double shiftTimestep,
-    tarch::la::Vector<2 * dim, bool> massFluxBoundary)
+    tarch::la::Vector<2 * dim, bool> massFluxBoundary, bool energyCorrection, double density)
     : coupling::transferstrategies::TransferStrategy<LinkedCell, dim>(mdSolverInterface), _massMapping(mdSolverInterface), _momentumMapping(mdSolverInterface),
       _oldSolution(NULL), _newSolution(NULL), _numberMDSteps(numberMDSteps), _shiftTimestep(shiftTimestep), _numberLocalCells(I02::linearNumberCellsInDomain),
-      _excessMass(NULL), _massFluxBoundary(massFluxBoundary) {
+      _excessMass(NULL), _massFluxBoundary(massFluxBoundary), _enableEnergyCorrection(energyCorrection), _density(density) {
   // allocate arrays for old and new solution (required for linear time
   // interpolation) and init. them with zero vectors
   _oldSolution = new tarch::la::Vector<dim, double>[_numberLocalCells];
@@ -123,7 +123,18 @@ void coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>
   // average sampled data from MD
   if (_timestepCounter != 0) {
     const double mass = cell.getMacroscopicMass() / ((double)_timestepCounter);
-    const tarch::la::Vector<dim, double> momentum = (1.0 / ((double)_timestepCounter)) * cell.getMacroscopicMomentum();
+    double momentumFactor = (1.0 / ((double)_timestepCounter));
+
+    if(_enableEnergyCorrection){
+      const double mass_macro = IDXS.getCouplingCellSize()[0]*IDXS.getCouplingCellSize()[1]*IDXS.getCouplingCellSize()[2]*_density;
+      // computes energy conservation correction factor
+      // based on assumption mass/2*vel_micro^2 = mass_macro/2*vel_macro^2
+      // Note: In MD-60 scenario, energy_correction factor is on average ca. 0.9998
+      const double energy_correction = sqrt( mass / mass_macro );
+      momentumFactor *= energy_correction;
+    }
+
+    const tarch::la::Vector<dim, double> momentum = momentumFactor * cell.getMacroscopicMomentum();
     cell.setMacroscopicMass(mass);
     cell.setMacroscopicMomentum(momentum);
   } else {

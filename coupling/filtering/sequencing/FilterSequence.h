@@ -91,11 +91,15 @@ public:
 
   virtual ~FilterSequence() {
     // Output average application times for all filters
-    std::cout << PRINT_PREFIX() << "Average application times for filters in this sequence in \u03BCs:" << std::endl;
-    for (auto filter : _filters) {
-      std::cout << "	" << filter->getType() << ": "
-                << (double)std::accumulate(_filterTimes[filter].begin(), _filterTimes[filter].end(), 0) / (double)_timestepsElapsed << std::endl;
+#ifdef DEBUG_FILTER_PIPELINE
+    if (IDXS.getRank() == 0){
+      std::cout << PRINT_PREFIX() << "Average application times for filters in this sequence in \u03BCs:" << std::endl;
+      for (auto filter : _filters) {
+        std::cout << "	" << filter->getType() << ": "
+                  << (double)std::accumulate(_filterTimes[filter].begin(), _filterTimes[filter].end(), 0) / (double)_timestepsElapsed << std::endl;
+      }
     }
+#endif
 
     for (auto v1 : _cellVector1)
       delete v1;
@@ -152,7 +156,9 @@ public:
 
   bool isOutputToMacro() { return _isOutput; }
   void setAsOutputToMacro() {
+#ifdef DEBUG_FILTER_PIPELINE
     std::cout << PRINT_PREFIX() << " Setting as pipeline to macro solver output." << std::endl;
+#endif
     _isOutput = true;
   }
 

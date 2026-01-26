@@ -94,7 +94,6 @@ public:
     global_log->set_mpi_output_root(0);
 #endif
 #endif
-    getRootRank();
     parseConfigurations();
     initSolvers();
   }
@@ -150,14 +149,6 @@ public:
   coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { return _couetteSolver; }
 
 protected:
-  /** @brief initialises all MPI variables  */
-  void getRootRank() {
-    int rank = 0;
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-#endif
-    _isRootRank = (rank == 0);
-  }
 
   /** @brief Executes the entire test several times for a range of time-window-size parameters */
   void twsLoop() {
@@ -177,12 +168,16 @@ protected:
     tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",
                                                                                                                            _simpleMDConfig);
     if (!_simpleMDConfig.isValid()) {
-      std::cout << "ERROR CouetteScenario: Invalid SimpleMD config!" << std::endl;
+      if (_isRootRank){
+        std::cout << "ERROR CouetteScenario: Invalid SimpleMD config!" << std::endl;
+      }
       exit(EXIT_FAILURE);
     }
     tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3>>(filename, "mamico", _mamicoConfig);
     if (!_mamicoConfig.isValid()) {
-      std::cout << "ERROR CouetteScenario: Invalid MaMiCo config!" << std::endl;
+      if (_isRootRank) {
+        std::cout << "ERROR CouetteScenario: Invalid MaMiCo config!" << std::endl;
+      }
       exit(EXIT_FAILURE);
     }
 
@@ -269,7 +264,9 @@ protected:
 
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(_simpleMDConfig, _mamicoConfig, *_multiMDService);
     if (_instanceHandling == nullptr) {
-      std::cout << "ERROR CouetteScenario::initSolvers() : _instanceHandling == NULL!" << std::endl;
+      if (_isRootRank) {
+        std::cout << "ERROR CouetteScenario::initSolvers() : _instanceHandling == NULL!" << std::endl;
+      }
       std::exit(EXIT_FAILURE);
     }
 
@@ -494,7 +491,9 @@ protected:
     if (_isRootRank) {
       gettimeofday(&_tv.start_total, NULL);
     }
-    std::cout << "Finish CouetteScenario::initSolvers() " << std::endl;
+    if (_isRootRank) {
+      std::cout << "Finish CouetteScenario::initSolvers() " << std::endl;
+    }
   }
 
   /** @brief advances the continuum solver and collects data to send to md
@@ -748,7 +747,9 @@ protected:
       _multiMDMediator = nullptr;
     }
 
-    std::cout << "Finish CouetteScenario::shutdown() " << std::endl;
+    if (_isRootRank)  {
+      std::cout << "Finish CouetteScenario::shutdown() " << std::endl;
+    }
   }
 
   /** computes global number of coupling cells from configs. Required by couette solver interface before CouplingCellService is initialised! */
@@ -804,7 +805,10 @@ protected:
       return;
     // form file name and open file
     std::stringstream ss;
-    ss << "CouetteAvgMultiMDCells_" << _timeIntegrationService->getPintDomain() << "_" << _rank << "_" << couplingCycle << ".csv";
+    ss << "CouetteAvgMultiMDCells_d" << _timeIntegrationService->getPintDomain() << "_r" << _rank << "_c" << couplingCycle;
+    if (_timeIntegrationService->isPintEnabled())
+      ss << "_i" << _timeIntegrationService->getIteration();
+    ss << ".csv";
     std::ofstream file(ss.str().c_str());
     if (!file.is_open()) {
       std::cout << "ERROR CouetteScenario::write2CSV(): Could not open file " << ss.str() << "!" << std::endl;
@@ -884,8 +888,8 @@ protected:
 #endif
     // LB solver: active on lbNumberProcesses
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
-      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "LBCouette",
-                                                      _cfg.lbNumberProcesses, _cfg.density, 1, this);
+      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, _cfg.plotAverageVelocity, "LBCouette",
+                                                      _cfg.lbNumberProcesses, 1, this);
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): LB solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
@@ -1005,8 +1009,6 @@ protected:
 
   /** @brief the rank of the current MPI process in the local time domain*/
   int _rank;
-  /** @brief if this is the world global root process */
-  bool _isRootRank;
   /** @todo Piet */
   int _tws;
   /** @brief the config data and information for SimpleMD */

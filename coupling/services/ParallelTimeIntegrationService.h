@@ -84,7 +84,7 @@ public:
     int getPintDomain() const { return _pint_domain; }
     int getRank() const { return _rank; }
     bool isPintEnabled() const { return _cfg.isPintEnabled(); }
-    int getInteration() const { return _iteration; }
+    int getIteration() const { return _iteration; }
 
     #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm getPintComm() const { return _local_pint_comm; }
@@ -117,8 +117,10 @@ private:
         if( isLast() ) 
             res.maxCycle = num_cycles;
         #ifdef PINT_DEBUG
-        std::cout << "PINT_DEBUG: _pint_domain " << _pint_domain << " has minCycle " << res.minCycle 
-            << " and maxCycle " << res.maxCycle << std::endl;
+        if(_rank == 0){
+            std::cout << "PINT_DEBUG: _pint_domain " << _pint_domain << " has minCycle " << res.minCycle 
+                << " and maxCycle " << res.maxCycle << std::endl;
+        }
         #endif
         return res;
     }
@@ -132,7 +134,9 @@ private:
         }
         #ifdef PINT_DEBUG
         if(_cfg.getViscMultiplier() != 1.0)
-            std::cout << "PINT_DEBUG: Starting supervisor with viscosity modified by " << _cfg.getViscMultiplier() << std::endl;
+            if(_world_rank == 0){
+                std::cout << "PINT_DEBUG: Starting supervisor with viscosity modified by " << _cfg.getViscMultiplier() << std::endl;
+            }
         #endif
         _supervisor = solver->getSupervisor(domain.size, _cfg.getViscMultiplier() );
         _F = [this, solver, domain](const std::unique_ptr<State>& s){
@@ -182,6 +186,9 @@ private:
         while(_iteration < iterations){
             // Correction step
             auto delta = _F(_u_last_past) - _G(_u_last_past);
+            // Alternative variant, together with second _u_last_future line below. 
+            // Better scalability, should yield the same results. TODO test and verify.
+            //auto delta = _F(_u_last_past) - _u_last_future;
 
             _iteration++;
 
@@ -197,10 +204,14 @@ private:
             // move for next iteration
             _u_last_past   = std::move(_u_next_past);
             _u_last_future = std::move(_u_next_future);
+            // Alternative variant
+            //_u_last_future = std::move(prediction);
         }
 
         #ifdef PINT_DEBUG
-        std::cout << "PINT_DEBUG: Finished all PinT iterations. " << std::endl;
+        if(_world_rank == 0){
+            std::cout << "PINT_DEBUG: Finished all PinT iterations. " << std::endl;
+        }
         #endif
     }
 
