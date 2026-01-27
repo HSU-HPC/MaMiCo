@@ -136,7 +136,6 @@ public:
 
   void testNumGhostCells() {
     srand(time(NULL));
-    std::stringstream outputMessage;
 
     const int numTests = 20;
     tarch::la::Vector<MD_DIM, double> numCellsTestInput;
@@ -144,10 +143,9 @@ public:
     const tarch::la::Vector<MD_DIM, double> domainOffset(0);
     const tarch::la::Vector<MD_DIM, double> meshWidth(1);
     const tarch::la::Vector<MD_DIM, unsigned int> numberProcesses(1);
-    int numInnerCells, numTotalCells;
+    unsigned int numInnerCells, numTotalCells;
 
     for (int i = 0; i < numTests; i++) {
-      outputMessage.clear();
       numInnerCells = 1;
       numTotalCells = 1;
       for (int j = 0; j < MD_DIM; j++) {
@@ -171,9 +169,9 @@ public:
   void testIterationLinkedCellPairsParallel() {};
 
 private:
-  int vectorToScalar(tarch::la::Vector<MD_DIM, unsigned int> vector) const {
-    int toRet = 1;
-    for (size_t i = 0; i < MD_DIM; i++) {
+  unsigned int vectorToScalar(tarch::la::Vector<MD_DIM, unsigned int> vector) const {
+    unsigned int toRet = 1;
+    for (int i = 0; i < MD_DIM; i++) {
       toRet *= vector[i];
     }
     return toRet;

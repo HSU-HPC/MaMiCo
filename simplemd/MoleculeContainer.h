@@ -46,7 +46,7 @@ public:
    * @param cellIdx The one-dimensional index of the linked cell to insert the molecule into (ghost included).
    * @param molecule The molecule to be inserted.
    */
-  void insert(int cellIdx, simplemd::Molecule& molecule);
+  void insert(unsigned int cellIdx, simplemd::Molecule& molecule);
 
   /**
    * @brief Inserts a molecule into a specific linked cell.
@@ -74,7 +74,7 @@ public:
    * @param cellIdx 1D linked cell index of the molecule (ghost included).
    * @param moleculeIdx Index of the molecule within the linked cell.
    */
-  void remove(int cellIdx, int moleculeIdx);
+  void remove(unsigned int cellIdx, unsigned int moleculeIdx);
 
   /**
    * @brief Clears a linked cell.
@@ -85,14 +85,14 @@ public:
    *
    * @param cellIdx 1D index of the linked cell to clear (ghost included).
    */
-  void clearLinkedCell(int cellIdx);
+  void clearLinkedCell(unsigned int cellIdx);
 
   /**
    * @brief Removes all outgoing molecules from a linked cell and moves them to the appropriate destination.
    *
    * @param cellIdx 1D index of the linked cell to sort (ghost included).
    */
-  void sort(int cellIdx);
+  void sort(unsigned int cellIdx);
 
   /**
    * @brief Puts all molecules into their appropriate linked cells.
@@ -110,7 +110,7 @@ public:
    * @param j
    * @return simplemd::Molecule&
    */
-  KOKKOS_FUNCTION simplemd::Molecule& getMoleculeAt(int i, int j) const;
+  KOKKOS_FUNCTION simplemd::Molecule& getMoleculeAt(unsigned int i, unsigned int j) const;
 
   /**
    * @brief Returns the linked cell at 1D index idx (ghost included)
@@ -131,9 +131,9 @@ public:
   /**
    * @brief Get the total number of cells in the container
    *
-   * @return int
+   * @return unsigned int
    */
-  int getLocalNumberOfCellsScalarWithGhost() const;
+  unsigned int getLocalNumberOfCellsScalarWithGhost() const;
 
   /**
    * @brief Returns the number of molecules in all cells
@@ -312,9 +312,7 @@ private:
   /** maximum number of particles a cell (a row of the view) can contain
    * if this is exceeded when writing to cell, the simulation behaviour is undefined
    */
-  int _cellCapacity;
-
-  KOKKOS_INLINE_FUNCTION void checkOperationWouldExceedCapacity(int sizePostOp) const;
+  size_t _cellCapacity;
 
   /** domain size */
   const tarch::la::Vector<MD_DIM, double> _domainSize;
