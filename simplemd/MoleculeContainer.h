@@ -29,7 +29,6 @@ class MoleculeContainer;
  */
 class simplemd::MoleculeContainer {
 public:
-
   /**
    * @brief Construct a new MoleculeContainer object
    *
@@ -40,7 +39,7 @@ public:
    * @param cellCapacity The maximum capacity of any cell. Cannot be changed, must provide ample room at compiletime.
    */
   MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity);
-  
+
   /**
    * @brief Inserts a molecule into a specific linked cell.
    *
@@ -364,8 +363,7 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
 #else
   a.beginMoleculeIteration();
   Kokkos::parallel_for(
-      Kokkos::RangePolicy<MainExecSpace>(0, _linkedCellIsGhostCell.size()),
-      KOKKOS_CLASS_LAMBDA(const unsigned int i) {
+      Kokkos::RangePolicy<MainExecSpace>(0, _linkedCellIsGhostCell.size()), KOKKOS_CLASS_LAMBDA(const unsigned int i) {
         for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
           a.handleMolecule(getMoleculeAt(i, j));
         }
@@ -386,8 +384,8 @@ void simplemd::MoleculeContainer::iterateCellsSerial(A& a, const tarch::la::Vect
       Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells: zero in cell range");
     }
     if (lowerLeftFrontCell[d] + cellRange[d] > 2 * _ghostCellLayerThickness[d] + _numLocalCellsNoGhost[d]) {
-     Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells(): "
-                   "defined Range does not fit into local sub-domain!");
+      Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells(): "
+                    "defined Range does not fit into local sub-domain!");
     }
   }
 #endif
@@ -546,7 +544,7 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
     }
     if (lowerLeftFrontCell[d] + cellRange[d] > 2 * _ghostCellLayerThickness[d] + _numLocalCellsNoGhost[d]) {
       Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells(): "
-                   "defined Range does not fit into local sub-domain!");
+                    "defined Range does not fit into local sub-domain!");
     }
   }
 #endif
@@ -570,8 +568,7 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
       ;
   // loop over domain, but with a single loop
   Kokkos::parallel_for(
-      Kokkos::RangePolicy<MainExecSpace>(0, length),
-      KOKKOS_CLASS_LAMBDA(const unsigned int i) {
+      Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int i) {
 // compute index of the current cell
 #if (MD_DIM > 1)
         int helpIndex1 = i;
@@ -667,7 +664,7 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (cellRange[d] > 2 * _ghostCellLayerThickness[d] + _numLocalCellsNoGhost[d] - 1) {
       Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCellPairs(): "
-                   "defined Range does not fit into local sub-domain!\n");
+                    "defined Range does not fit into local sub-domain!\n");
     }
   }
 #endif
@@ -715,8 +712,7 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
 
         // parallelise loop for all cells that are to be traversed in this way
         Kokkos::parallel_for(
-            Kokkos::RangePolicy<MainExecSpace>(0, length),
-            KOKKOS_CLASS_LAMBDA(const unsigned int j) {
+            Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int j) {
               // compute index of the current cell
               unsigned int index = 0;
 #if (MD_DIM > 1)

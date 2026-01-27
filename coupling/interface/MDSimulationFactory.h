@@ -38,6 +38,8 @@
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
+#else
+#error "No MD solver defined!"
 #endif
 
 /** interface for different MD solvers.

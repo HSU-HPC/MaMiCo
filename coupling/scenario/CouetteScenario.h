@@ -149,7 +149,6 @@ public:
   coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { return _couetteSolver; }
 
 protected:
-
   /** @brief Executes the entire test several times for a range of time-window-size parameters */
   void twsLoop() {
     for (_tws = _cfg.twsLoopMin; _tws <= _cfg.twsLoopMax; _tws += _cfg.twsLoopStep) {
@@ -168,7 +167,7 @@ protected:
     tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",
                                                                                                                            _simpleMDConfig);
     if (!_simpleMDConfig.isValid()) {
-      if (_isRootRank){
+      if (_isRootRank) {
         std::cout << "ERROR CouetteScenario: Invalid SimpleMD config!" << std::endl;
       }
       exit(EXIT_FAILURE);
@@ -527,7 +526,7 @@ protected:
       fillSendBuffer(_cfg.density, *_couetteSolver, _couplingBuffer.macro2MDBuffer);
     }
     if (_cfg.macro2Md) {
-#ifdef USE_COLLECTIVE_MPI
+#ifdef MAMICO_USE_COLLECTIVE_MPI
       _multiMDCellService->bcastFromMacro2MD(_couplingBuffer.macro2MDBuffer);
 #else
       _multiMDCellService->sendFromMacro2MD(_couplingBuffer.macro2MDBuffer);
@@ -620,7 +619,7 @@ protected:
 
       // send back data from MD instances and merge it
       if (_cfg.md2Macro) {
-#ifdef USE_COLLECTIVE_MPI
+#ifdef MAMICO_USE_COLLECTIVE_MPI
         _tv.filter += _multiMDCellService->reduceFromMD2Macro(_couplingBuffer.md2macroBuffer);
 #else
         _tv.filter += _multiMDCellService->sendFromMD2Macro(_couplingBuffer.md2macroBuffer);
@@ -635,7 +634,7 @@ protected:
         //_couplingBuffer does not get used here: Instead, the synthetic MD in the
         // SYNTHETICMD_SEQUENCE generates values. To prevent segfaults, it has
         // to be nonempty, though.
-#ifdef USE_COLLECTIVE_MPI
+#ifdef MAMICO_USE_COLLECTIVE_MPI
         _tv.filter += _multiMDCellService->reduceFromMD2Macro(_couplingBuffer.md2macroBuffer);
 #else
         _tv.filter += _multiMDCellService->sendFromMD2Macro(_couplingBuffer.md2macroBuffer);
@@ -747,7 +746,7 @@ protected:
       _multiMDMediator = nullptr;
     }
 
-    if (_isRootRank)  {
+    if (_isRootRank) {
       std::cout << "Finish CouetteScenario::shutdown() " << std::endl;
     }
   }
@@ -888,8 +887,8 @@ protected:
 #endif
     // LB solver: active on lbNumberProcesses
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
-      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, _cfg.plotAverageVelocity, "LBCouette",
-                                                      _cfg.lbNumberProcesses, 1, this);
+      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, _cfg.plotAverageVelocity,
+                                                      "LBCouette", _cfg.lbNumberProcesses, 1, this);
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): LB solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);

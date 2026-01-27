@@ -37,7 +37,7 @@ public:
    *  positions position1 and position2. Remark: The force on the particle at position2 is just (-1.0)*returnValue.
    */
   KOKKOS_FUNCTION tarch::la::Vector<MD_DIM, double> getLennardJonesForce(const tarch::la::Vector<MD_DIM, double>& position1,
-                                                         const tarch::la::Vector<MD_DIM, double>& position2) const;
+                                                                         const tarch::la::Vector<MD_DIM, double>& position2) const;
 
   static const bool IsParallel = true;
 

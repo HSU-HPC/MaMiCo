@@ -35,13 +35,12 @@ public:
     const tarch::la::Vector<MD_DIM, double> meshWidth(1);
     const tarch::la::Vector<MD_DIM, unsigned int> numberProcesses(1);
     const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> boundary(simplemd::BoundaryType::PERIODIC_BOUNDARY);
-    simplemd::services::ParallelTopologyService parallelTopologyService(numCells, domainOffset, meshWidth, numberProcesses,
-                                                                          boundary);
+    simplemd::services::ParallelTopologyService parallelTopologyService(numCells, domainOffset, meshWidth, numberProcesses, boundary);
     _moleculeContainer = new simplemd::MoleculeContainer(parallelTopologyService, 20);
   }
 
   void tearDown() {
-    if(_moleculeContainer != nullptr) {
+    if (_moleculeContainer != nullptr) {
       delete _moleculeContainer;
       _moleculeContainer = nullptr;
     }
@@ -58,7 +57,7 @@ public:
     for (size_t i = 0; i < MD_DIM; i++) {
       CPPUNIT_ASSERT_DOUBLES_EQUAL(trialMolecule.getPosition()[i], extractMolecule.getPosition()[i], 1e-6);
     }
-    _moleculeContainer->remove(0,0);
+    _moleculeContainer->remove(0, 0);
     CPPUNIT_ASSERT(_moleculeContainer->getLocalNumberOfMoleculesWithGhost() == 0);
 
     for (size_t i = 0; i < MD_DIM; i++) {
@@ -78,7 +77,7 @@ public:
 #endif
 #if (MD_DIM == 3)
     // molecule idx is [1,1,1]
-    index = (_numCellsIf3D[1]+2)*(_numCellsIf3D[0]+2) + _numCellsIf3D[0] + 2 + 1;
+    index = (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2) + _numCellsIf3D[0] + 2 + 1;
 #endif
 
     extractMolecule2 = _moleculeContainer->getMoleculeAt(index, 0);
@@ -125,11 +124,10 @@ public:
     _moleculeContainer->insert(1, mol1);
     _moleculeContainer->insert(1, mol2);
     _moleculeContainer->insert(2, mol3);
-    for (size_t i = 0; i < MD_DIM; i++)
-    {
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(mol1.getPosition()[i], _moleculeContainer->getMoleculeAt(1,0).getPosition()[i], 1e-6);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(mol2.getPosition()[i], _moleculeContainer->getMoleculeAt(1,1).getPosition()[i], 1e-6);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(mol3.getPosition()[i], _moleculeContainer->getMoleculeAt(2,0).getPosition()[i], 1e-6);
+    for (size_t i = 0; i < MD_DIM; i++) {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(mol1.getPosition()[i], _moleculeContainer->getMoleculeAt(1, 0).getPosition()[i], 1e-6);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(mol2.getPosition()[i], _moleculeContainer->getMoleculeAt(1, 1).getPosition()[i], 1e-6);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(mol3.getPosition()[i], _moleculeContainer->getMoleculeAt(2, 0).getPosition()[i], 1e-6);
     }
     // cleanup
     _moleculeContainer->clearLinkedCell(1);
@@ -158,8 +156,7 @@ public:
         numTotalCells *= static_cast<int>(numCellsTestInput[j] + 2);
       }
       const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> boundary(simplemd::BoundaryType::PERIODIC_BOUNDARY);
-      simplemd::services::ParallelTopologyService parallelTopologyService(numCellsTestInput, domainOffset, meshWidth, numberProcesses,
-                                                                          boundary);
+      simplemd::services::ParallelTopologyService parallelTopologyService(numCellsTestInput, domainOffset, meshWidth, numberProcesses, boundary);
       simplemd::MoleculeContainer moleculeContainer(parallelTopologyService, 20);
       CPPUNIT_ASSERT(numTotalCells == moleculeContainer.getLocalNumberOfCellsScalarWithGhost());
       CPPUNIT_ASSERT(numInnerCells == vectorToScalar(moleculeContainer.getLocalNumberOfCells()));
@@ -182,8 +179,8 @@ private:
     return toRet;
   }
 
-  //use for persistent tests
-  const tarch::la::Vector<3, double> _numCellsIf3D = {100,60,50};
+  // use for persistent tests
+  const tarch::la::Vector<3, double> _numCellsIf3D = {100, 60, 50};
   simplemd::MoleculeContainer* _moleculeContainer;
 };
 

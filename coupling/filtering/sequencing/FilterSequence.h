@@ -92,7 +92,7 @@ public:
   virtual ~FilterSequence() {
     // Output average application times for all filters
 #ifdef DEBUG_FILTER_PIPELINE
-    if (IDXS.getRank() == 0){
+    if (IDXS.getRank() == 0) {
       std::cout << PRINT_PREFIX() << "Average application times for filters in this sequence in \u03BCs:" << std::endl;
       for (auto filter : _filters) {
         std::cout << "	" << filter->getType() << ": "

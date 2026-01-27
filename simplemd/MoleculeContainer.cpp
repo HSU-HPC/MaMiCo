@@ -4,14 +4,13 @@
 
 simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity)
     : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _ghostCellLayerThickness(parallelTopologyService.getGhostCellLayerThickness()),
-      _numLocalCellsNoGhost(_numCells - 2u * _ghostCellLayerThickness), _cellCapacity(cellCapacity),
-      _domainSize(parallelTopologyService.getGlobalDomainSize()),
+      _numLocalCellsNoGhost(_numCells - 2u * _ghostCellLayerThickness), _cellCapacity(cellCapacity), _domainSize(parallelTopologyService.getGlobalDomainSize()),
       _domainOffset(parallelTopologyService.getGlobalDomainOffset()), _meshWidth(parallelTopologyService.getMeshWidth()),
       _globalIndexOfFirstCell(parallelTopologyService.getGlobalIndexOfFirstCell()), _localIndexOfFirstCell(parallelTopologyService.getLocalIndexOfFirstCell()),
       _moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
       _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)),
       _linkedCellIsGhostCell("linkedCellIsGhostCell", _linkedCellNumMolecules.size()) {
-  for(unsigned int i = 0; i < _linkedCellIsGhostCell.size(); i++)
+  for (unsigned int i = 0; i < _linkedCellIsGhostCell.size(); i++)
     _linkedCellIsGhostCell(i) = isGhostCell(i);
 }
 
@@ -86,8 +85,7 @@ void simplemd::MoleculeContainer::sort() {
         // parallelise loop for all cells that are to be traversed in this way
         MoleculeContainer& container = (*this);
         Kokkos::parallel_for(
-          Kokkos::RangePolicy<MainExecSpace>(0,length),
-          KOKKOS_LAMBDA(const unsigned int j) {
+            Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_LAMBDA(const unsigned int j) {
               // compute index of the current cell
               unsigned int index = 0;
 #if (MD_DIM > 1)

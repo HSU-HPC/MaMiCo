@@ -14,9 +14,9 @@ simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simpl
       _cutOffRadiusSquared(molecularPropertiesService.getMolecularProperties().getCutOffRadius() *
                            molecularPropertiesService.getMolecularProperties().getCutOffRadius()),
       _externalForce(0) {
-        // Note: This copies the (static) external force from the configuration
-        externalForceService.addExternalForce(_externalForce);
-      }
+  // Note: This copies the (static) external force from the configuration
+  externalForceService.addExternalForce(_externalForce);
+}
 
 void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
 #if (MD_DEBUG == MD_YES)
@@ -30,7 +30,8 @@ void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
  * because results do not depend on order of force summation
  * this expects force1, force2 and forceBuffer to contain correctly formatted long long data already, not double
  */
-KOKKOS_INLINE_FUNCTION void addForce(tarch::la::Vector<MD_DIM, double>& force1, tarch::la::Vector<MD_DIM, double>& force2, tarch::la::Vector<MD_DIM, double>& forceBuffer) {
+KOKKOS_INLINE_FUNCTION void addForce(tarch::la::Vector<MD_DIM, double>& force1, tarch::la::Vector<MD_DIM, double>& force2,
+                                     tarch::la::Vector<MD_DIM, double>& forceBuffer) {
 #if (TARCH_DEBUG == TARCH_YES)
   *(long long*)(&force1[0]) += *(long long*)(&forceBuffer[0]);
   *(long long*)(&force1[1]) += *(long long*)(&forceBuffer[1]);
