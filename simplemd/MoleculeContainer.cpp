@@ -29,12 +29,12 @@ void simplemd::MoleculeContainer::insert(simplemd::Molecule& molecule) { insert(
 
 void simplemd::MoleculeContainer::remove(unsigned int cellIdx, unsigned int moleculeIdx) {
 #if (MD_ERROR == MD_YES)
-  if (moleculeIdx >= _linkedCellNumMolecules(cellIdx) || moleculeIdx < 0) {
+  if (moleculeIdx >= _linkedCellNumMolecules(cellIdx)) {
     Kokkos::printf("Deleting particle that does not exist! moleculeIdx: %d, cellIdx: %d, num molecules: %d\n", moleculeIdx, cellIdx,
                    _linkedCellNumMolecules(cellIdx));
     Kokkos::abort("ERROR simplemd::MoleculeContainer::remove");
   }
-  if (cellIdx >= _linkedCellNumMolecules(cellIdx) || cellIdx < 0) {
+  if (cellIdx >= _linkedCellNumMolecules(cellIdx)) {
     Kokkos::printf("Deleting particle from cell that does not exist! moleculeIdx: %d, cellIdx: %d, num molecules: %d\n", moleculeIdx, cellIdx,
                    _linkedCellNumMolecules(cellIdx));
     Kokkos::abort("ERROR simplemd::MoleculeContainer::remove");
