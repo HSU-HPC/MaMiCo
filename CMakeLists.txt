@@ -824,6 +824,7 @@ set(CLANGFORMAT_SOURCES
   "test/unit/coupling/datastructures/LinkedCellContainerTest.cpp"
   "test/unit/coupling/datastructures/FlexibleCellContainerTest.cpp"
   "test/unit/coupling/datastructures/CellContainerTest.cpp"
+  "test/unit/simplemd/LinkedCellTest.cpp"
   "test/unit/simplemd/MoleculeContainerTest.cpp"
   "coupling/scenario/CouetteScenario.h"
   "coupling/scenario/main_couette.cpp"

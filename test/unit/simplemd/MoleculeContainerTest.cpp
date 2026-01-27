@@ -6,7 +6,6 @@
 #include "simplemd/MolecularDynamicsDefinitions.h"
 #include "tarch/la/Vector.h"
 
-#include <sstream>
 #include <ctime>
 #include <array>
 

@@ -41,7 +41,6 @@ public:
     KOKKOS_INLINE_FUNCTION Iterator operator++(int) {
       Iterator temp = *this;
       ++(*this);
-      _idx++;
       return temp;
     }
     KOKKOS_INLINE_FUNCTION Iterator& operator--() {
@@ -52,7 +51,6 @@ public:
     KOKKOS_INLINE_FUNCTION Iterator operator--(int) {
       Iterator temp = *this;
       --(*this);
-      _idx--;
       return temp;
     }
 
