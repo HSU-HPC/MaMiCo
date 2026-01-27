@@ -28,7 +28,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
  * this expects force1, force2 and forceBuffer to contain correctly formatted long long data already, not double
  */
 constexpr double maxF = 1e6;
-constexpr double stepF = std::numeric_limits<long long>::max() / maxF;
+constexpr double stepF = (double)(std::numeric_limits<long long>::max()) / maxF;
 constexpr double minF = 1 / stepF;
 inline void addForce(tarch::la::Vector<MD_DIM, double>& force1, tarch::la::Vector<MD_DIM, double>& force2, tarch::la::Vector<MD_DIM, double>& forceBuffer) {
 #if (TARCH_DEBUG == TARCH_YES)

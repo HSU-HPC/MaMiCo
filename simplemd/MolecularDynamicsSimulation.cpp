@@ -13,7 +13,7 @@
  * this expects forces to contain long int and converts them back into double
  */
 constexpr double maxF = 1e6;
-constexpr double stepF = std::numeric_limits<long long>::max() / maxF;
+constexpr double stepF = (double)(std::numeric_limits<long long>::max()) / maxF;
 constexpr double minF = 1 / stepF;
 class ConvertForcesMapping {
 public:
