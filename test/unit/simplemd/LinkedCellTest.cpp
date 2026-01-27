@@ -14,6 +14,7 @@ class LinkedCellTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testInsertRemove);
   CPPUNIT_TEST(testClearCell);
   CPPUNIT_TEST(testIteratorIncrement);
+  CPPUNIT_TEST(testIteratorDecrement);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -88,7 +89,7 @@ public:
 
     // prefix
     double pos = 1;
-    for (auto it = (*_moleculeContainer)[0].begin(); it != (*_moleculeContainer)[0].end(); it++) {
+    for (auto it = (*_moleculeContainer)[0].begin(); it != (*_moleculeContainer)[0].end(); ++it) {
       CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], pos, 1e-6);
       unsigned int idx = it.getIndex();
       CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], (_moleculeContainer->getMoleculeAt(0, idx)).getPosition()[0], 1e-6);
@@ -97,10 +98,66 @@ public:
 
     // postfix
     pos = 1;
-    for (auto it = (*_moleculeContainer)[0].begin(); it != (*_moleculeContainer)[0].end(); ++it) {
+    for (auto it = (*_moleculeContainer)[0].begin(); it != (*_moleculeContainer)[0].end(); it++) {
       CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], pos, 1e-6);
+      unsigned int idx = it.getIndex();
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], (_moleculeContainer->getMoleculeAt(0, idx)).getPosition()[0], 1e-6);
       pos++;
     }
+
+    // cleanup
+    (*_moleculeContainer)[0].clear();
+    for (unsigned int i = 0; i < positions.size(); i++) {
+      if (molecules[i] != nullptr) {
+        delete molecules[i];
+        molecules[i] = nullptr;
+      }
+    }
+  }
+
+  void testIteratorDecrement() {
+    const unsigned int numMols = 5;
+    tarch::la::Vector<MD_DIM, double> velocity(0);
+    std::array<tarch::la::Vector<MD_DIM, double>, numMols> positions;
+    std::array<simplemd::Molecule*, numMols> molecules;
+    for (unsigned int i = 0; i < positions.size(); i++) {
+      positions[i][0] = i + 1;
+      molecules[i] = new simplemd::Molecule(positions[i], velocity);
+      (*_moleculeContainer)[0].insert(*molecules[i]);
+    }
+    std::cout << "here1" << std::endl;
+    // prefix
+    double pos = numMols;
+    auto it = (*_moleculeContainer)[0].end();
+    it--;
+    for (; it != (*_moleculeContainer)[0].begin(); --it) {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], pos, 1e-6);
+      unsigned int idx = it.getIndex();
+      std::cout << "here1" << pos << " " << idx << std::endl;
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], (_moleculeContainer->getMoleculeAt(0, idx)).getPosition()[0], 1e-6);
+      std::cout << "here2" << pos << std::endl;
+      pos--;
+    }
+    std::cout << "here1" << std::endl;
+    // check first item
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], pos, 1e-6);
+    unsigned int idx = it.getIndex();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], (_moleculeContainer->getMoleculeAt(0, idx)).getPosition()[0], 1e-6);
+    std::cout << "here1" << std::endl;
+    // postfix
+    it = (*_moleculeContainer)[0].end();
+    it--;
+    pos = numMols;
+    for (; it != (*_moleculeContainer)[0].begin(); it--) {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], pos, 1e-6);
+      unsigned int idx = it.getIndex();
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], (_moleculeContainer->getMoleculeAt(0, idx)).getPosition()[0], 1e-6);
+      pos--;
+    }
+    // check first item
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], pos, 1e-6);
+    idx = it.getIndex();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], (_moleculeContainer->getMoleculeAt(0, idx)).getPosition()[0], 1e-6);
 
     // cleanup
     (*_moleculeContainer)[0].clear();
