@@ -315,12 +315,10 @@ private:
    */
   int _cellCapacity;
 
-#if (MD_ERROR == MD_YES)
   KOKKOS_INLINE_FUNCTION void checkOperationWouldExceedCapacity(int sizePostOp) const;
 
   /** domain size */
   const tarch::la::Vector<MD_DIM, double> _domainSize;
-#endif
 
   /** global domain offset */
   const tarch::la::Vector<MD_DIM, double> _domainOffset;

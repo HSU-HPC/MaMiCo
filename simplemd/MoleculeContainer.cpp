@@ -5,9 +5,7 @@
 simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity)
     : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _ghostCellLayerThickness(parallelTopologyService.getGhostCellLayerThickness()),
       _numLocalCellsNoGhost(_numCells - 2u * _ghostCellLayerThickness), _cellCapacity(cellCapacity),
-#if (MD_ERROR == MD_YES)
       _domainSize(parallelTopologyService.getGlobalDomainSize()),
-#endif
       _domainOffset(parallelTopologyService.getGlobalDomainOffset()), _meshWidth(parallelTopologyService.getMeshWidth()),
       _globalIndexOfFirstCell(parallelTopologyService.getGlobalIndexOfFirstCell()), _localIndexOfFirstCell(parallelTopologyService.getLocalIndexOfFirstCell()),
       _moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
@@ -269,11 +267,11 @@ size_t simplemd::MoleculeContainer::getLocalNumberOfMoleculesWithGhost() const {
 const tarch::la::Vector<MD_DIM, unsigned int>& simplemd::MoleculeContainer::getLocalIndexOfFirstCell() const { return _ghostCellLayerThickness; }
 const tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalNumberOfCells() const { return _numLocalCellsNoGhost; }
 
-#if (MD_ERROR == MD_YES)
 inline void simplemd::MoleculeContainer::checkOperationWouldExceedCapacity(int sizePostOp) const {
+#if (MD_ERROR == MD_YES)
   if (sizePostOp > _cellCapacity) {
     Kokkos::printf("Cell capacity=%d would be exceeded by an operation! Exiting...", _cellCapacity);
     Kokkos::abort("simplemd::MoleculeContainer::checkOperationWouldExceedCapacity");
   }
-}
 #endif
+}
