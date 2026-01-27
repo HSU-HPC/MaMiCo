@@ -28,7 +28,7 @@ class PeriodicAndParallelBoundaryFillCellsMapping;
 class simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping {
 public:
   PeriodicAndParallelBoundaryFillCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                              simplemd::MoleculeContainer moleculeContainer)
+                                              simplemd::MoleculeContainer& moleculeContainer)
       : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer) {}
   ~PeriodicAndParallelBoundaryFillCellsMapping() {}
 

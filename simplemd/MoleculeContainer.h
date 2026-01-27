@@ -365,12 +365,11 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
   iterateMoleculesSerial(a);
 #else
   a.beginMoleculeIteration();
-  MoleculeContainer& container = (*this);
   Kokkos::parallel_for(
       Kokkos::RangePolicy<MainExecSpace>(0, _linkedCellIsGhostCell.size()),
-      KOKKOS_LAMBDA(const unsigned int i) {
-        for (unsigned int j = 0; j < container._linkedCellNumMolecules(i); j++) {
-          a.handleMolecule(container.getMoleculeAt(i, j));
+      KOKKOS_CLASS_LAMBDA(const unsigned int i) {
+        for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
+          a.handleMolecule(getMoleculeAt(i, j));
         }
       });
   Kokkos::fence(); // Ensure results are available on the host
@@ -572,10 +571,9 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
 #endif
       ;
   // loop over domain, but with a single loop
-  MoleculeContainer& container = (*this);
   Kokkos::parallel_for(
       Kokkos::RangePolicy<MainExecSpace>(0, length),
-      KOKKOS_LAMBDA(const unsigned int i) {
+      KOKKOS_CLASS_LAMBDA(const unsigned int i) {
 // compute index of the current cell
 #if (MD_DIM > 1)
         int helpIndex1 = i;
@@ -608,7 +606,7 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
 #endif
 
         // handle cell
-        auto cell = container[index];
+        auto cell = (*this)[index];
         a.handleCell(cell);
       });          // Kokkos::parallel_for
   Kokkos::fence(); // Ensure results are available on the host
@@ -718,10 +716,9 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
             ;
 
         // parallelise loop for all cells that are to be traversed in this way
-        MoleculeContainer& container = (*this);
         Kokkos::parallel_for(
             Kokkos::RangePolicy<MainExecSpace>(0, length),
-            KOKKOS_LAMBDA(const unsigned int j) {
+            KOKKOS_CLASS_LAMBDA(const unsigned int j) {
               // compute index of the current cell
               unsigned int index = 0;
 #if (MD_DIM > 1)
@@ -755,7 +752,7 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
               Kokkos::printf("Handle cell %d\n", index);
 #endif
 
-              simplemd::LinkedCell cell = container[index];
+              simplemd::LinkedCell cell = (*this)[index];
               a.handleCell(cell);
               // handle pairs (lower,left,back-oriented cells)
               for (unsigned int i = 0; i < MD_LINKED_CELL_NEIGHBOURS / 2; i++) {
@@ -764,8 +761,8 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
 #endif
                 coordsCell1Buffer = index + indexOffset[i];
                 coordsCell2Buffer = index + neighbourOffset[i];
-                auto cell1 = container[coordsCell1Buffer];
-                auto cell2 = container[coordsCell2Buffer];
+                auto cell1 = (*this)[coordsCell1Buffer];
+                auto cell2 = (*this)[coordsCell2Buffer];
                 a.handleCellPair(cell1, cell2, coordsCell1Buffer, coordsCell2Buffer);
               }
             });          // j, Kokkos::parallel_for
