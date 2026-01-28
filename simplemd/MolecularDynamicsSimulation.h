@@ -13,6 +13,7 @@
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
 #include "simplemd/cell-mappings/RDFMapping.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
+#include "simplemd/molecule-mappings/ConvertForcesMapping.h"
 #include "simplemd/molecule-mappings/InitialPositionAndForceUpdate.h"
 #include "simplemd/molecule-mappings/VTKMoleculeWriter.h"
 #if BUILD_WITH_ADIOS2
@@ -65,6 +66,8 @@ private:
    *  This is only used during initialisation.
    */
   double getNumberDensity(unsigned int numberMolecules, const tarch::la::Vector<MD_DIM, double>& domainSize) const;
+
+  class simplemd::moleculemappings::ConvertForcesMapping _convertForcesMapping;
 
 protected:
   const simplemd::configurations::MolecularDynamicsConfiguration& _configuration;

@@ -871,6 +871,7 @@ set(CLANGFORMAT_SOURCES
   "simplemd/molecule-mappings/VelocityStoermerVerletMapping.h"
   "simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
   "simplemd/molecule-mappings/ComputeMeanVelocityMapping.h"
+  "simplemd/molecule-mappings/ConvertForcesMapping.h"
   "simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
   "simplemd/molecule-mappings/WriteCheckPointMapping.h"
   "simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
