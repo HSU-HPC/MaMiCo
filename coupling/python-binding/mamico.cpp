@@ -513,7 +513,7 @@ PYBIND11_MODULE(mamico, mamico) {
   py::class_<coupling::configurations::ParticleInsertionConfiguration>(configuration, "ParticleInsertionConfiguration")
       .def("getParticleInsertionType", &coupling::configurations::ParticleInsertionConfiguration::getParticleInsertionType);
 
-  py::class_<coupling::configurations::MomentumInsertionConfiguration>(configuration, "MomentumInsertionConfiguration")
+  py::class_<coupling::configurations::MomentumInsertionConfiguration<3>>(configuration, "MomentumInsertionConfiguration")
       .def("getMomentumInsertionType", &coupling::configurations::MomentumInsertionConfiguration<3>::getMomentumInsertionType)
       .def("getInnerOverlap", &coupling::configurations::MomentumInsertionConfiguration<3>::getInnerOverlap);
 
