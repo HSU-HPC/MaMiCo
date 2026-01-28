@@ -57,7 +57,14 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(LinkedCell& ce
     tarch::la::Vector<MD_DIM, double>& force1 = m1->getForce();
     const tarch::la::Vector<MD_DIM, double>& position1 = m1->getConstPosition();
 
+#if (TARCH_DEBUG == TARCH_YES)
+    if (_externalForce != tarch::la::Vector<MD_DIM, double>{0.0}) {
+      throw std::runtime_error(
+          std::string("simplemd::cellmappings::LennardJonesForceMapping::handleCell(): externalForce not implemented in fixed point math debug mode!"));
+    }
+#else
     force1 += _externalForce;
+#endif
 
     // iterate over all other molecules not touched so far
     m2++;

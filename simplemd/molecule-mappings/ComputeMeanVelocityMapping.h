@@ -29,9 +29,7 @@ public:
     }
   }
 
-  void endMoleculeIteration() {
-    _meanVelocity = _meanVelocity / _particleCounter;
-  }
+  void endMoleculeIteration() { _meanVelocity = _meanVelocity / _particleCounter; }
 
   void handleMolecule(Molecule& molecule) {
     tarch::la::Vector<MD_DIM, double> v{stepV * molecule.getVelocity()};
@@ -41,7 +39,7 @@ public:
     _particleCounter++;
   }
 
-  tarch::la::Vector<MD_DIM, double> getMeanVelocity() const { 
+  tarch::la::Vector<MD_DIM, double> getMeanVelocity() const {
     tarch::la::Vector<MD_DIM, double> res;
     for (unsigned int d = 0; d < MD_DIM; d++) {
       res[d] = _meanVelocity[d] * minV;
