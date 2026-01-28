@@ -150,7 +150,7 @@ void simplemd::MoleculeContainer::sort() {
                   i--;
                 }
               }
-            });          // j, Kokkos::parallel_for
+            }); // j, Kokkos::parallel_for
       } // x
 #if (MD_DIM > 1)
     } // y

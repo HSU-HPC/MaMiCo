@@ -600,7 +600,7 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
         // handle cell
         auto cell = (*this)[index];
         a.handleCell(cell);
-      });          // Kokkos::parallel_for
+      }); // Kokkos::parallel_for
   // end iteration();
   a.endCellIteration();
 }
@@ -755,7 +755,7 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
                 auto cell2 = (*this)[coordsCell2Buffer];
                 a.handleCellPair(cell1, cell2, coordsCell1Buffer, coordsCell2Buffer);
               }
-            });          // j, Kokkos::parallel_for
+            }); // j, Kokkos::parallel_for
       } // x
 #if (MD_DIM > 1)
     } // y
