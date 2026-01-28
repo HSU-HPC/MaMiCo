@@ -27,11 +27,12 @@ public:
   /** @brief a simple constructor
    *  @param mdSolverInterface interface to the md solver
    *  @param outermostLayer the index of the outermost cell layer
-   *  @param innermostLayer the index of the innermost cell layer */
+   *  @param innermostLayer the index of the innermost cell layer
+   *  @param impositionEnabled whether imposition is allowed at the specified domain face */
   NieVelocityImposition(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, const unsigned int& outermostLayer,
-                        const unsigned int& innermostLayer)
+                        const unsigned int& innermostLayer, const tarch::la::Vector<2 * dim, bool> impositionEnabled)
       : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _outermostLayer(outermostLayer), _innermostLayer(innermostLayer),
-      _enableInnerImposition(false) {}
+        _impositionEnabled(impositionEnabled), _enableInnerImposition(false) {}
 
   /** @brief a simple destructor */
   virtual ~NieVelocityImposition() {}
@@ -63,9 +64,7 @@ public:
     cell.iterateCells(velocityImposition);
   }
 
-  void setInnerImposition(bool enable) override {
-    _enableInnerImposition = enable;
-  }
+  void setInnerImposition(bool enable) override { _enableInnerImposition = enable; }
 
 private:
   /** returns true if the local cell at index currentLocalCouplingCellIndex is
@@ -95,6 +94,7 @@ private:
   const unsigned int _outermostLayer;
   /** @brief the index of the innermost cell layer*/
   const unsigned int _innermostLayer;
+  const tarch::la::Vector<2 * dim, bool> _impositionEnabled;
   bool _enableInnerImposition;
 };
 

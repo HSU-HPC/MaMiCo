@@ -40,7 +40,7 @@ public:
     coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface = new TestMacroscopicSolverInterface<dim>();
 
     TestParticleInsertionConfiguration particleInsertionConfiguration;
-    TestMomentumInsertionConfiguration momentumInsertionConfiguration;
+    TestMomentumInsertionConfiguration<dim> momentumInsertionConfiguration;
     TestBoundaryForceConfiguration<dim> boundaryForceConfiguration;
     TestTransferStrategyConfiguration<dim> transferStrategyConfiguration;
     TestParallelTopologyConfiguration parallelTopologyConfiguration;
@@ -118,11 +118,11 @@ private:
     bool isValid() const override { return true; };
   };
 
-  class TestMomentumInsertionConfiguration : public coupling::configurations::MomentumInsertionConfiguration {
+  template <unsigned int dim> class TestMomentumInsertionConfiguration : public coupling::configurations::MomentumInsertionConfiguration<dim> {
   public:
     TestMomentumInsertionConfiguration()
-        : coupling::configurations::MomentumInsertionConfiguration(
-              coupling::configurations::MomentumInsertionConfiguration::MomentumInsertionType::NO_INSERTION) {}
+        : coupling::configurations::MomentumInsertionConfiguration<dim>(
+              coupling::configurations::MomentumInsertionConfiguration<dim>::MomentumInsertionType::NO_INSERTION) {}
 
     ~TestMomentumInsertionConfiguration() {}
 
