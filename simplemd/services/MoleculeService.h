@@ -86,7 +86,7 @@ public:
   /** resets the velocity over the whole molecule system to the mean velocity specified at the beginning */
   void resetMeanVelocity();
 
-  simplemd::MoleculeContainer& getContainer() const { return *_moleculeContainer; }
+  inline simplemd::MoleculeContainer& getContainer() const { return *_moleculeContainer; }
 
   tarch::la::Vector<MD_DIM, double> getLocalDomainSize() { return _localDomainSize; }
 

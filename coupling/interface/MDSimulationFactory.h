@@ -22,8 +22,8 @@
 
 #if defined(SIMPLE_MD)
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
-#include "simplemd/LinkedCell.h"
-#define MY_LINKEDCELL simplemd::LinkedCell
+#include "coupling/interface/impl/SimpleMD/SimpleMDLinkedCellWrapper.h"
+#define MY_LINKEDCELL coupling::interface::SimpleMDLinkedCellWrapper
 #include "coupling/interface/impl/SimpleMD/SimpleMDSimulation.h"
 #elif defined(LAMMPS_MD) || defined(LAMMPS_DPD)
 #if defined(LAMMPS_MD)

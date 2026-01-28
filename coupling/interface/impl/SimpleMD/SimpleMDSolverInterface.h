@@ -17,6 +17,7 @@
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDMoleculeIterator.h"
+#include "coupling/interface/impl/SimpleMD/SimpleMDLinkedCellWrapper.h"
 
 namespace coupling {
 namespace interface {
@@ -24,9 +25,9 @@ namespace interface {
 /** general MD solver interface for SimpleMD.
  *  @author Philipp Neumann
  */
-class SimpleMDSolverInterface : public MDSolverInterface<simplemd::LinkedCell, MD_DIM> {
+class SimpleMDSolverInterface : public MDSolverInterface<SimpleMDLinkedCellWrapper, MD_DIM> {
 private:
-  std::vector<simplemd::LinkedCell> _linkedCells;
+  std::vector<SimpleMDLinkedCellWrapper*> _linkedCells;
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
   simplemd::services::MoleculeService& _moleculeService;
   const simplemd::services::MolecularPropertiesService& _molecularPropertiesService;
@@ -115,18 +116,24 @@ public:
         _cutoffEnergy(4.0 * _epsilon * _sigma6 / (_cutoffRadiusSquared * _cutoffRadiusSquared * _cutoffRadiusSquared) *
                       (_sigma6 / (_cutoffRadiusSquared * _cutoffRadiusSquared * _cutoffRadiusSquared) - 1.0)),
         _dt(dt) {}
-  ~SimpleMDSolverInterface() { _linkedCells.clear(); }
+  ~SimpleMDSolverInterface() {
+    for (auto linkedCell : _linkedCells) {
+      if (linkedCell != nullptr)
+        delete linkedCell;
+    }
+    _linkedCells.clear();
+  }
 
-  simplemd::LinkedCell& getLinkedCell(const CellIndex_T& couplingCellIndex, const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellInCouplingCell,
-                                      const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerCouplingCell) {
+  SimpleMDLinkedCellWrapper& getLinkedCell(const CellIndex_T& couplingCellIndex, const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellInCouplingCell,
+                                           const tarch::la::Vector<MD_DIM, unsigned int>& linkedCellsPerCouplingCell) {
     // no linked cells found in outer region!
 
     tarch::la::Vector<MD_DIM, unsigned int> index(_moleculeService.getContainer().getLocalIndexOfFirstCell());
     for (unsigned int d = 0; d < MD_DIM; d++) {
       index[d] = index[d] + couplingCellIndex.get()[d] * linkedCellsPerCouplingCell[d] + linkedCellInCouplingCell[d];
     }
-    _linkedCells.push_back(_moleculeService.getContainer()[index]);
-    return _linkedCells.back();
+    _linkedCells.push_back(new SimpleMDLinkedCellWrapper(index));
+    return *_linkedCells.back();
   }
 
   /** returns the global size of the box-shaped MD domain */
@@ -148,7 +155,8 @@ public:
     _moleculeService.getInitialVelocity(meanVelocity, kB, temperature, _molecularPropertiesService, initialVelocity);
   }
 
-  void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<MD_DIM>& molecule, simplemd::LinkedCell& cell) {
+  void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<MD_DIM>& molecule, SimpleMDLinkedCellWrapper& cellWrapper) {
+    auto cell = _moleculeService.getContainer()[cellWrapper.getCellIndex()];
     auto it = cell.begin();
     const tarch::la::Vector<MD_DIM, double> moleculePosition = molecule.getPosition();
     while (it != cell.end()) {
@@ -161,7 +169,7 @@ public:
       it++;
     }
 
-    std::cout << "Could delete molecule at position " << moleculePosition << "!" << std::endl;
+    std::cout << "Could not delete molecule at position " << moleculePosition << "!" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -303,8 +311,8 @@ public:
 
   double getDt() { return _dt; }
 
-  coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM>* getMoleculeIterator(simplemd::LinkedCell& cell) {
-    return new coupling::interface::SimpleMDMoleculeIterator(cell);
+  coupling::interface::MoleculeIterator<SimpleMDLinkedCellWrapper, MD_DIM>* getMoleculeIterator(SimpleMDLinkedCellWrapper& cellWrapper) {
+    return new coupling::interface::SimpleMDMoleculeIterator(cellWrapper, _moleculeService);
   }
 };
 
