@@ -150,7 +150,8 @@ void simplemd::MoleculeContainer::sort() {
                   i--;
                 }
               }
-            }); // j, Kokkos::parallel_for
+            });          // j, Kokkos::parallel_for
+        Kokkos::fence(); // Ensure results are available on the host
       } // x
 #if (MD_DIM > 1)
     } // y
@@ -268,6 +269,7 @@ bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
 }
 
 size_t simplemd::MoleculeContainer::getLocalNumberOfMoleculesWithGhost() const {
+  Kokkos::fence(); // Ensure molecule count per cell is up to date
   size_t moleculeCount = 0;
   for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {
     moleculeCount += _linkedCellNumMolecules(i);
