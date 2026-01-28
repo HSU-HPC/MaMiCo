@@ -388,8 +388,8 @@ PYBIND11_MODULE(mamico, mamico) {
   utils.def("finalizeMPI", &MPI_Finalize, "Calls MPI_Finalize");
   utils.def(
       "initIndexing",
-      [](tarch::la::Vector<3, double> globalMDDomainSize, tarch::la::Vector<3, unsigned int> mdNumberProcesses,
-         tarch::la::Vector<3, double> couplingCellSize, coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion, unsigned int rank) {
+      [](tarch::la::Vector<3, double> globalMDDomainSize, tarch::la::Vector<3, unsigned int> mdNumberProcesses, tarch::la::Vector<3, double> couplingCellSize,
+         coupling::paralleltopology::ParallelTopologyType parallelTopologyType, unsigned int outerRegion, unsigned int rank) {
         const unsigned int dim = 3;
         return IDXS.initWithMDSize(globalMDDomainSize, tarch::la::Vector<3, double>{0, 0, 0}, mdNumberProcesses, couplingCellSize, parallelTopologyType,
                                    outerRegion, rank);
@@ -514,8 +514,8 @@ PYBIND11_MODULE(mamico, mamico) {
       .def("getParticleInsertionType", &coupling::configurations::ParticleInsertionConfiguration::getParticleInsertionType);
 
   py::class_<coupling::configurations::MomentumInsertionConfiguration>(configuration, "MomentumInsertionConfiguration")
-      .def("getMomentumInsertionType", &coupling::configurations::MomentumInsertionConfiguration::getMomentumInsertionType)
-      .def("getInnerOverlap", &coupling::configurations::MomentumInsertionConfiguration::getInnerOverlap);
+      .def("getMomentumInsertionType", &coupling::configurations::MomentumInsertionConfiguration<3>::getMomentumInsertionType)
+      .def("getInnerOverlap", &coupling::configurations::MomentumInsertionConfiguration<3>::getInnerOverlap);
 
   py::class_<coupling::configurations::BoundaryForceConfiguration<3>>(configuration, "BoundaryForceConfiguration")
       .def("getBoundaryForceType", &coupling::configurations::BoundaryForceConfiguration<3>::getBoundaryForceType);
@@ -607,10 +607,10 @@ PYBIND11_MODULE(mamico, mamico) {
   py::class_<coupling::interface::MacroscopicSolverInterface<3>> maSoIf(interface, "MacroscopicSolverInterface");
 
   py::enum_<coupling::paralleltopology::ParallelTopologyType>(paralleltopology, "ParallelTopologyType")
-    .value("UNDEFINED", coupling::paralleltopology::UNDEFINED)
-    .value("XYZ", coupling::paralleltopology::XYZ)
-    .value("ZYX", coupling::paralleltopology::ZYX)
-    .export_values();
+      .value("UNDEFINED", coupling::paralleltopology::UNDEFINED)
+      .value("XYZ", coupling::paralleltopology::XYZ)
+      .value("ZYX", coupling::paralleltopology::ZYX)
+      .export_values();
 
   // we indicate that CouetteSolverInterface is a subclass of
   // MacroscopicSolverInterface by passing maSoIf here

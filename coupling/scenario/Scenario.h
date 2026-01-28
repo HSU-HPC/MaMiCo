@@ -19,14 +19,14 @@ class Scenario {
 public:
   Scenario(std::string scenarioname) : _scenarioname(scenarioname) {
     getRootRank();
-    if (_isRootRank){
+    if (_isRootRank) {
       std::cout << "Run " << scenarioname << "..." << std::endl;
       std::cout << "MaMiCo git commit hash = " << MAMICO_STRINGIFY(MAMICO_COMMIT_HASH) << std::endl;
     }
   }
-  virtual ~Scenario() { 
-    if (_isRootRank){
-      std::cout << "Shut down " << _scenarioname << std::endl; 
+  virtual ~Scenario() {
+    if (_isRootRank) {
+      std::cout << "Shut down " << _scenarioname << std::endl;
     }
   }
 
