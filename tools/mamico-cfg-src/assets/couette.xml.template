@@ -44,7 +44,7 @@
       write-every-macroscopic-timestep="0"
       macroscopic-filename="CouplingCell_macro"
     />
-    <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" />
+    <momentum-insertion type="nie-velocity-imposition" outermost-overlap-layer="2" innermost-overlap-layer="3" west="yes" east="yes" north="yes" south="yes" bottom="yes" top="yes"/>
     <transfer-strategy type="nie-transfer" mass-flux-west="yes" mass-flux-east="yes" mass-flux-north="no" mass-flux-south="no" mass-flux-bottom="no" mass-flux-top="no" shift-by-timesteps="0.5"/>
     <parallel-topology type="{parallel-topology-type}" />
     <thermostat type='{thermostat-type}' number-layers='1' />
