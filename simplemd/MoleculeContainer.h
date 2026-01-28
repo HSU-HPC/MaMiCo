@@ -366,7 +366,6 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
           a.handleMolecule(getMoleculeAt(i, j));
         }
       });
-  Kokkos::fence(); // Ensure results are available on the host
   a.endMoleculeIteration();
 #endif
 }
@@ -602,7 +601,6 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
         auto cell = (*this)[index];
         a.handleCell(cell);
       });          // Kokkos::parallel_for
-  Kokkos::fence(); // Ensure results are available on the host
   // end iteration();
   a.endCellIteration();
 }
@@ -758,7 +756,6 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
                 a.handleCellPair(cell1, cell2, coordsCell1Buffer, coordsCell2Buffer);
               }
             });          // j, Kokkos::parallel_for
-        Kokkos::fence(); // Ensure results are available on the host
       } // x
 #if (MD_DIM > 1)
     } // y
