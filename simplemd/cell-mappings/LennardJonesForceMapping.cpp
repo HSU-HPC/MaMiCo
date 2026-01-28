@@ -59,8 +59,8 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(LinkedCell& ce
 
 #if (TARCH_DEBUG == TARCH_YES)
     if (_externalForce != tarch::la::Vector<MD_DIM, double>{0.0}) {
-      throw std::runtime_error(
-          std::string("simplemd::cellmappings::LennardJonesForceMapping::handleCell(): externalForce not implemented in fixed point math debug mode!"));
+      std::cout << "simplemd::cellmappings::LennardJonesForceMapping::handleCell(): externalForce not implemented in fixed point math debug mode!";
+      std::exit(1);
     }
 #else
     force1 += _externalForce;
