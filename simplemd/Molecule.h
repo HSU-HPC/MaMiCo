@@ -35,7 +35,7 @@ public:
   KOKKOS_FUNCTION const bool& isFixed() const { return _isFixed; }
 
   /** get/set ID */
-  const unsigned int& getID() const { return _id; }
+  KOKKOS_FUNCTION const unsigned int& getID() const { return _id; }
   void setID(const unsigned int& id) { _id = id; }
 
   /** get/ set position */
