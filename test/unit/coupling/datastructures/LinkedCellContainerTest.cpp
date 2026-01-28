@@ -2,7 +2,7 @@
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSolverInterface.h"
-#include "simplemd/LinkedCell.h"
+#include "coupling/interface/impl/SimpleMD/SimpleMDLinkedCellWrapper.h"
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -22,14 +22,15 @@ private:
   /** test interface; only implements the getLinkedCell method (required in initialisation of macroscopic cells) and
    *  strictly returns its only linked cell ;-) The MD domain is considered to be the unit square/box.
    */
-  class TestMDSolverInterface : public coupling::interface::MDSolverInterface<simplemd::LinkedCell, 3> {
+  class TestMDSolverInterface : public coupling::interface::MDSolverInterface<coupling::interface::SimpleMDLinkedCellWrapper, 3> {
   public:
-    TestMDSolverInterface() : coupling::interface::MDSolverInterface<simplemd::LinkedCell, 3>() {}
+    TestMDSolverInterface() : coupling::interface::MDSolverInterface<coupling::interface::SimpleMDLinkedCellWrapper, 3>() {}
     virtual ~TestMDSolverInterface() {}
 
-    virtual simplemd::LinkedCell& getLinkedCell(const I11& couplingCellIndex, const tarch::la::Vector<3, unsigned int>& linkedCellInCouplingCell,
-                                                const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell) {
-      throw std::runtime_error("Not implemented!");
+    virtual coupling::interface::SimpleMDLinkedCellWrapper& getLinkedCell(const I11& couplingCellIndex,
+                                                                          const tarch::la::Vector<3, unsigned int>& linkedCellInCouplingCell,
+                                                                          const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell) {
+      return _linkedCellWrapper;
     }
 
     /** returns the global size of the box-shaped MD domain */
@@ -44,7 +45,7 @@ private:
     virtual double getMoleculeEpsilon() const { return 1.0; }
     virtual void getInitialVelocity(const tarch::la::Vector<3, double>& meanVelocity, const double& kB, const double& temperature,
                                     tarch::la::Vector<3, double>& initialVelocity) const {}
-    virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<3>& molecule, simplemd::LinkedCell& cell) {}
+    virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<3>& molecule, coupling::interface::SimpleMDLinkedCellWrapper& cell) {}
     virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<3>& molecule) {}
     virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<3, unsigned int>& indexOfFirstCouplingCell,
                                                const tarch::la::Vector<3, unsigned int>& rangeCouplingCells,
@@ -56,7 +57,11 @@ private:
     virtual void synchronizeMoleculesAfterMassModification() {}
     virtual void synchronizeMoleculesAfterMomentumModification() {}
     virtual double getDt() { return 1.0; }
-    virtual coupling::interface::MoleculeIterator<simplemd::LinkedCell, 3>* getMoleculeIterator(simplemd::LinkedCell& cell) { return NULL; }
+    virtual coupling::interface::MoleculeIterator<coupling::interface::SimpleMDLinkedCellWrapper, 3>*
+    getMoleculeIterator(coupling::interface::SimpleMDLinkedCellWrapper& cell) {
+      return NULL;
+    }
+    coupling::interface::SimpleMDLinkedCellWrapper _linkedCellWrapper;
   };
 
   class LayerChecker {
@@ -65,7 +70,7 @@ private:
     ~LayerChecker() {}
     void beginCellIteration() { _applicationCount = 0; }
     void endCellIteration() {}
-    void apply(coupling::datastructures::CouplingCellWithLinkedCells<simplemd::LinkedCell, 3>& cell, I02 index) {
+    void apply(coupling::datastructures::CouplingCellWithLinkedCells<coupling::interface::SimpleMDLinkedCellWrapper, 3>& cell, I02 index) {
       _applicationCount++;
       CPPUNIT_ASSERT(_check(getLayer(index)));
     }
@@ -120,7 +125,8 @@ public:
     _testInterface = new TestMDSolverInterface();
     IndexingService<3>::getInstance().initWithCells(globalNumberCells, numberProcesses, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
     const tarch::la::Vector<3, unsigned int> numberLinkedCellsPerCouplingCell(2);
-    _cells = std::make_unique<coupling::datastructures::LinkedCellContainer<simplemd::LinkedCell, 3>>(numberLinkedCellsPerCouplingCell, _testInterface);
+    _cells = std::make_unique<coupling::datastructures::LinkedCellContainer<coupling::interface::SimpleMDLinkedCellWrapper, 3>>(
+        numberLinkedCellsPerCouplingCell, _testInterface);
   }
 
   void tearDown() {
@@ -219,7 +225,7 @@ public:
 
 private:
   int _size, _rank;
-  std::unique_ptr<coupling::datastructures::LinkedCellContainer<simplemd::LinkedCell, 3>> _cells;
+  std::unique_ptr<coupling::datastructures::LinkedCellContainer<coupling::interface::SimpleMDLinkedCellWrapper, 3>> _cells;
   TestMDSolverInterface* _testInterface;
 };
 

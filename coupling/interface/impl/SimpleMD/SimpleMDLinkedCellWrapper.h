@@ -13,11 +13,12 @@ class SimpleMDLinkedCellWrapper;
  */
 class coupling::interface::SimpleMDLinkedCellWrapper {
 public:
-    SimpleMDLinkedCellWrapper(const tarch::la::Vector<MD_DIM, unsigned int> cellIndex) : _cellIndex(cellIndex) {}
+  SimpleMDLinkedCellWrapper() : _cellIndex(0) {}
+  SimpleMDLinkedCellWrapper(const tarch::la::Vector<MD_DIM, unsigned int> cellIndex) : _cellIndex(cellIndex) {}
 
-    inline const tarch::la::Vector<MD_DIM, unsigned int> getCellIndex() const { return _cellIndex; } 
+  inline const tarch::la::Vector<MD_DIM, unsigned int> getCellIndex() const { return _cellIndex; }
 
 private:
-    const tarch::la::Vector<MD_DIM, unsigned int> _cellIndex;
+  const tarch::la::Vector<MD_DIM, unsigned int> _cellIndex;
 };
 #endif /* _MOLECULARDYNAMICS_COUPLING_INTERFACE_SIMPLEMDLINKEDCELLWRAPPER_H_ */

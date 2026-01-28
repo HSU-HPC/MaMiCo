@@ -755,6 +755,7 @@ set(CLANGFORMAT_SOURCES
   "coupling/interface/MDSimulationFactory.h"
   "coupling/interface/MoleculeIterator.h"
   "coupling/interface/MacroscopicSolverInterface.h"
+  "coupling/interface/impl/SimpleMD/SimpleMDLinkedCellWrapper.h"
   "coupling/interface/impl/SimpleMD/SimpleMDMoleculeIterator.h"
   "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
   "coupling/interface/impl/SimpleMD/SimpleMDMolecule.h"
