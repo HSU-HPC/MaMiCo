@@ -177,6 +177,8 @@ private:
       std::cout << "INFO SimpleMDBench: SUCCESS Checksum is correct :-)" << std::endl;
     else {
       std::cout << "ERROR SimpleMDBench: ERROR Checksum is wrong!! " << std::endl;
+      std::cout << "(Note that this is expected and OK in Release build mode,)" << std::endl;
+      std::cout << "(as checksum is supposed to match only in Debug / DebugOptimized build mode.)" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
