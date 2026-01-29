@@ -160,9 +160,16 @@ public:
     index = (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2) + _numCellsIf3D[0] + 2 + 1;
 #endif
     std::vector<simplemd::Molecule*> molecules;
-    std::vector<size_t> cellsForTest{index-1, index+1, index +_numCellsIf3D[0] + 2, index - (_numCellsIf3D[0] + 2), 
-      index +_numCellsIf3D[0] + 2+1, index - (_numCellsIf3D[0] + 2)+1, index +_numCellsIf3D[0] + 2-1, index - (_numCellsIf3D[0] + 2)-1,
-      index +(_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2), index - (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2)};
+    std::vector<size_t> cellsForTest{index - 1,
+                                     index + 1,
+                                     index + _numCellsIf3D[0] + 2,
+                                     index - (_numCellsIf3D[0] + 2),
+                                     index + _numCellsIf3D[0] + 2 + 1,
+                                     index - (_numCellsIf3D[0] + 2) + 1,
+                                     index + _numCellsIf3D[0] + 2 - 1,
+                                     index - (_numCellsIf3D[0] + 2) - 1,
+                                     index + (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2),
+                                     index - (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2)};
     molecules.resize(cellsForTest.size());
     for (size_t i : cellsForTest) {
       simplemd::Molecule m{position, velocity};

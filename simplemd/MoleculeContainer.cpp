@@ -79,14 +79,14 @@ void simplemd::MoleculeContainer::sort() {
         // For odd block sizes, we need to do some more work in the
         // x/y/z==0-traversals. The second x/y/z==1-traversals are reduced by
         // the normal integer-rounding in this case.
-        const tarch::la::Vector<MD_DIM, unsigned int> lengthVector((_numCells[0]/stride) + (_numCells[0] % stride > 0) * (x == 0)
+        const tarch::la::Vector<MD_DIM, unsigned int> lengthVector((_numCells[0] / stride) + (_numCells[0] % stride > 0) * (x == 0)
 #if (MD_DIM > 1)
-                                                                   ,
-                                                                  (_numCells[1]/stride) + (_numCells[1] % stride > 0) * (y == 0)
+                                                                       ,
+                                                                   (_numCells[1] / stride) + (_numCells[1] % stride > 0) * (y == 0)
 #endif
 #if (MD_DIM > 2)
-                                                                   ,
-                                                                   (_numCells[2]/stride) + (_numCells[2] % stride > 0) * (z == 0)
+                                                                       ,
+                                                                   (_numCells[2] / stride) + (_numCells[2] % stride > 0) * (z == 0)
 #endif
         );
         const int length = lengthVector[0]
@@ -134,7 +134,7 @@ void simplemd::MoleculeContainer::sort() {
               Kokkos::printf("Handle cell %u\n", index);
 #endif
 #if (MD_ERROR == MD_YES)
-              if ( index >= _linkedCellNumMolecules.size()){
+              if (index >= _linkedCellNumMolecules.size()) {
                 Kokkos::abort("simplemd::MoleculeContainer::sort() out-of-bounds access to linked cell");
               }
 #endif
@@ -266,26 +266,28 @@ bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
 
 void simplemd::MoleculeContainer::printNonGhostCells(size_t numCells, bool printContainerContents, const char* const label) const {
 #if (MD_DUMP == MD_YES)
-  if (!printContainerContents) return;
+  if (!printContainerContents)
+    return;
   Kokkos::printf("=== BEGIN DUMP MOLECULE CONTAINER ===\n");
   Kokkos::printf("Label: %s\n", label);
   Kokkos::printf("cell\tpos_x\tpos_y\tpos_z\n");
   size_t linkedCellCount = _linkedCellNumMolecules.size();
   size_t cellsRemaining = numCells == 0 ? linkedCellCount : min(numCells, linkedCellCount);
-  for(size_t i = 0; i < linkedCellCount && cellsRemaining > 0; i++) {
-    if (_linkedCellIsGhostCell(i)) continue;
+  for (size_t i = 0; i < linkedCellCount && cellsRemaining > 0; i++) {
+    if (_linkedCellIsGhostCell(i))
+      continue;
     cellsRemaining--;
     auto cellMoleculeCount = _linkedCellNumMolecules(i);
-    for(size_t j = 0; j < cellMoleculeCount; j++) {
-        Molecule& molecule = getMoleculeAt(i, j);
-        Kokkos::printf("%u\t", i);
-        auto position = molecule.getConstPosition();
-        Kokkos::printf("%lf\t%lf\t%lf\t", position[0], position[1], MD_DIM > 2 ? position[2] : 0);
-        auto velocity = molecule.getConstVelocity();
-        Kokkos::printf("%lf\t%lf\t%lf\t", velocity[0], velocity[1], MD_DIM > 2 ? velocity[2] : 0);
-        auto force = molecule.getConstForce();
-        Kokkos::printf("%lf\t%lf\t%lf\t", force[0], force[1], MD_DIM > 2 ? force[2] : 0);
-        Kokkos::printf("\n");
+    for (size_t j = 0; j < cellMoleculeCount; j++) {
+      Molecule& molecule = getMoleculeAt(i, j);
+      Kokkos::printf("%u\t", i);
+      auto position = molecule.getConstPosition();
+      Kokkos::printf("%lf\t%lf\t%lf\t", position[0], position[1], MD_DIM > 2 ? position[2] : 0);
+      auto velocity = molecule.getConstVelocity();
+      Kokkos::printf("%lf\t%lf\t%lf\t", velocity[0], velocity[1], MD_DIM > 2 ? velocity[2] : 0);
+      auto force = molecule.getConstForce();
+      Kokkos::printf("%lf\t%lf\t%lf\t", force[0], force[1], MD_DIM > 2 ? force[2] : 0);
+      Kokkos::printf("\n");
     }
   }
   Kokkos::printf("=== END DUMP MOLECULE CONTAINER ===\n");
