@@ -38,7 +38,7 @@ void simplemd::configurations::SimulationConfiguration::parseSubtag(tinyxml2::XM
   // get quantity evaluation info
   tarch::configuration::ParseConfiguration::readIntMandatory(intBuf, node, COMPUTE_QUANTITIES_EVERY_TIMESTEP);
   if (intBuf < 0) {
-    std::cout << REORGANISE_MEMORY_EVERY_TIMESTEP << " is smaller than zero: " << intBuf << std::endl;
+    std::cout << COMPUTE_QUANTITIES_EVERY_TIMESTEP << " is smaller than zero: " << intBuf << std::endl;
     _isValid = false;
     exit(EXIT_FAILURE);
   }

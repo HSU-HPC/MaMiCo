@@ -54,7 +54,6 @@ public:
 private:
   static const std::string DT;
   static const std::string NUMBER_OF_TIMESTEPS;
-  static const std::string REORGANISE_MEMORY_EVERY_TIMESTEP;
   static const std::string COMPUTE_QUANTITIES_EVERY_TIMESTEP;
   static const std::string FIX_SEED;
   static const std::string OVERLAP_COMMUNICATION_WITH_FORCE_COMPUTATION;
