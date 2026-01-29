@@ -56,9 +56,6 @@ using MainExecSpace =
 #define MD_ERROR MD_NO
 #endif
 
-// OpenMP-Parallelisation (MD_YES/MD_NO)
-#define MD_OPENMP MD_NO
-
 // TEST_TCHIPEV (MD_YES/MD_NO). If no - two communication stages, if yes - one
 // communication stage.
 #define PARALLEL_GDB_DEBUG MD_NO
