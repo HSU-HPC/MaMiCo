@@ -125,7 +125,6 @@ public:
       molecules[i] = new simplemd::Molecule(positions[i], velocity);
       (*_moleculeContainer)[0].insert(*molecules[i]);
     }
-    std::cout << "here1" << std::endl;
     // prefix
     double pos = numMols;
     auto it = (*_moleculeContainer)[0].end();
@@ -133,17 +132,13 @@ public:
     for (; it != (*_moleculeContainer)[0].begin(); --it) {
       CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], pos, 1e-6);
       unsigned int idx = it.getIndex();
-      std::cout << "here1" << pos << " " << idx << std::endl;
       CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], (_moleculeContainer->getMoleculeAt(0, idx)).getPosition()[0], 1e-6);
-      std::cout << "here2" << pos << std::endl;
       pos--;
     }
-    std::cout << "here1" << std::endl;
     // check first item
     CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], pos, 1e-6);
     unsigned int idx = it.getIndex();
     CPPUNIT_ASSERT_DOUBLES_EQUAL(it->getPosition()[0], (_moleculeContainer->getMoleculeAt(0, idx)).getPosition()[0], 1e-6);
-    std::cout << "here1" << std::endl;
     // postfix
     it = (*_moleculeContainer)[0].end();
     it--;

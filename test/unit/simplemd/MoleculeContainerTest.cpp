@@ -15,12 +15,10 @@ public:
   KOKKOS_FUNCTION void beginMoleculeIteration() {};
   KOKKOS_FUNCTION void endMoleculeIteration() {};
   KOKKOS_FUNCTION void handleMolecule(simplemd::Molecule& molecule) const {
-    tarch::la::Vector<MD_DIM, double> pos = molecule.getPosition();
+    tarch::la::Vector<MD_DIM, double>& pos = molecule.getPosition();
     for (size_t i = 0; i < MD_DIM; i++) {
       pos[i] += i + 1;
     }
-
-    molecule.setPosition(pos);
   }
   static const bool IsParallel = par;
 };
