@@ -566,12 +566,6 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
     _moleculeService->writeCheckPoint(*_parallelTopologyService, _checkpointFilestem, t);
   }
 
-  // reorganise memory if needed
-  if ((_configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() != 0) &&
-      (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {
-    _moleculeService->getContainer().sort();
-  }
-
   auto& dc = _configuration.getDomainConfiguration();
   if (t % 500 == 0 && (dc.initFromCheckpoint() || dc.initFromSequentialCheckpoint())) {
     cellmappings::VaryCheckpointMapping varyCheckpointMapping(

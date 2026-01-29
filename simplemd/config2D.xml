@@ -14,7 +14,6 @@
   <simulation-configuration
      dt="0.002"
      number-of-timesteps="1000"
-     reorganise-memory-every-timestep="10"
      compute-macroscopic-quantities-every-timestep="5"
      fix-seed="yes"
   ></simulation-configuration>

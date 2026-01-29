@@ -7,7 +7,6 @@
 
 const std::string simplemd::configurations::SimulationConfiguration::DT("dt");
 const std::string simplemd::configurations::SimulationConfiguration::NUMBER_OF_TIMESTEPS("number-of-timesteps");
-const std::string simplemd::configurations::SimulationConfiguration::REORGANISE_MEMORY_EVERY_TIMESTEP("reorganise-memory-every-timestep");
 const std::string simplemd::configurations::SimulationConfiguration::COMPUTE_QUANTITIES_EVERY_TIMESTEP("compute-macroscopic-quantities-every-timestep");
 const std::string simplemd::configurations::SimulationConfiguration::FIX_SEED("fix-seed");
 const std::string
@@ -36,15 +35,6 @@ void simplemd::configurations::SimulationConfiguration::parseSubtag(tinyxml2::XM
   }
   _numberOfTimesteps = (unsigned int)(intBuf);
 
-  // get reorganise-memory info
-  tarch::configuration::ParseConfiguration::readIntMandatory(intBuf, node, REORGANISE_MEMORY_EVERY_TIMESTEP);
-  if (intBuf <= 0) {
-    std::cout << REORGANISE_MEMORY_EVERY_TIMESTEP << " is smaller than or equal zero: " << intBuf << std::endl;
-    _isValid = false;
-    exit(EXIT_FAILURE);
-  }
-  _reorganiseMemoryEveryTimestep = (unsigned int)(intBuf);
-
   // get quantity evaluation info
   tarch::configuration::ParseConfiguration::readIntMandatory(intBuf, node, COMPUTE_QUANTITIES_EVERY_TIMESTEP);
   if (intBuf < 0) {
@@ -66,7 +56,6 @@ void simplemd::configurations::SimulationConfiguration::parseSubtag(tinyxml2::XM
 #if (MD_DEBUG == MD_YES)
   std::cout << "Timestep dt:   " << _dt << std::endl;
   std::cout << "No. timesteps: " << _numberOfTimesteps << std::endl;
-  std::cout << "Reorganise memory every timestep: " << _reorganiseMemoryEveryTimestep << std::endl;
 #endif
 }
 

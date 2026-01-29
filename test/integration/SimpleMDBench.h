@@ -90,7 +90,6 @@ private:
   <simulation-configuration
     dt="0.005"
     number-of-timesteps="50"
-    reorganise-memory-every-timestep="20"
     compute-macroscopic-quantities-every-timestep="0"
     fix-seed="yes"
    />

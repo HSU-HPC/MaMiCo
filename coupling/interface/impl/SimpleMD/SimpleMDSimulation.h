@@ -92,11 +92,6 @@ public:
       simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(*_parallelTopologyService, _configuration.getCheckpointConfiguration().getFilename(), t);
       _moleculeService->getContainer().iterateMolecules(writeCheckPointMapping);
     }
-    // reorganise memory if needed
-    if ((_configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() != 0) &&
-        (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {
-      _moleculeService->getContainer().sort();
-    }
     // plot also coupling cell information
     _couplingCellService->plotEveryMicroscopicTimestep(t);
 
