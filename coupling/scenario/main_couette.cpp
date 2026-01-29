@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Kokkos using execution space \"" << MainExecSpace::name() << "\" with memory space \"" << MainExecSpace::memory_space::name() << "\""
             << std::endl;
   MainExecSpace().print_configuration(std::cout);
+  std::cout << "Available concurrency: " << MainExecSpace::concurrency() << std::endl;
 
   // run scenarios
   runScenario(new CouetteScenario());
