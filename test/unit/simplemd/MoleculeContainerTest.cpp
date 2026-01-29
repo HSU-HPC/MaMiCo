@@ -159,7 +159,6 @@ public:
     // molecule idx is [1,1,1]
     index = (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2) + _numCellsIf3D[0] + 2 + 1;
 #endif
-    std::vector<simplemd::Molecule*> molecules;
     std::vector<size_t> cellsForTest{index - 1,
                                      index + 1,
                                      index + _numCellsIf3D[0] + 2,
@@ -170,7 +169,6 @@ public:
                                      index - (_numCellsIf3D[0] + 2) - 1,
                                      index + (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2),
                                      index - (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2)};
-    molecules.resize(cellsForTest.size());
     for (size_t i : cellsForTest) {
       simplemd::Molecule m{position, velocity};
       (*_moleculeContainer)[i].insert(m);
@@ -261,15 +259,14 @@ public:
     // generate particle positions
     tarch::la::Vector<MD_DIM, double> velocity(0);
     std::array<std::array<tarch::la::Vector<MD_DIM, double>, numMolsForTestPerCell>, numCellsForTest> positions;
-    std::array<std::array<simplemd::Molecule*, numMolsForTestPerCell>, numCellsForTest> molecules;
     int ctr = 5; // arbitrary value
     for (size_t i = 0; i < numCellsForTest; i++) {
       for (size_t j = 0; j < numMolsForTestPerCell; j++) {
         for (size_t k = 0; k < MD_DIM; k++) {
           positions[i][j][k] = ctr++;
         }
-        molecules[i][j] = new simplemd::Molecule(positions[i][j], velocity);
-        (*_moleculeContainer)[i].insert(*molecules[i][j]);
+        simplemd::Molecule m{positions[i][j], velocity};
+        (*_moleculeContainer)[i].insert(m);
       }
     }
 
@@ -288,12 +285,6 @@ public:
     // cleanup
     for (size_t i = 0; i < numCellsForTest; i++) {
       _moleculeContainer->clearLinkedCell(i);
-      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
-        if (molecules[i][j] != nullptr) {
-          delete molecules[i][j];
-          molecules[i][j] = nullptr;
-        }
-      }
     }
   }
 
@@ -305,15 +296,14 @@ public:
     // generate particle positions
     tarch::la::Vector<MD_DIM, double> velocity(0);
     std::array<std::array<tarch::la::Vector<MD_DIM, double>, numMolsForTestPerCell>, numCellsForTest> positions;
-    std::array<std::array<simplemd::Molecule*, numMolsForTestPerCell>, numCellsForTest> molecules;
     int ctr = 5; // arbitrary value
     for (size_t i = 0; i < numCellsForTest; i++) {
       for (size_t j = 0; j < numMolsForTestPerCell; j++) {
         for (size_t k = 0; k < MD_DIM; k++) {
           positions[i][j][k] = ctr++;
         }
-        molecules[i][j] = new simplemd::Molecule(positions[i][j], velocity);
-        (*_moleculeContainer)[i].insert(*molecules[i][j]);
+        simplemd::Molecule m(positions[i][j], velocity);
+        (*_moleculeContainer)[i].insert(m);
       }
     }
 
@@ -335,12 +325,6 @@ public:
     // cleanup
     for (size_t i = 0; i < numCellsForTest; i++) {
       _moleculeContainer->clearLinkedCell(i);
-      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
-        if (molecules[i][j] != nullptr) {
-          delete molecules[i][j];
-          molecules[i][j] = nullptr;
-        }
-      }
     }
   }
 
@@ -354,15 +338,14 @@ public:
     // generate particle positions
     tarch::la::Vector<MD_DIM, double> velocity(0);
     std::array<std::array<tarch::la::Vector<MD_DIM, double>, numMolsForTestPerCell>, numCellsForTest> positions;
-    std::array<std::array<simplemd::Molecule*, numMolsForTestPerCell>, numCellsForTest> molecules;
     int ctr = 5; // arbitrary value
     for (size_t i = 0; i < numCellsForTest; i++) {
       for (size_t j = 0; j < numMolsForTestPerCell; j++) {
         for (size_t k = 0; k < MD_DIM; k++) {
           positions[i][j][k] = ctr++;
         }
-        molecules[i][j] = new simplemd::Molecule(positions[i][j], velocity);
-        (*_moleculeContainer)[i].insert(*molecules[i][j]);
+        simplemd::Molecule m(positions[i][j], velocity);
+        (*_moleculeContainer)[i].insert(m);
       }
     }
 
@@ -381,12 +364,6 @@ public:
     // cleanup
     for (size_t i = 0; i < numCellsForTest; i++) {
       _moleculeContainer->clearLinkedCell(i);
-      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
-        if (molecules[i][j] != nullptr) {
-          delete molecules[i][j];
-          molecules[i][j] = nullptr;
-        }
-      }
     }
   }
 
@@ -401,7 +378,6 @@ public:
     // generate particle positions
     tarch::la::Vector<MD_DIM, double> velocity(0);
     std::array<std::array<tarch::la::Vector<MD_DIM, double>, numMolsForTestPerCell>, numCellsForTest> positions;
-    std::array<std::array<simplemd::Molecule*, numMolsForTestPerCell>, numCellsForTest> molecules;
     tarch::la::Vector<MD_DIM, double> maxPos(0);
     int ctr = 5; // arbitrary value
     for (size_t i = 0; i < numCellsForTest; i++) {
@@ -410,8 +386,8 @@ public:
           positions[i][j][k] = ctr++;
           maxPos[k] = positions[i][j][k] > maxPos[k] ? positions[i][j][k] : maxPos[k]; // always true, but kept for clarity
         }
-        molecules[i][j] = new simplemd::Molecule(positions[i][j], velocity);
-        (*_moleculeContainer)[i].insert(*molecules[i][j]);
+        simplemd::Molecule m(positions[i][j], velocity);
+        (*_moleculeContainer)[i].insert(m);
       }
     }
 
@@ -430,12 +406,6 @@ public:
     // cleanup
     for (size_t i = 0; i < numCellsForTest; i++) {
       _moleculeContainer->clearLinkedCell(i);
-      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
-        if (molecules[i][j] != nullptr) {
-          delete molecules[i][j];
-          molecules[i][j] = nullptr;
-        }
-      }
     }
   }
 
