@@ -73,19 +73,14 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(LinkedCell& ce
 #if (MD_DEBUG == MD_YES)
       if (tarch::la::dot(forceBuffer, forceBuffer) > 1e12) {
         const auto position2 = m2->getConstPosition();
-        Kokkos::printf(
-          "Force: %lf %lf %lf; "
-          "Position1: %lf %lf %lf; "
-          "Position2: %lf %lf %lf; "
-          "ID1: %u;"
-          "ID2: %u"
-          "\n",
-          forceBuffer[0], forceBuffer[1], MD_DIM > 2 ? forceBuffer[2] : 0,
-          position1[0], position1[1], MD_DIM > 2 ? position1[2] : 0,
-          position2[0], position2[1], MD_DIM > 2 ? position2[2] : 0,
-          m1->getID(),
-          m2->getID()
-        );
+        Kokkos::printf("Force: %lf %lf %lf; "
+                       "Position1: %lf %lf %lf; "
+                       "Position2: %lf %lf %lf; "
+                       "ID1: %u;"
+                       "ID2: %u"
+                       "\n",
+                       forceBuffer[0], forceBuffer[1], MD_DIM > 2 ? forceBuffer[2] : 0, position1[0], position1[1], MD_DIM > 2 ? position1[2] : 0, position2[0],
+                       position2[1], MD_DIM > 2 ? position2[2] : 0, m1->getID(), m2->getID());
         Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCellPair: Force out of range!");
       }
 #endif
@@ -116,19 +111,14 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
 #if (MD_DEBUG == MD_YES)
       if (tarch::la::dot(forceBuffer, forceBuffer) > 1e12) {
         const auto position2 = m2->getConstPosition();
-        Kokkos::printf(
-          "Force: %lf %lf %lf; "
-          "Position1: %lf %lf %lf; "
-          "Position2: %lf %lf %lf; "
-          "ID1: %u;"
-          "ID2: %u"
-          "\n",
-          forceBuffer[0], forceBuffer[1], MD_DIM > 2 ? forceBuffer[2] : 0,
-          position1[0], position1[1], MD_DIM > 2 ? position1[2] : 0,
-          position2[0], position2[1], MD_DIM > 2 ? position2[2] : 0,
-          m1->getID(),
-          m2->getID()
-        );
+        Kokkos::printf("Force: %lf %lf %lf; "
+                       "Position1: %lf %lf %lf; "
+                       "Position2: %lf %lf %lf; "
+                       "ID1: %u;"
+                       "ID2: %u"
+                       "\n",
+                       forceBuffer[0], forceBuffer[1], MD_DIM > 2 ? forceBuffer[2] : 0, position1[0], position1[1], MD_DIM > 2 ? position1[2] : 0, position2[0],
+                       position2[1], MD_DIM > 2 ? position2[2] : 0, m1->getID(), m2->getID());
         Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCellPair: Force out of range!");
       }
 #endif
