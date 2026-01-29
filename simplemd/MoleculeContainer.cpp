@@ -177,14 +177,9 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
   for (unsigned int d = 0; d < MD_DIM; d++) {
 #if (MD_ERROR == MD_YES)
     if ((position[d] < _domainOffset[d] - _meshWidth[d]) || (position[d] > _domainOffset[d] + _domainSize[d] + _meshWidth[d])) {
-      Kokkos::printf("Position:");
-      for (unsigned int e = 0; e < MD_DIM; e++) {
-        Kokkos::printf(" %f", position[e]);
-        if (e == d) {
-          Kokkos::printf("(<- !!!)");
-        }
-      }
-      Kokkos::printf("\n");
+      const char* highlightError = "(<- !!!)";
+      Kokkos::printf("Position: %lf%s %lf%s %lf%s\n", position[0], d == 0 ? highlightError : "", position[1], d == 1 ? highlightError : "",
+                     MD_DIM > 2 ? position[2] : 0, d == 2 ? highlightError : "");
       Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex: Position is out of range!");
     }
 #endif
@@ -201,25 +196,16 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
     index -= _globalIndexOfFirstCell[d];
 #if (MD_ERROR == MD_YES)
     if (index < 0) {
-      Kokkos::printf("index < 0: index=%d\n", index);
-      Kokkos::printf("Dimension : %d, %d, %d\n", d, _globalIndexOfFirstCell[d], _localIndexOfFirstCell[d]);
-      Kokkos::printf("%d\n", (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])));
-      for (unsigned int e = 0; e < d; e++) {
-        Kokkos::printf("%u\n", cellVectorIndex[e]);
-      }
-      Kokkos::printf("Position:");
-      for (unsigned int e = 0; e < MD_DIM; e++) {
-        Kokkos::printf(" %f", position[e]);
-      }
-      Kokkos::printf(", offset: ");
-      for (unsigned int e = 0; e < MD_DIM; e++) {
-        Kokkos::printf(" %f", _domainOffset[e]);
-      }
-      Kokkos::printf(", meshwidth: ");
-      for (unsigned int e = 0; e < MD_DIM; e++) {
-        Kokkos::printf(" %f", _meshWidth[e]);
-      }
-      Kokkos::printf("\n");
+      Kokkos::printf("index < 0: index=%d; "
+                     "Dimension : dim=%u, GIFC=%u, LIFC=%u, cell=%u; "
+                     "cellVectorIndex: %lf %lf %lf; "
+                     "Position: %lf %lf %lf; "
+                     "offset: %lf %lf %lf; "
+                     "meshwidth: %lf %lf %lf"
+                     "\n",
+                     index, d, _globalIndexOfFirstCell[d], _localIndexOfFirstCell[d], (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])),
+                     cellVectorIndex[0], cellVectorIndex[1], MD_DIM > 2 ? cellVectorIndex[2] : 0, position[0], position[1], MD_DIM > 2 ? position[2] : 0,
+                     _domainOffset[0], _domainOffset[1], MD_DIM > 2 ? _domainOffset[2] : 0, _meshWidth[0], _meshWidth[1], MD_DIM > 2 ? _meshWidth[2] : 0);
       Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex");
     }
 #endif
