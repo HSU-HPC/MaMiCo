@@ -63,29 +63,30 @@ void simplemd::MoleculeContainer::sort(unsigned int cellIdx) { // set all outgoi
 }
 
 void simplemd::MoleculeContainer::sort() {
+  constexpr unsigned int stride = 3;
   // sort all cells, including ghost
   // find red-black cells
 
 // iterate over the domain in a red-black manner
 #if (MD_DIM > 2)
-  for (unsigned int z = 0; z < 2; z++) {
+  for (unsigned int z = 0; z < stride; z++) {
 #endif
 #if (MD_DIM > 1)
-    for (unsigned int y = 0; y < 2; y++) {
+    for (unsigned int y = 0; y < stride; y++) {
 #endif
-      for (unsigned int x = 0; x < 2; x++) {
+      for (unsigned int x = 0; x < stride; x++) {
         // determine range/ length of blocks for red-black traversal.
         // For odd block sizes, we need to do some more work in the
         // x/y/z==0-traversals. The second x/y/z==1-traversals are reduced by
         // the normal integer-rounding in this case.
-        const tarch::la::Vector<MD_DIM, unsigned int> lengthVector((_numCells[0] + ((_numCells[0]) % 2) * (x == 0)) / 2
+        const tarch::la::Vector<MD_DIM, unsigned int> lengthVector((_numCells[0]/stride) + (_numCells[0] % stride > 0) * (x == 0)
 #if (MD_DIM > 1)
                                                                    ,
-                                                                   (_numCells[1] + ((_numCells[1]) % 2) * (y == 0)) / 2
+                                                                  (_numCells[1]/stride) + (_numCells[1] % stride > 0) * (y == 0)
 #endif
 #if (MD_DIM > 2)
                                                                    ,
-                                                                   (_numCells[2] + ((_numCells[2]) % 2) * (z == 0)) / 2
+                                                                   (_numCells[2]/stride) + (_numCells[2] % stride > 0) * (z == 0)
 #endif
         );
         const int length = lengthVector[0]
@@ -115,7 +116,7 @@ void simplemd::MoleculeContainer::sort() {
               // save rest of index in helpIndex1
               helpIndex1 = helpIndex1 - helpIndex2 * (lengthVector[0] * lengthVector[1]);
               // compute contribution to index (the starting 1 is the z coordinate of the first cell)
-              index += (2 * helpIndex2 + z) * _numCells[0] * _numCells[1];
+              index += (stride * helpIndex2 + z) * _numCells[0] * _numCells[1];
 #endif
 #if (MD_DIM > 1)
               // determine plane within traversed block
@@ -123,11 +124,11 @@ void simplemd::MoleculeContainer::sort() {
               // save rest of index in helpIndex1
               helpIndex1 = helpIndex1 - helpIndex2 * lengthVector[0];
               // compute contribution to index
-              index += (2 * helpIndex2 + y) * _numCells[0];
+              index += (stride * helpIndex2 + y) * _numCells[0];
               // compute contribution for last dimension
-              index += (2 * helpIndex1 + x);
+              index += (stride * helpIndex1 + x);
 #else
-        index = 2 * j + x;
+        index = stride * j + x;
 #endif
 #if (MD_DEBUG == MD_YES)
               Kokkos::printf("Handle cell %u\n", index);
