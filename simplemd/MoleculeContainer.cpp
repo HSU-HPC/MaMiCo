@@ -98,8 +98,10 @@ void simplemd::MoleculeContainer::sort() {
             ;
 
         // parallelise loop for all cells that are to be traversed in this way
+        printNonGhostCells(1, true, "host start sort");
         Kokkos::parallel_for(
             Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int j) {
+              printNonGhostCells(1, j == 0, "device start sort");
               // compute index of the current cell
               unsigned int index = 0;
 #if (MD_DIM > 1)
@@ -128,7 +130,7 @@ void simplemd::MoleculeContainer::sort() {
         index = 2 * j + x;
 #endif
 #if (MD_DEBUG == MD_YES)
-              std::cout << "Handle cell " << index << std::endl;
+              Kokkos::printf("Handle cell %u\n", index);
 #endif
 #if (MD_ERROR == MD_YES)
               if ( index >= _linkedCellNumMolecules.size()){
@@ -155,8 +157,10 @@ void simplemd::MoleculeContainer::sort() {
                   i--;
                 }
               }
+              printNonGhostCells(1, j == 0, "device end sorf");
             });          // j, Kokkos::parallel_for
         Kokkos::fence(); // Ensure results are available on the host
+        printNonGhostCells(1, true, "host end sort");
       } // x
 #if (MD_DIM > 1)
     } // y
@@ -257,6 +261,34 @@ bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
   }
   // return false if no ghost cell coordinate could be detected
   return false;
+}
+
+void simplemd::MoleculeContainer::printNonGhostCells(size_t numCells, bool printContainerContents, const char* const label) const {
+#if (MD_DUMP == MD_YES)
+  if (!printContainerContents) return;
+  Kokkos::printf("=== BEGIN DUMP MOLECULE CONTAINER ===\n");
+  Kokkos::printf("Label: %s\n", label);
+  Kokkos::printf("cell\tpos_x\tpos_y\tpos_z\n");
+  size_t linkedCellCount = _linkedCellNumMolecules.size();
+  size_t cellsRemaining = numCells == 0 ? linkedCellCount : min(numCells, linkedCellCount);
+  for(size_t i = 0; i < linkedCellCount && cellsRemaining > 0; i++) {
+    if (_linkedCellIsGhostCell(i)) continue;
+    cellsRemaining--;
+    auto cellMoleculeCount = _linkedCellNumMolecules(i);
+    for(size_t j = 0; j < cellMoleculeCount; j++) {
+        Molecule& molecule = getMoleculeAt(i, j);
+        Kokkos::printf("%u\t", i);
+        auto position = molecule.getConstPosition();
+        Kokkos::printf("%lf\t%lf\t%lf\t", position[0], position[1], MD_DIM > 2 ? position[2] : 0);
+        auto velocity = molecule.getConstVelocity();
+        Kokkos::printf("%lf\t%lf\t%lf\t", velocity[0], velocity[1], MD_DIM > 2 ? velocity[2] : 0);
+        auto force = molecule.getConstForce();
+        Kokkos::printf("%lf\t%lf\t%lf\t", force[0], force[1], MD_DIM > 2 ? force[2] : 0);
+        Kokkos::printf("\n");
+    }
+  }
+  Kokkos::printf("=== END DUMP MOLECULE CONTAINER ===\n");
+#endif
 }
 
 size_t simplemd::MoleculeContainer::getLocalNumberOfMoleculesWithGhost() const {

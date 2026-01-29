@@ -296,7 +296,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
               // if this cell is a ghost cell and periodic boundary condition needs to be handled locally:
             } else if (neighbourRank == _rank && isInBoundary == true) {
 #if (MD_DEBUG == MD_YES)
-              std::cout << "Pack " << cell.getList().size() << " molecules in local buffer " << std::endl;
+              Kokkos::printf("Pack %u molecules in local buffer\n", cell.numMolecules());
 #endif
               // push molecules into buffer
               for (auto it = cell.begin(); it != cell.end(); it++) {

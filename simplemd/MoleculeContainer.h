@@ -304,6 +304,8 @@ private:
    */
   KOKKOS_INLINE_FUNCTION bool isGhostCell(const size_t cellIndex) const;
 
+  KOKKOS_FUNCTION void printNonGhostCells(size_t numCells, bool printContainerContents, const char* const label) const;
+
   /** number of cells per direction in the local domain */
   const tarch::la::Vector<MD_DIM, unsigned int> _numCells;
   /** The number of ghost cells around the local domain along each axis on each side*/
@@ -361,13 +363,17 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
   iterateMoleculesSerial(a);
 #else
   a.beginMoleculeIteration();
+  printNonGhostCells(1, true, "host start iterateMoleculesParallel");
   Kokkos::parallel_for(
       Kokkos::RangePolicy<MainExecSpace>(0, _linkedCellIsGhostCell.size()), KOKKOS_CLASS_LAMBDA(const unsigned int i) {
+        printNonGhostCells(1, i == 0, "device start iterateMoleculesParallel");
         for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
           a.handleMolecule(getMoleculeAt(i, j));
         }
+        printNonGhostCells(1, i == 0, "device end iterateMoleculesParallel");
       });
   Kokkos::fence(); // Ensure results are available on the host
+  printNonGhostCells(1, true, "host end iterateMoleculesParallel");
   a.endMoleculeIteration();
 #endif
 }
@@ -566,8 +572,10 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
 #endif
       ;
   // loop over domain, but with a single loop
+  printNonGhostCells(1, true, "host start iterateCellsParallel");
   Kokkos::parallel_for(
       Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int i) {
+        printNonGhostCells(1, i == 0, "device start iterateCellsParallel");
 // compute index of the current cell
 #if (MD_DIM > 1)
         int helpIndex1 = i;
@@ -596,14 +604,16 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
       index = lowerLeftFrontCell[0] + i;
 #endif
 #if (MD_DEBUG == MD_YES)
-        std::cout << "Handle cell " << index << std::endl;
+        Kokkos::printf("Handle cell %u\n", index);
 #endif
 
         // handle cell
         auto cell = (*this)[index];
         a.handleCell(cell);
+        printNonGhostCells(1, i == 0, "device end iterateCellsParallel");
       });          // Kokkos::parallel_for
   Kokkos::fence(); // Ensure results are available on the host
+  printNonGhostCells(1, true, "host end iterateCellsParallel");
   // end iteration();
   a.endCellIteration();
 }
@@ -710,8 +720,10 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
             ;
 
         // parallelise loop for all cells that are to be traversed in this way
+        printNonGhostCells(1, true, "host start iterateCellPairsParallel");
         Kokkos::parallel_for(
             Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int j) {
+              printNonGhostCells(1, j == 0, "device start iterateCellPairsParallel");
               // compute index of the current cell
               unsigned int index = 0;
 #if (MD_DIM > 1)
@@ -758,8 +770,10 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
                 auto cell2 = (*this)[coordsCell2Buffer];
                 a.handleCellPair(cell1, cell2, coordsCell1Buffer, coordsCell2Buffer);
               }
+              printNonGhostCells(1, j == 0, "device end iterateCellPairsParallel");
             });          // j, Kokkos::parallel_for
         Kokkos::fence(); // Ensure results are available on the host
+        printNonGhostCells(1, true, "host end iterateCellPairsParallel");
       } // x
 #if (MD_DIM > 1)
     } // y

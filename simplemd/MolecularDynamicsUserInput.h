@@ -49,6 +49,13 @@ using MainExecSpace =
 #define MD_DEBUG MD_NO
 #endif
 
+// Enable/disable (MD_YES/MD_NO) output raw contents of SimpleMD cells for debugging
+#if (MD_DEBUG == MD_YES)
+#define MD_DUMP MD_YES
+#else
+#define MD_DUMP MD_NO
+#endif
+
 #ifdef MDError
 #define MD_ERROR MD_YES
 #else

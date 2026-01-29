@@ -101,7 +101,7 @@ private:
   /** stores the spatial extent of the local domain */
   const tarch::la::Vector<MD_DIM, double> _localDomainSize;
 
-  simplemd::MoleculeContainer* _moleculeContainer;
+  simplemd::MoleculeContainer* _moleculeContainer = nullptr;
 };
 
 #endif // _MOLECULARDYNAMICS_SERVICES_MOLECULESERVICE_H_
