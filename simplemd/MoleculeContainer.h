@@ -46,7 +46,7 @@ public:
    * @param cellIdx The one-dimensional index of the linked cell to insert the molecule into (ghost included).
    * @param molecule The molecule to be inserted.
    */
-  void insert(unsigned int cellIdx, simplemd::Molecule& molecule);
+  void insert(unsigned int cellIdx, const simplemd::Molecule& molecule);
 
   /**
    * @brief Inserts a molecule into a specific linked cell.
@@ -54,7 +54,7 @@ public:
    * @param cellIdx The vector index of the linked cell to insert the molecule into (ghost included).
    * @param molecule The molecule to be inserted.
    */
-  void insert(tarch::la::Vector<MD_DIM, unsigned int> cellIdx, simplemd::Molecule& molecule) { insert(vectorIndexToLinear(cellIdx), molecule); }
+  void insert(tarch::la::Vector<MD_DIM, unsigned int> cellIdx, const simplemd::Molecule& molecule) { insert(vectorIndexToLinear(cellIdx), molecule); }
 
   /**
    * @brief Inserts a molecule into the container.
@@ -63,7 +63,7 @@ public:
    *
    * @param molecule The molecule to be inserted.
    */
-  void insert(simplemd::Molecule& molecule);
+  void insert(const simplemd::Molecule& molecule);
 
   /**
    * @brief Removes a molecule, given its ID and linked cell index.

@@ -142,19 +142,11 @@ public:
   }
 
   void testSort() {
-    const unsigned int numCellsForTest = 10;
     tarch::la::Vector<MD_DIM, double> position, velocity(0);
     for (size_t i = 0; i < MD_DIM; i++) {
       position[i] = 0.5;
     }
-    std::array<simplemd::Molecule*, numCellsForTest> molecules;
-    for (size_t i = 0; i < numCellsForTest; i++) {
-      molecules[i] = new simplemd::Molecule(position, velocity);
-      (*_moleculeContainer)[i].insert(*molecules[i]);
-    }
-    _moleculeContainer->sort();
-    // all molecules should be in the same cell since all have same position
-    int index;
+    size_t index;
 #if (MD_DIM == 1)
     // molecule idx is [1] thus cell 1
     index = 1;
@@ -167,14 +159,22 @@ public:
     // molecule idx is [1,1,1]
     index = (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2) + _numCellsIf3D[0] + 2 + 1;
 #endif
-    CPPUNIT_ASSERT_EQUAL(numCellsForTest, (*_moleculeContainer)[index].numMolecules());
+    std::vector<simplemd::Molecule*> molecules;
+    std::vector<size_t> cellsForTest{index-1, index+1, index +_numCellsIf3D[0] + 2, index - (_numCellsIf3D[0] + 2), 
+      index +_numCellsIf3D[0] + 2+1, index - (_numCellsIf3D[0] + 2)+1, index +_numCellsIf3D[0] + 2-1, index - (_numCellsIf3D[0] + 2)-1,
+      index +(_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2), index - (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2)};
+    molecules.resize(cellsForTest.size());
+    for (size_t i : cellsForTest) {
+      simplemd::Molecule m{position, velocity};
+      (*_moleculeContainer)[i].insert(m);
+    }
+    _moleculeContainer->sort();
+    // all molecules should be in the same cell since all have same position
+
+    CPPUNIT_ASSERT_EQUAL((size_t)(cellsForTest.size()), (size_t)((*_moleculeContainer)[index].numMolecules()));
     // cleanup
-    for (size_t i = 0; i < numCellsForTest; i++) {
+    for (size_t i : cellsForTest) {
       _moleculeContainer->clearLinkedCell(i);
-      if (molecules[i] != nullptr) {
-        delete molecules[i];
-        molecules[i] = nullptr;
-      }
     }
   }
 
@@ -442,7 +442,7 @@ private:
   }
 
   // use for persistent tests
-  const tarch::la::Vector<3, double> _numCellsIf3D = {100, 60, 50};
+  const tarch::la::Vector<3, size_t> _numCellsIf3D = {100, 60, 50};
   simplemd::MoleculeContainer* _moleculeContainer;
 };
 

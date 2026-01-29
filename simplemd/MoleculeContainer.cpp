@@ -14,7 +14,7 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
     _linkedCellIsGhostCell(i) = isGhostCell(i);
 }
 
-void simplemd::MoleculeContainer::insert(unsigned int cellIdx, simplemd::Molecule& molecule) {
+void simplemd::MoleculeContainer::insert(unsigned int cellIdx, const simplemd::Molecule& molecule) {
 #if (MD_ERROR == MD_YES)
   if (_linkedCellNumMolecules(cellIdx) + 1 > _cellCapacity) {
     Kokkos::printf("Cell capacity=%d would be exceeded by an operation! Exiting...", _cellCapacity);
@@ -25,7 +25,7 @@ void simplemd::MoleculeContainer::insert(unsigned int cellIdx, simplemd::Molecul
   _linkedCellNumMolecules(cellIdx) += 1;
 }
 
-void simplemd::MoleculeContainer::insert(simplemd::Molecule& molecule) { insert(positionToCellIndex(molecule.getPosition()), molecule); }
+void simplemd::MoleculeContainer::insert(const simplemd::Molecule& molecule) { insert(positionToCellIndex(molecule.getConstPosition()), molecule); }
 
 void simplemd::MoleculeContainer::remove(unsigned int cellIdx, unsigned int moleculeIdx) {
 #if (MD_ERROR == MD_YES)
