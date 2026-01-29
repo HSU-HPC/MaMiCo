@@ -126,10 +126,8 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
   const double rij2 = tarch::la::dot(rij, rij);
 #if (MD_ERROR == MD_YES)
   if (tarch::la::equals(rij2, 0.0, 1e-4)) {
-    Kokkos::printf("Position: %lf %lf %lf, %lf %lf %lf\n",
-      position1[0], position1[1], MD_DIM > 2 ? position1[2] : 0,
-      position2[0], position2[1], MD_DIM > 2 ? position2[2] : 0
-    );
+    Kokkos::printf("Position: %lf %lf %lf, %lf %lf %lf\n", position1[0], position1[1], MD_DIM > 2 ? position1[2] : 0, position2[0], position2[1],
+                   MD_DIM > 2 ? position2[2] : 0);
     Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(): Particle positions are identical!");
   }
 #endif
