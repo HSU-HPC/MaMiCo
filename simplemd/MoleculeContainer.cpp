@@ -63,7 +63,7 @@ void simplemd::MoleculeContainer::sort(unsigned int cellIdx) { // set all outgoi
 }
 
 void simplemd::MoleculeContainer::sort() {
-  // sort all inner cells, exclude all ghost cells
+  // sort all cells, including ghost
   // find red-black cells
 
 // iterate over the domain in a red-black manner

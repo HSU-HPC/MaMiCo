@@ -100,6 +100,7 @@ public:
    * Since a molecule can only travel to its immediate neighbours per timestep, sorting is done with a red-black
    * traversal of the whole domain (including ghost cells). This ensures that there are no concurrency issues since
    * no two linked cells should try to write to the same linked cell. Concurrency is implemented in quarter shells.
+   * Since this includes ghost shells, they should be empty before sort() is called.
    */
   void sort();
 
