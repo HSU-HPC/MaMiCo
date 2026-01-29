@@ -133,7 +133,7 @@ public:
    *
    * @return unsigned int
    */
-  unsigned int getLocalNumberOfCellsScalarWithGhost() const;
+  KOKKOS_FUNCTION unsigned int getLocalNumberOfCellsScalarWithGhost() const;
 
   /**
    * @brief Returns the number of molecules in all cells

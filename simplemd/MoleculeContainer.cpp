@@ -130,6 +130,11 @@ void simplemd::MoleculeContainer::sort() {
 #if (MD_DEBUG == MD_YES)
               std::cout << "Handle cell " << index << std::endl;
 #endif
+#if (MD_ERROR == MD_YES)
+              if ( index >= _linkedCellNumMolecules.size()){
+                Kokkos::abort("simplemd::MoleculeContainer::sort() out-of-bounds access to linked cell");
+              }
+#endif
               for (size_t i = 0; i < _linkedCellNumMolecules(index); i++) {
                 unsigned int curMolIdx = positionToCellIndex(_moleculeData(index, i).getPosition());
                 if (curMolIdx != index) { // if molecule does not belong to current cell anymore
