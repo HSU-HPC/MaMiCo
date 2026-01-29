@@ -32,6 +32,7 @@ class MoleculeContainerTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testNumGhostCells);
   CPPUNIT_TEST(testIterationMoleculesSerial);
   CPPUNIT_TEST(testIterationMoleculesParallel);
+  CPPUNIT_TEST(testIterationMoleculesAlternate);
   CPPUNIT_TEST(testIterationLinkedCellsSerial);
   CPPUNIT_TEST(testIterationLinkedCellsParallel);
   CPPUNIT_TEST(testIterationLinkedCellPairsSerial);
@@ -205,6 +206,53 @@ public:
       for (size_t j = 0; j < numMolsForTestPerCell; j++) {
         for (size_t k = 0; k < MD_DIM; k++) {
           CPPUNIT_ASSERT_DOUBLES_EQUAL(positions[i][j][k] + k + 1, _moleculeContainer->getMoleculeAt(i, j).getConstPosition()[0], 1e6);
+        }
+      }
+    }
+
+    // cleanup
+    for (size_t i = 0; i < numCellsForTest; i++) {
+      _moleculeContainer->clearLinkedCell(i);
+      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
+        if (molecules[i][j] != nullptr) {
+          delete molecules[i][j];
+          molecules[i][j] = nullptr;
+        }
+      }
+    }
+  }
+
+  void testIterationMoleculesAlternate() {
+    MolPosIncrMapping<true> mappingPar;
+    MolPosIncrMapping<false> mappingSer;
+    const unsigned int numCellsForTest = 10;
+    const unsigned int numMolsForTestPerCell = 5;
+    // generate particle positions
+    tarch::la::Vector<MD_DIM, double> velocity(0);
+    std::array<std::array<tarch::la::Vector<MD_DIM, double>, numMolsForTestPerCell>, numCellsForTest> positions;
+    std::array<std::array<simplemd::Molecule*, numMolsForTestPerCell>, numCellsForTest> molecules;
+    int ctr = 5; // arbitrary value
+    for (size_t i = 0; i < numCellsForTest; i++) {
+      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
+        for (size_t k = 0; k < MD_DIM; k++) {
+          positions[i][j][k] = ctr++;
+        }
+        molecules[i][j] = new simplemd::Molecule(positions[i][j], velocity);
+        (*_moleculeContainer)[i].insert(*molecules[i][j]);
+      }
+    }
+
+    // use mapping
+    _moleculeContainer->iterateMolecules(mappingSer);
+    _moleculeContainer->iterateMolecules(mappingPar);
+    _moleculeContainer->iterateMolecules(mappingSer);
+    _moleculeContainer->iterateMolecules(mappingPar);
+
+    // check if successful
+    for (size_t i = 0; i < numCellsForTest; i++) {
+      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
+        for (size_t k = 0; k < MD_DIM; k++) {
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(positions[i][j][k] + 4 * (k + 1), _moleculeContainer->getMoleculeAt(i, j).getConstPosition()[0], 1e6);
         }
       }
     }
