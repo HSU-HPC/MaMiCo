@@ -2,6 +2,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "simplemd/MoleculeContainer.h"
+#include "simplemd/LinkedCell.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include "simplemd/MolecularDynamicsDefinitions.h"
 #include "tarch/la/Vector.h"
@@ -18,6 +19,46 @@ public:
     tarch::la::Vector<MD_DIM, double>& pos = molecule.getPosition();
     for (size_t i = 0; i < MD_DIM; i++) {
       pos[i] += i + 1;
+    }
+  }
+  static const bool IsParallel = par;
+};
+
+template <bool par> class CellMolPosIncrMapping {
+public:
+  CellMolPosIncrMapping() {}
+  KOKKOS_FUNCTION void beginCellIteration() {};
+  KOKKOS_FUNCTION void endCellIteration() {};
+  KOKKOS_FUNCTION void handleCell(simplemd::LinkedCell& cell) const {
+    for (auto it = cell.begin(); it != cell.end(); it++) {
+      tarch::la::Vector<MD_DIM, double>& pos = it->getPosition();
+      for (size_t i = 0; i < MD_DIM; i++) {
+        pos[i] += i + 1;
+      }
+    }
+  }
+  static const bool IsParallel = par;
+};
+
+template <bool par> class CellPairPosMaxMapping {
+public:
+  CellPairPosMaxMapping() {}
+  KOKKOS_FUNCTION void beginCellIteration() {};
+  KOKKOS_FUNCTION void endCellIteration() {};
+  KOKKOS_FUNCTION void handleCell(simplemd::LinkedCell& cell) const {};
+  KOKKOS_FUNCTION void handleCellPair(simplemd::LinkedCell& cell1, simplemd::LinkedCell& cell2, const unsigned int& cellIndex1,
+                                      const unsigned int& cellIndex2) const {
+    double temp;
+    for (auto it1 = cell1.begin(); it1 != cell1.end(); it1++) {
+      tarch::la::Vector<MD_DIM, double>& pos1 = it1->getPosition();
+      for (auto it2 = cell2.begin(); it2 != cell2.end(); it2++) {
+        tarch::la::Vector<MD_DIM, double>& pos2 = it2->getPosition();
+        for (size_t i = 0; i < MD_DIM; i++) {
+          temp = pos1[i] > pos2[i] ? pos1[i] : pos2[i];
+          pos1[i] = temp;
+          pos2[i] = temp;
+        }
+      }
     }
   }
   static const bool IsParallel = par;
@@ -101,12 +142,40 @@ public:
   }
 
   void testSort() {
+    const unsigned int numCellsForTest = 10;
+    tarch::la::Vector<MD_DIM, double> position, velocity(0);
+    for (size_t i = 0; i < MD_DIM; i++) {
+      position[i] = 0.5;
+    }
+    std::array<simplemd::Molecule*, numCellsForTest> molecules;
+    for (size_t i = 0; i < numCellsForTest; i++) {
+      molecules[i] = new simplemd::Molecule(position, velocity);
+      (*_moleculeContainer)[i].insert(*molecules[i]);
+    }
+    _moleculeContainer->sort();
+    // all molecules should be in the same cell since all have same position
+    int index;
 #if (MD_DIM == 1)
+    // molecule idx is [1] thus cell 1
+    index = 1;
 #endif
 #if (MD_DIM == 2)
+    // molecule idx is [1,1]
+    index = _numCellsIf3D[0] + 2 + 1;
 #endif
 #if (MD_DIM == 3)
+    // molecule idx is [1,1,1]
+    index = (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2) + _numCellsIf3D[0] + 2 + 1;
 #endif
+    CPPUNIT_ASSERT_EQUAL(numCellsForTest, (*_moleculeContainer)[index].numMolecules());
+    // cleanup
+    for (size_t i = 0; i < numCellsForTest; i++) {
+      _moleculeContainer->clearLinkedCell(i);
+      if (molecules[i] != nullptr) {
+        delete molecules[i];
+        molecules[i] = nullptr;
+      }
+    }
   }
 
   void testClearCell() {
@@ -176,7 +245,6 @@ public:
   }
 
   void testIterationMoleculesSerial() { consolidatedMolIter<false>(); }
-
   void testIterationMoleculesParallel() { consolidatedMolIter<true>(); }
 
   template <bool par> void consolidatedMolIter() {
@@ -269,10 +337,100 @@ public:
     }
   }
 
-  void testIterationLinkedCellsSerial() {};
-  void testIterationLinkedCellsParallel() {};
-  void testIterationLinkedCellPairsSerial() {};
-  void testIterationLinkedCellPairsParallel() {};
+  void testIterationLinkedCellsSerial() { consolidatedCellIter<false>(); }
+  void testIterationLinkedCellsParallel() { consolidatedCellIter<true>(); }
+
+  template <bool par> void consolidatedCellIter() {
+    CellMolPosIncrMapping<par> mapping;
+    const unsigned int numCellsForTest = 10;
+    const unsigned int numMolsForTestPerCell = 5;
+    // generate particle positions
+    tarch::la::Vector<MD_DIM, double> velocity(0);
+    std::array<std::array<tarch::la::Vector<MD_DIM, double>, numMolsForTestPerCell>, numCellsForTest> positions;
+    std::array<std::array<simplemd::Molecule*, numMolsForTestPerCell>, numCellsForTest> molecules;
+    int ctr = 5; // arbitrary value
+    for (size_t i = 0; i < numCellsForTest; i++) {
+      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
+        for (size_t k = 0; k < MD_DIM; k++) {
+          positions[i][j][k] = ctr++;
+        }
+        molecules[i][j] = new simplemd::Molecule(positions[i][j], velocity);
+        (*_moleculeContainer)[i].insert(*molecules[i][j]);
+      }
+    }
+
+    // use mapping
+    _moleculeContainer->iterateCells(mapping);
+
+    // check if successful
+    for (size_t i = 0; i < numCellsForTest; i++) {
+      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
+        for (size_t k = 0; k < MD_DIM; k++) {
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(positions[i][j][k] + k + 1, _moleculeContainer->getMoleculeAt(i, j).getConstPosition()[0], 1e6);
+        }
+      }
+    }
+
+    // cleanup
+    for (size_t i = 0; i < numCellsForTest; i++) {
+      _moleculeContainer->clearLinkedCell(i);
+      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
+        if (molecules[i][j] != nullptr) {
+          delete molecules[i][j];
+          molecules[i][j] = nullptr;
+        }
+      }
+    }
+  }
+
+  void testIterationLinkedCellPairsSerial() { consolidatedCellPairIter<false>(); };
+  void testIterationLinkedCellPairsParallel() { consolidatedCellPairIter<true>(); };
+
+  template <bool par> void consolidatedCellPairIter() {
+    CellPairPosMaxMapping<par> mapping;
+    // cells 0 and 1 neighbours in all MD_SIM values
+    const unsigned int numCellsForTest = 2;
+    const unsigned int numMolsForTestPerCell = 15;
+    // generate particle positions
+    tarch::la::Vector<MD_DIM, double> velocity(0);
+    std::array<std::array<tarch::la::Vector<MD_DIM, double>, numMolsForTestPerCell>, numCellsForTest> positions;
+    std::array<std::array<simplemd::Molecule*, numMolsForTestPerCell>, numCellsForTest> molecules;
+    tarch::la::Vector<MD_DIM, double> maxPos(0);
+    int ctr = 5; // arbitrary value
+    for (size_t i = 0; i < numCellsForTest; i++) {
+      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
+        for (size_t k = 0; k < MD_DIM; k++) {
+          positions[i][j][k] = ctr++;
+          maxPos[k] = positions[i][j][k] > maxPos[k] ? positions[i][j][k] : maxPos[k]; // always true, but kept for clarity
+        }
+        molecules[i][j] = new simplemd::Molecule(positions[i][j], velocity);
+        (*_moleculeContainer)[i].insert(*molecules[i][j]);
+      }
+    }
+
+    // use mapping
+    _moleculeContainer->iterateCellPairs(mapping);
+
+    // check if successful
+    for (size_t i = 0; i < numCellsForTest; i++) {
+      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
+        for (size_t k = 0; k < MD_DIM; k++) {
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(maxPos[k], _moleculeContainer->getMoleculeAt(i, j).getConstPosition()[0], 1e6);
+        }
+      }
+    }
+
+    // cleanup
+    for (size_t i = 0; i < numCellsForTest; i++) {
+      _moleculeContainer->clearLinkedCell(i);
+      for (size_t j = 0; j < numMolsForTestPerCell; j++) {
+        if (molecules[i][j] != nullptr) {
+          delete molecules[i][j];
+          molecules[i][j] = nullptr;
+        }
+      }
+    }
+  }
 
 private:
   unsigned int vectorToScalar(tarch::la::Vector<MD_DIM, unsigned int> vector) const {
