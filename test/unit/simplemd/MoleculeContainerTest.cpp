@@ -167,7 +167,7 @@ public:
     // molecule idx is [1,1,1]
     index = (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2) + _numCellsIf3D[0] + 2 + 1;
 #endif
-    CPPUNIT_ASSERT_EQUAL((*_moleculeContainer)[index].numMolecules(), numCellsForTest);
+    CPPUNIT_ASSERT_EQUAL(numCellsForTest, (*_moleculeContainer)[index].numMolecules());
     // cleanup
     for (size_t i = 0; i < numCellsForTest; i++) {
       _moleculeContainer->clearLinkedCell(i);
