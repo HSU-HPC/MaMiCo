@@ -694,7 +694,6 @@ set(CLANGFORMAT_SOURCES
   "coupling/solvers/FDCouetteSolver.h"
   "coupling/solvers/IcoFoamInterface.h"
   "coupling/solvers/LBCouetteSolver.h"
-  "coupling/solvers/IcoFoamBufferSetup.h"
   "coupling/solvers/CouetteSolver.h"
   "coupling/solvers/CouetteSolverInterface.h"
   "coupling/solvers/LBCouetteSolverInterface.h"

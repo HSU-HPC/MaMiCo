@@ -381,8 +381,8 @@ public:
     numThreads = omp_get_num_threads();
 #endif
 
-    auto res = std::make_unique<LBCouetteSolver>(_channelheight, _wallVelocity * _dx / _dt, _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep, _plotAverageVelocity,
-                                                 _filestem + std::string("_supervising"), _processes, numThreads, _scen);
+    auto res = std::make_unique<LBCouetteSolver>(_channelheight, _wallVelocity * _dx / _dt, _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep,
+                                                 _plotAverageVelocity, _filestem + std::string("_supervising"), _processes, numThreads, _scen);
 
     res->_mode = Mode::supervising;
     res->_dt_pint = _dt * num_cycles;
@@ -452,8 +452,9 @@ private:
     }
   }
 
-  void plot_avg_vel(){
-    if (!_plotAverageVelocity) return;
+  void plot_avg_vel() {
+    if (!_plotAverageVelocity)
+      return;
 
     int rank = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -470,13 +471,13 @@ private:
     }
     ss << ".csv";
     std::string filename = ss.str();
-    std::ofstream file(filename.c_str(), _counter==0 ? std::ofstream::out : std::ofstream::app);
+    std::ofstream file(filename.c_str(), _counter == 0 ? std::ofstream::out : std::ofstream::app);
     if (!file.is_open()) {
       std::cout << "ERROR LBCouetteSolver::plot_avg_vel(): Could not open file " << filename << "!" << std::endl;
       exit(EXIT_FAILURE);
     }
 
-    if(_counter == 0){
+    if (_counter == 0) {
       file << "coupling_cycle ; avg_vel ; avg_velX" << std::endl;
     }
 

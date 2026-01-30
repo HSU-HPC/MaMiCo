@@ -133,10 +133,9 @@ public:
       exit(EXIT_FAILURE);
     }
     mdSolverInterface = new coupling::interface::SimpleMDSolverInterface(
-        simpleMDSimulation->getBoundaryTreatment(),
-        simpleMDSimulation->getParallelTopologyService(), simpleMDSimulation->getMoleculeService(), simpleMDSimulation->getLinkedCellService(),
-        simpleMDSimulation->getMolecularPropertiesService(), (simpleMDSimulation->getParallelTopologyService()).getLocalBoundaryInformation(),
-        configuration.getSimulationConfiguration().getDt());
+        simpleMDSimulation->getBoundaryTreatment(), simpleMDSimulation->getParallelTopologyService(), simpleMDSimulation->getMoleculeService(),
+        simpleMDSimulation->getLinkedCellService(), simpleMDSimulation->getMolecularPropertiesService(),
+        (simpleMDSimulation->getParallelTopologyService()).getLocalBoundaryInformation(), configuration.getSimulationConfiguration().getDt());
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMDSolverInterface(mdSolverInterface);
 #elif defined(LAMMPS_MD)
     // as switchOnCoupling() should have been called before this method, the

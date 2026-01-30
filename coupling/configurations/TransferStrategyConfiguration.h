@@ -93,7 +93,7 @@ public:
       _energyCorrection = false;
       _density = 1;
       tarch::configuration::ParseConfiguration::readBoolOptional(_energyCorrection, node, "energy-correction");
-      if (_energyCorrection){
+      if (_energyCorrection) {
         tarch::configuration::ParseConfiguration::readDoubleMandatory(_density, node, "density");
       }
     }

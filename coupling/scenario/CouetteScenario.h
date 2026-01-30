@@ -125,21 +125,23 @@ public:
   /** called to push the micro solver into a new macroscopic state (given from outside)
    * */
   void equilibrateMicro() override {
-    if(_cfg.miSolverType == coupling::configurations::CouetteConfig::SYNTHETIC) return;
+    if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SYNTHETIC)
+      return;
 
     coupling::datastructures::FlexibleCellContainer<3> buffer;
-    for (auto pair : _couplingBuffer.macro2MDBuffer) buffer << pair;
-    for (auto pair : _couplingBuffer.md2macroBuffer) buffer << pair;
+    for (auto pair : _couplingBuffer.macro2MDBuffer)
+      buffer << pair;
+    for (auto pair : _couplingBuffer.md2macroBuffer)
+      buffer << pair;
     fillSendBuffer(_cfg.density, *_couetteSolver, buffer);
 
     _multiMDCellService->setInnerMomentumImposition(true);
     const int EQUI_CYCLES = 3; // 2 cycles should be sufficient (10 cycles without inner imposition on MD30), 3 cycles is even safer
-    for(int i = 0; i < EQUI_CYCLES; i++){
+    for (int i = 0; i < EQUI_CYCLES; i++) {
       _multiMDCellService->sendFromMacro2MD(buffer);
-      _instanceHandling->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(),
-        _mdStepCounter, *_multiMDCellService);
+      _instanceHandling->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter, *_multiMDCellService);
     }
-    _mdStepCounter += EQUI_CYCLES*_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
+    _mdStepCounter += EQUI_CYCLES * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
 
     _multiMDCellService->setInnerMomentumImposition(false);
   }
@@ -147,7 +149,6 @@ public:
   coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { return _couetteSolver; }
 
 protected:
-
   /** @brief Executes the entire test several times for a range of time-window-size parameters */
   void twsLoop() {
     for (_tws = _cfg.twsLoopMin; _tws <= _cfg.twsLoopMax; _tws += _cfg.twsLoopStep) {
@@ -166,7 +167,7 @@ protected:
     tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",
                                                                                                                            _simpleMDConfig);
     if (!_simpleMDConfig.isValid()) {
-      if (_isRootRank){
+      if (_isRootRank) {
         std::cout << "ERROR CouetteScenario: Invalid SimpleMD config!" << std::endl;
       }
       exit(EXIT_FAILURE);
@@ -680,11 +681,12 @@ protected:
       }
 #endif
       if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle >= _cfg.filterInitCycles) {
-        if (!_MDBoundarySetupDone){
+        if (!_MDBoundarySetupDone) {
           static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
-            ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),_mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
-            _MDBoundarySetupDone = true;
-          }
+              ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
+                              _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+          _MDBoundarySetupDone = true;
+        }
         static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_couplingBuffer.md2macroBuffer);
       }
 #if (BUILD_WITH_OPENFOAM)
@@ -744,7 +746,7 @@ protected:
       _multiMDMediator = nullptr;
     }
 
-    if (_isRootRank)  {
+    if (_isRootRank) {
       std::cout << "Finish CouetteScenario::shutdown() " << std::endl;
     }
   }
@@ -885,8 +887,8 @@ protected:
 #endif
     // LB solver: active on lbNumberProcesses
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
-      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, _cfg.plotAverageVelocity, "LBCouette",
-                                                      _cfg.lbNumberProcesses, 1, this);
+      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, _cfg.plotAverageVelocity,
+                                                      "LBCouette", _cfg.lbNumberProcesses, 1, this);
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): LB solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
