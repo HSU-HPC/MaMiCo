@@ -43,7 +43,6 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
   initContainer(parallelTopologyService, moleculeCount, capacityFactor);
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
-  unsigned int indexNumberMolecules = 0;
 
   Molecule tmpMolecule;
   // loop over domain and determine position vector (place molecules initially on a grid)
@@ -63,10 +62,8 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
         // initialise molecule in memory block and set ID
         tmpMolecule.setPosition(position);
         tmpMolecule.setVelocity(velocity);
-        tmpMolecule.setID(indexNumberMolecules);
+        tmpMolecule.setID(getNextMoleculeID());
         _moleculeContainer->insert(tmpMolecule);
-        // increment index counter
-        indexNumberMolecules++;
       }
 #if (MD_DIM > 1)
     }
@@ -83,7 +80,6 @@ simplemd::services::MoleculeService::MoleculeService(const std::string& checkPoi
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
   tarch::la::Vector<MD_DIM, double> force(0.0);
-  unsigned int idCounter = 0;
   unsigned int dimensions = 0;
   std::stringstream ss;
   ss << checkPointFileStem;
@@ -108,7 +104,6 @@ simplemd::services::MoleculeService::MoleculeService(const std::string& checkPoi
     exit(EXIT_FAILURE);
   }
 
-  idCounter = 0;
   Molecule tmpMolecule;
   for (unsigned int i = 0; i < moleculeCount; i++) {
     for (unsigned int d = 0; d < MD_DIM; d++) {
@@ -124,10 +119,8 @@ simplemd::services::MoleculeService::MoleculeService(const std::string& checkPoi
     tmpMolecule.setPosition(position);
     tmpMolecule.setVelocity(velocity);
     tmpMolecule.setForceOld(force);
-    tmpMolecule.setID(idCounter);
+    tmpMolecule.setID(getNextMoleculeID());
     _moleculeContainer->insert(tmpMolecule);
-
-    idCounter++;
   }
 
   // _meanVelocity was not initialised!
@@ -142,7 +135,6 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
   tarch::la::Vector<MD_DIM, double> force(0.0);
-  unsigned int idCounter = 0;
   unsigned int dimensions = 0;
   // buffer for all relevant molecules
   std::vector<tarch::la::Vector<MD_DIM, double>> positions;
@@ -196,7 +188,6 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     exit(EXIT_FAILURE);
   }
 
-  idCounter = 0;
   Molecule tmpMolecule;
   // write molecule data from dynamic vectors to allocated memory
   for (unsigned int i = 0; i < moleculeCount; i++) {
@@ -207,9 +198,8 @@ simplemd::services::MoleculeService::MoleculeService(const tarch::la::Vector<MD_
     tmpMolecule.setPosition(position);
     tmpMolecule.setVelocity(velocity);
     tmpMolecule.setForceOld(force);
-    tmpMolecule.setID(idCounter);
+    tmpMolecule.setID(getNextMoleculeID());
     _moleculeContainer->insert(tmpMolecule);
-    idCounter++;
   }
 
   // empty vectors

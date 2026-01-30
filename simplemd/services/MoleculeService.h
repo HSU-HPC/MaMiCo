@@ -92,6 +92,8 @@ public:
 
   static bool tarchDebugIsOn();
 
+  inline size_t getNextMoleculeID() { return _nextMoleculeID++; }
+
 private:
   void initContainer(ParallelTopologyService parallelTopologyService, size_t moleculeCount, double capacityFactor);
 
@@ -102,6 +104,8 @@ private:
   const tarch::la::Vector<MD_DIM, double> _localDomainSize;
 
   simplemd::MoleculeContainer* _moleculeContainer = nullptr;
+
+  size_t _nextMoleculeID = 0;
 };
 
 #endif // _MOLECULARDYNAMICS_SERVICES_MOLECULESERVICE_H_

@@ -181,6 +181,7 @@ public:
     simplemd::Molecule newMolecule(position, velocity);
     newMolecule.setForce(force);
     newMolecule.setPotentialEnergy(potentialEnergy);
+    newMolecule.setID(_moleculeService.getNextMoleculeID());
     // add molecule to MoleculeContainer
     _moleculeService.getContainer().insert(newMolecule);
   }

@@ -25,7 +25,20 @@ public:
     }
     const tarch::la::Vector<MD_DIM, double> domainOffset(0);
     const tarch::la::Vector<MD_DIM, double> meshWidth(1);
-    const tarch::la::Vector<MD_DIM, unsigned int> numberProcesses(1);
+    const tarch::la::Vector<MD_DIM, unsigned int> numberProcesses =
+#if (MD_PARALLEL == MD_YES)
+#if (MD_DIM > 2)
+    { 2,
+      2,
+      1 }
+#else
+    { 2,
+      2 }
+#endif
+#else
+        {1}
+#endif
+    ;
     const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> boundary(simplemd::BoundaryType::PERIODIC_BOUNDARY);
     simplemd::services::ParallelTopologyService parallelTopologyService(numCells, domainOffset, meshWidth, numberProcesses, boundary
 #if (MD_PARALLEL == MD_YES)
