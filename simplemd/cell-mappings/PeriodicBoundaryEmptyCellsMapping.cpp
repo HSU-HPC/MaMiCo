@@ -57,21 +57,9 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
   }
 
   // if the molecules need to be sent, they are sent and deleted from the local molecule service
-  if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cell.getIndex(), _moleculeContainer)) {
-    cell.clear();
+  if (!_parallelTopologyService.reduceGhostCellViaBuffer(cell, cell.getIndex(), _moleculeContainer)) {
     // if the molecules need to be placed somewhere on this process, do so...
-  } else {
-    LinkedCell innerCell = _moleculeContainer[coords];
-    // iterate over molecules and either send them to other process or put them locally in the right cell
-    for (auto it = cell.begin(); it != cell.end(); it++) {
-      Molecule myMolecule(it->getConstPosition(), it->getConstVelocity());
-      myMolecule.setForceOld(it->getConstForceOld());
-      if (it->isFixed())
-        myMolecule.fix();
-      innerCell.insert(myMolecule);
-    }
-    cell.clear();
+    _moleculeContainer.sort(_moleculeContainer[outerCellCoords].getIndex());
   }
-  // in any case: clear list in this cell
   cell.clear();
 }
