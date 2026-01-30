@@ -354,12 +354,12 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
   return localIndex;
 }
 
-bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(LinkedCell& cell, const size_t,
+bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(LinkedCell& cell, const size_t cellIndex,
                                                                            const simplemd::MoleculeContainer& moleculeContainer) {
 #if (MD_PARALLEL == MD_YES)
   // determine neighbour rank (from position of the respective ghost cell cellIndex)
   int cellCoords = 0;
-  unsigned int help = cellIndex;
+  auto help = cellIndex;
   int neighbourRank = 0;
 #if (MD_DIM > 2)
   cellCoords = help / ((moleculeContainer.getLocalNumberOfCells()[1] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[1]) *
