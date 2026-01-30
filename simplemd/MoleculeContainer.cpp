@@ -47,9 +47,9 @@ void simplemd::MoleculeContainer::remove(unsigned int cellIdx, unsigned int mole
 void simplemd::MoleculeContainer::clearLinkedCell(unsigned int cellIdx) {
 #if (MD_ERROR == MD_YES)
   if (cellIdx >= _linkedCellNumMolecules.size()) {
-    std::cout << "ERROR simplemd::MoleculeContainer::clearLinkedCell: Index out of range: " << cellIdx
-              << " (Local cell count = " << _linkedCellNumMolecules.size() << ")" << std::endl;
-    exit(EXIT_FAILURE);
+    Kokkos::printf("ERROR simplemd::MoleculeContainer::clearLinkedCell: Index out of range: %i (Local cell count = %i )\n", cellIdx,
+                   _linkedCellNumMolecules.size());
+    Kokkos::abort("\n");
   }
 #endif
   _linkedCellNumMolecules(cellIdx) = 0;
@@ -188,9 +188,8 @@ simplemd::Molecule& simplemd::MoleculeContainer::getMoleculeAt(size_t i, size_t 
 simplemd::LinkedCell simplemd::MoleculeContainer::operator[](const size_t idx) const {
 #if (MD_ERROR == MD_YES)
   if (idx >= _linkedCellNumMolecules.size()) {
-    std::cout << "ERROR simplemd::MoleculeContainer::operator[]: Index out of range: " << idx << " (Local cell count = " << _linkedCellNumMolecules.size()
-              << ")" << std::endl;
-    exit(EXIT_FAILURE);
+    Kokkos::printf("ERROR simplemd::MoleculeContainer::operator[]: Index out of range: %i (Local cell count = %i )\n", idx, _linkedCellNumMolecules.size());
+    Kokkos::abort("\n");
   }
 #endif
   return simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx, isGhostCell(idx));
@@ -256,9 +255,9 @@ size_t simplemd::MoleculeContainer::vectorIndexToLinear(const tarch::la::Vector<
 tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalCellIndexVector(const size_t cellIndex) const {
 #if (MD_ERROR == MD_YES)
   if (cellIndex >= _linkedCellNumMolecules.size()) {
-    std::cout << "ERROR simplemd::MoleculeContainer::getLocalCellIndexVector: Index out of range: " << cellIndex
-              << " (Local cell count = " << _linkedCellNumMolecules.size() << ")" << std::endl;
-    exit(EXIT_FAILURE);
+    Kokkos::printf("ERROR simplemd::MoleculeContainer::getLocalCellIndexVector: Index out of range: %i (Local cell count = %i )\n", cellIndex,
+                   _linkedCellNumMolecules.size());
+    Kokkos::abort("\n");
   }
 #endif
   size_t help = cellIndex;
