@@ -106,7 +106,8 @@ private:
   /** dimensionless Boltzmann's constant */
   double _kB;
 
-  /** capacity factor, used to compute the maximum number of molecules that can be present in a linked cell by multiplication with the average number of molecules per cell*/
+  /** capacity factor, used to compute the maximum number of molecules that can be present in a linked cell by multiplication with the average number of
+   * molecules per cell*/
   double _capacityFactor;
 
   /** blocksize to be used for molecule storage */
