@@ -163,7 +163,7 @@ private:
   /** @brief bool holding the current state of the coupling: true - coupled
    * simulation and false - independent md simulation */
   bool _couplingSwitchedOn;
-  class simplemd::moleculemappings::ConvertForcesMapping _convertForcesMapping;
+  simplemd::moleculemappings::ConvertForcesMapping _convertForcesMapping;
 };
 } // namespace interface
 } // namespace coupling
