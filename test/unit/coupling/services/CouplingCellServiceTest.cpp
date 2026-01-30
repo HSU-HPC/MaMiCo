@@ -62,9 +62,10 @@ private:
     TestMDSolverInterface() : coupling::interface::MDSolverInterface<coupling::interface::SimpleMDLinkedCellWrapper, dim>() {}
     virtual ~TestMDSolverInterface() {}
 
-    coupling::interface::SimpleMDLinkedCellWrapper& getLinkedCell(const typename coupling::interface::MDSolverInterface<coupling::interface::SimpleMDLinkedCellWrapper, dim>::CellIndex_T& couplingCellIndex,
-                                        const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
-                                        const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) override {
+    coupling::interface::SimpleMDLinkedCellWrapper&
+    getLinkedCell(const typename coupling::interface::MDSolverInterface<coupling::interface::SimpleMDLinkedCellWrapper, dim>::CellIndex_T& couplingCellIndex,
+                  const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
+                  const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) override {
       return _linkedCellWrapper;
     }
 
@@ -78,7 +79,8 @@ private:
     virtual double getMoleculeEpsilon() const override { return 1.0; }
     virtual void getInitialVelocity(const tarch::la::Vector<dim, double>& meanVelocity, const double& kB, const double& temperature,
                                     tarch::la::Vector<dim, double>& initialVelocity) const override {}
-    virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim>& molecule, coupling::interface::SimpleMDLinkedCellWrapper& cell) override {}
+    virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim>& molecule,
+                                                coupling::interface::SimpleMDLinkedCellWrapper& cell) override {}
     virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim>& molecule) override {}
     virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstCouplingCell,
                                                const tarch::la::Vector<dim, unsigned int>& rangeCouplingCells,
@@ -90,7 +92,10 @@ private:
     virtual void synchronizeMoleculesAfterMassModification() override {}
     virtual void synchronizeMoleculesAfterMomentumModification() override {}
     virtual double getDt() override { return 1.0; }
-    virtual coupling::interface::MoleculeIterator<coupling::interface::SimpleMDLinkedCellWrapper, dim>* getMoleculeIterator(coupling::interface::SimpleMDLinkedCellWrapper& cell) override { return NULL; }
+    virtual coupling::interface::MoleculeIterator<coupling::interface::SimpleMDLinkedCellWrapper, dim>*
+    getMoleculeIterator(coupling::interface::SimpleMDLinkedCellWrapper& cell) override {
+      return NULL;
+    }
     coupling::interface::SimpleMDLinkedCellWrapper _linkedCellWrapper;
   };
 
@@ -98,7 +103,7 @@ private:
   public:
     ~TestMacroscopicSolverInterface() {}
     std::vector<unsigned int> getRanks(I01 globalCellIndex) override { return {1}; };
-    unsigned int getOuterRegion() override {return 1;}
+    unsigned int getOuterRegion() override { return 1; }
   };
 
   class TestParticleInsertionConfiguration : public coupling::configurations::ParticleInsertionConfiguration {
@@ -109,7 +114,7 @@ private:
 
     ~TestParticleInsertionConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -124,7 +129,7 @@ private:
 
     ~TestMomentumInsertionConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -139,7 +144,7 @@ private:
 
     ~TestBoundaryForceConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -154,7 +159,7 @@ private:
 
     ~TestTransferStrategyConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -167,7 +172,7 @@ private:
 
     ~TestParallelTopologyConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -181,7 +186,7 @@ private:
 
     ~TestThermostatConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -194,7 +199,7 @@ private:
 
     ~TestCouplingCellConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 

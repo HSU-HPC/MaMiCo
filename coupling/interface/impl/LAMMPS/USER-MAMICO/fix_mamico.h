@@ -33,7 +33,7 @@ namespace LAMMPS_NS {
  */
 class FixMamico : public Fix {
 public:
-  FixMamico(LAMMPS *lmp, int argc, char **argv);
+  FixMamico(LAMMPS* lmp, int argc, char** argv);
   ~FixMamico();
 
   void pre_force(int vflag);
@@ -51,9 +51,9 @@ private:
   // step counter. Called from post_force() callback.
   template <unsigned int dim> void modifyMomentumAndTemperature();
 
-  template <unsigned int dim> void sortAtomPositionsIntoCells(const coupling::IndexConversion<dim> &indexConversion);
+  template <unsigned int dim> void sortAtomPositionsIntoCells(const coupling::IndexConversion<dim>& indexConversion);
 
-  LAMMPS *_lmp;                  // ptr to lammps
+  LAMMPS* _lmp;                  // ptr to lammps
   bool _use2D;                   // true, if this is a 2D simulation
   unsigned int _timestepCounter; // counts the total number of time steps where
                                  // this fix is applied

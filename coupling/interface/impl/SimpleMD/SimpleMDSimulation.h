@@ -58,9 +58,9 @@ public:
     // compute forces. After this step, each molecule has received all force
     // contributions from its neighbors.
     _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
-    #if (TARCH_DEBUG == TARCH_YES)
-        _moleculeService->getContainer().iterateMolecules(_convertForcesMapping);
-    #endif
+#if (TARCH_DEBUG == TARCH_YES)
+    _moleculeService->getContainer().iterateMolecules(_convertForcesMapping);
+#endif
 
     // distribute momentum -> some methods require modification of force terms,
     // therefore we call it AFTER the force computation and before everything else
@@ -89,7 +89,8 @@ public:
     // write checkpoint
     if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0) &&
         (t % _configuration.getCheckpointConfiguration().getWriteEveryTimestep() == 0)) {
-      simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(*_parallelTopologyService, _configuration.getCheckpointConfiguration().getFilename(), t);
+      simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(*_parallelTopologyService,
+                                                                                _configuration.getCheckpointConfiguration().getFilename(), t);
       _moleculeService->getContainer().iterateMolecules(writeCheckPointMapping);
     }
     // plot also coupling cell information
@@ -138,21 +139,21 @@ public:
   simplemd::BoundaryTreatment& getBoundaryTreatment() { return *_boundaryTreatment; }
   simplemd::services::ParallelTopologyService& getParallelTopologyService() { return *_parallelTopologyService; }
   simplemd::services::MoleculeService& getMoleculeService() {
-    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(_moleculeService == NULL){
-      std::cout <<"ERROR coupling::interface::MDSimulation::getMoleculeService(): _moleculeService == NULL " << std::endl;
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (_moleculeService == NULL) {
+      std::cout << "ERROR coupling::interface::MDSimulation::getMoleculeService(): _moleculeService == NULL " << std::endl;
       exit(1);
     }
-    #endif
+#endif
     return *_moleculeService;
   }
   const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() {
-    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(_molecularPropertiesService == NULL){
-      std::cout <<"ERROR coupling::interface::MDSimulation::getMolecularPropertiesService(): _molecularPropertiesService == NULL " << std::endl;
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (_molecularPropertiesService == NULL) {
+      std::cout << "ERROR coupling::interface::MDSimulation::getMolecularPropertiesService(): _molecularPropertiesService == NULL " << std::endl;
       exit(1);
     }
-    #endif
+#endif
     return *_molecularPropertiesService;
   }
 
