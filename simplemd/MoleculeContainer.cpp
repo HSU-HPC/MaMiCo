@@ -154,8 +154,9 @@ void simplemd::MoleculeContainer::sort() {
 #if (MD_ERROR == MD_YES)
                   if (_linkedCellNumMolecules(curMolIdx) + 1 > _cellCapacity) {
                     Kokkos::printf("Cell capacity=%d would be exceeded by an operation. "
-                      "(Increase \"capacity-factor\" of the \"domain-configuration\" in the config!) "
-                      "Exiting...", _cellCapacity);
+                                   "(Increase \"capacity-factor\" of the \"domain-configuration\" in the config!) "
+                                   "Exiting...",
+                                   _cellCapacity);
                     Kokkos::abort("simplemd::MoleculeContainer::insert\n");
                   }
 #endif
