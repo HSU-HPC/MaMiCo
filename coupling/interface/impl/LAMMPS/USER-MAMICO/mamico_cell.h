@@ -12,9 +12,9 @@ namespace LAMMPS_NS {
 // structures
 class MoleculeInformation {
 public:
-  double **_x;
-  double **_v;
-  double **_f;
+  double** _x;
+  double** _v;
+  double** _f;
 };
 
 // implements a cell structure which embed atom identifiers

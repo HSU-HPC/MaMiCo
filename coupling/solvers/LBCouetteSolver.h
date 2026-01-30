@@ -65,15 +65,16 @@ public:
    *  @param kinVisc the kinematic viscosity of the fluid
    *  @param plotEveryTimestep the time step interval for plotting data;
    *                           4 means, every 4th time step is plotted
+   *  @param plotAverageVelocity writes average velocity for all time steps into CSV file
    *  @param filestem the name of the plotted file
    *  @param processes defines on how many processes the solver will run;
    *                   1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes
    *  @param numThreads number of OpenMP threads */
   LBCouetteSolver(const double channelheight, tarch::la::Vector<3, double> wallVelocity, const double kinVisc, const double dx, const double dt,
-                  const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes, double md_density,
+                  const int plotEveryTimestep, const bool plotAverageVelocity, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes,
                   const unsigned int numThreads = 1, const Scenario* scen = nullptr)
       : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes, scen), _mode(Mode::coupling), _dt_pint(dt),
-        _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)), _wallVelocity((dt / dx) * wallVelocity), _md_density(md_density) {
+        _omega(1.0 / (3.0 * (kinVisc * dt / (dx * dx)) + 0.5)), _wallVelocity((dt / dx) * wallVelocity), _plotAverageVelocity(plotAverageVelocity) {
     // return if required
     if (skipRank()) {
       return;
@@ -184,6 +185,7 @@ public:
       if (_plotEveryTimestep >= 1 && _counter % _plotEveryTimestep == 0)
         computeDensityAndVelocityEverywhere();
       plot();
+      plot_avg_vel();
       collidestream();
       communicate(); // exchange between neighbouring MPI subdomains
       _counter++;
@@ -232,10 +234,7 @@ public:
       // relations only. determine local velocity received from MaMiCo and
       // convert it to LB units; store the velocity in _vel
       // massFactor is used to ensure conservation of energy
-      double massMD = couplingCell->getMacroscopicMass() / (_md_density * _dx * _dx * _dx);
-      double massFactor = sqrt(massMD / _density[index]);
-      tarch::la::Vector<3, double> velMD((1.0 / couplingCell->getMacroscopicMass()) * (_dt / _dx) * couplingCell->getMacroscopicMomentum());
-      tarch::la::Vector<3, double> localVel(massFactor * velMD);
+      tarch::la::Vector<3, double> localVel((1.0 / couplingCell->getMacroscopicMass()) * (_dt / _dx) * couplingCell->getMacroscopicMomentum());
       for (unsigned int d = 0; d < 3; d++) {
         _vel[3 * index + d] = localVel[d];
       }
@@ -324,10 +323,15 @@ public:
 
   std::unique_ptr<State> getState() override {
     computeDensityAndVelocityEverywhere();
+    if (skipRank())
+      return std::make_unique<LBCouetteSolverState>(0);
     return std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
   }
 
   void setState(const std::unique_ptr<State>& input, int cycle) override {
+    if (skipRank())
+      return;
+
     const LBCouetteSolverState* state = dynamic_cast<const LBCouetteSolverState*>(input.get());
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
@@ -379,7 +383,7 @@ public:
 #endif
 
     auto res = std::make_unique<LBCouetteSolver>(_channelheight, _wallVelocity * _dx / _dt, _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep,
-                                                 _filestem + std::string("_supervising"), _processes, _md_density, numThreads, _scen);
+                                                 _plotAverageVelocity, _filestem + std::string("_supervising"), _processes, numThreads, _scen);
 
     res->_mode = Mode::supervising;
     res->_dt_pint = _dt * num_cycles;
@@ -395,6 +399,8 @@ public:
   }
 
   double get_avg_vel(const std::unique_ptr<State>& state) const override {
+    if (skipRank())
+      return 0;
     double vel[3];
     double density;
     double res[3]{0, 0, 0};
@@ -410,6 +416,22 @@ public:
       res[2] /= (_pdfsize / 19);
     }
     return std::sqrt(res[0] * res[0] + res[1] * res[1] + res[2] * res[2]);
+  }
+
+  double get_avg_velX(const std::unique_ptr<State>& state) const {
+    if (skipRank())
+      return 0;
+    double vel[3];
+    double density;
+    double res{0};
+    for (int i = 0; i < _pdfsize; i += 19) {
+      LBCouetteSolver::computeDensityAndVelocity(vel, density, state->getData() + i);
+      res += vel[0];
+    }
+    if (_pdfsize > 0) {
+      res /= (_pdfsize / 19);
+    }
+    return res;
   }
 
 private:
@@ -429,6 +451,42 @@ private:
         }
       }
     }
+  }
+
+  void plot_avg_vel() {
+    if (!_plotAverageVelocity)
+      return;
+
+    int rank = 0;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm_rank(coupling::indexing::IndexingService<3>::getInstance().getComm(), &rank);
+#endif
+    std::stringstream ss;
+    ss << _filestem << "_r" << rank;
+    if (_scen != nullptr) {
+      auto ts = _scen->getTimeIntegrationService();
+      if (ts != nullptr) {
+        if (ts->isPintEnabled())
+          ss << "_i" << ts->getIteration();
+      }
+    }
+    ss << ".csv";
+    std::string filename = ss.str();
+    std::ofstream file(filename.c_str(), _counter == 0 ? std::ofstream::out : std::ofstream::app);
+    if (!file.is_open()) {
+      std::cout << "ERROR LBCouetteSolver::plot_avg_vel(): Could not open file " << filename << "!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    if (_counter == 0) {
+      file << "coupling_cycle ; avg_vel ; avg_velX" << std::endl;
+    }
+
+    std::unique_ptr<State> s = std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
+    double vel = get_avg_vel(s);
+    double velX = get_avg_velX(s);
+    file << _counter << " ; " << vel << " ; " << velX << std::endl;
+    file.close();
   }
 
   /// ------------------------------------------------------------------------------------------------------
@@ -734,7 +792,6 @@ private:
   const double _omega;
   /** @brief velocity of moving wall of Couette flow */
   tarch::la::Vector<3, double> _wallVelocity;
-  double _md_density;
   int _pdfsize{0};
   /** @brief partical distribution function field */
   double* _pdf1{NULL};
@@ -746,6 +803,8 @@ private:
   /** @brief lattice weights */
   const double _W[19]{1.0 / 36.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 3.0,
                       1.0 / 18.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 36.0, 1.0 / 18.0, 1.0 / 36.0, 1.0 / 36.0};
+  /** @brief enables avg_vel CSV output */
+  const bool _plotAverageVelocity;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_SOLVERS_LBCOUETTESOLVER_H_

@@ -34,6 +34,14 @@ using MainExecSpace =
 #error "MDDim2 or MDDim3"
 #endif
 
+// Do not evaluate and fall back on zero when using 2D
+// (for accessing values in third dimension)
+#if (MD_DIM > 2)
+#define MD_DIM3_OR0(x) x
+#else
+#define MD_DIM3_OR0(x) 0
+#endif
+
 // MPI-Parallelisation (MD_YES/ MD_NO)
 #ifdef MDParallel
 #define MD_PARALLEL MD_YES
@@ -49,15 +57,19 @@ using MainExecSpace =
 #define MD_DEBUG MD_NO
 #endif
 
+// Enable/disable (MD_YES/MD_NO) output raw contents of SimpleMD cells for debugging
+#if (MD_DEBUG == MD_YES)
+#define MD_DUMP MD_YES
+#else
+#define MD_DUMP MD_NO
+#endif
+
 #ifdef MDError
 #define MD_ERROR MD_YES
 #else
 // error mode (MD_YES/MD_NO). Performs error checks during the computation.
 #define MD_ERROR MD_NO
 #endif
-
-// OpenMP-Parallelisation (MD_YES/MD_NO)
-#define MD_OPENMP MD_NO
 
 // TEST_TCHIPEV (MD_YES/MD_NO). If no - two communication stages, if yes - one
 // communication stage.

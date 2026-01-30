@@ -89,6 +89,13 @@ public:
                      "shift-by-timesteps="
                   << _shiftTimestep << "; typical values range between 0 and 1!" << std::endl;
       }
+
+      _energyCorrection = false;
+      _density = 1;
+      tarch::configuration::ParseConfiguration::readBoolOptional(_energyCorrection, node, "energy-correction");
+      if (_energyCorrection) {
+        tarch::configuration::ParseConfiguration::readDoubleMandatory(_density, node, "density");
+      }
     }
   }
 
@@ -124,7 +131,7 @@ public:
       return new coupling::transferstrategies::TransferStrategy4SchwarzCoupling<LinkedCell, dim>(mdSolverInterface, numberOfMDTimesteps);
     } else if (_type == TransferStrategy4NieCoupling) {
       return new coupling::transferstrategies::TransferStrategy4NieCoupling<LinkedCell, dim>(mdSolverInterface, numberOfMDTimesteps, _shiftTimestep,
-                                                                                             _massFluxBoundary);
+                                                                                             _massFluxBoundary, _energyCorrection, _density);
     } else if (_type == AveragingTransferStrategy) {
       return new coupling::transferstrategies::AveragingTransferStrategy<LinkedCell, dim>(mdSolverInterface);
     } else {
@@ -151,6 +158,8 @@ private:
                                                       // more details.
 
   bool _isValid;
+  bool _energyCorrection;
+  double _density;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_CONFIGURATIONS_STRATEGYCONFIGURATION_H_

@@ -2,6 +2,8 @@
 #include "coupling/interface/MDSimulation.h"
 #include "coupling/interface/MamicoInterfaceProvider.h"
 #include "simplemd/MolecularDynamicsSimulation.h"
+#include "simplemd/molecule-mappings/ConvertForcesFixedToFloatMapping.h"
+#include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 
 namespace coupling {
 namespace interface {
@@ -55,7 +57,10 @@ public:
 
     // compute forces. After this step, each molecule has received all force
     // contributions from its neighbors.
-    _linkedCellService->iterateCellPairs(*_lennardJonesForce);
+    _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
+#if (TARCH_DEBUG == TARCH_YES)
+    _moleculeService->getContainer().iterateMolecules(_convertForcesFixedToFloatMapping);
+#endif
 
     // distribute momentum -> some methods require modification of force terms,
     // therefore we call it AFTER the force computation and before everything else
@@ -70,42 +75,33 @@ public:
     // plot VTK output
     if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() != 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
       _vtkMoleculeWriter->setTimestep(t);
-      _moleculeService->iterateMolecules(*_vtkMoleculeWriter);
+      _moleculeService->getContainer().iterateMolecules(*_vtkMoleculeWriter);
     }
 
 // plot ADIOS2 output
 #if BUILD_WITH_ADIOS2
     if ((_configuration.getAdios2Configuration().getWriteEveryTimestep() != 0) && (t % _configuration.getAdios2Configuration().getWriteEveryTimestep() == 0)) {
       _Adios2Writer->setTimestep(t);
-      _moleculeService->iterateMolecules(*_Adios2Writer);
+      _moleculeService->getContainer().iterateMolecules(*_Adios2Writer);
     }
 #endif
 
     // write checkpoint
     if ((_configuration.getCheckpointConfiguration().getWriteEveryTimestep() != 0) &&
         (t % _configuration.getCheckpointConfiguration().getWriteEveryTimestep() == 0)) {
-      _moleculeService->writeCheckPoint(*_parallelTopologyService, _configuration.getCheckpointConfiguration().getFilename(), t);
-    }
-    // reorganise memory if needed
-    if ((_configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() != 0) &&
-        (t % _configuration.getSimulationConfiguration().getReorganiseMemoryEveryTimestep() == 0)) {
-      _moleculeService->reorganiseMemory(*_parallelTopologyService, *_linkedCellService);
+      simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(*_parallelTopologyService,
+                                                                                _configuration.getCheckpointConfiguration().getFilename(), t);
+      _moleculeService->getContainer().iterateMolecules(writeCheckPointMapping);
     }
     // plot also coupling cell information
     _couplingCellService->plotEveryMicroscopicTimestep(t);
 
-    _linkedCellService->iterateCells(*_emptyLinkedListsMapping);
-
     // time integration. After this step, the velocities and the positions of the
     // molecules have been updated.
-    _moleculeService->iterateMolecules(*_timeIntegrator);
+    _moleculeService->getContainer().iterateMolecules(*_timeIntegrator);
 
     // sort molecules into linked cells
-    _moleculeService->iterateMolecules(*_updateLinkedCellListsMapping);
-
-    if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
-      // if(t%50==0) std::cout <<"Finish MD timestep " << t << "..." << std::endl;
-    }
+    _moleculeService->getContainer().sort();
   }
 
   virtual void sortMoleculesIntoCells() {
@@ -130,7 +126,8 @@ public:
   virtual void shutdown() { shutdownServices(); }
 
   virtual void writeCheckpoint(const std::string& filestem, const unsigned int& t) {
-    getMoleculeService().writeCheckPoint(getParallelTopologyService(), filestem, t);
+    simplemd::moleculemappings::WriteCheckPointMapping writeCheckPointMapping(getParallelTopologyService(), filestem, t);
+    _moleculeService->getContainer().iterateMolecules(writeCheckPointMapping);
   }
 
   // function particularly needed to init MD solver interface -> should only be
@@ -138,22 +135,21 @@ public:
   simplemd::BoundaryTreatment& getBoundaryTreatment() { return *_boundaryTreatment; }
   simplemd::services::ParallelTopologyService& getParallelTopologyService() { return *_parallelTopologyService; }
   simplemd::services::MoleculeService& getMoleculeService() {
-    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(_moleculeService == NULL){
-      std::cout <<"ERROR coupling::interface::MDSimulation::getMoleculeService(): _moleculeService == NULL " << std::endl;
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (_moleculeService == NULL) {
+      std::cout << "ERROR coupling::interface::MDSimulation::getMoleculeService(): _moleculeService == NULL " << std::endl;
       exit(1);
     }
-    #endif
+#endif
     return *_moleculeService;
   }
-  simplemd::services::LinkedCellService& getLinkedCellService() { return *_linkedCellService; }
   const simplemd::services::MolecularPropertiesService& getMolecularPropertiesService() {
-    #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    if(_molecularPropertiesService == NULL){
-      std::cout <<"ERROR coupling::interface::MDSimulation::getMolecularPropertiesService(): _molecularPropertiesService == NULL " << std::endl;
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (_molecularPropertiesService == NULL) {
+      std::cout << "ERROR coupling::interface::MDSimulation::getMolecularPropertiesService(): _molecularPropertiesService == NULL " << std::endl;
       exit(1);
     }
-    #endif
+#endif
     return *_molecularPropertiesService;
   }
 
@@ -163,6 +159,7 @@ private:
   /** @brief bool holding the current state of the coupling: true - coupled
    * simulation and false - independent md simulation */
   bool _couplingSwitchedOn;
+  simplemd::moleculemappings::ConvertForcesFixedToFloatMapping _convertForcesFixedToFloatMapping;
 };
 } // namespace interface
 } // namespace coupling

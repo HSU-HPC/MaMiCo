@@ -36,11 +36,11 @@ public:
     unsigned long long sum = 0;
   };
 
-  bool tarchDebugIsOn() const { return _moleculeService->tarchDebugIsOn(); }
+  bool tarchDebugIsOn() const { return simplemd::services::MoleculeService::tarchDebugIsOn(); }
 
   unsigned long long getChecksum() {
     ChecksumMapping mapping;
-    _moleculeService->iterateMolecules(mapping);
+    _moleculeService->getContainer().iterateMolecules(mapping);
     return mapping.checksum();
   }
 };
@@ -90,7 +90,6 @@ private:
   <simulation-configuration
     dt="0.005"
     number-of-timesteps="50"
-    reorganise-memory-every-timestep="20"
     compute-macroscopic-quantities-every-timestep="0"
     fix-seed="yes"
    />
@@ -161,7 +160,7 @@ private:
 #endif
 
     if (!_simulation->tarchDebugIsOn()) {
-      std::cout << "WARN SimpleMDBench: Result validity check FAILED: MoleculeService: TARCH_DEBUG is off!" << std::endl;
+      std::cout << "WARN SimpleMDBench: Result validity check FAILED: MoleculeContainer: TARCH_DEBUG is off!" << std::endl;
       return;
     }
 
@@ -177,6 +176,8 @@ private:
       std::cout << "INFO SimpleMDBench: SUCCESS Checksum is correct :-)" << std::endl;
     else {
       std::cout << "ERROR SimpleMDBench: ERROR Checksum is wrong!! " << std::endl;
+      std::cout << "(Note that this is expected and OK in Release build mode,)" << std::endl;
+      std::cout << "(as checksum is supposed to match only in Debug / DebugOptimized build mode.)" << std::endl;
       exit(EXIT_FAILURE);
     }
   }

@@ -126,6 +126,7 @@ else()
     endif()
     if(KOKKOS_TARGET STREQUAL "CUDA")
       set(Kokkos_ENABLE_CUDA ON CACHE STRING "Build MaMiCo/Kokkos with CUDA support" FORCE)
+      set(Kokkos_ENABLE_CUDA_RELOCATABLE_DEVICE_CODE ON CACHE STRING "MaMiCo requires CUDA relocatable device code (RDC)" FORCE)
     else()
       set(Kokkos_ENABLE_CUDA OFF CACHE STRING "Build MaMiCo/Kokkos without CUDA support" FORCE)
     endif()
@@ -138,6 +139,9 @@ else()
     endif()
     set(Kokkos_ENABLE_DEBUG ${KOKKOS_DEBUG} CACHE STRING "Debug builds only" FORCE)
     set(Kokkos_ENABLE_DEBUG_BOUNDS_CHECK ${KOKKOS_DEBUG} CACHE STRING "Debug builds only" FORCE)
+    if(CMAKE_BUILD_TYPE MATCHES "^Debug" AND (${KOKKOS_TARGET} STREQUAL "CUDA"))
+      set(Kokkos_ENABLE_CUDA_CONSTEXPR ON CACHE STRING "Allow host constexpr code for CUDA" FORCE)
+    endif()
 
     FetchContent_Declare(
         Kokkos
@@ -288,38 +292,70 @@ if(BUILD_TESTING)
   find_package(CppUnit REQUIRED)
 endif()
 
+
+#
+# shared macros across targets
+#
+add_library(shared_defines INTERFACE)
+target_compile_definitions(shared_defines INTERFACE ${MD_SIM})
+target_compile_definitions(shared_defines INTERFACE KOKKOS_TARGET_${KOKKOS_TARGET})
+if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
+  target_compile_definitions(shared_defines INTERFACE MDDebug TarchDebug MDError)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_definitions(shared_defines INTERFACE MDError TarchDebug)
+elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
+  target_compile_definitions(shared_defines INTERFACE MDError TarchDebug)
+endif()
+if(BUILD_WITH_MPI)
+    target_compile_definitions(shared_defines INTERFACE MDParallel TarchParallel)
+endif()
+
 #
 # simplemd interface
 #
 add_library(simplemd_interface INTERFACE)
+target_link_libraries(simplemd_interface INTERFACE shared_defines)
 target_compile_definitions(simplemd_interface INTERFACE ${MDDim})
 target_compile_options(simplemd_interface INTERFACE -fpic)
-
-target_compile_definitions(simplemd_interface INTERFACE KOKKOS_TARGET_${KOKKOS_TARGET})
 if(NOT KOKKOS_TARGET STREQUAL "SERIAL")
   target_compile_options(simplemd_interface INTERFACE -fopenmp)
 endif()
 
+if(KOKKOS_TARGET STREQUAL "CUDA")
+    set(FLAG_OPT_DEBUG "-O0")
+else()
+    set(FLAG_OPT_DEBUG "-Og")
+endif()
+
 if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
-  target_compile_definitions(simplemd_interface INTERFACE MDDebug TarchDebug MDError)
-  target_compile_options(simplemd_interface INTERFACE -Og -g3)
+  target_compile_options(simplemd_interface INTERFACE ${FLAG_OPT_DEBUG} -g3)
+  if(KOKKOS_TARGET STREQUAL "CUDA")
+    target_compile_options(simplemd_interface INTERFACE --fmad=false)
+  endif()
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  target_compile_definitions(simplemd_interface INTERFACE MDError TarchDebug)
-  target_compile_options(simplemd_interface INTERFACE -Og -g3)
+  target_compile_options(simplemd_interface INTERFACE ${FLAG_OPT_DEBUG} -g3)
+  if(KOKKOS_TARGET STREQUAL "CUDA")
+    target_compile_options(simplemd_interface INTERFACE --fmad=false)
+  endif()
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
-  target_compile_definitions(simplemd_interface INTERFACE MDError TarchDebug)
   # Note: -fexpensive-optimizations breaks SimpleMDBench
   target_compile_options(simplemd_interface INTERFACE -O3 -fno-expensive-optimizations -g3)
+  if(KOKKOS_TARGET STREQUAL "CUDA")
+    target_compile_options(simplemd_interface INTERFACE --fmad=false)
+  endif()
 elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   target_compile_options(simplemd_interface INTERFACE -O3 -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-  target_compile_options(simplemd_interface INTERFACE -Ofast)
+  if(KOKKOS_TARGET STREQUAL "CUDA")
+    target_compile_options(simplemd_interface INTERFACE -O3)
+  else()
+    target_compile_options(simplemd_interface INTERFACE -Ofast)
+  endif()
 else()
   message(FATAL_ERROR "Unsupported build type")
 endif()
 
 if(BUILD_WITH_MPI)
-    target_compile_definitions(simplemd_interface INTERFACE MDParallel TarchParallel)
     target_link_libraries(simplemd_interface INTERFACE MPI::MPI_CXX)
 endif()
 target_link_libraries(simplemd_interface INTERFACE Kokkos::kokkos)
@@ -354,7 +390,6 @@ set(SIMPLE_MD_SOURCES
   "simplemd/BoundaryTreatment.cpp"
   "simplemd/MolecularDynamicsSimulation.cpp"
   "simplemd/ProfilePlotter.cpp"
-  "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
   "simplemd/cell-mappings/LennardJonesForceMapping.cpp"
   "simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.cpp"
   "simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.cpp"
@@ -370,12 +405,10 @@ set(SIMPLE_MD_SOURCES
   "simplemd/configurations/SimulationConfiguration.cpp"
   "simplemd/configurations/VTKConfiguration.cpp"
   "simplemd/configurations/DomainDecompConfiguration.cpp"
-  "simplemd/molecule-mappings/UpdateLinkedCellListsMapping.cpp"
   "simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
   "simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
   "simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
   "simplemd/services/ExternalForceService.cpp"
-  "simplemd/services/LinkedCellService.cpp"
   "simplemd/services/MolecularPropertiesService.cpp"
   "simplemd/services/MoleculeService.cpp"
   "simplemd/services/ParallelAndLocalBufferService.cpp"
@@ -383,6 +416,7 @@ set(SIMPLE_MD_SOURCES
   "tarch/tinyxml2/tinyxml2.cpp"
   "tarch/utils/RandomNumberService.cpp"
   "simplemd/configurations/Adios2Configuration.cpp"
+  "simplemd/MoleculeContainer.cpp"
 )
 if(BUILD_WITH_ADIOS2)
   list(APPEND SIMPLE_MD_SOURCES "simplemd/molecule-mappings/Adios2Writer.cpp")
@@ -390,6 +424,7 @@ endif()
 
 
 add_library(libsimplemd ${SIMPLE_MD_SOURCES})
+target_link_libraries(libsimplemd INTERFACE shared_defines)
 target_link_libraries(libsimplemd PRIVATE simplemd_interface)
 set_target_properties(libsimplemd PROPERTIES CXX_STANDARD 17)
 set_target_properties(libsimplemd PROPERTIES OUTPUT_NAME simplemd)
@@ -398,6 +433,7 @@ set_target_properties(libsimplemd PROPERTIES OUTPUT_NAME simplemd)
 # simplemd executable target
 #
 add_executable(simplemd ${SIMPLE_MD_SOURCES} "simplemd/main.cpp")
+target_link_libraries(simplemd INTERFACE shared_defines)
 target_link_libraries(simplemd PRIVATE simplemd_interface)
 set_target_properties(simplemd PROPERTIES CXX_STANDARD 17)
 set_target_properties(simplemd PROPERTIES OUTPUT_NAME simplemd)
@@ -406,6 +442,7 @@ set_target_properties(simplemd PROPERTIES OUTPUT_NAME simplemd)
 # multi-simplemd target
 #
 add_executable(multi-simplemd ${SIMPLE_MD_SOURCES} "simplemd/main_multi.cpp")
+target_link_libraries(multi-simplemd INTERFACE shared_defines)
 target_link_libraries(multi-simplemd PRIVATE simplemd_interface)
 set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 
@@ -413,12 +450,34 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 # MaMiCo interface
 #
 add_library(mamico INTERFACE)
-target_compile_definitions(mamico INTERFACE KOKKOS_TARGET_${KOKKOS_TARGET})
+target_link_libraries(mamico INTERFACE shared_defines)
 target_link_libraries(mamico INTERFACE Kokkos::kokkos)
+set(MAMICO_COMMIT_HASH "unknown")
+find_package(Git QUIET)
+if(GIT_FOUND)
+  execute_process(
+      COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+      OUTPUT_VARIABLE MAMICO_COMMIT_HASH
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  # Check for uncommitted changes
+  execute_process(
+      COMMAND ${GIT_EXECUTABLE} status --porcelain
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+      OUTPUT_VARIABLE GIT_STATUS
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  if(NOT "${GIT_STATUS}" STREQUAL "")
+      string(APPEND MAMICO_COMMIT_HASH "-dirty")
+  endif()
+endif()
+message(STATUS ">> MAMICO_COMMIT_HASH: " ${MAMICO_COMMIT_HASH})
+target_compile_definitions(mamico INTERFACE MAMICO_COMMIT_HASH=${MAMICO_COMMIT_HASH})
 if(BUILD_WITH_MPI)
-  option(USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
-  if(USE_COLLECTIVE_MPI)
-    target_compile_definitions(mamico INTERFACE USE_COLLECTIVE_MPI)
+  option(MAMICO_USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
+  if(MAMICO_USE_COLLECTIVE_MPI)
+    target_compile_definitions(mamico INTERFACE MAMICO_USE_COLLECTIVE_MPI)
   endif()
 endif()
 if(BUILD_WITH_EIGEN)
@@ -428,13 +487,13 @@ endif()
 if(BUILD_WITH_ADIOS2)
   target_compile_definitions(mamico INTERFACE BUILD_WITH_ADIOS2)
 endif()
-target_compile_definitions(mamico INTERFACE ${MD_SIM} MDDim3)
+target_compile_definitions(mamico INTERFACE MDDim3)
 target_compile_options(mamico INTERFACE -Wall -Wno-unknown-warning-option -Wno-unknown-pragmas -Wfatal-errors)
 if(NOT KOKKOS_TARGET STREQUAL "SERIAL")
   target_compile_options(mamico INTERFACE -fopenmp)
 endif()
 if(BUILD_WITH_MPI)
-  target_compile_definitions(mamico INTERFACE MDCoupledParallel TarchParallel MDParallel MPICH_IGNORE_CXX_SEEK)
+  target_compile_definitions(mamico INTERFACE MDCoupledParallel MPICH_IGNORE_CXX_SEEK)
   target_compile_options(mamico INTERFACE -Werror -Wno-int-in-bool-context)
   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
     target_compile_options(mamico INTERFACE -Wno-uninitialized)
@@ -520,20 +579,24 @@ if(ENABLE_COVERAGE)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "DebugMD")
-  target_compile_definitions(mamico INTERFACE MDCoupledDebug MDCoupledError TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE)
-  target_compile_options(mamico INTERFACE -Og -g3)
+  target_compile_definitions(mamico INTERFACE MDCoupledDebug MDCoupledError NLM_DEBUG DEBUG_FILTER_PIPELINE)
+  target_compile_options(mamico INTERFACE ${FLAG_OPT_DEBUG} -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
   if (NOT ENABLE_COVERAGE)
-    target_compile_definitions(mamico INTERFACE MDCoupledDebug MDCoupledError TarchDebug NLM_DEBUG DEBUG_FILTER_PIPELINE PINT_DEBUG)
+    target_compile_definitions(mamico INTERFACE MDCoupledDebug MDCoupledError NLM_DEBUG DEBUG_FILTER_PIPELINE PINT_DEBUG)
   endif()
-  target_compile_options(mamico INTERFACE -Og -g3)
+  target_compile_options(mamico INTERFACE ${FLAG_OPT_DEBUG} -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
   target_compile_definitions(mamico INTERFACE MDCoupledError)
   target_compile_options(mamico INTERFACE -O3 -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   target_compile_options(mamico INTERFACE -O3 -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-  target_compile_options(mamico INTERFACE -Ofast)
+  if(KOKKOS_TARGET STREQUAL "CUDA")
+    target_compile_options(mamico INTERFACE -O3)
+  else()
+    target_compile_options(mamico INTERFACE -Ofast)
+  endif()
 else()
   message(FATAL_ERROR "Unsupported build type")
 endif()
@@ -552,6 +615,7 @@ set(COUETTE_SOURCES
   "coupling/scenario/main_couette.cpp"
 )
 add_executable(couette ${COUETTE_SOURCES})
+target_link_libraries(couette INTERFACE shared_defines)
 set_target_properties(couette PROPERTIES CXX_STANDARD 17)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
   target_compile_options(couette PRIVATE -std=c++17)
@@ -569,6 +633,7 @@ if("${MD_SIM}" STREQUAL "LAMMPS_MD")
     "test/integration/main_lammps.cpp"
   )
   add_executable(test_lammps ${TEST_LAMMPS_SOURCES})
+  target_link_libraries(test_lammps INTERFACE shared_defines)
   set_target_properties(test_lammps PROPERTIES CXX_STANDARD 17)
   if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
     target_compile_options(test_lammps PRIVATE -std=c++17)
@@ -587,6 +652,7 @@ if(BUILD_WITH_PYBIND11)
   pybind11_add_module(mamico_pybind
     ${PYBIND_SOURCES11}
   )
+  target_link_libraries(mamico_pybind INTERFACE shared_defines)
   set_target_properties(mamico_pybind PROPERTIES OUTPUT_NAME mamico)
   target_compile_options(mamico_pybind PRIVATE -fPIC)
   set_target_properties(mamico_pybind PROPERTIES CXX_STANDARD 17)
@@ -596,298 +662,32 @@ endif()
 #
 # Clangformat target
 #
-set(CLANGFORMAT_SOURCES
-  "tarch/utils/Uncopyable.h"
-  "tarch/utils/MultiMDService.cpph"
-  "tarch/utils/RandomNumberService.h"
-  "tarch/utils/RandomNumberService.cpp"
-  "tarch/utils/MultiMDService.h"
-  "tarch/configuration/ParseConfiguration.h"
-  "tarch/configuration/Configuration.h"
-  "tarch/la/VectorOperations.cpph"
-  "tarch/la/Vector.h"
-  "tarch/la/ScalarOperations.h"
-  "tarch/la/Matrix.h"
-  "tarch/TarchDefinitions.h"
-  "coupling/services/MultiMDCellService.h"
-  "coupling/services/CouplingCellServiceDummy.h"
-  "coupling/services/CouplingCellService.cpph"
-  "coupling/services/CouplingCellTraversalWrappers.cpph"
-  "coupling/services/CouplingCellService.h"
-  "coupling/ErrorEstimation.h"
-  "coupling/ParticleInsertion.h"
-  "coupling/SetGivenVelocity4MomentumInsertion.h"
-  "coupling/MomentumController.h"
-  "coupling/filtering/FilterPipeline.cpph"
-  "coupling/filtering/FilterPipeline.h"
-  "coupling/filtering/SequentialFilter.h"
-  "coupling/filtering/sequencing/AsymmetricalFilterJunction.cpph"
-  "coupling/filtering/sequencing/FilterJunction.h"
-  "coupling/filtering/sequencing/FilterSequence.cpph"
-  "coupling/filtering/sequencing/FilterJunction.cpph"
-  "coupling/filtering/sequencing/FilterSequence.h"
-  "coupling/filtering/sequencing/AsymmetricalFilterJunction.h"
-  "coupling/filtering/SequentialFilter.cpph"
-  "coupling/filtering/interfaces/FilterInterfaceReadOnly.h"
-  "coupling/filtering/interfaces/FilterInterface.h"
-  "coupling/filtering/interfaces/AsymmetricalJunctorInterface.h"
-  "coupling/filtering/interfaces/JunctorInterface.h"
-  "coupling/filtering/filters/NLM.cpph"
-  "coupling/filtering/filters/POD.cpph"
-  "coupling/filtering/filters/Strouhal.h"
-  "coupling/filtering/filters/NLM.h"
-  "coupling/filtering/filters/Copy.h"
-  "coupling/filtering/filters/Gauss.h"
-  "coupling/filtering/filters/Constant.h"
-  "coupling/filtering/filters/ReadFromFile.cpph"
-  "coupling/filtering/filters/Gauss.cpph"
-  "coupling/filtering/filters/FilterFromFunction.h"
-  "coupling/filtering/filters/ReadFromFile.h"
-  "coupling/filtering/filters/WriteToFile.h"
-  "coupling/filtering/filters/Datastructures.h"
-  "coupling/filtering/filters/WriteToFileJunctor.h"
-  "coupling/filtering/filters/POD.h"
-  "coupling/filtering/filters/Strouhal.cpph"
-  "coupling/filtering/filters/WriteToFile.cpph"
-  "coupling/UsherParticleInsertion.h"
-  "coupling/NieVelocityImposition.h"
-  "coupling/MultiMDMediator.cpph"
-  "coupling/python-binding/mamico.cpp"
-  "coupling/python-binding/conversion.h"
-  "coupling/NoParticleInsertion.h"
-  "coupling/CouplingCellPlotter.h"
-  "coupling/NoMomentumInsertion.h"
-  "coupling/cell-mappings/ComputeKineticEnergyMapping.h"
-  "coupling/cell-mappings/MoleculeExtractor.h"
-  "coupling/cell-mappings/ComputeMomentumMapping.h"
-  "coupling/cell-mappings/VTKMoleculePlotter.h"
-  "coupling/cell-mappings/SetKineticEnergyMapping.h"
-  "coupling/cell-mappings/ComputeAvgForceAndVelocity.h"
-  "coupling/cell-mappings/SetMomentumMapping.h"
-  "coupling/cell-mappings/ComputeTemperatureMapping.h"
-  "coupling/cell-mappings/ComputeMeanPotentialEnergyMapping.h"
-  "coupling/cell-mappings/DeleteParticleMapping.h"
-  "coupling/cell-mappings/ComputeMassMapping.h"
-  "coupling/cell-mappings/VelocityGradientRelaxationMapping.h"
-  "coupling/cell-mappings/PerturbateVelocityMapping.h"
-  "coupling/cell-mappings/SetTemperatureMapping.h"
-  "coupling/cell-mappings/NieVelocityImpositionMapping.h"
-  "coupling/cell-mappings/ZhouBoundaryForce.h"
-  "coupling/ZhouBoundaryForceController.h"
-  "coupling/indexing/CellIndex.cpph"
-  "coupling/indexing/IndexingService.cpp"
-  "coupling/indexing/Operations.h"
-  "coupling/indexing/IndexingService.h"
-  "coupling/indexing/CellIndex.h"
-  "coupling/sendrecv/FromMacro2MDSendOnly.h"
-  "coupling/sendrecv/FromMD2MacroRecvOnly.h"
-  "coupling/sendrecv/FromMacro2MD.h"
-  "coupling/sendrecv/FromMD2MacroRecvOnly.cpph"
-  "coupling/sendrecv/SendReceiveBuffer.h"
-  "coupling/sendrecv/FromMacro2MDSendOnly.cpph"
-  "coupling/sendrecv/DataExchangeFromMD2Macro.h"
-  "coupling/sendrecv/FromMD2Macro.cpph"
-  "coupling/sendrecv/DataExchange.h"
-  "coupling/sendrecv/DataExchangeFromMacro2MD.h"
-  "coupling/sendrecv/SendReceiveBuffer.cpph"
-  "coupling/sendrecv/FromMacro2MD.cpph"
-  "coupling/sendrecv/FromMD2Macro.h"
-  "coupling/UsherParticleInsertion.cpph"
-  "coupling/NoBoundaryForce.h"
-  "coupling/CouplingMDDefinitions.h"
-  "coupling/AdditiveMomentumInsertion.h"
-  "coupling/transferstrategies/AveragingTransferStrategy.h"
-  "coupling/transferstrategies/TransferStrategy4NieCoupling.h"
-  "coupling/transferstrategies/TransferStrategy4SchwarzCoupling.h"
-  "coupling/transferstrategies/TransferStrategy4SchwarzCoupling.cpph"
-  "coupling/transferstrategies/TransferStrategy.h"
-  "coupling/transferstrategies/DifferenceTransferStrategy.h"
-  "coupling/transferstrategies/TransferStrategy4NieCoupling.cpph"
-  "coupling/transferstrategies/DirectTransferStrategy.h"
-  "coupling/paralleltopology/ParallelTopology.h"
-  "coupling/paralleltopology/ZYXTopology.h"
-  "coupling/paralleltopology/XYZTopology.h"
-  "coupling/paralleltopology/ParallelTopologyFactory.h"
-  "coupling/datastructures/CellContainer.h"
-  "coupling/datastructures/FlexibleCellContainer.h"
-  "coupling/datastructures/CouplingCell.h"
-  "coupling/datastructures/Molecule.h"
-  "coupling/MultiMDMediator.h"
-  "coupling/configurations/ParticleInsertionConfiguration.h"
-  "coupling/configurations/TransferStrategyConfiguration.h"
-  "coupling/configurations/BoundaryForceConfiguration.h"
-  "coupling/configurations/CouetteConfiguration.h"
-  "coupling/configurations/MaMiCoConfiguration.cpph"
-  "coupling/configurations/MomentumInsertionConfiguration.h"
-  "coupling/configurations/ParallelTopologyConfiguration.h"
-  "coupling/configurations/CouplingCellConfiguration.h"
-  "coupling/configurations/ParticleInsertionConfiguration.cpp"
-  "coupling/configurations/CouplingCellConfiguration.cpph"
-  "coupling/configurations/MaMiCoConfiguration.h"
-  "coupling/configurations/ThermostatConfiguration.h"
-  "coupling/configurations/TimeIntegrationConfiguration.h"
-  "coupling/VelocityGradientRelaxation.h"
-  "coupling/BoundaryForceController.h"
-  "coupling/interface/MDSimulationFactory.h"
-  "coupling/interface/MoleculeIterator.h"
-  "coupling/interface/MacroscopicSolverInterface.h"
-  "coupling/interface/impl/SimpleMD/SimpleMDMoleculeIterator.h"
-  "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
-  "coupling/interface/impl/SimpleMD/SimpleMDMolecule.h"
-  "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
-  "coupling/interface/impl/ls1/LS1MoleculeIterator.h"
-  "coupling/interface/impl/ls1/LS1StaticCommData.h"
-  "coupling/interface/impl/ls1/LS1Molecule.h"
-  "coupling/interface/impl/ls1/LS1RegionWrapper.h"
-  "coupling/interface/impl/macroscopictestsolvers/TestMacroscopicSolverInterface.h"
-  "coupling/interface/impl/macroscopictestsolvers/TestMacroscopicSolver.h"
-  "coupling/interface/impl/macroscopictestsolvers/MacroscopicSolverFactory.h"
-  "coupling/interface/impl/macroscopictestsolvers/VoidMacroscopicSolverInterface.h"
-  "coupling/interface/impl/macroscopictestsolvers/Helper.h"
-  "coupling/interface/impl/macroscopictestsolvers/UniformFlowSolverInterface.h"
-  "coupling/interface/impl/macroscopictestsolvers/VoidMacroscopicSolver.h"
-  "coupling/interface/MamicoInterfaceProvider.h"
-  "coupling/interface/Molecule.h"
-  "coupling/interface/MDSolverInterface.h"
-  "coupling/interface/PintableMacroSolver.h"
-  "coupling/KineticEnergyController.h"
-  "coupling/solvers/FDCouetteSolver.h"
-  "coupling/solvers/IcoFoamInterface.h"
-  "coupling/solvers/LBCouetteSolver.h"
-  "coupling/solvers/CouetteSolver.h"
-  "coupling/solvers/CouetteSolverInterface.h"
-  "coupling/solvers/LBCouetteSolverState.cpp"
-  "coupling/solvers/LBCouetteSolverInterface.h"
-  "coupling/solvers/NumericalSolver.h"
-  "test/integration/TestEspressoMDMolecule.h"
-  "test/integration/Test.h"
-  "test/integration/TestEspressoAddDeleteMolecule.h"
-  "test/integration/main_lbcouettesolver.cpp"
-  "test/integration/TestLammpsCalculateForceEnergy.h"
-  "test/integration/TestEspressoMDSolverInterface.h"
-  "test/integration/main_lammps.cpp"
-  "test/integration/TestLammpsMoleculeIterator.h"
-  "test/integration/TestMarDynMolecule.h"
-  "test/integration/TestLammpsAddDeleteAtom.h"
-  "test/integration/main_mardyn.cpp"
-  "test/integration/TestEspressoForceEnergyCalculation.h"
-  "test/integration/TestLammps.h"
-  "test/integration/TestLammpsInitialVelocity.h"
-  "test/integration/TestLBCouetteSolver.h"
-  "test/integration/benchmarks.cpp"
-  "test/integration/CellIdxIterBench.h"
-  "test/integration/SimpleMDBench.h"
-  "test/integration/main_espresso.cpp"
-  "test/integration/TestEspresso.h"
-  "test/integration/TestMarDyn.h"
-  "test/integration/TestLammpsGhost.h"
-  "test/integration/TestMarDynAddDeleteMolecule.h"
-  "test/integration/TestEspressoMoleculeIterator.h"
-  "test/integration/TestMarDynMoleculeIterator.h"
-  "test/unit/coupling/solvers/LBCouetteSolverStateTest.cpp"
-  "test/unit/coupling/solvers/PintableLBCouetteSolverTest.cpp"
-  "test/unit/getTestNames.cpp"
-  "test/unit/coupling/InstanceHandlingTest.cpp"
-  "test/unit/coupling/indexing/OperationsTest.cpp"
-  "test/unit/coupling/indexing/CellIndexTest.cpp"
-  "test/unit/coupling/indexing/IndexingServiceTest.cpp"
-  "test/unit/coupling/interface/impl/SimpleMD/SimpleMDMoleculeTest.cpp"
-  "test/unit/coupling/interface/impl/ls1/LS1MDSolverInterfaceTest.cpp"
-  "test/unit/coupling/interface/impl/ls1/LS1MoleculeIteratorTest.cpp"
-  "test/unit/coupling/interface/impl/ls1/LS1MoleculeTest.cpp"
-  "test/unit/coupling/interface/impl/ls1/LS1RegionWrapperTest.cpp"
-  "test/unit/coupling/interface/impl/ls1/LS1StaticCommDataTest.cpp"
-  "test/unit/coupling/datastructures/LinkedCellContainerTest.cpp"
-  "test/unit/coupling/datastructures/FlexibleCellContainerTest.cpp"
-  "test/unit/coupling/datastructures/CellContainerTest.cpp"
-  "coupling/scenario/CouetteScenario.h"
-  "coupling/scenario/main_couette.cpp"
-  "coupling/scenario/Scenario.h"
-  "coupling/InstanceHandling.h"
-  "coupling/MomentumInsertion.h"
-  "simplemd/services/ExternalForceService.cpp"
-  "simplemd/services/LinkedCellService.h"
-  "simplemd/services/ExternalForceService.h"
-  "simplemd/services/MoleculeService.h"
-  "simplemd/services/ParallelTopologyService.cpp"
-  "simplemd/services/MolecularPropertiesService.h"
-  "simplemd/services/LinkedCellService.cpp"
-  "simplemd/services/MolecularPropertiesService.cpp"
-  "simplemd/services/ParallelTopologyService.h"
-  "simplemd/services/ParallelAndLocalBufferService.cpp"
-  "simplemd/services/ParallelAndLocalBufferService.h"
-  "simplemd/services/MoleculeService.cpp"
-  "simplemd/MolecularDynamicsDefinitions.h"
-  "simplemd/ProfilePlotter.cpp"
-  "simplemd/MolecularDynamicsSimulation.cpp"
-  "simplemd/BoundaryTreatment.cpp"
-  "simplemd/cell-mappings/ResetPotentialEnergyMapping.h"
-  "simplemd/cell-mappings/ParallelBoundaryEmptyCellsMapping.h"
-  "simplemd/cell-mappings/RDFMapping.h"
-  "simplemd/cell-mappings/CollectMoleculesMapping.h"
-  "simplemd/cell-mappings/LennardJonesForceMapping.cpp"
-  "simplemd/cell-mappings/ProfilePlotterMapping.h"
-  "simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.cpp"
-  "simplemd/cell-mappings/ComputeTemperatureMapping.h"
-  "simplemd/cell-mappings/ComputeMeanVelocityMapping.h"
-  "simplemd/cell-mappings/CopyMoleculesMapping.h"
-  "simplemd/cell-mappings/VaryCheckpointMapping.h"
-  "simplemd/cell-mappings/EmptyLinkedListsMapping.h"
-  "simplemd/cell-mappings/DeleteMoleculesMapping.cpp"
-  "simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.h"
-  "simplemd/cell-mappings/LennardJonesForceMapping.h"
-  "simplemd/cell-mappings/RDFMapping.cpp"
-  "simplemd/cell-mappings/DeleteMoleculesMapping.h"
-  "simplemd/cell-mappings/LennardJonesPotentialEnergyMapping.h"
-  "simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.cpp"
-  "simplemd/cell-mappings/PeriodicBoundaryEmptyCellsMapping.cpp"
-  "simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.h"
-  "simplemd/MolecularDynamicsSimulation.h"
-  "simplemd/MolecularProperties.h"
-  "simplemd/molecule-mappings/InitialPositionAndForceUpdate.h"
-  "simplemd/molecule-mappings/SetMeanVelocityMapping.h"
-  "simplemd/molecule-mappings/VTKMoleculeWriter.h"
-  "simplemd/molecule-mappings/VelocityStoermerVerletMapping.h"
-  "simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
-  "simplemd/molecule-mappings/UpdateLinkedCellListsMapping.cpp"
-  "simplemd/molecule-mappings/ComputeMeanVelocityMapping.h"
-  "simplemd/molecule-mappings/UpdateLinkedCellListsMapping.h"
-  "simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
-  "simplemd/molecule-mappings/WriteCheckPointMapping.h"
-  "simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
-  "simplemd/molecule-mappings/Adios2Writer.cpp"
-  "simplemd/molecule-mappings/Adios2Writer.h"
-  "simplemd/BoundaryTreatment.h"
-  "simplemd/LinkedCell.h"
-  "simplemd/main_multi.cpp"
-  "simplemd/configurations/CheckpointConfiguration.h"
-  "simplemd/configurations/MoleculeConfiguration.h"
-  "simplemd/configurations/MolecularDynamicsConfiguration.cpp"
-  "simplemd/configurations/MolecularDynamicsConfiguration.h"
-  "simplemd/configurations/DomainConfiguration.h"
-  "simplemd/configurations/MoleculeConfiguration.cpp"
-  "simplemd/configurations/SimulationConfiguration.h"
-  "simplemd/configurations/DomainConfiguration.cpp"
-  "simplemd/configurations/VTKConfiguration.h"
-  "simplemd/configurations/ProfilePlotterConfiguration.cpp"
-  "simplemd/configurations/RDFConfiguration.cpp"
-  "simplemd/configurations/ProfilePlotterConfiguration.h"
-  "simplemd/configurations/MPIConfiguration.cpp"
-  "simplemd/configurations/ExternalForceConfiguration.h"
-  "simplemd/configurations/SimulationConfiguration.cpp"
-  "simplemd/configurations/MPIConfiguration.h"
-  "simplemd/configurations/ExternalForceConfiguration.cpp"
-  "simplemd/configurations/RDFConfiguration.h"
-  "simplemd/configurations/VTKConfiguration.cpp"
-  "simplemd/configurations/Adios2Configuration.cpp"
-  "simplemd/configurations/Adios2Configuration.h"
-  "simplemd/configurations/DomainDecompConfiguration.cpp"
-  "simplemd/configurations/DomainDecompConfiguration.h"
-  "simplemd/main.cpp"
-  "simplemd/Molecule.h"
-  "simplemd/ProfilePlotter.h"
-  "simplemd/MolecularDynamicsUserInput.h"
+set(CLANGFORMAT_DIRS
+  coupling
+  simplemd
+  tarch
+  test
 )
+set(CLANGFORMAT_EXTS
+  *.c
+  *.h
+  *.hpp
+  *.cpp
+  *.cxx
+  *.cpph
+)
+set(CLANGFORMAT_SOURCES)
+foreach(dir IN LISTS CLANGFORMAT_DIRS)
+  foreach(ext IN LISTS CLANGFORMAT_EXTS)
+    file(GLOB_RECURSE _tmp
+      CONFIGURE_DEPENDS
+      FOLLOW_SYMLINKS
+      "${CMAKE_SOURCE_DIR}/${dir}/${ext}"
+    )
+    list(APPEND CLANGFORMAT_SOURCES ${_tmp})
+  endforeach()
+endforeach()
+list(REMOVE_DUPLICATES CLANGFORMAT_SOURCES)
 foreach(clangformat_source ${CLANGFORMAT_SOURCES})
   get_filename_component(clangformat_source ${clangformat_source} ABSOLUTE)
   list(APPEND CLANGFORMAT_SOURCES_ABS ${clangformat_source})
@@ -936,6 +736,7 @@ set(BENCHMARKS_SOURCES
   "test/integration/benchmarks.cpp"
 )
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
+target_link_libraries(benchmarks INTERFACE shared_defines)
 set_target_properties(benchmarks PROPERTIES CXX_STANDARD 17)
 target_link_libraries(benchmarks PRIVATE mamico)
 target_compile_definitions(benchmarks PRIVATE TarchDebug)
@@ -993,6 +794,7 @@ if (BUILD_TESTING)
       "test/unit/getTestNames.cpp"
       ${TEST_SOURCES}
     )
+    target_link_libraries(getTestNames INTERFACE shared_defines)
     set_target_properties(getTestNames PROPERTIES CXX_STANDARD 17)
     target_link_libraries(getTestNames PRIVATE mamico)
     target_include_directories(getTestNames PRIVATE ${CPPUNIT_INCLUDE_DIRS})
@@ -1007,8 +809,9 @@ if (BUILD_TESTING)
     "test/unit/main.cpp"
     ${TEST_SOURCES}
   )
+  target_link_libraries(testmamico INTERFACE shared_defines)
   set_target_properties(testmamico PROPERTIES CXX_STANDARD 17)
-  target_compile_definitions(testmamico PRIVATE MDCoupledError)
+  target_compile_definitions(testmamico PRIVATE MDCoupledError MDError)
   target_link_libraries(testmamico PRIVATE mamico)
   target_include_directories(testmamico PRIVATE ${CPPUNIT_INCLUDE_DIRS})
   target_link_directories(testmamico PRIVATE ${CPPUNIT_LIBRARY})

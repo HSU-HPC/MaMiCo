@@ -5,8 +5,6 @@
 #ifndef _MOLECULARDYNAMICS_CELLMAPPINGS_PARALLELBOUNDARYEMPTYCELLSMAPPING_H_
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_PARALLELBOUNDARYEMPTYCELLSMAPPING_H_
 
-#include "simplemd/services/LinkedCellService.h"
-#include "simplemd/services/MoleculeService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 
 namespace simplemd {
@@ -22,29 +20,24 @@ class ParallelBoundaryEmptyCellsMapping;
  */
 class simplemd::cellmappings::ParallelBoundaryEmptyCellsMapping {
 public:
-  ParallelBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
-                                    const simplemd::services::LinkedCellService& linkedCellService)
-      : _parallelTopologyService(parallelTopologyService), _moleculeService(moleculeService), _linkedCellService(linkedCellService) {}
+  ParallelBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::MoleculeContainer& moleculeContainer)
+      : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer) {}
   ~ParallelBoundaryEmptyCellsMapping() {}
 
   void beginCellIteration() {}
   void endCellIteration() {}
 
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     // send molecules from this cell first...
-    if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cellIndex, _linkedCellService)) {
+    if (_parallelTopologyService.reduceGhostCellViaBuffer(cell, cell.getIndex(), _moleculeContainer)) {
       // ... and erase them afterwards
-      for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
-        _moleculeService.deleteMolecule(*(*it));
-      }
-      cell.getList().clear();
+      cell.clear();
     }
   }
   static const bool IsParallel = false;
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  simplemd::services::MoleculeService& _moleculeService;
-  const simplemd::services::LinkedCellService& _linkedCellService;
+  const simplemd::MoleculeContainer& _moleculeContainer;
 };
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_PARALLELBOUNDARYEMPTYCELLSMAPPING_H_

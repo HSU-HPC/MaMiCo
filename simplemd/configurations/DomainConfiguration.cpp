@@ -13,6 +13,7 @@ const std::string simplemd::configurations::DomainConfiguration::DOMAIN_OFFSET("
 const std::string simplemd::configurations::DomainConfiguration::CUTOFF_RADIUS("cutoff-radius");
 const std::string simplemd::configurations::DomainConfiguration::LINKED_CELL_SIZE("linked-cell-size");
 const std::string simplemd::configurations::DomainConfiguration::K_B("k_B");
+const std::string simplemd::configurations::DomainConfiguration::CAPACITY_FACTOR("capacity-factor");
 const std::string simplemd::configurations::DomainConfiguration::BLOCK_SIZE("block-size");
 const std::string simplemd::configurations::DomainConfiguration::BOUNDARY[MD_LINKED_CELL_NEIGHBOURS]
 #if (MD_DIM == 1)
@@ -59,7 +60,7 @@ const std::string simplemd::configurations::DomainConfiguration::INIT_FROM_SEQUE
 const std::string simplemd::configurations::DomainConfiguration::LINKED_CELLS_PER_NUMBER_DENSITY_EVALUATION("linked-cells-per-number-density-evaluation");
 
 simplemd::configurations::DomainConfiguration::DomainConfiguration()
-    : _moleculesPerDirection(0), _domainSize(0.0), _domainOffset(0.0), _cutoffRadius(0.0), _meshWidth(0.0), _kB(0.0), _blockSize(0),
+    : _moleculesPerDirection(0), _domainSize(0.0), _domainOffset(0.0), _cutoffRadius(0.0), _meshWidth(0.0), _kB(0.0), _capacityFactor(3.0), _blockSize(0),
       _boundary(simplemd::PERIODIC_BOUNDARY), _checkpointFilestem(""), _initFromCheckpoint(false), _initFromSequentialCheckpoint(false), _isValid(true) {}
 
 void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLElement* node) {
@@ -142,6 +143,13 @@ void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLEle
     exit(EXIT_FAILURE);
   }
 
+  tarch::configuration::ParseConfiguration::readDoubleOptional(_capacityFactor, node, CAPACITY_FACTOR);
+  if (_capacityFactor <= 1.0) {
+    std::cout << CAPACITY_FACTOR << " is less than one! Capacity of a linked cell would be less than the average number of molecules per cell!" << std::endl;
+    _isValid = false;
+    exit(EXIT_FAILURE);
+  }
+
   // read block size
   tarch::configuration::ParseConfiguration::readIntMandatory(intBuf, node, BLOCK_SIZE);
   if (intBuf <= 0) {
@@ -190,6 +198,7 @@ void simplemd::configurations::DomainConfiguration::parseSubtag(tinyxml2::XMLEle
   std::cout << "Cutoff radius:                  " << _cutoffRadius << std::endl;
   std::cout << "Linked-cell size:               " << _meshWidth << std::endl;
   std::cout << "K_B:                            " << _kB << std::endl;
+  std::cout << "Capacity factor:                " << _capacityFactor << std::endl;
   std::cout << "Boundary:                       " << _boundary << std::endl;
   std::cout << "Blocksize:                      " << _blockSize << std::endl;
 #endif

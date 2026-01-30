@@ -4,9 +4,6 @@
 // www5.in.tum.de/mamico
 #include "simplemd/services/ParallelTopologyService.h"
 
-#include "simplemd/services/LinkedCellService.h"
-#include "simplemd/services/MoleculeService.h"
-
 simplemd::services::ParallelTopologyService::ParallelTopologyService(const tarch::la::Vector<MD_DIM, double>& domainSize,
                                                                      const tarch::la::Vector<MD_DIM, double>& domainOffset,
                                                                      const tarch::la::Vector<MD_DIM, double>& meshWidth,
@@ -18,7 +15,9 @@ simplemd::services::ParallelTopologyService::ParallelTopologyService(const tarch
 #endif
                                                                      )
     : _domainSize(domainSize), _domainOffset(domainOffset), _meshWidth(computeMeshwidth(meshWidth, numberProcesses, domainSize)),
-      _numberProcesses(numberProcesses), _localNumberOfCells(computeNumberOfCells(meshWidth, numberProcesses, domainSize)),
+      _localIndexOfFirstCell(_ghostCellLayerThickness), _numberProcesses(numberProcesses),
+      _localNumberOfCells(computeNumberOfCells(meshWidth, numberProcesses, domainSize)),
+      _localNumberOfCellsWithGhostCells(_localNumberOfCells + tarch::la::Vector<MD_DIM, unsigned int>(2 * _ghostCellLayerThickness)),
       _globalNumberOfCells(computeGlobalNumberOfCells(meshWidth, numberProcesses, domainSize))
 #if (MD_PARALLEL == MD_YES)
       ,
@@ -146,14 +145,14 @@ bool simplemd::services::ParallelTopologyService::isIdle() const {
 }
 
 std::vector<tarch::la::Vector<MD_DIM, unsigned int>>
-simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
-                                                                         const simplemd::services::LinkedCellService& linkedCellService) {
+simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedCell& cell, const size_t cellIndex,
+                                                                         const simplemd::MoleculeContainer& moleculeContainer) {
 
   std::vector<tarch::la::Vector<MD_DIM, unsigned int>> localIndex;
 
   // determine cell index in vector form
   tarch::la::Vector<MD_DIM, int> cellCoords(0);
-  tarch::la::Vector<MD_DIM, unsigned int> size(linkedCellService.getLocalNumberOfCells() + 2u * linkedCellService.getLocalIndexOfFirstCell());
+  tarch::la::Vector<MD_DIM, unsigned int> size(moleculeContainer.getLocalNumberOfCells() + 2u * moleculeContainer.getLocalIndexOfFirstCell());
   tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, tarch::la::Vector<MD_DIM, int>> neighbours(0);
   int help = (int)cellIndex;
 
@@ -269,9 +268,9 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
               std::cout << "Pack " << cell.getList().size() << " molecules in buffer " << bufferIndex << std::endl;
 #endif
               // push molecules into buffer
-              for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
+              for (auto it = cell.begin(); it != cell.end(); it++) {
                 // for periodic boundaries: adapt position vector
-                tarch::la::Vector<MD_DIM, double> position((*it)->getConstPosition());
+                tarch::la::Vector<MD_DIM, double> position(it->getConstPosition());
                 adaptPositionForPeriodicBoundaries(position, _boundary[help], x
 #if (MD_DIM > 1)
                                                    ,
@@ -284,10 +283,10 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
                 );
 
 #if (MD_DEBUG == MD_YES)
-                std::cout << "Send molecule at position " << position << ", velocity " << (*it)->getVelocity() << std::endl;
+                std::cout << "Send molecule at position " << position << ", velocity " << it->getVelocity() << std::endl;
 #endif
                 // set correct position and push molecule
-                pushMoleculeToSendBuffer(bufferIndex, *it, position);
+                pushMoleculeToSendBuffer(bufferIndex, it.operator->(), position);
               }
 #else
           std::cout << "ERROR simplemd::services::ParallelTopologyService::broadcastInnerCell: There is no MPI support";
@@ -297,12 +296,12 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
               // if this cell is a ghost cell and periodic boundary condition needs to be handled locally:
             } else if (neighbourRank == _rank && isInBoundary == true) {
 #if (MD_DEBUG == MD_YES)
-              std::cout << "Pack " << cell.getList().size() << " molecules in local buffer " << std::endl;
+              Kokkos::printf("Pack %u molecules in local buffer\n", cell.numMolecules());
 #endif
               // push molecules into buffer
-              for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
+              for (auto it = cell.begin(); it != cell.end(); it++) {
                 // for periodic boundaries: adapt position vector
-                tarch::la::Vector<MD_DIM, double> position((*it)->getConstPosition());
+                tarch::la::Vector<MD_DIM, double> position(it->getConstPosition());
                 adaptPositionForPeriodicBoundaries(position, _boundary[help], x
 #if (MD_DIM > 1)
                                                    ,
@@ -315,11 +314,11 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
                 );
 
 #if (MD_DEBUG == MD_YES)
-                std::cout << "Put molecule at position " << position << ", velocity " << (*it)->getVelocity() << ", forceOld" << (*it)->getForceOld()
+                std::cout << "Put molecule at position " << position << ", velocity " << it->getVelocity() << ", forceOld" << it->getForceOld()
                           << " in local buffer" << std::endl;
 #endif
                 // set correct position and push molecule
-                pushMoleculeToLocalBuffer(*it, position);
+                pushMoleculeToLocalBuffer(it.operator->(), position);
               }
               // if this boundary is located on the same process:
             } else {
@@ -355,21 +354,21 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
   return localIndex;
 }
 
-bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
-                                                                           const simplemd::services::LinkedCellService& linkedCellService) {
+bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(LinkedCell& cell, const size_t cellIndex,
+                                                                           const simplemd::MoleculeContainer& moleculeContainer) {
 #if (MD_PARALLEL == MD_YES)
   // determine neighbour rank (from position of the respective ghost cell cellIndex)
   int cellCoords = 0;
-  unsigned int help = cellIndex;
+  auto help = cellIndex;
   int neighbourRank = 0;
 #if (MD_DIM > 2)
-  cellCoords = help / ((linkedCellService.getLocalNumberOfCells()[1] + 2 * linkedCellService.getLocalIndexOfFirstCell()[1]) *
-                       (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]));
-  help = help - ((unsigned int)cellCoords) * ((linkedCellService.getLocalNumberOfCells()[1] + 2 * linkedCellService.getLocalIndexOfFirstCell()[1]) *
-                                              (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]));
+  cellCoords = help / ((moleculeContainer.getLocalNumberOfCells()[1] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[1]) *
+                       (moleculeContainer.getLocalNumberOfCells()[0] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[0]));
+  help = help - ((unsigned int)cellCoords) * ((moleculeContainer.getLocalNumberOfCells()[1] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[1]) *
+                                              (moleculeContainer.getLocalNumberOfCells()[0] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[0]));
   if (cellCoords == 0) {
     cellCoords = -1;
-  } else if (cellCoords == (int)(linkedCellService.getLocalNumberOfCells()[2] + 2 * linkedCellService.getLocalIndexOfFirstCell()[2] - 1)) {
+  } else if (cellCoords == (int)(moleculeContainer.getLocalNumberOfCells()[2] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[2] - 1)) {
     cellCoords = 1;
   } else {
     cellCoords = 0;
@@ -382,11 +381,11 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
   neighbourRank += cellCoords * _numberProcesses[0] * _numberProcesses[1];
 #endif
 #if (MD_DIM > 1)
-  cellCoords = help / (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]);
-  help = help - cellCoords * (linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0]);
+  cellCoords = help / (moleculeContainer.getLocalNumberOfCells()[0] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[0]);
+  help = help - cellCoords * (moleculeContainer.getLocalNumberOfCells()[0] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[0]);
   if (cellCoords == 0) {
     cellCoords = -1;
-  } else if (cellCoords == (int)(linkedCellService.getLocalNumberOfCells()[1] + 2 * linkedCellService.getLocalIndexOfFirstCell()[1] - 1)) {
+  } else if (cellCoords == (int)(moleculeContainer.getLocalNumberOfCells()[1] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[1] - 1)) {
     cellCoords = 1;
   } else {
     cellCoords = 0;
@@ -397,7 +396,7 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
   cellCoords = help;
   if (cellCoords == 0) {
     cellCoords = -1;
-  } else if (cellCoords == (int)(linkedCellService.getLocalNumberOfCells()[0] + 2 * linkedCellService.getLocalIndexOfFirstCell()[0] - 1)) {
+  } else if (cellCoords == (int)(moleculeContainer.getLocalNumberOfCells()[0] + 2 * moleculeContainer.getLocalIndexOfFirstCell()[0] - 1)) {
     cellCoords = 1;
   } else {
     cellCoords = 0;
@@ -415,11 +414,11 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
 
     // determine appropriate buffer index
     int bufferIndex = getCurrentBufferIndexFromNeighbourRank(neighbourRank);
-    for (std::list<Molecule*>::iterator it = cell.begin(); it != cell.end(); it++) {
+    for (auto it = cell.begin(); it != cell.end(); it++) {
 #if (MD_DEBUG == MD_YES)
-      std::cout << "Reduce molecule at position " << (*it)->getConstPosition() << ", velocity " << (*it)->getConstVelocity() << std::endl;
+      std::cout << "Reduce molecule at position " << it->getConstPosition() << ", velocity " << it->getConstVelocity() << std::endl;
 #endif
-      pushMoleculeToSendBuffer(bufferIndex, *it, (*it)->getConstPosition());
+      pushMoleculeToSendBuffer(bufferIndex, it.operator->(), it->getConstPosition());
     }
     return true;
   } else {
@@ -430,9 +429,8 @@ bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(Linke
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::unpackLocalBuffer(simplemd::services::MoleculeService& moleculeService,
-                                                                    simplemd::services::LinkedCellService& linkedCellService) {
-  unpackBuffer(_bufferService.getLocalBuffer(), moleculeService, linkedCellService);
+void simplemd::services::ParallelTopologyService::unpackLocalBuffer(simplemd::MoleculeContainer& moleculeContainer) {
+  unpackBuffer(_bufferService.getLocalBuffer(), moleculeContainer);
 }
 
 void simplemd::services::ParallelTopologyService::communicationSteps_1_2() {
@@ -449,8 +447,7 @@ void simplemd::services::ParallelTopologyService::communicationSteps_1_2() {
 #endif
 }
 
-void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplemd::services::MoleculeService& moleculeService,
-                                                                         simplemd::services::LinkedCellService& linkedCellService) {
+void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplemd::MoleculeContainer& moleculeContainer) {
 #if (MD_PARALLEL == MD_YES)
   // Steps 3 and 4 together:
 
@@ -528,7 +525,7 @@ void simplemd::services::ParallelTopologyService::communicationSteps_3_4(simplem
 
   // now unpack all buffers in a fixed order:
   for (i_buf = 0; i_buf < _numUniqueNeighbours; i_buf++) {
-    unpackBuffer(_bufferService.getReceiveBuffer(i_buf), moleculeService, linkedCellService);
+    unpackBuffer(_bufferService.getReceiveBuffer(i_buf), moleculeContainer);
   }
 
 #endif
@@ -1096,8 +1093,7 @@ unsigned int simplemd::services::ParallelTopologyService::getCurrentBufferIndexF
 }
 
 void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf,
-                                                               simplemd::services::MoleculeService& moleculeService,
-                                                               simplemd::services::LinkedCellService& linkedCellService) {
+                                                               simplemd::MoleculeContainer& moleculeContainer) {
   tarch::la::Vector<MD_DIM, double> position(0.0);
   tarch::la::Vector<MD_DIM, double> velocity(0.0);
   tarch::la::Vector<MD_DIM, double> forceOld(0.0);
@@ -1143,7 +1139,7 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalB
     for (unsigned int d = 0; d < MD_DIM; d++) {
       int cell = (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d]));
       cell -= (int)(_processCoordinates[d] * _localNumberOfCells[d]);
-      cell += (int)linkedCellService.getLocalIndexOfFirstCell()[d];
+      cell += (int)moleculeContainer.getLocalIndexOfFirstCell()[d];
 #if (MD_ERROR == MD_YES)
       if (cell < 0) {
         std::cout << "ERROR simplemd::services::ParallelTopologyService::unpackBuffer:";
@@ -1156,17 +1152,15 @@ void simplemd::services::ParallelTopologyService::unpackBuffer(ParallelAndLocalB
       cellIndex[d] = (unsigned int)cell;
     }
 
-    // add molecule to MoleculeService and LinkedCellService
+    // add molecule to MoleculeContainer
     Molecule myMolecule(position, velocity);
     myMolecule.setForceOld(forceOld);
     if (isFixed)
       myMolecule.fix();
-
-    Molecule* mPtr = moleculeService.addMolecule(myMolecule);
 #if (MD_DEBUG == MD_YES)
     std::cout << "Rank " << _rank << ": unpacked molecule from buffer into cell " << cellIndex << std::endl;
 #endif
-    linkedCellService.addMoleculeToLinkedCell(*mPtr, cellIndex);
+    moleculeContainer.insert(cellIndex, myMolecule);
   }
 
   // clear the buffer

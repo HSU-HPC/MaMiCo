@@ -7,6 +7,7 @@
 
 #include "simplemd/LinkedCell.h"
 #include "simplemd/services/MolecularPropertiesService.h"
+#include <Kokkos_Core.hpp>
 
 namespace simplemd {
 namespace cellmappings {
@@ -25,8 +26,8 @@ public:
   void beginCellIteration();
 
   void endCellIteration() {}
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) const;
-  void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) const;
+  KOKKOS_FUNCTION void handleCell(LinkedCell& cell) const;
+  KOKKOS_FUNCTION void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) const;
 
   static const bool IsParallel = true;
 

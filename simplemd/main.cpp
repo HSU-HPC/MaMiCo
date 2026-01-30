@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
   tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",
                                                                                                                          configuration);
   if (!configuration.isValid()) {
-    std::cout << "Unvalid configuration!" << std::endl;
+    std::cout << "Invalid configuration!" << std::endl;
     return -1;
   }
 

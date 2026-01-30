@@ -27,6 +27,8 @@ int main(int argc, char* argv[]) {
               << std::endl;
     MainExecSpace().print_configuration(std::cout);
 
+    std::cout << "Available concurrency: " << MainExecSpace::concurrency() << std::endl;
+
     // run tests
     runTest(new CellIdxIterBench());
     std::cout << std::endl << "==================== ==================== ====================" << std::endl << std::endl;

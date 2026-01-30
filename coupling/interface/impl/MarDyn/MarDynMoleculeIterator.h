@@ -21,11 +21,9 @@ public:
    * 	the MarDynMolecule '_mdMolecule' to NULL (prevents memory leaks in
    * get-methods)
    */
-  MarDynMoleculeIterator(MarDynCell &cell) : coupling::interface::MoleculeIterator<MarDynCell, 3>(cell), _cutoffRadius(cell.getCutoffRadius()) {
-  }
+  MarDynMoleculeIterator(MarDynCell& cell) : coupling::interface::MoleculeIterator<MarDynCell, 3>(cell), _cutoffRadius(cell.getCutoffRadius()) {}
 
-  virtual ~MarDynMoleculeIterator() {
-  }
+  virtual ~MarDynMoleculeIterator() {}
 
   /* sets iterator to the first element of the cell */
   virtual void begin() { coupling::interface::MoleculeIterator<MarDynCell, 3>::_cell.begin(); }
@@ -38,7 +36,7 @@ public:
 
   /* returns a reference to the molecule that the iterator currently points to
    */
-  virtual coupling::interface::Molecule<3> &get() {
+  virtual coupling::interface::Molecule<3>& get() {
     // set the mardyn molecule to the current iterator value
     _molecule.setMolecule(coupling::interface::MoleculeIterator<MarDynCell, 3>::_cell.get(), _cutoffRadius);
     return _molecule;
@@ -46,16 +44,15 @@ public:
 
   /* returns a const reference to the current molecule for pure reading purposes
    */
-  virtual const coupling::interface::Molecule<3> &
-  getConst() {
+  virtual const coupling::interface::Molecule<3>& getConst() {
     // set the mardyn molecule to the current iterator value
     _molecule.setMolecule(coupling::interface::MoleculeIterator<MarDynCell, 3>::_cell.get(), _cutoffRadius);
     return _molecule;
   }
 
-  private :
-      // the molecule wrapper interface returned in the get methods
-      MarDynMoleculeWrapper _molecule;
+private:
+  // the molecule wrapper interface returned in the get methods
+  MarDynMoleculeWrapper _molecule;
   // the cutoff radius of the MarDyn cell
   const double _cutoffRadius;
 };
