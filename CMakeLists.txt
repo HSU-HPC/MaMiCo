@@ -452,7 +452,26 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 add_library(mamico INTERFACE)
 target_link_libraries(mamico INTERFACE shared_defines)
 target_link_libraries(mamico INTERFACE Kokkos::kokkos)
-execute_process(COMMAND git rev-parse HEAD OUTPUT_VARIABLE MAMICO_COMMIT_HASH OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(MAMICO_COMMIT_HASH "unknown")
+find_package(Git QUIET)
+if(GIT_FOUND)
+  execute_process(
+      COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+      OUTPUT_VARIABLE MAMICO_COMMIT_HASH
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  # Check for uncommitted changes
+  execute_process(
+      COMMAND ${GIT_EXECUTABLE} status --porcelain
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+      OUTPUT_VARIABLE GIT_STATUS
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  if(NOT "${GIT_STATUS}" STREQUAL "")
+      string(APPEND MAMICO_COMMIT_HASH "-dirty")
+  endif()
+endif()
 message(STATUS ">> MAMICO_COMMIT_HASH: " ${MAMICO_COMMIT_HASH})
 target_compile_definitions(mamico INTERFACE MAMICO_COMMIT_HASH=${MAMICO_COMMIT_HASH})
 if(BUILD_WITH_MPI)
