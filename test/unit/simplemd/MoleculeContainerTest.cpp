@@ -88,7 +88,20 @@ public:
     }
     const tarch::la::Vector<MD_DIM, double> domainOffset(0);
     const tarch::la::Vector<MD_DIM, double> meshWidth(1);
-    const tarch::la::Vector<MD_DIM, unsigned int> numberProcesses(1);
+    const tarch::la::Vector<MD_DIM, unsigned int> numberProcesses =
+#if (MD_PARALLEL == MD_YES)
+#if (MD_DIM > 2)
+    { 2,
+      2,
+      1 }
+#else
+    { 2,
+      2 }
+#endif
+#else
+        {1}
+#endif
+    ;
     const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> boundary(simplemd::BoundaryType::PERIODIC_BOUNDARY);
     simplemd::services::ParallelTopologyService parallelTopologyService(numCells, domainOffset, meshWidth, numberProcesses, boundary
 #if (MD_PARALLEL == MD_YES)
@@ -124,7 +137,13 @@ public:
       position[i] = 0.5;
     }
     simplemd::Molecule trialMolecule2(position, velocity);
-    _moleculeContainer->insert(trialMolecule2);
+    int rank = 0, scaleFactor = 1;
+#if (MD_PARALLEL == MD_YES)
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    scaleFactor = 2;
+#endif
+    if (!rank)
+      _moleculeContainer->insert(trialMolecule2);
     simplemd::Molecule extractMolecule2;
     int index;
 #if (MD_DIM == 1)
@@ -133,16 +152,17 @@ public:
 #endif
 #if (MD_DIM == 2)
     // molecule idx is [1,1]
-    index = _numCellsIf3D[0] + 2 + 1;
+    index = _numCellsIf3D[0] / scaleFactor + 2 + 1;
 #endif
 #if (MD_DIM == 3)
     // molecule idx is [1,1,1]
-    index = (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2) + _numCellsIf3D[0] + 2 + 1;
+    index = (_numCellsIf3D[1] / scaleFactor + 2) * (_numCellsIf3D[0] / scaleFactor + 2) + _numCellsIf3D[0] / scaleFactor + 2 + 1;
 #endif
-
-    extractMolecule2 = _moleculeContainer->getMoleculeAt(index, 0);
-    for (size_t i = 0; i < MD_DIM; i++) {
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(trialMolecule2.getPosition()[i], extractMolecule2.getPosition()[i], 1e-6);
+    if (!rank) {
+      extractMolecule2 = _moleculeContainer->getMoleculeAt(index, 0);
+      for (size_t i = 0; i < MD_DIM; i++) {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(trialMolecule2.getPosition()[i], extractMolecule2.getPosition()[i], 1e-6);
+      }
     }
   }
 
@@ -151,6 +171,11 @@ public:
     for (size_t i = 0; i < MD_DIM; i++) {
       position[i] = 0.5;
     }
+    int rank = 0, scaleFactor = 1;
+#if (MD_PARALLEL == MD_YES)
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    scaleFactor = 2;
+#endif
     size_t index;
 #if (MD_DIM == 1)
     // molecule idx is [1] thus cell 1
@@ -158,33 +183,34 @@ public:
 #endif
 #if (MD_DIM == 2)
     // molecule idx is [1,1]
-    index = _numCellsIf3D[0] + 2 + 1;
+    index = _numCellsIf3D[0] / scaleFactor + 2 + 1;
 #endif
 #if (MD_DIM == 3)
     // molecule idx is [1,1,1]
-    index = (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2) + _numCellsIf3D[0] + 2 + 1;
+    index = (_numCellsIf3D[1] / scaleFactor + 2) * (_numCellsIf3D[0] / scaleFactor + 2) + _numCellsIf3D[0] / scaleFactor + 2 + 1;
 #endif
     std::vector<size_t> cellsForTest{index - 1,
                                      index + 1,
-                                     index + _numCellsIf3D[0] + 2,
-                                     index - (_numCellsIf3D[0] + 2),
-                                     index + _numCellsIf3D[0] + 2 + 1,
-                                     index - (_numCellsIf3D[0] + 2) + 1,
-                                     index + _numCellsIf3D[0] + 2 - 1,
-                                     index - (_numCellsIf3D[0] + 2) - 1,
-                                     index + (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2),
-                                     index - (_numCellsIf3D[1] + 2) * (_numCellsIf3D[0] + 2)};
-    for (size_t i : cellsForTest) {
-      simplemd::Molecule m{position, velocity};
-      (*_moleculeContainer)[i].insert(m);
-    }
-    _moleculeContainer->sort();
-    // all molecules should be in the same cell since all have same position
-
-    CPPUNIT_ASSERT_EQUAL((size_t)(cellsForTest.size()), (size_t)((*_moleculeContainer)[index].numMolecules()));
-    // cleanup
-    for (size_t i : cellsForTest) {
-      _moleculeContainer->clearLinkedCell(i);
+                                     index + _numCellsIf3D[0] / scaleFactor + 2,
+                                     index - (_numCellsIf3D[0] / scaleFactor + 2),
+                                     index + _numCellsIf3D[0] / scaleFactor + 2 + 1,
+                                     index - (_numCellsIf3D[0] / scaleFactor + 2) + 1,
+                                     index + _numCellsIf3D[0] / scaleFactor + 2 - 1,
+                                     index - (_numCellsIf3D[0] / scaleFactor + 2) - 1,
+                                     index + (_numCellsIf3D[1] / scaleFactor + 2) * (_numCellsIf3D[0] / scaleFactor + 2),
+                                     index - (_numCellsIf3D[1] / scaleFactor + 2) * (_numCellsIf3D[0] / scaleFactor + 2)};
+    if (!rank) {
+      for (size_t i : cellsForTest) {
+        simplemd::Molecule m{position, velocity};
+        (*_moleculeContainer)[i].insert(m);
+      }
+      _moleculeContainer->sort();
+      // all molecules should be in the same cell since all have same position
+      CPPUNIT_ASSERT_EQUAL((size_t)(cellsForTest.size()), (size_t)((*_moleculeContainer)[index].numMolecules()));
+      // cleanup
+      for (size_t i : cellsForTest) {
+        _moleculeContainer->clearLinkedCell(i);
+      }
     }
   }
 
@@ -235,17 +261,31 @@ public:
 
     const tarch::la::Vector<MD_DIM, double> domainOffset(0);
     const tarch::la::Vector<MD_DIM, double> meshWidth(1);
-    const tarch::la::Vector<MD_DIM, unsigned int> numberProcesses(1);
-    unsigned int numInnerCells, numTotalCells;
+    const tarch::la::Vector<MD_DIM, unsigned int> numberProcesses =
+#if (MD_PARALLEL == MD_YES)
+#if (MD_DIM > 2)
+    { 2,
+      2,
+      1 }
+#else
+    { 2,
+      2 }
+#endif
+#else
+        {1}
+#endif
+    ;
+    size_t numInnerCells, numTotalCells;
 
     for (int i = 0; i < numTests; i++) {
       numInnerCells = 1;
       numTotalCells = 1;
       for (int j = 0; j < MD_DIM; j++) {
-        numCellsTestInput[j] = static_cast<double>(rand() % 50 + 1);
-        numInnerCells *= static_cast<int>(numCellsTestInput[j]);
-        numTotalCells *= static_cast<int>(numCellsTestInput[j] + 2);
+        numCellsTestInput[j] = ((rand() * numberProcesses[j]) % 50 + 2);
+        numInnerCells *= static_cast<int>(numCellsTestInput[j] / numberProcesses[j]);
+        numTotalCells *= static_cast<int>((numCellsTestInput[j] / numberProcesses[j]) + 2);
       }
+      std::cout << numCellsTestInput << std::endl;
       const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType> boundary(simplemd::BoundaryType::PERIODIC_BOUNDARY);
       simplemd::services::ParallelTopologyService parallelTopologyService(numCellsTestInput, domainOffset, meshWidth, numberProcesses, boundary
 #if (MD_PARALLEL == MD_YES)
@@ -254,8 +294,8 @@ public:
 #endif
       );
       simplemd::MoleculeContainer moleculeContainer(parallelTopologyService, 20);
-      CPPUNIT_ASSERT(numTotalCells == moleculeContainer.getLocalNumberOfCellsScalarWithGhost());
-      CPPUNIT_ASSERT(numInnerCells == vectorToScalar(moleculeContainer.getLocalNumberOfCells()));
+      CPPUNIT_ASSERT_EQUAL(numInnerCells, vectorToScalar(moleculeContainer.getLocalNumberOfCells()));
+      CPPUNIT_ASSERT_EQUAL(numTotalCells, moleculeContainer.getLocalNumberOfCellsScalarWithGhost());
     }
   }
 
@@ -420,8 +460,8 @@ public:
   }
 
 private:
-  unsigned int vectorToScalar(tarch::la::Vector<MD_DIM, unsigned int> vector) const {
-    unsigned int toRet = 1;
+  size_t vectorToScalar(tarch::la::Vector<MD_DIM, unsigned int> vector) const {
+    size_t toRet = 1;
     for (int i = 0; i < MD_DIM; i++) {
       toRet *= vector[i];
     }
