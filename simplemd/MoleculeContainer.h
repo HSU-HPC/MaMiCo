@@ -276,7 +276,6 @@ public:
   void iterateCellPairsSerial(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
                               const tarch::la::Vector<MD_DIM, unsigned int>& cellRange);
 
-private:
   /**
    * @brief Converts a global 3D spatial coordinate to a local 1D linked cell index.
    *
@@ -285,8 +284,9 @@ private:
    * @param position 3D spatial coordinate.
    * @return unsigned int
    */
-  KOKKOS_INLINE_FUNCTION unsigned int positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const;
+  KOKKOS_FUNCTION unsigned int positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const;
 
+private:
   /**
    * @brief Converts a 3D local linked cell index into a 1D local linked cell index.
    *

@@ -186,41 +186,7 @@ public:
   }
 
   tarch::la::Vector<MD_DIM, unsigned int> getLinkedCellIndexForMoleculePosition(const tarch::la::Vector<MD_DIM, double>& position) {
-    tarch::la::Vector<MD_DIM, double> domainOffset = _parallelTopologyService.getGlobalDomainOffset();
-    tarch::la::Vector<MD_DIM, double> meshWidth = _parallelTopologyService.getMeshWidth();
-    tarch::la::Vector<MD_DIM, unsigned int> globalIndexOfFirstCell = _parallelTopologyService.getGlobalIndexOfFirstCell();
-    tarch::la::Vector<MD_DIM, unsigned int> localIndexOfFirstCell = _moleculeService.getContainer().getLocalIndexOfFirstCell();
-
-#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-    const tarch::la::Vector<MD_DIM, double> domainSize = _parallelTopologyService.getGlobalDomainSize();
-    for (unsigned int d = 0; d < MD_DIM; d++) {
-      if ((position[d] < domainOffset[d] - meshWidth[d]) || (position[d] > domainOffset[d] + domainSize[d] + meshWidth[d])) {
-        std::cout << "ERROR coupling::interface::impl::MDSolverInterface::addMoleculeToLinkedCell: Position ";
-        std::cout << d << " is out of range!" << std::endl;
-        std::cout << "Position: " << position << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
-#endif
-    tarch::la::Vector<MD_DIM, unsigned int> cellVectorIndex(0);
-
-    // determine current cell index (in serial, i.e. 1-D, form)
-    for (unsigned int d = 0; d < MD_DIM; d++) {
-      // find global cell index
-      int index = static_cast<int>(floor((position[d] - domainOffset[d]) / meshWidth[d]));
-      // shift into local cell index
-      index = index - globalIndexOfFirstCell[d] + localIndexOfFirstCell[d];
-#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
-      if (index < 0) {
-        std::cout << "ERROR coupling::interfaces::impl::SimpleMD::SimpleMDSolverInterface: index < 0: index=";
-        std::cout << index << std::endl;
-        exit(EXIT_FAILURE);
-      }
-#endif
-      cellVectorIndex[d] = static_cast<unsigned int>(index);
-    }
-
-    return cellVectorIndex;
+    return _moleculeService.getContainer().getLocalCellIndexVector(_moleculeService.getContainer().positionToCellIndex(position));
   }
 
   void setupPotentialEnergyLandscape(const tarch::la::Vector<MD_DIM, unsigned int>& indexOfFirstCouplingCell,
