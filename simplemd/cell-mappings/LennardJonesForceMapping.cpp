@@ -59,7 +59,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(LinkedCell& ce
 
 #if (TARCH_DEBUG == TARCH_YES)
     if (_externalForce != tarch::la::Vector<MD_DIM, double>{0.0}) {
-      Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCell(): externalForce not implemented in fixed point math debug mode!");
+      Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCell(): externalForce not implemented in fixed point math debug mode!\n");
     }
 #else
     force1 += _externalForce;
@@ -81,7 +81,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCell(LinkedCell& ce
                        "\n",
                        forceBuffer[0], forceBuffer[1], MD_DIM3_OR0(forceBuffer[2]), position1[0], position1[1], MD_DIM3_OR0(position1[2]), position2[0],
                        position2[1], MD_DIM3_OR0(position2[2]), m1->getID(), m2->getID());
-        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCellPair: Force out of range!");
+        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCellPair: Force out of range!\n");
       }
 #endif
       addForce(force1, force2, forceBuffer);
@@ -119,7 +119,7 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
                        "\n",
                        forceBuffer[0], forceBuffer[1], MD_DIM3_OR0(forceBuffer[2]), position1[0], position1[1], MD_DIM3_OR0(position1[2]), position2[0],
                        position2[1], MD_DIM3_OR0(position2[2]), m1->getID(), m2->getID());
-        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCellPair: Force out of range!");
+        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCellPair: Force out of range!\n");
       }
 #endif
       addForce(force1, force2, forceBuffer);
@@ -136,7 +136,7 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
   if (tarch::la::equals(rij2, 0.0, 1e-4)) {
     Kokkos::printf("Position: %lf %lf %lf, %lf %lf %lf\n", position1[0], position1[1], MD_DIM3_OR0(position1[2]), position2[0], position2[1],
                    MD_DIM3_OR0(position2[2]));
-    Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(): Particle positions are identical!");
+    Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(): Particle positions are identical!\n");
   }
 #endif
 

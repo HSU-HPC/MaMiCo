@@ -386,11 +386,11 @@ void simplemd::MoleculeContainer::iterateCellsSerial(A& a, const tarch::la::Vect
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (cellRange[d] == 0) {
       Kokkos::printf("cellRange(%d)==0!\n", d);
-      Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells: zero in cell range");
+      Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells: zero in cell range\n");
     }
     if (lowerLeftFrontCell[d] + cellRange[d] > 2 * _ghostCellLayerThickness[d] + _numLocalCellsNoGhost[d]) {
       Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells(): "
-                    "defined Range does not fit into local sub-domain!");
+                    "defined Range does not fit into local sub-domain!\n");
     }
   }
 #endif
@@ -545,11 +545,11 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (cellRange[d] == 0) {
       Kokkos::printf("cellRange(%d)==0!\n", d);
-      Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells: zero in cell range");
+      Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells: zero in cell range\n");
     }
     if (lowerLeftFrontCell[d] + cellRange[d] > 2 * _ghostCellLayerThickness[d] + _numLocalCellsNoGhost[d]) {
       Kokkos::abort("ERROR simplemd::MoleculeContainer::iterateCells(): "
-                    "defined Range does not fit into local sub-domain!");
+                    "defined Range does not fit into local sub-domain!\n");
     }
   }
 #endif

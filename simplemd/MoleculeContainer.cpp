@@ -18,7 +18,7 @@ void simplemd::MoleculeContainer::insert(unsigned int cellIdx, const simplemd::M
 #if (MD_ERROR == MD_YES)
   if (_linkedCellNumMolecules(cellIdx) + 1 > _cellCapacity) {
     Kokkos::printf("Cell capacity=%d would be exceeded by an operation! Exiting...", _cellCapacity);
-    Kokkos::abort("simplemd::MoleculeContainer::insert");
+    Kokkos::abort("simplemd::MoleculeContainer::insert\n");
   }
 #endif
   _moleculeData(cellIdx, _linkedCellNumMolecules(cellIdx)) = molecule;
@@ -32,12 +32,12 @@ void simplemd::MoleculeContainer::remove(unsigned int cellIdx, unsigned int mole
   if (moleculeIdx >= _linkedCellNumMolecules(cellIdx)) {
     Kokkos::printf("Deleting particle that does not exist! moleculeIdx: %d, cellIdx: %d, num molecules: %d\n", moleculeIdx, cellIdx,
                    _linkedCellNumMolecules(cellIdx));
-    Kokkos::abort("ERROR simplemd::MoleculeContainer::remove");
+    Kokkos::abort("ERROR simplemd::MoleculeContainer::remove\n");
   }
   if (cellIdx >= _linkedCellNumMolecules(cellIdx)) {
     Kokkos::printf("Deleting particle from cell that does not exist! moleculeIdx: %d, cellIdx: %d, num molecules: %d\n", moleculeIdx, cellIdx,
                    _linkedCellNumMolecules(cellIdx));
-    Kokkos::abort("ERROR simplemd::MoleculeContainer::remove");
+    Kokkos::abort("ERROR simplemd::MoleculeContainer::remove\n");
   }
 #endif
   _moleculeData(cellIdx, moleculeIdx) = _moleculeData(cellIdx, _linkedCellNumMolecules(cellIdx) - 1);
@@ -135,7 +135,7 @@ void simplemd::MoleculeContainer::sort() {
 #endif
 #if (MD_ERROR == MD_YES)
               if (index >= _linkedCellNumMolecules.size()) {
-                Kokkos::abort("simplemd::MoleculeContainer::sort() out-of-bounds access to linked cell");
+                Kokkos::abort("simplemd::MoleculeContainer::sort() out-of-bounds access to linked cell\n");
               }
 #endif
               for (size_t i = 0; i < _linkedCellNumMolecules(index); i++) {
@@ -145,7 +145,7 @@ void simplemd::MoleculeContainer::sort() {
 #if (MD_ERROR == MD_YES)
                   if (_linkedCellNumMolecules(curMolIdx) + 1 > _cellCapacity) {
                     Kokkos::printf("Cell capacity=%d would be exceeded by an operation! Exiting...", _cellCapacity);
-                    Kokkos::abort("simplemd::MoleculeContainer::insert");
+                    Kokkos::abort("simplemd::MoleculeContainer::insert\n");
                   }
 #endif
                   _moleculeData(curMolIdx, _linkedCellNumMolecules(curMolIdx)) = _moleculeData(index, i);
@@ -190,7 +190,7 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
       const char* highlightError = "(<- !!!)";
       Kokkos::printf("Position: %lf%s %lf%s %lf%s\n", position[0], d == 0 ? highlightError : "", position[1], d == 1 ? highlightError : "",
                      MD_DIM3_OR0(position[2]), d == 2 ? highlightError : "");
-      Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex: Position is out of range!");
+      Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex: Position is out of range!\n");
     }
 #endif
   }
@@ -216,7 +216,7 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
                      index, d, _globalIndexOfFirstCell[d], _localIndexOfFirstCell[d], (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])),
                      cellVectorIndex[0], cellVectorIndex[1], MD_DIM3_OR0(cellVectorIndex[2]), position[0], position[1], MD_DIM3_OR0(position[2]),
                      _domainOffset[0], _domainOffset[1], MD_DIM3_OR0(_domainOffset[2]), _meshWidth[0], _meshWidth[1], MD_DIM3_OR0(_meshWidth[2]));
-      Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex");
+      Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex\n");
     }
 #endif
     cellVectorIndex[d] = (unsigned int)index;

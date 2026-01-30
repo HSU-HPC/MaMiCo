@@ -89,7 +89,7 @@ public:
   KOKKOS_FUNCTION T& operator[](int i) {
 #if (TARCH_DEBUG == TARCH_YES)
     if (i < 0 || i > size - 1) {
-      Kokkos::abort("ERROR Vector T& operator[]: i out of range!");
+      Kokkos::abort("ERROR Vector T& operator[]: i out of range!\n");
     }
 #endif
     return _entries[i];
@@ -101,7 +101,7 @@ public:
   KOKKOS_FUNCTION const T& operator[](int i) const {
 #if (TARCH_DEBUG == TARCH_YES)
     if (i < 0 || i > size - 1) {
-      Kokkos::abort("ERROR Vector const T& operator[]: i out of range!");
+      Kokkos::abort("ERROR Vector const T& operator[]: i out of range!\n");
     }
 #endif
     return _entries[i];

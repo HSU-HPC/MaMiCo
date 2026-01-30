@@ -37,7 +37,7 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(Link
       const double rij2 = tarch::la::dot((m2->getConstPosition() - m1->getConstPosition()), (m2->getConstPosition() - m1->getConstPosition()));
 #if (MD_ERROR == MD_YES)
       if (rij2 == 0.0) {
-        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(): Particle positions are identical!");
+        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCell(): Particle positions are identical!\n");
       }
 #endif
 
@@ -73,7 +73,7 @@ void simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPair(
       const double rij2 = tarch::la::dot((m2->getConstPosition() - m1->getConstPosition()), (m2->getConstPosition() - m1->getConstPosition()));
 #if (MD_ERROR == MD_YES)
       if (rij2 == 0.0) {
-        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPairs(): Particle positions are identical!");
+        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesPotentialEnergyMapping::handleCellPairs(): Particle positions are identical!\n");
       }
 #endif
 
