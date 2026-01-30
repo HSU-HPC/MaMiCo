@@ -12,8 +12,8 @@ void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handle
       _parallelTopologyService.broadcastInnerCellViaBuffer(cell, cell.getIndex(), _moleculeContainer);
 
   // now: run over the local periodic boundaries and update those
-  const unsigned int localIndexSize = (unsigned int)localIndex.size();
-  for (unsigned int i = 0; i < localIndexSize; i++) {
+  const size_t localIndexSize = localIndex.size();
+  for (size_t i = 0; i < localIndexSize; i++) {
     // compute shift for periodic condition
     tarch::la::Vector<MD_DIM, double> shift(0.0);
     tarch::la::Vector<MD_DIM, double> positionBuffer(0.0);

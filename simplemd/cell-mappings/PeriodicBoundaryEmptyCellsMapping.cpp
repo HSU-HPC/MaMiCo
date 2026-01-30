@@ -22,7 +22,7 @@ void simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping::handleCell(Linke
   const tarch::la::Vector<MD_DIM, unsigned int> size(_moleculeContainer.getLocalNumberOfCells() + 2u * _moleculeContainer.getLocalIndexOfFirstCell());
   tarch::la::Vector<MD_DIM, unsigned int> outerCellCoords(0);
   tarch::la::Vector<MD_DIM, unsigned int> coords(0);
-  unsigned int helpIndex = cell.getIndex();
+  size_t helpIndex = cell.getIndex();
 #if (MD_DIM > 2)
   coords[2] = helpIndex / (size[1] * size[0]);
   helpIndex = helpIndex - coords[2] * (size[1] * size[0]);

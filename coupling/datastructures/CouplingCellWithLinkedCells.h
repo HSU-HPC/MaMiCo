@@ -110,7 +110,7 @@ private:
   }
 
   /** total number of linked cells contained in this coupling cell */
-  const unsigned int _numberCells;
+  const size_t _numberCells;
 
   /** holds pointers to all linked cells that describe the microscopic dynamics
    * within the coupling cell */

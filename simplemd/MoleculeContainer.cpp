@@ -153,7 +153,9 @@ void simplemd::MoleculeContainer::sort() {
                                           // write data to target end
 #if (MD_ERROR == MD_YES)
                   if (_linkedCellNumMolecules(curMolIdx) + 1 > _cellCapacity) {
-                    Kokkos::printf("Cell capacity=%d would be exceeded by an operation! Exiting...", _cellCapacity);
+                    Kokkos::printf("Cell capacity=%d would be exceeded by an operation. "
+                      "(Increase \"capacity-factor\" of the \"domain-configuration\" in the config!) "
+                      "Exiting...", _cellCapacity);
                     Kokkos::abort("simplemd::MoleculeContainer::insert\n");
                   }
 #endif
@@ -182,7 +184,7 @@ void simplemd::MoleculeContainer::sort() {
 
 simplemd::Molecule& simplemd::MoleculeContainer::getMoleculeAt(size_t i, size_t j) const { return _moleculeData(i, j); }
 
-simplemd::LinkedCell simplemd::MoleculeContainer::operator[](size_t idx) const {
+simplemd::LinkedCell simplemd::MoleculeContainer::operator[](const size_t idx) const {
 #if (MD_ERROR == MD_YES)
   if (idx >= _linkedCellNumMolecules.size()) {
     std::cout << "ERROR simplemd::MoleculeContainer::operator[]: Index out of range: " << idx << " (Local cell count = " << _linkedCellNumMolecules.size()
@@ -193,7 +195,7 @@ simplemd::LinkedCell simplemd::MoleculeContainer::operator[](size_t idx) const {
   return simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx, isGhostCell(idx));
 }
 
-simplemd::LinkedCell simplemd::MoleculeContainer::operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx) const {
+simplemd::LinkedCell simplemd::MoleculeContainer::operator[](const tarch::la::Vector<MD_DIM, unsigned int> cellIdx) const {
   return (*this)[vectorIndexToLinear(cellIdx)];
 }
 

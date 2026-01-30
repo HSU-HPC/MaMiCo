@@ -119,7 +119,7 @@ public:
    * @param idx
    * @return simplemd::LinkedCell
    */
-  KOKKOS_FUNCTION simplemd::LinkedCell operator[](size_t idx) const;
+  KOKKOS_FUNCTION simplemd::LinkedCell operator[](const size_t idx) const;
 
   /**
    * @brief Returns the linked cell at 3D index idx (ghost included)
@@ -127,7 +127,7 @@ public:
    * @param idx
    * @return simplemd::LinkedCell
    */
-  KOKKOS_FUNCTION simplemd::LinkedCell operator[](tarch::la::Vector<MD_DIM, unsigned int> cellIdx) const;
+  KOKKOS_FUNCTION simplemd::LinkedCell operator[](const tarch::la::Vector<MD_DIM, unsigned int> cellIdx) const;
 
   /**
    * @brief Get the total number of cells in the container
