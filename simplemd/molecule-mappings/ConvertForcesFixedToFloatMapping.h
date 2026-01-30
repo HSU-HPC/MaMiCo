@@ -3,7 +3,7 @@
 
 namespace simplemd {
 namespace moleculemappings {
-class ConvertForcesMapping;
+class ConvertForcesFixedToFloatMapping;
 }
 } // namespace simplemd
 
@@ -13,7 +13,7 @@ class ConvertForcesMapping;
  * because results do not depend on order of force summation
  * this expects forces to contain long int and converts them back into double
  */
-class simplemd::moleculemappings::ConvertForcesMapping {
+class simplemd::moleculemappings::ConvertForcesFixedToFloatMapping {
 public:
   void beginMoleculeIteration() const {}
   KOKKOS_FUNCTION void handleMolecule(simplemd::Molecule& molecule) const {

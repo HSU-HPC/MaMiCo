@@ -2,7 +2,7 @@
 #include "coupling/interface/MDSimulation.h"
 #include "coupling/interface/MamicoInterfaceProvider.h"
 #include "simplemd/MolecularDynamicsSimulation.h"
-#include "simplemd/molecule-mappings/ConvertForcesMapping.h"
+#include "simplemd/molecule-mappings/ConvertForcesFixedToFloatMapping.h"
 #include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 
 namespace coupling {
@@ -59,7 +59,7 @@ public:
     // contributions from its neighbors.
     _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
 #if (TARCH_DEBUG == TARCH_YES)
-    _moleculeService->getContainer().iterateMolecules(_convertForcesMapping);
+    _moleculeService->getContainer().iterateMolecules(_convertForcesFixedToFloatMapping);
 #endif
 
     // distribute momentum -> some methods require modification of force terms,
@@ -159,7 +159,7 @@ private:
   /** @brief bool holding the current state of the coupling: true - coupled
    * simulation and false - independent md simulation */
   bool _couplingSwitchedOn;
-  simplemd::moleculemappings::ConvertForcesMapping _convertForcesMapping;
+  simplemd::moleculemappings::ConvertForcesFixedToFloatMapping _convertForcesFixedToFloatMapping;
 };
 } // namespace interface
 } // namespace coupling

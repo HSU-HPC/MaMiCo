@@ -216,7 +216,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     // its neighbors.
     _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
 #if (TARCH_DEBUG == TARCH_YES)
-    _moleculeService->getContainer().iterateMolecules(_convertForcesMapping);
+    _moleculeService->getContainer().iterateMolecules(_convertForcesFixedToFloatMapping);
 #endif
     _boundaryTreatment->emptyGhostBoundaryCells();
     _moleculeService->getContainer().iterateMolecules(initialPositionAndForceUpdate);
@@ -426,7 +426,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     // its neighbors.
     _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
 #if (TARCH_DEBUG == TARCH_YES)
-    _moleculeService->getContainer().iterateMolecules(_convertForcesMapping);
+    _moleculeService->getContainer().iterateMolecules(_convertForcesFixedToFloatMapping);
 #endif
     _boundaryTreatment->emptyGhostBoundaryCells();
     _moleculeService->getContainer().iterateMolecules(initialPositionAndForceUpdate);
@@ -535,7 +535,7 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
     // compute forces between molecules.
     _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
 #if (TARCH_DEBUG == TARCH_YES)
-    _moleculeService->getContainer().iterateMolecules(_convertForcesMapping);
+    _moleculeService->getContainer().iterateMolecules(_convertForcesFixedToFloatMapping);
 #endif
   } else {
     _boundaryTreatment->putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations(_localBoundary, *_parallelTopologyService,
