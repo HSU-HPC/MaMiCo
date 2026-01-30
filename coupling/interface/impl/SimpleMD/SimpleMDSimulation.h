@@ -102,10 +102,6 @@ public:
 
     // sort molecules into linked cells
     _moleculeService->getContainer().sort();
-
-    if (_parallelTopologyService->getProcessCoordinates() == tarch::la::Vector<MD_DIM, unsigned int>(0)) {
-      // if(t%50==0) std::cout <<"Finish MD timestep " << t << "..." << std::endl;
-    }
   }
 
   virtual void sortMoleculesIntoCells() {
