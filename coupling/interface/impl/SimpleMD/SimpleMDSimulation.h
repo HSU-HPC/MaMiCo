@@ -163,8 +163,10 @@ private:
   /** @brief bool holding the current state of the coupling: true - coupled
    * simulation and false - independent md simulation */
   bool _couplingSwitchedOn;
+#if (TARCH_DEBUG == TARCH_YES)
   simplemd::moleculemappings::ConvertForcesFloatToFixedMapping _convertForcesFloatToFixedMapping;
   simplemd::moleculemappings::ConvertForcesFixedToFloatMapping _convertForcesFixedToFloatMapping;
+#endif
 };
 } // namespace interface
 } // namespace coupling
