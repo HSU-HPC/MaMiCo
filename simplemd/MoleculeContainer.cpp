@@ -218,20 +218,20 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
   for (unsigned int d = 0; d < MD_DIM; d++) {
     // find global cell index
 
-    int index = (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d]));
+    long int index = (long int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d]));
     // shift into local cell index
     index += _localIndexOfFirstCell[d];
     index -= _globalIndexOfFirstCell[d];
 #if (MD_ERROR == MD_YES)
     if (index < 0) {
-      Kokkos::printf("index < 0: index=%d; "
-                     "Dimension : dim=%u, GIFC=%u, LIFC=%u, cell=%u; "
-                     "cellVectorIndex: %lf %lf %lf; "
+      Kokkos::printf("index < 0: index=%ld; "
+                     "Dimension : dim=%u, GIFC=%u, LIFC=%u, cell=%ld; "
+                     "cellVectorIndex: %u %u %u; "
                      "Position: %lf %lf %lf; "
                      "offset: %lf %lf %lf; "
                      "meshwidth: %lf %lf %lf"
                      "\n",
-                     index, d, _globalIndexOfFirstCell[d], _localIndexOfFirstCell[d], (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])),
+                     index, d, _globalIndexOfFirstCell[d], _localIndexOfFirstCell[d], (long int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])),
                      cellVectorIndex[0], cellVectorIndex[1], MD_DIM3_OR0(cellVectorIndex[2]), position[0], position[1], MD_DIM3_OR0(position[2]),
                      _domainOffset[0], _domainOffset[1], MD_DIM3_OR0(_domainOffset[2]), _meshWidth[0], _meshWidth[1], MD_DIM3_OR0(_meshWidth[2]));
       Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex\n");
