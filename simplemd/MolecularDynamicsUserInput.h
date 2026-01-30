@@ -34,6 +34,14 @@ using MainExecSpace =
 #error "MDDim2 or MDDim3"
 #endif
 
+// Do not evaluate and fall back on zero when using 2D
+// (for accessing values in third dimension)
+#if(MD_DIM > 2)
+#define MD_DIM3_OR0(x) x
+#else
+#define MD_DIM3_OR0(x) 0
+#endif
+
 // MPI-Parallelisation (MD_YES/ MD_NO)
 #ifdef MDParallel
 #define MD_PARALLEL MD_YES

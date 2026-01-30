@@ -189,7 +189,7 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
     if ((position[d] < _domainOffset[d] - _meshWidth[d]) || (position[d] > _domainOffset[d] + _domainSize[d] + _meshWidth[d])) {
       const char* highlightError = "(<- !!!)";
       Kokkos::printf("Position: %lf%s %lf%s %lf%s\n", position[0], d == 0 ? highlightError : "", position[1], d == 1 ? highlightError : "",
-                     MD_DIM > 2 ? position[2] : 0, d == 2 ? highlightError : "");
+                     MD_DIM3_OR0(position[2]), d == 2 ? highlightError : "");
       Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex: Position is out of range!");
     }
 #endif
@@ -214,8 +214,8 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
                      "meshwidth: %lf %lf %lf"
                      "\n",
                      index, d, _globalIndexOfFirstCell[d], _localIndexOfFirstCell[d], (int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])),
-                     cellVectorIndex[0], cellVectorIndex[1], MD_DIM > 2 ? cellVectorIndex[2] : 0, position[0], position[1], MD_DIM > 2 ? position[2] : 0,
-                     _domainOffset[0], _domainOffset[1], MD_DIM > 2 ? _domainOffset[2] : 0, _meshWidth[0], _meshWidth[1], MD_DIM > 2 ? _meshWidth[2] : 0);
+                     cellVectorIndex[0], cellVectorIndex[1], MD_DIM3_OR0(cellVectorIndex[2]), position[0], position[1], MD_DIM3_OR0(position[2]),
+                     _domainOffset[0], _domainOffset[1], MD_DIM3_OR0(_domainOffset[2]), _meshWidth[0], _meshWidth[1], MD_DIM3_OR0(_meshWidth[2]));
       Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex");
     }
 #endif
@@ -282,11 +282,11 @@ void simplemd::MoleculeContainer::printNonGhostCells(size_t numCells, bool print
       Molecule& molecule = getMoleculeAt(i, j);
       Kokkos::printf("%u\t", i);
       auto position = molecule.getConstPosition();
-      Kokkos::printf("%lf\t%lf\t%lf\t", position[0], position[1], MD_DIM > 2 ? position[2] : 0);
+      Kokkos::printf("%lf\t%lf\t%lf\t", position[0], position[1], MD_DIM3_OR0(position[2]));
       auto velocity = molecule.getConstVelocity();
-      Kokkos::printf("%lf\t%lf\t%lf\t", velocity[0], velocity[1], MD_DIM > 2 ? velocity[2] : 0);
+      Kokkos::printf("%lf\t%lf\t%lf\t", velocity[0], velocity[1], MD_DIM3_OR0(velocity[2]));
       auto force = molecule.getConstForce();
-      Kokkos::printf("%lf\t%lf\t%lf\t", force[0], force[1], MD_DIM > 2 ? force[2] : 0);
+      Kokkos::printf("%lf\t%lf\t%lf\t", force[0], force[1], MD_DIM3_OR0(force[2]));
       Kokkos::printf("\n");
     }
   }
