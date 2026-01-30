@@ -31,11 +31,9 @@ public:
    *                           4 means, every 4th time step is plotted
    *  @param filestem the name of the plotted file
    *  @param processes defines on how many processes the solver will run;
-   *                   1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes
-   *  @param numThreads number of OpenMP threads */
+   *                   1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes */
   FiniteDifferenceSolver(const double channelheight, tarch::la::Vector<3, double> wallVelocity, const double kinVisc, const double dx, const double dt,
-                         const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes,
-                         const unsigned int numThreads = 1)
+                         const int plotEveryTimestep, const std::string filestem, const tarch::la::Vector<3, unsigned int> processes)
       : coupling::solvers::NumericalSolver(channelheight, dx, dt, kinVisc, plotEveryTimestep, filestem, processes), _omega(dt * kinVisc / (dx * dx)),
         _wallVelocity(wallVelocity) {
     if (_processes[0] > 1 || _processes[1] > 1 || _processes[2] > 1) {
@@ -50,11 +48,6 @@ public:
       return;
     }
     _velold = new double[3 * (_domainSizeX + 2) * (_domainSizeY + 2) * (_domainSizeZ + 2)];
-#if defined(_OPENMP)
-    // Could affect Kokkos when using OpenMP backend
-    std::cout << "[OpenMP] FiniteDifferenceSolver is setting the number of threads to " << numThreads << std::endl;
-    omp_set_num_threads(numThreads);
-#endif
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Domain size=" << _domainSizeX << "," << _domainSizeY << "," << _domainSizeZ << std::endl;
     std::cout << "tau=" << 1.0 / _omega << std::endl;

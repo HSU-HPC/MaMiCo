@@ -895,7 +895,7 @@ protected:
       }
     } else if (_cfg.maSolverType == CouetteConfig::COUETTE_FD) {
       solver = new coupling::solvers::FiniteDifferenceSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "FDCouette",
-                                                             _cfg.lbNumberProcesses, 1);
+                                                             _cfg.lbNumberProcesses);
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): FD solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
