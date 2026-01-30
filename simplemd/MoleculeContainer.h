@@ -304,6 +304,7 @@ private:
    */
   KOKKOS_INLINE_FUNCTION bool isGhostCell(const size_t cellIndex) const;
 
+  KOKKOS_FUNCTION void printCellMolecules(size_t cellIndex) const;
   KOKKOS_FUNCTION void printNonGhostCells(size_t numCells, bool printContainerContents, const char* const label) const;
 
   /** number of cells per direction in the local domain */
