@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-30 18:18:00</td>
+            <td class="headerValue">2026-01-30 19:14:01</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -122,9 +122,9 @@
 <a name="60"><span class="lineNum">      60 </span>            :    * We refer to the lexicographic ordering of the linked cells here.</a>
 <a name="61"><span class="lineNum">      61 </span>            :    * @param cell the linked cell that should be inserted into the coupling</a>
 <a name="62"><span class="lineNum">      62 </span>            :    * cell</a>
-<a name="63"><span class="lineNum">      63 </span>            :    * @param index specifies the position, at which cell shoeld be inserted</a>
+<a name="63"><span class="lineNum">      63 </span>            :    * @param index specifies the position, at which cell should be inserted</a>
 <a name="64"><span class="lineNum">      64 </span>            :    */</a>
-<a name="65"><span class="lineNum">      65 </span><span class="lineCov">      69124 :   void addLinkedCell(LinkedCell&amp; cell, const unsigned int&amp; index) { _linkedCells[index] = &amp;cell; }</span></a>
+<a name="65"><span class="lineNum">      65 </span><span class="lineCov">      69124 :   void addLinkedCell(LinkedCell&amp; cell, const size_t index) { _linkedCells[index] = &amp;cell; }</span></a>
 <a name="66"><span class="lineNum">      66 </span>            : </a>
 <a name="67"><span class="lineNum">      67 </span>            :   /** This template fuction applies class A to all linked cells of this</a>
 <a name="68"><span class="lineNum">      68 </span>            :    *coupling cell. The syntax is exactly the same as for regular cell</a>
@@ -172,7 +172,7 @@
 <a name="110"><span class="lineNum">     110 </span>            :   }</a>
 <a name="111"><span class="lineNum">     111 </span>            : </a>
 <a name="112"><span class="lineNum">     112 </span>            :   /** total number of linked cells contained in this coupling cell */</a>
-<a name="113"><span class="lineNum">     113 </span>            :   const unsigned int _numberCells;</a>
+<a name="113"><span class="lineNum">     113 </span>            :   const size_t _numberCells;</a>
 <a name="114"><span class="lineNum">     114 </span>            : </a>
 <a name="115"><span class="lineNum">     115 </span>            :   /** holds pointers to all linked cells that describe the microscopic dynamics</a>
 <a name="116"><span class="lineNum">     116 </span>            :    * within the coupling cell */</a>

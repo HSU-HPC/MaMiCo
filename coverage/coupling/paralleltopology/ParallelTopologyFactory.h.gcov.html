@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-30 18:18:00</td>
+            <td class="headerValue">2026-01-30 19:14:01</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -116,7 +116,7 @@
 <a name="54"><span class="lineNum">      54 </span>            :    *    @param numberProcesses number of processes</a>
 <a name="55"><span class="lineNum">      55 </span>            :    */</a>
 <a name="56"><span class="lineNum">      56 </span>            :   template &lt;unsigned int dim&gt;</a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineCov">        788 :   static coupling::paralleltopology::ParallelTopology&lt;dim&gt;* getParallelTopology(coupling::paralleltopology::ParallelTopologyType type,</span></a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineCov">        780 :   static coupling::paralleltopology::ParallelTopology&lt;dim&gt;* getParallelTopology(coupling::paralleltopology::ParallelTopologyType type,</span></a>
 <a name="58"><span class="lineNum">      58 </span>            :                                                                                 tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses) {</a>
 <a name="59"><span class="lineNum">      59 </span><span class="lineCov">        780 :     if (type == XYZ) {</span></a>
 <a name="60"><span class="lineNum">      60 </span><span class="lineCov">        772 :       return new coupling::paralleltopology::XYZTopology&lt;dim&gt;(numberProcesses);</span></a>

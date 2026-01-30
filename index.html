@@ -107,20 +107,27 @@ Build instructions</h2>
 </pre><p>* This will configure the build system with default settings and generate makefiles in the build directory. Optionally, you might want to change the build configuration now: </p><pre class="fragment">  ccmake .
 </pre><p>* Here you can enable optional dependencies, e.g. activate BUILD_WITH_MPI (default OFF), or modifiy which compiler and flags you want to use. When you are done, press the configure [c] and generate [g] keys. Now you can start the compilation: </p><pre class="fragment">  make
 </pre><h3><a class="anchor" id="autotoc_md3"></a>
+Building with GPU support</h3>
+<p>To compile for Nvidia GPUs, use <code>-DKOKKOS_TARGET=CUDA</code>. <br  />
+ For compilation on a host without a GPU (such as the login node of a cluster), it is also necessary to specify the <a href="https://kokkos.org/kokkos-core-wiki/get-started/configuration-guide.html#gpu-architectures">target GPU architecture</a>:</p>
+<div class="fragment"><div class="line">ml gcc cuda cmake # Load build tools</div>
+<div class="line">cmake -DKOKKOS_TARGET=CUDA -DKokkos_ARCH_AMPERE80=ON .. # Nvidia A100</div>
+<div class="line">make</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4"></a>
 Additional instructions to build with ls1</h3>
 <p>* After cloning the repository, initialize the ls1 submodule with </p><pre class="fragment">  git submodule init
   git submodule update
 </pre><p>* Follow the instructions on the <a href="https://github.com/ls1mardyn/ls1-mardyn">ls1 repository</a> to build with cmake, however remember to enable the MAMICO_COUPLING flag, and provide the MaMiCo base directory in the MAMICO_SRC_DIR variable.</p>
 <p>* Make MaMiCo as normal, choosing LS1_MARDYN as your MD library.</p>
-<h3><a class="anchor" id="autotoc_md4"></a>
+<h3><a class="anchor" id="autotoc_md5"></a>
 Additional instructions to build with LAMMPS</h3>
 <p>1. <a href="https://docs.lammps.org/Install_git.html">Download the LAMMPS source code</a>, <a href="https://docs.lammps.org/Build_cmake.html">build it using CMake</a> with the option <code>-DBUILD_SHARED_LIBS=ON</code>, and install it using <code>make install</code>. <br  />
  2. Make LAMMPS available through pgk-config with <code>export PKG_CONFIG_PATH=/home/$(whoami)/.local/lib/pkgconfig</code>. 3. Create a symbolic link to the LAMMPS header files in the MaMiCo root folder using <code>ln -s &lt;path to LAMMPS&gt;/src &lt;path to MaMiCo&gt;/lammps</code></p>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md6"></a>
 Input file construction and first runs</h2>
 <p>* The build instructions have created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. * An example simulation configuration can be generated in the current working directory using <a href="./tools/"><code>tools</code></a><code>/mamico-cfg</code>. * The available options and features are explained <a href="https://github.com/HSU-HPC/MaMiCo/wiki/couette.xml">here</a>. <br  />
  (<em>Deprecated:</em> Some are also listed directly in the template file via XML comments, so that you can modify the configuration to suit your needs.) * Start the simulation by executing (sequential case) <code>./couette</code> or e.g. (MPI-parallel) <code>mpirun -n 8 ./couette</code>. * If you get the error message 'ERROR MoleculeService::MoleculeService: Could not open file CheckpointSimpleMD_10000_reflecting_0.checkpoint!', copy the file of the same name from the 'examples' folder into your build folder. * Depending on the configuration, you will obtain various output files in CSV, VTK or other formats.</p>
-<h2><a class="anchor" id="autotoc_md6"></a>
+<h2><a class="anchor" id="autotoc_md7"></a>
 Papers to cite</h2>
 <p>* P. Jarmatz, P. Neumann: <a href="https://link.springer.com/chapter/10.1007/978-3-030-22747-0_34">MaMiCo: Parallel Noise Reduction for Multi-instance Molecular-Continuum Flow Simulation</a>, International Conference on Computational Science. Springer, Cham, 2019 * P. Neumann, X. Bian: <a href="https://doi.org/10.1016/j.cpc.2017.06.026">MaMiCo: Transient multi-instance molecular-continuum flow simulation on supercomputers</a>, Computer Physics Communications 220 (2017): 390-402 * P. Neumann, H. Flohr, R. Arora, P. Jarmatz: <a href="https://doi.org/10.1016/j.cpc.2015.10.029">MaMiCo: Software design for parallel molecular-continuum flow simulations</a> Computer Physics Communications 200 (2016): 324-335 </p>
 </div></div><!-- PageDoc -->

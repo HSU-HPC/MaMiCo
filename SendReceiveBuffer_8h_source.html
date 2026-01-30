@@ -179,7 +179,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    std::set&lt;unsigned int&gt; cellIndices;</div>
 <div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> rootRank;</div>
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span> </div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    BufferCollective() : buffer(), nonRootRanks(), cellIndices(), rootRank(-1) {}</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    BufferCollective() : buffer(), nonRootRanks(), cellIndices(), rootRank(UINT_MAX) {}</div>
 <div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>  };</div>
 </div>
 <div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span></div>

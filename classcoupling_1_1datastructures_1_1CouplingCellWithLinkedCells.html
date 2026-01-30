@@ -130,8 +130,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a87e72bb5d12bd4e43e14f72f4f77e3fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a254054543c1526e083088b6c609aec76" id="r_a254054543c1526e083088b6c609aec76"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a254054543c1526e083088b6c609aec76">~CouplingCellWithLinkedCells</a> ()</td></tr>
 <tr class="separator:a254054543c1526e083088b6c609aec76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51cdf9a790ef64de82540ca209f9e47c" id="r_a51cdf9a790ef64de82540ca209f9e47c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51cdf9a790ef64de82540ca209f9e47c">addLinkedCell</a> (LinkedCell &amp;cell, const unsigned int &amp;index)</td></tr>
-<tr class="separator:a51cdf9a790ef64de82540ca209f9e47c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e8667a6c7a4de32f769e9174db49e38" id="r_a1e8667a6c7a4de32f769e9174db49e38"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1e8667a6c7a4de32f769e9174db49e38">addLinkedCell</a> (LinkedCell &amp;cell, const size_t index)</td></tr>
+<tr class="separator:a1e8667a6c7a4de32f769e9174db49e38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af8638abd30b4ad6cfabca03dab279d7c" id="r_af8638abd30b4ad6cfabca03dab279d7c"><td class="memTemplParams" colspan="2">template&lt;class A&gt; </td></tr>
 <tr class="memitem:af8638abd30b4ad6cfabca03dab279d7c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#af8638abd30b4ad6cfabca03dab279d7c">iterateCells</a> (A &amp;a)</td></tr>
 <tr class="separator:af8638abd30b4ad6cfabca03dab279d7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,8 +187,8 @@ Private Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:ad676cf0d10722e40d3e7a3fe6ba383c8" id="r_ad676cf0d10722e40d3e7a3fe6ba383c8"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad676cf0d10722e40d3e7a3fe6ba383c8">_numberCells</a></td></tr>
-<tr class="separator:ad676cf0d10722e40d3e7a3fe6ba383c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab58b367ae3e10d8b7e90b6afd9c08d85" id="r_ab58b367ae3e10d8b7e90b6afd9c08d85"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab58b367ae3e10d8b7e90b6afd9c08d85">_numberCells</a></td></tr>
+<tr class="separator:ab58b367ae3e10d8b7e90b6afd9c08d85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a581d64f61dfec94101e2efb4cfd7b2bc" id="r_a581d64f61dfec94101e2efb4cfd7b2bc"><td class="memItemLeft" align="right" valign="top">LinkedCell **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a581d64f61dfec94101e2efb4cfd7b2bc">_linkedCells</a></td></tr>
 <tr class="separator:a581d64f61dfec94101e2efb4cfd7b2bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -284,8 +284,8 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a51cdf9a790ef64de82540ca209f9e47c" name="a51cdf9a790ef64de82540ca209f9e47c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51cdf9a790ef64de82540ca209f9e47c">&#9670;&#160;</a></span>addLinkedCell()</h2>
+<a id="a1e8667a6c7a4de32f769e9174db49e38" name="a1e8667a6c7a4de32f769e9174db49e38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e8667a6c7a4de32f769e9174db49e38">&#9670;&#160;</a></span>addLinkedCell()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -303,7 +303,7 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const unsigned int &amp;</td>          <td class="paramname"><span class="paramname"><em>index</em></span>&#160;)</td>
+          <td class="paramtype">const size_t</td>          <td class="paramname"><span class="paramname"><em>index</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -315,7 +315,7 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
 <p>adds a linked cell to the coupling cell and puts it at position index. We refer to the lexicographic ordering of the linked cells here. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">cell</td><td>the linked cell that should be inserted into the coupling cell </td></tr>
-    <tr><td class="paramname">index</td><td>specifies the position, at which cell shoeld be inserted </td></tr>
+    <tr><td class="paramname">index</td><td>specifies the position, at which cell should be inserted </td></tr>
   </table>
   </dd>
 </dl>
@@ -463,8 +463,8 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
 
 </div>
 </div>
-<a id="ad676cf0d10722e40d3e7a3fe6ba383c8" name="ad676cf0d10722e40d3e7a3fe6ba383c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad676cf0d10722e40d3e7a3fe6ba383c8">&#9670;&#160;</a></span>_numberCells</h2>
+<a id="ab58b367ae3e10d8b7e90b6afd9c08d85" name="ab58b367ae3e10d8b7e90b6afd9c08d85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab58b367ae3e10d8b7e90b6afd9c08d85">&#9670;&#160;</a></span>_numberCells</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -475,7 +475,7 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const unsigned int <a class="el" href="classcoupling_1_1datastructures_1_1CouplingCellWithLinkedCells.html">coupling::datastructures::CouplingCellWithLinkedCells</a>&lt; LinkedCell, dim &gt;::_numberCells</td>
+          <td class="memname">const size_t <a class="el" href="classcoupling_1_1datastructures_1_1CouplingCellWithLinkedCells.html">coupling::datastructures::CouplingCellWithLinkedCells</a>&lt; LinkedCell, dim &gt;::_numberCells</td>
         </tr>
       </table>
   </td>

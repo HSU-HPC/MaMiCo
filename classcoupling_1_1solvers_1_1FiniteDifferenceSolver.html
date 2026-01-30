@@ -138,9 +138,9 @@ Collaboration diagram for coupling::solvers::FiniteDifferenceSolver:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8629986bc9fb0676e9cd29bc460ab58f" id="r_a8629986bc9fb0676e9cd29bc460ab58f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8629986bc9fb0676e9cd29bc460ab58f">FiniteDifferenceSolver</a> (const double channelheight, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; wallVelocity, const double kinVisc, const double dx, const double dt, const int plotEveryTimestep, const std::string filestem, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes, const unsigned int numThreads=1)</td></tr>
-<tr class="memdesc:a8629986bc9fb0676e9cd29bc460ab58f"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
-<tr class="separator:a8629986bc9fb0676e9cd29bc460ab58f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88426dbade8a91f12afe94f13982db58" id="r_a88426dbade8a91f12afe94f13982db58"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a88426dbade8a91f12afe94f13982db58">FiniteDifferenceSolver</a> (const double channelheight, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, double &gt; wallVelocity, const double kinVisc, const double dx, const double dt, const int plotEveryTimestep, const std::string filestem, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; processes)</td></tr>
+<tr class="memdesc:a88426dbade8a91f12afe94f13982db58"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
+<tr class="separator:a88426dbade8a91f12afe94f13982db58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaa5404658593e1345e71615261f9c78" id="r_aaaa5404658593e1345e71615261f9c78"><td class="memItemLeft" align="right" valign="top"><a id="aaaa5404658593e1345e71615261f9c78" name="aaaa5404658593e1345e71615261f9c78"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>~FiniteDifferenceSolver</b> ()</td></tr>
 <tr class="memdesc:aaaa5404658593e1345e71615261f9c78"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple destructor <br /></td></tr>
@@ -388,8 +388,8 @@ const <a class="el" href="classScenario.html">Scenario</a> *&#160;</td><td class
 <div class="textblock"><p>implements a simple one-dimensional finite-diffference solver for the Couette flow. </p>
 <p>In our scenario, the lower wall is accelerated and the upper wall stands still. The lower wall is located at zero height. The grid is just a simple cubic, equidistant mesh. </p><dl class="section author"><dt>Author</dt><dd>Helene Wittenberg </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a8629986bc9fb0676e9cd29bc460ab58f" name="a8629986bc9fb0676e9cd29bc460ab58f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8629986bc9fb0676e9cd29bc460ab58f">&#9670;&#160;</a></span>FiniteDifferenceSolver()</h2>
+<a id="a88426dbade8a91f12afe94f13982db58" name="a88426dbade8a91f12afe94f13982db58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88426dbade8a91f12afe94f13982db58">&#9670;&#160;</a></span>FiniteDifferenceSolver()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -435,12 +435,7 @@ const <a class="el" href="classScenario.html">Scenario</a> *&#160;</td><td class
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt;</td>          <td class="paramname"><span class="paramname"><em>processes</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const unsigned int</td>          <td class="paramname"><span class="paramname"><em>numThreads</em></span><span class="paramdefsep"> = </span><span class="paramdefval">1</span>&#160;)</td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt;</td>          <td class="paramname"><span class="paramname"><em>processes</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -461,7 +456,6 @@ const <a class="el" href="classScenario.html">Scenario</a> *&#160;</td><td class
     <tr><td class="paramname">plotEveryTimestep</td><td>the time step interval for plotting data; 4 means, every 4th time step is plotted </td></tr>
     <tr><td class="paramname">filestem</td><td>the name of the plotted file </td></tr>
     <tr><td class="paramname">processes</td><td>defines on how many processes the solver will run; 1,1,1 - sequential run - 1,2,2 = 1*2*2 = 4 processes </td></tr>
-    <tr><td class="paramname">numThreads</td><td>number of OpenMP threads </td></tr>
   </table>
   </dd>
 </dl>

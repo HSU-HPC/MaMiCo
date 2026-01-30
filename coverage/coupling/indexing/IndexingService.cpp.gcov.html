@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-30 18:18:00</td>
+            <td class="headerValue">2026-01-30 19:14:01</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">3</td>
@@ -410,7 +410,7 @@
 <a name="348"><span class="lineNum">     348 </span><span class="lineCov">         16 :       throw std::runtime_error(ss.str());</span></a>
 <a name="349"><span class="lineNum">     349 </span><span class="lineCov">          8 :     }</span></a>
 <a name="350"><span class="lineNum">     350 </span>            : </a>
-<a name="351"><span class="lineNum">     351 </span><span class="lineCov">       2308 :     const auto totalWeight = std::reduce(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);</span></a>
+<a name="351"><span class="lineNum">     351 </span><span class="lineCov">       2308 :     const auto totalWeight = std::accumulate(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);</span></a>
 <a name="352"><span class="lineNum">     352 </span><span class="lineCov">       2308 :     if (globalNumberCouplingCells[d] % totalWeight != 0) {</span></a>
 <a name="353"><span class="lineNum">     353 </span><span class="lineNoCov">          0 :       std::stringstream ss;</span></a>
 <a name="354"><span class="lineNum">     354 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;IndexingService: initWithCells(): ERROR: Number &quot;</span></a>
@@ -436,7 +436,7 @@
 <a name="374"><span class="lineNum">     374 </span>            :   // hence cell 3 will be on x axis coord 1</a>
 <a name="375"><span class="lineNum">     375 </span><span class="lineCov">       3056 :   for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
 <a name="376"><span class="lineNum">     376 </span>            :     // with weights 1,2,1, totalWeight = 4</a>
-<a name="377"><span class="lineNum">     377 </span><span class="lineCov">       2292 :     const int totalWeight = std::reduce(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);</span></a>
+<a name="377"><span class="lineNum">     377 </span><span class="lineCov">       2292 :     const int totalWeight = std::accumulate(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);</span></a>
 <a name="378"><span class="lineNum">     378 </span>            :     // with 8 cells on an axis and totalWeight = 4, multiplier = 2, thus weight 1 will have 2 cells</a>
 <a name="379"><span class="lineNum">     379 </span><span class="lineCov">       2292 :     const int multiplier = globalNumberCouplingCells[d] / totalWeight;</span></a>
 <a name="380"><span class="lineNum">     380 </span><span class="lineCov">       2292 :     _subdomainOwnership[d].clear();</span></a>
@@ -454,21 +454,21 @@
 <a name="392"><span class="lineNum">     392 </span><span class="lineCov">       1528 :   const auto globalNumberCouplingCellsInclGL{globalNumberCouplingCells + tarch::la::Vector&lt;dim, unsigned int&gt;{2}};</span></a>
 <a name="393"><span class="lineNum">     393 </span>            : </a>
 <a name="394"><span class="lineNum">     394 </span>            :   // init boundaries of all global, non-m2m, GL including indexing types</a>
-<a name="395"><span class="lineNum">     395 </span><span class="lineCov">       4584 :   CellIndex&lt;dim&gt;::lowerBoundary = I01{0};</span></a>
-<a name="396"><span class="lineNum">     396 </span><span class="lineCov">       5348 :   CellIndex&lt;dim&gt;::upperBoundary = I01{tarch::la::Vector&lt;dim, int&gt;{globalNumberCouplingCellsInclGL - tarch::la::Vector&lt;dim, unsigned int&gt;{1}}};</span></a>
+<a name="395"><span class="lineNum">     395 </span><span class="lineCov">       1528 :   CellIndex&lt;dim&gt;::lowerBoundary = I01{0};</span></a>
+<a name="396"><span class="lineNum">     396 </span><span class="lineCov">       2292 :   CellIndex&lt;dim&gt;::upperBoundary = I01{tarch::la::Vector&lt;dim, int&gt;{globalNumberCouplingCellsInclGL - tarch::la::Vector&lt;dim, unsigned int&gt;{1}}};</span></a>
 <a name="397"><span class="lineNum">     397 </span><span class="lineCov">        764 :   CellIndex&lt;dim&gt;::setDomainParameters();</span></a>
 <a name="398"><span class="lineNum">     398 </span>            : </a>
-<a name="399"><span class="lineNum">     399 </span><span class="lineCov">       3056 :   CellIndex&lt;dim, IndexTrait::vector&gt;::lowerBoundary = CellIndex&lt;dim&gt;::lowerBoundary;</span></a>
+<a name="399"><span class="lineNum">     399 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector&gt;::lowerBoundary = CellIndex&lt;dim&gt;::lowerBoundary;</span></a>
 <a name="400"><span class="lineNum">     400 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector&gt;::upperBoundary = CellIndex&lt;dim&gt;::upperBoundary;</span></a>
 <a name="401"><span class="lineNum">     401 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector&gt;::setDomainParameters();</span></a>
 <a name="402"><span class="lineNum">     402 </span>            : </a>
 <a name="403"><span class="lineNum">     403 </span>            :   // init boundaries of all global, non-m2m, GL excluding indexing types</a>
-<a name="404"><span class="lineNum">     404 </span><span class="lineCov">       4584 :   CellIndex&lt;dim, IndexTrait::noGhost&gt;::lowerBoundary = I01{1};</span></a>
-<a name="405"><span class="lineNum">     405 </span><span class="lineCov">       3820 :   CellIndex&lt;dim, IndexTrait::noGhost&gt;::upperBoundary =</span></a>
+<a name="404"><span class="lineNum">     404 </span><span class="lineCov">       1528 :   CellIndex&lt;dim, IndexTrait::noGhost&gt;::lowerBoundary = I01{1};</span></a>
+<a name="405"><span class="lineNum">     405 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::noGhost&gt;::upperBoundary =</span></a>
 <a name="406"><span class="lineNum">     406 </span><span class="lineCov">       1528 :       I01{tarch::la::Vector&lt;dim, int&gt;{globalNumberCouplingCellsInclGL - tarch::la::Vector&lt;dim, unsigned int&gt;{2}}};</span></a>
 <a name="407"><span class="lineNum">     407 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::noGhost&gt;::setDomainParameters();</span></a>
 <a name="408"><span class="lineNum">     408 </span>            : </a>
-<a name="409"><span class="lineNum">     409 </span><span class="lineCov">       3056 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::noGhost&gt;::lowerBoundary = CellIndex&lt;dim, IndexTrait::noGhost&gt;::lowerBoundary;</span></a>
+<a name="409"><span class="lineNum">     409 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::noGhost&gt;::lowerBoundary = CellIndex&lt;dim, IndexTrait::noGhost&gt;::lowerBoundary;</span></a>
 <a name="410"><span class="lineNum">     410 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::noGhost&gt;::upperBoundary = CellIndex&lt;dim, IndexTrait::noGhost&gt;::upperBoundary;</span></a>
 <a name="411"><span class="lineNum">     411 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::noGhost&gt;::setDomainParameters();</span></a>
 <a name="412"><span class="lineNum">     412 </span>            : </a>
@@ -479,25 +479,25 @@
 <a name="417"><span class="lineNum">     417 </span>            : </a>
 <a name="418"><span class="lineNum">     418 </span>            :   // init boundaries of all global, m2m, GL excluding indexing types</a>
 <a name="419"><span class="lineNum">     419 </span>            : </a>
-<a name="420"><span class="lineNum">     420 </span><span class="lineCov">       4584 :   CellIndex&lt;dim, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary = BaseIndex&lt;dim&gt;{tarch::la::Vector&lt;dim, int&gt;{(int)(outerRegion + 1)}};</span></a>
+<a name="420"><span class="lineNum">     420 </span><span class="lineCov">       1528 :   CellIndex&lt;dim, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary = BaseIndex&lt;dim&gt;{tarch::la::Vector&lt;dim, int&gt;{(int)(outerRegion + 1)}};</span></a>
 <a name="421"><span class="lineNum">     421 </span><span class="lineCov">       1528 :   CellIndex&lt;dim, IndexTrait::md2macro, IndexTrait::noGhost&gt;::upperBoundary =</span></a>
-<a name="422"><span class="lineNum">     422 </span><span class="lineCov">       2292 :       BaseIndex&lt;dim&gt;::upperBoundary - BaseIndex&lt;dim&gt;{tarch::la::Vector&lt;dim, int&gt;{(int)(outerRegion + 1)}};</span></a>
+<a name="422"><span class="lineNum">     422 </span><span class="lineCov">       1528 :       BaseIndex&lt;dim&gt;::upperBoundary - BaseIndex&lt;dim&gt;{tarch::la::Vector&lt;dim, int&gt;{(int)(outerRegion + 1)}};</span></a>
 <a name="423"><span class="lineNum">     423 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::md2macro, IndexTrait::noGhost&gt;::setDomainParameters();</span></a>
 <a name="424"><span class="lineNum">     424 </span>            : </a>
-<a name="425"><span class="lineNum">     425 </span><span class="lineCov">       3056 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary =</span></a>
+<a name="425"><span class="lineNum">     425 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary =</span></a>
 <a name="426"><span class="lineNum">     426 </span>            :       CellIndex&lt;dim, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary;</a>
 <a name="427"><span class="lineNum">     427 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost&gt;::upperBoundary =</span></a>
 <a name="428"><span class="lineNum">     428 </span>            :       CellIndex&lt;dim, IndexTrait::md2macro, IndexTrait::noGhost&gt;::upperBoundary;</a>
 <a name="429"><span class="lineNum">     429 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::md2macro, IndexTrait::noGhost&gt;::setDomainParameters();</span></a>
 <a name="430"><span class="lineNum">     430 </span>            : </a>
 <a name="431"><span class="lineNum">     431 </span>            :   // init boundaries of all global, m2m, GL including indexing types</a>
-<a name="432"><span class="lineNum">     432 </span><span class="lineCov">       3820 :   CellIndex&lt;dim, IndexTrait::md2macro&gt;::lowerBoundary =</span></a>
-<a name="433"><span class="lineNum">     433 </span><span class="lineCov">       3820 :       I01{CellIndex&lt;dim, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary.get() - tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
-<a name="434"><span class="lineNum">     434 </span><span class="lineCov">       3820 :   CellIndex&lt;dim, IndexTrait::md2macro&gt;::upperBoundary =</span></a>
-<a name="435"><span class="lineNum">     435 </span><span class="lineCov">       3820 :       I01{CellIndex&lt;dim, IndexTrait::md2macro, IndexTrait::noGhost&gt;::upperBoundary.get() + tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
+<a name="432"><span class="lineNum">     432 </span><span class="lineCov">       1528 :   CellIndex&lt;dim, IndexTrait::md2macro&gt;::lowerBoundary =</span></a>
+<a name="433"><span class="lineNum">     433 </span><span class="lineCov">       1528 :       I01{CellIndex&lt;dim, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary.get() - tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
+<a name="434"><span class="lineNum">     434 </span><span class="lineCov">       1528 :   CellIndex&lt;dim, IndexTrait::md2macro&gt;::upperBoundary =</span></a>
+<a name="435"><span class="lineNum">     435 </span><span class="lineCov">       1528 :       I01{CellIndex&lt;dim, IndexTrait::md2macro, IndexTrait::noGhost&gt;::upperBoundary.get() + tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
 <a name="436"><span class="lineNum">     436 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::md2macro&gt;::setDomainParameters();</span></a>
 <a name="437"><span class="lineNum">     437 </span>            : </a>
-<a name="438"><span class="lineNum">     438 </span><span class="lineCov">       3056 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::md2macro&gt;::lowerBoundary = CellIndex&lt;dim, IndexTrait::md2macro&gt;::lowerBoundary;</span></a>
+<a name="438"><span class="lineNum">     438 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::md2macro&gt;::lowerBoundary = CellIndex&lt;dim, IndexTrait::md2macro&gt;::lowerBoundary;</span></a>
 <a name="439"><span class="lineNum">     439 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::md2macro&gt;::upperBoundary = CellIndex&lt;dim, IndexTrait::md2macro&gt;::upperBoundary;</span></a>
 <a name="440"><span class="lineNum">     440 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::md2macro&gt;::setDomainParameters();</span></a>
 <a name="441"><span class="lineNum">     441 </span>            : </a>
@@ -509,7 +509,7 @@
 <a name="447"><span class="lineNum">     447 </span><span class="lineCov">       2292 :   for (unsigned int d = 1; d &lt; dim; d++)</span></a>
 <a name="448"><span class="lineNum">     448 </span><span class="lineCov">       1528 :     _scalarNumberProcesses *= _numberProcesses[d];</span></a>
 <a name="449"><span class="lineNum">     449 </span>            : </a>
-<a name="450"><span class="lineNum">     450 </span><span class="lineCov">       1528 :   _parallelTopology = coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology&lt;dim&gt;(parallelTopologyType, _numberProcesses);</span></a>
+<a name="450"><span class="lineNum">     450 </span><span class="lineCov">        764 :   _parallelTopology = coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology&lt;dim&gt;(parallelTopologyType, _numberProcesses);</span></a>
 <a name="451"><span class="lineNum">     451 </span>            : </a>
 <a name="452"><span class="lineNum">     452 </span><span class="lineCov">        764 :   const unsigned int topologyOffset = (_rank / _scalarNumberProcesses) * _scalarNumberProcesses;</span></a>
 <a name="453"><span class="lineNum">     453 </span><span class="lineCov">        764 :   auto coords = _parallelTopology-&gt;getProcessCoordinates(_rank, topologyOffset);</span></a>
@@ -528,23 +528,23 @@
 <a name="466"><span class="lineNum">     466 </span>            :     // however directly casting it into baseIndex shifts everything left by 1, since baseIndex expects ghost</a>
 <a name="467"><span class="lineNum">     467 </span>            :     // thus we directly use the BaseIndex cast, and consequently boxMax requires +2 for two ghost layers</a>
 <a name="468"><span class="lineNum">     468 </span>            :     // the &quot;safer&quot; way to write this would be I08{boxMin} -1 and I08{boxMax} + 1, but the result is the same</a>
-<a name="469"><span class="lineNum">     469 </span><span class="lineCov">       3056 :     CellIndex&lt;dim, IndexTrait::local&gt;::lowerBoundary = BaseIndex&lt;dim&gt;{boxMin};</span></a>
-<a name="470"><span class="lineNum">     470 </span><span class="lineCov">       4584 :     CellIndex&lt;dim, IndexTrait::local&gt;::upperBoundary = BaseIndex&lt;dim&gt;{boxMax + tarch::la::Vector&lt;dim, int&gt;{2}};</span></a>
+<a name="469"><span class="lineNum">     469 </span><span class="lineCov">        764 :     CellIndex&lt;dim, IndexTrait::local&gt;::lowerBoundary = BaseIndex&lt;dim&gt;{boxMin};</span></a>
+<a name="470"><span class="lineNum">     470 </span><span class="lineCov">       2292 :     CellIndex&lt;dim, IndexTrait::local&gt;::upperBoundary = BaseIndex&lt;dim&gt;{boxMax + tarch::la::Vector&lt;dim, int&gt;{2}};</span></a>
 <a name="471"><span class="lineNum">     471 </span><span class="lineCov">        764 :     CellIndex&lt;dim, IndexTrait::local&gt;::setDomainParameters();</span></a>
 <a name="472"><span class="lineNum">     472 </span>            :   }</a>
 <a name="473"><span class="lineNum">     473 </span>            : </a>
-<a name="474"><span class="lineNum">     474 </span><span class="lineCov">       3056 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local&gt;::lowerBoundary = CellIndex&lt;dim, IndexTrait::local&gt;::lowerBoundary;</span></a>
+<a name="474"><span class="lineNum">     474 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local&gt;::lowerBoundary = CellIndex&lt;dim, IndexTrait::local&gt;::lowerBoundary;</span></a>
 <a name="475"><span class="lineNum">     475 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local&gt;::upperBoundary = CellIndex&lt;dim, IndexTrait::local&gt;::upperBoundary;</span></a>
 <a name="476"><span class="lineNum">     476 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local&gt;::setDomainParameters();</span></a>
 <a name="477"><span class="lineNum">     477 </span>            : </a>
 <a name="478"><span class="lineNum">     478 </span>            :   // init boundaries of all local, non-m2m, GL excluding indexing types</a>
-<a name="479"><span class="lineNum">     479 </span><span class="lineCov">       3820 :   CellIndex&lt;dim, IndexTrait::local, IndexTrait::noGhost&gt;::lowerBoundary =</span></a>
-<a name="480"><span class="lineNum">     480 </span><span class="lineCov">       3820 :       I01{CellIndex&lt;dim, IndexTrait::local&gt;::lowerBoundary.get() + tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
-<a name="481"><span class="lineNum">     481 </span><span class="lineCov">       3820 :   CellIndex&lt;dim, IndexTrait::local, IndexTrait::noGhost&gt;::upperBoundary =</span></a>
-<a name="482"><span class="lineNum">     482 </span><span class="lineCov">       3820 :       I01{CellIndex&lt;dim, IndexTrait::local&gt;::upperBoundary.get() - tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
+<a name="479"><span class="lineNum">     479 </span><span class="lineCov">       1528 :   CellIndex&lt;dim, IndexTrait::local, IndexTrait::noGhost&gt;::lowerBoundary =</span></a>
+<a name="480"><span class="lineNum">     480 </span><span class="lineCov">       1528 :       I01{CellIndex&lt;dim, IndexTrait::local&gt;::lowerBoundary.get() + tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
+<a name="481"><span class="lineNum">     481 </span><span class="lineCov">       1528 :   CellIndex&lt;dim, IndexTrait::local, IndexTrait::noGhost&gt;::upperBoundary =</span></a>
+<a name="482"><span class="lineNum">     482 </span><span class="lineCov">       1528 :       I01{CellIndex&lt;dim, IndexTrait::local&gt;::upperBoundary.get() - tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
 <a name="483"><span class="lineNum">     483 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::local, IndexTrait::noGhost&gt;::setDomainParameters();</span></a>
 <a name="484"><span class="lineNum">     484 </span>            : </a>
-<a name="485"><span class="lineNum">     485 </span><span class="lineCov">       3056 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost&gt;::lowerBoundary =</span></a>
+<a name="485"><span class="lineNum">     485 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost&gt;::lowerBoundary =</span></a>
 <a name="486"><span class="lineNum">     486 </span>            :       CellIndex&lt;dim, IndexTrait::local, IndexTrait::noGhost&gt;::lowerBoundary;</a>
 <a name="487"><span class="lineNum">     487 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local, IndexTrait::noGhost&gt;::upperBoundary =</span></a>
 <a name="488"><span class="lineNum">     488 </span>            :       CellIndex&lt;dim, IndexTrait::local, IndexTrait::noGhost&gt;::upperBoundary;</a>
@@ -558,29 +558,29 @@
 <a name="496"><span class="lineNum">     496 </span><span class="lineCov">        764 :     tarch::la::Vector&lt;dim, int&gt; lowerBoundary;</span></a>
 <a name="497"><span class="lineNum">     497 </span><span class="lineCov">        764 :     tarch::la::Vector&lt;dim, int&gt; upperBoundary;</span></a>
 <a name="498"><span class="lineNum">     498 </span><span class="lineCov">       3056 :     for (unsigned int d = 0; d &lt; dim; d++) {</span></a>
-<a name="499"><span class="lineNum">     499 </span><span class="lineCov">       6245 :       lowerBoundary[d] = std::max(LocalNoGlIndex::lowerBoundary.get()[d], GlobalMD2MacroNoGlIndex::lowerBoundary.get()[d]);</span></a>
-<a name="500"><span class="lineNum">     500 </span><span class="lineCov">       6233 :       upperBoundary[d] = std::min(LocalNoGlIndex::upperBoundary.get()[d], GlobalMD2MacroNoGlIndex::upperBoundary.get()[d]);</span></a>
+<a name="499"><span class="lineNum">     499 </span><span class="lineCov">       3953 :       lowerBoundary[d] = std::max(LocalNoGlIndex::lowerBoundary.get()[d], GlobalMD2MacroNoGlIndex::lowerBoundary.get()[d]);</span></a>
+<a name="500"><span class="lineNum">     500 </span><span class="lineCov">       3941 :       upperBoundary[d] = std::min(LocalNoGlIndex::upperBoundary.get()[d], GlobalMD2MacroNoGlIndex::upperBoundary.get()[d]);</span></a>
 <a name="501"><span class="lineNum">     501 </span>            :     }</a>
 <a name="502"><span class="lineNum">     502 </span>            : </a>
-<a name="503"><span class="lineNum">     503 </span><span class="lineCov">       3056 :     CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary = I01{lowerBoundary};</span></a>
-<a name="504"><span class="lineNum">     504 </span><span class="lineCov">       3056 :     CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::upperBoundary = I01{upperBoundary};</span></a>
+<a name="503"><span class="lineNum">     503 </span><span class="lineCov">        764 :     CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary = I01{lowerBoundary};</span></a>
+<a name="504"><span class="lineNum">     504 </span><span class="lineCov">        764 :     CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::upperBoundary = I01{upperBoundary};</span></a>
 <a name="505"><span class="lineNum">     505 </span><span class="lineCov">        764 :     CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::setDomainParameters();</span></a>
 <a name="506"><span class="lineNum">     506 </span>            :   }</a>
 <a name="507"><span class="lineNum">     507 </span>            : </a>
-<a name="508"><span class="lineNum">     508 </span><span class="lineCov">       3056 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary =</span></a>
+<a name="508"><span class="lineNum">     508 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary =</span></a>
 <a name="509"><span class="lineNum">     509 </span>            :       CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary;</a>
 <a name="510"><span class="lineNum">     510 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::upperBoundary =</span></a>
 <a name="511"><span class="lineNum">     511 </span>            :       CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::upperBoundary;</a>
 <a name="512"><span class="lineNum">     512 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::setDomainParameters();</span></a>
 <a name="513"><span class="lineNum">     513 </span>            : </a>
 <a name="514"><span class="lineNum">     514 </span>            :   // init boundaries of all local, m2m, GL including indexing types</a>
-<a name="515"><span class="lineNum">     515 </span><span class="lineCov">       3820 :   CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro&gt;::lowerBoundary =</span></a>
-<a name="516"><span class="lineNum">     516 </span><span class="lineCov">       3820 :       I01{CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary.get() - tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
-<a name="517"><span class="lineNum">     517 </span><span class="lineCov">       3820 :   CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro&gt;::upperBoundary =</span></a>
-<a name="518"><span class="lineNum">     518 </span><span class="lineCov">       3820 :       I01{CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::upperBoundary.get() + tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
+<a name="515"><span class="lineNum">     515 </span><span class="lineCov">       1528 :   CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro&gt;::lowerBoundary =</span></a>
+<a name="516"><span class="lineNum">     516 </span><span class="lineCov">       1528 :       I01{CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::lowerBoundary.get() - tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
+<a name="517"><span class="lineNum">     517 </span><span class="lineCov">       1528 :   CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro&gt;::upperBoundary =</span></a>
+<a name="518"><span class="lineNum">     518 </span><span class="lineCov">       1528 :       I01{CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro, IndexTrait::noGhost&gt;::upperBoundary.get() + tarch::la::Vector&lt;dim, int&gt;{1}};</span></a>
 <a name="519"><span class="lineNum">     519 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro&gt;::setDomainParameters();</span></a>
 <a name="520"><span class="lineNum">     520 </span>            : </a>
-<a name="521"><span class="lineNum">     521 </span><span class="lineCov">       3056 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro&gt;::lowerBoundary =</span></a>
+<a name="521"><span class="lineNum">     521 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro&gt;::lowerBoundary =</span></a>
 <a name="522"><span class="lineNum">     522 </span>            :       CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro&gt;::lowerBoundary;</a>
 <a name="523"><span class="lineNum">     523 </span><span class="lineCov">        764 :   CellIndex&lt;dim, IndexTrait::vector, IndexTrait::local, IndexTrait::md2macro&gt;::upperBoundary =</span></a>
 <a name="524"><span class="lineNum">     524 </span>            :       CellIndex&lt;dim, IndexTrait::local, IndexTrait::md2macro&gt;::upperBoundary;</a>
@@ -694,7 +694,7 @@
 <a name="632"><span class="lineNum">     632 </span>            :     else // all internal cells</a>
 <a name="633"><span class="lineNum">     633 </span><span class="lineCov">        240 :       processCoords[d] = _subdomainOwnership[d][globalCellIndex[d] - 1];</span></a>
 <a name="634"><span class="lineNum">     634 </span>            :   }</a>
-<a name="635"><span class="lineNum">     635 </span><span class="lineCov">        232 :   return _parallelTopology-&gt;getRank(processCoords, topologyOffset);</span></a>
+<a name="635"><span class="lineNum">     635 </span><span class="lineCov">        116 :   return _parallelTopology-&gt;getRank(processCoords, topologyOffset);</span></a>
 <a name="636"><span class="lineNum">     636 </span>            : }</a>
 <a name="637"><span class="lineNum">     637 </span>            : </a>
 <a name="638"><span class="lineNum">     638 </span>            : template &lt;unsigned int dim&gt;</a>

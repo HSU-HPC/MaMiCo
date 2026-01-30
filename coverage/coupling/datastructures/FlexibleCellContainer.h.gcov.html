@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-30 18:18:00</td>
+            <td class="headerValue">2026-01-30 19:14:01</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">4</td>
@@ -154,7 +154,7 @@
 <a name="92"><span class="lineNum">      92 </span>            :      *</a>
 <a name="93"><span class="lineNum">      93 </span>            :      * @return a std::pair with the cell pointer and the index of the data that the iterator points to</a>
 <a name="94"><span class="lineNum">      94 </span>            :      */</a>
-<a name="95"><span class="lineNum">      95 </span><span class="lineCov">        408 :     const std::pair&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*, I01&gt; operator*() const { return std::make_pair(*_itCouplingCells, *_itIdxs); }</span></a>
+<a name="95"><span class="lineNum">      95 </span><span class="lineCov">        204 :     const std::pair&lt;coupling::datastructures::CouplingCell&lt;dim&gt;*, I01&gt; operator*() const { return std::make_pair(*_itCouplingCells, *_itIdxs); }</span></a>
 <a name="96"><span class="lineNum">      96 </span>            : </a>
 <a name="97"><span class="lineNum">      97 </span><span class="lineCov">        320 :     Iterator&amp; operator++() {</span></a>
 <a name="98"><span class="lineNum">      98 </span><span class="lineCov">        120 :       ++_itCouplingCells;</span></a>

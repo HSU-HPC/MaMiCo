@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-30 18:18:00</td>
+            <td class="headerValue">2026-01-30 19:14:01</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -105,12 +105,12 @@
 <a name="43"><span class="lineNum">      43 </span>            : </a>
 <a name="44"><span class="lineNum">      44 </span><span class="lineCov">         48 :   unsigned int getLocalNumberOfMDSimulations() const { return _thisNumberMDSimulations; }</span></a>
 <a name="45"><span class="lineNum">      45 </span>            : </a>
-<a name="46"><span class="lineNum">      46 </span><span class="lineCov">         36 :   unsigned int getAvgNumberOfMDSimulations() const { return _avgNumberMDSimulationsPerLocalComm; }</span></a>
+<a name="46"><span class="lineNum">      46 </span><span class="lineCov">         32 :   unsigned int getAvgNumberOfMDSimulations() const { return _avgNumberMDSimulationsPerLocalComm; }</span></a>
 <a name="47"><span class="lineNum">      47 </span>            : </a>
 <a name="48"><span class="lineNum">      48 </span>            :   tarch::la::Vector&lt;dim, unsigned int&gt; getNumberProcessesPerMDSimulation() const { return _numberProcessesPerMDSimulation; }</a>
 <a name="49"><span class="lineNum">      49 </span>            : </a>
 <a name="50"><span class="lineNum">      50 </span>            : #if (TARCH_PARALLEL == TARCH_YES)</a>
-<a name="51"><span class="lineNum">      51 </span><span class="lineCov">         12 :   MPI_Comm getLocalCommunicator() const { return _localComm; }</span></a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">          4 :   MPI_Comm getLocalCommunicator() const { return _localComm; }</span></a>
 <a name="52"><span class="lineNum">      52 </span>            : #endif</a>
 <a name="53"><span class="lineNum">      53 </span>            :   unsigned int getLocalRank() const { return _localRank; }</a>
 <a name="54"><span class="lineNum">      54 </span>            :   unsigned int getLocalSize() const { return _localSize; }</a>
