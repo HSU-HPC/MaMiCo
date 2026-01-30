@@ -91,9 +91,9 @@ public:
   }
 
   /** returns the local number of cells (i.e. only the cells of this process) */
-  unsigned int getLocalNumberOfCellsLinear(bool includingGhostCells = false) const {
+  size_t getLocalNumberOfCellsLinear(bool includingGhostCells = false) const {
     auto numCells = getLocalNumberOfCells(includingGhostCells);
-    unsigned int numCellsLinear = 1;
+    size_t numCellsLinear = 1;
     for (int d = 0; d < MD_DIM; d++) {
       numCellsLinear *= numCells[d];
     }
@@ -136,7 +136,7 @@ public:
    *
    * The MPI send calls are executed later (from within BoundaryTreatment).
    */
-  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> broadcastInnerCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
+  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> broadcastInnerCellViaBuffer(LinkedCell& cell, const size_t cellIndex,
                                                                                    const simplemd::MoleculeContainer& moleculeContainer);
 
   /** sends all molecules from cell cellIndex to the respective neighbouring process. The cell
@@ -148,7 +148,7 @@ public:
    *
    * The MPI send calls are executed later (from within BoundaryTreatment).
    */
-  bool reduceGhostCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex, const simplemd::MoleculeContainer& moleculeContainer);
+  bool reduceGhostCellViaBuffer(LinkedCell& cell, const size_t cellIndex, const simplemd::MoleculeContainer& moleculeContainer);
 
   /** unpack and resort local buffer
    */
@@ -293,7 +293,7 @@ private:
   const tarch::la::Vector<MD_DIM, double> _meshWidth;
 
   /** The number of ghost cells around the local domain along each axis */
-  const unsigned int _ghostCellLayerThickness = 1; // NOTE: This MUST be 1 (otherwise nothing will work anymore)
+  static constexpr unsigned int _ghostCellLayerThickness = 1; // NOTE: This MUST be 1 (otherwise nothing will work anymore)
 
   /** index of first cell w.r.t. global grid
    */

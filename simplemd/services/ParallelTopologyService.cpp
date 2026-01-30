@@ -145,7 +145,7 @@ bool simplemd::services::ParallelTopologyService::isIdle() const {
 }
 
 std::vector<tarch::la::Vector<MD_DIM, unsigned int>>
-simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
+simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedCell& cell, const size_t cellIndex,
                                                                          const simplemd::MoleculeContainer& moleculeContainer) {
 
   std::vector<tarch::la::Vector<MD_DIM, unsigned int>> localIndex;
@@ -354,7 +354,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
   return localIndex;
 }
 
-bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
+bool simplemd::services::ParallelTopologyService::reduceGhostCellViaBuffer(LinkedCell& cell, const size_t,
                                                                            const simplemd::MoleculeContainer& moleculeContainer) {
 #if (MD_PARALLEL == MD_YES)
   // determine neighbour rank (from position of the respective ghost cell cellIndex)

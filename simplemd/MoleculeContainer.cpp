@@ -44,7 +44,16 @@ void simplemd::MoleculeContainer::remove(unsigned int cellIdx, unsigned int mole
   _linkedCellNumMolecules(cellIdx) -= 1;
 }
 
-void simplemd::MoleculeContainer::clearLinkedCell(unsigned int cellIdx) { _linkedCellNumMolecules(cellIdx) = 0; }
+void simplemd::MoleculeContainer::clearLinkedCell(unsigned int cellIdx) {
+#if (MD_ERROR == MD_YES)
+  if (cellIdx >= _linkedCellNumMolecules.size()) {
+    std::cout << "ERROR simplemd::MoleculeContainer::clearLinkedCell: Index out of range: " << cellIdx
+              << " (Local cell count = " << _linkedCellNumMolecules.size() << ")" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+#endif
+  _linkedCellNumMolecules(cellIdx) = 0;
+}
 
 void simplemd::MoleculeContainer::sort(unsigned int cellIdx) { // set all outgoing molecules
   for (size_t i = 0; i < _linkedCellNumMolecules(cellIdx); i++) {
@@ -171,9 +180,16 @@ void simplemd::MoleculeContainer::sort() {
 #endif
 }
 
-simplemd::Molecule& simplemd::MoleculeContainer::getMoleculeAt(unsigned int i, unsigned int j) const { return _moleculeData(i, j); }
+simplemd::Molecule& simplemd::MoleculeContainer::getMoleculeAt(size_t i, size_t j) const { return _moleculeData(i, j); }
 
-simplemd::LinkedCell simplemd::MoleculeContainer::operator[](unsigned int idx) const {
+simplemd::LinkedCell simplemd::MoleculeContainer::operator[](size_t idx) const {
+#if (MD_ERROR == MD_YES)
+  if (idx >= _linkedCellNumMolecules.size()) {
+    std::cout << "ERROR simplemd::MoleculeContainer::operator[]: Index out of range: " << idx << " (Local cell count = " << _linkedCellNumMolecules.size()
+              << ")" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+#endif
   return simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx, isGhostCell(idx));
 }
 
@@ -181,7 +197,7 @@ simplemd::LinkedCell simplemd::MoleculeContainer::operator[](tarch::la::Vector<M
   return (*this)[vectorIndexToLinear(cellIdx)];
 }
 
-unsigned int simplemd::MoleculeContainer::getLocalNumberOfCellsScalarWithGhost() const { return _linkedCellNumMolecules.size(); }
+size_t simplemd::MoleculeContainer::getLocalNumberOfCellsScalarWithGhost() const { return _linkedCellNumMolecules.size(); }
 
 unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const {
   for (unsigned int d = 0; d < MD_DIM; d++) {
@@ -224,7 +240,7 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
   return vectorIndexToLinear(cellVectorIndex);
 }
 
-unsigned int simplemd::MoleculeContainer::vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const {
+size_t simplemd::MoleculeContainer::vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const {
   unsigned int cellLinearIndex = 0;
   unsigned int stepSize = 1;
   for (int d = 0; d < MD_DIM; d++) {
@@ -234,8 +250,15 @@ unsigned int simplemd::MoleculeContainer::vectorIndexToLinear(const tarch::la::V
   return cellLinearIndex;
 }
 
-tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalCellIndexVector(const unsigned int cellIndex) const {
-  unsigned int help = cellIndex;
+tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalCellIndexVector(const size_t cellIndex) const {
+#if (MD_ERROR == MD_YES)
+  if (cellIndex >= _linkedCellNumMolecules.size()) {
+    std::cout << "ERROR simplemd::MoleculeContainer::getLocalCellIndexVector: Index out of range: " << cellIndex
+              << " (Local cell count = " << _linkedCellNumMolecules.size() << ")" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+#endif
+  size_t help = cellIndex;
   tarch::la::Vector<MD_DIM, unsigned int> localCellIndexVector(0);
 
   for (int d = MD_DIM - 1; d > -1; d--) {

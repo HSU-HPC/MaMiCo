@@ -111,7 +111,7 @@ public:
    * @param j
    * @return simplemd::Molecule&
    */
-  KOKKOS_FUNCTION simplemd::Molecule& getMoleculeAt(unsigned int i, unsigned int j) const;
+  KOKKOS_FUNCTION simplemd::Molecule& getMoleculeAt(size_t i, size_t j) const;
 
   /**
    * @brief Returns the linked cell at 1D index idx (ghost included)
@@ -119,7 +119,7 @@ public:
    * @param idx
    * @return simplemd::LinkedCell
    */
-  KOKKOS_FUNCTION simplemd::LinkedCell operator[](unsigned int idx) const;
+  KOKKOS_FUNCTION simplemd::LinkedCell operator[](size_t idx) const;
 
   /**
    * @brief Returns the linked cell at 3D index idx (ghost included)
@@ -132,9 +132,9 @@ public:
   /**
    * @brief Get the total number of cells in the container
    *
-   * @return unsigned int
+   * @return size_t
    */
-  KOKKOS_FUNCTION unsigned int getLocalNumberOfCellsScalarWithGhost() const;
+  KOKKOS_FUNCTION size_t getLocalNumberOfCellsScalarWithGhost() const;
 
   /**
    * @brief Returns the number of molecules in all cells
@@ -162,7 +162,7 @@ public:
    *
    * @return tarch::la::Vector
    */
-  KOKKOS_FUNCTION tarch::la::Vector<MD_DIM, unsigned int> getLocalCellIndexVector(const unsigned int cellIndex) const;
+  KOKKOS_FUNCTION tarch::la::Vector<MD_DIM, unsigned int> getLocalCellIndexVector(const size_t cellIndex) const;
 
   /**
    * @brief can be used to apply a molecule-mapping which is iterated over all molecules of this process
@@ -293,7 +293,7 @@ private:
    * @param vectorIndex 3D local index of the linked cell.
    * @return const unsigned int
    */
-  KOKKOS_FUNCTION unsigned int vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const;
+  KOKKOS_FUNCTION size_t vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const;
 
   /**
    * @brief returns true if the local cell index cellIndex describes a linked cell
