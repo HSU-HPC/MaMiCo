@@ -272,7 +272,7 @@ void simplemd::MoleculeContainer::printNonGhostCells(size_t numCells, bool print
   Kokkos::printf("Label: %s\n", label);
   Kokkos::printf("cell\tpos_x\tpos_y\tpos_z\n");
   size_t linkedCellCount = _linkedCellNumMolecules.size();
-  size_t cellsRemaining = numCells == 0 ? linkedCellCount : min(numCells, linkedCellCount);
+  size_t cellsRemaining = numCells == 0 ? linkedCellCount : std::min(numCells, linkedCellCount);
   for (size_t i = 0; i < linkedCellCount && cellsRemaining > 0; i++) {
     if (_linkedCellIsGhostCell(i))
       continue;
