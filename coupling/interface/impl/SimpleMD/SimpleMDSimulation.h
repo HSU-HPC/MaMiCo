@@ -2,6 +2,7 @@
 #include "coupling/interface/MDSimulation.h"
 #include "coupling/interface/MamicoInterfaceProvider.h"
 #include "simplemd/MolecularDynamicsSimulation.h"
+#include "simplemd/molecule-mappings/ConvertForcesFloatToFixedMapping.h"
 #include "simplemd/molecule-mappings/ConvertForcesFixedToFloatMapping.h"
 #include "simplemd/molecule-mappings/WriteCheckPointMapping.h"
 
@@ -57,6 +58,9 @@ public:
 
     // compute forces. After this step, each molecule has received all force
     // contributions from its neighbors.
+#if (TARCH_DEBUG == TARCH_YES)
+    _moleculeService->getContainer().iterateMolecules(_convertForcesFloatToFixedMapping);
+#endif
     _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
 #if (TARCH_DEBUG == TARCH_YES)
     _moleculeService->getContainer().iterateMolecules(_convertForcesFixedToFloatMapping);
@@ -159,6 +163,7 @@ private:
   /** @brief bool holding the current state of the coupling: true - coupled
    * simulation and false - independent md simulation */
   bool _couplingSwitchedOn;
+  simplemd::moleculemappings::ConvertForcesFloatToFixedMapping _convertForcesFloatToFixedMapping;
   simplemd::moleculemappings::ConvertForcesFixedToFloatMapping _convertForcesFixedToFloatMapping;
 };
 } // namespace interface
