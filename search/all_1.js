@@ -9,7 +9,7 @@ var searchData=
   ['action_6',['Action',['../classcoupling_1_1ParticleInsertion.html#a6cb63e8cc21131195a1d4da388ad8e06',1,'coupling::ParticleInsertion']]],
   ['additional_20instructions_20to_20build_20with_20lammps_7',['Additional instructions to build with LAMMPS',['../index.html#autotoc_md4',1,'']]],
   ['additional_20instructions_20to_20build_20with_20ls1_8',['Additional instructions to build with ls1',['../index.html#autotoc_md3',1,'']]],
-  ['additive_5fmomentum_5finsertion_9',['ADDITIVE_MOMENTUM_INSERTION',['../classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html#aae22d796ad110edcfc4ccb17c36869b5a39507b4966ed40b86c642703d582807e',1,'coupling::configurations::MomentumInsertionConfiguration']]],
+  ['additive_5fmomentum_5finsertion_9',['ADDITIVE_MOMENTUM_INSERTION',['../classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html#aae22d796ad110edcfc4ccb17c36869b5ab694e6a150f02a4f6aaee20afcd09168',1,'coupling::configurations::MomentumInsertionConfiguration']]],
   ['additivemomentuminsertion_10',['AdditiveMomentumInsertion',['../classcoupling_1_1AdditiveMomentumInsertion.html',1,'coupling::AdditiveMomentumInsertion&lt; LinkedCell, dim &gt;'],['../classcoupling_1_1AdditiveMomentumInsertion.html#ac12ac6d91d0d69d4017a20f181c26c95',1,'coupling::AdditiveMomentumInsertion::AdditiveMomentumInsertion()']]],
   ['addlinkedcell_11',['addLinkedCell',['../classcoupling_1_1datastructures_1_1CouplingCellWithLinkedCells.html#a51cdf9a790ef64de82540ca209f9e47c',1,'coupling::datastructures::CouplingCellWithLinkedCells']]],
   ['addmacroscopicmass_12',['addMacroscopicMass',['../classcoupling_1_1datastructures_1_1CouplingCell.html#a7adfde942fa5e3668b5322143e05a63f',1,'coupling::datastructures::CouplingCell']]],

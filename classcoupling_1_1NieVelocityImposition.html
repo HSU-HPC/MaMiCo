@@ -116,17 +116,19 @@ Collaboration diagram for coupling::NieVelocityImposition&lt; LinkedCell, dim &g
 <div class="dyncontent">
 <div class="center"><img src="classcoupling_1_1NieVelocityImposition__coll__graph.png" border="0" usemap="#acoupling_1_1NieVelocityImposition_3_01LinkedCell_00_01dim_01_4_coll__map" alt="Collaboration graph"/></div>
 <map name="acoupling_1_1NieVelocityImposition_3_01LinkedCell_00_01dim_01_4_coll__map" id="acoupling_1_1NieVelocityImposition_3_01LinkedCell_00_01dim_01_4_coll__map">
-<area shape="rect" title="Velocity imposition scheme following the respective paper by Nie et al., J. Fluid...." alt="" coords="5,94,207,135"/>
-<area shape="rect" href="classcoupling_1_1MomentumInsertion.html" title="used to manipulate the momentum/ velocity of the molecules contained in a coupling cell." alt="" coords="11,5,201,46"/>
-<area shape="poly" title=" " alt="" coords="109,62,109,94,103,94,103,62"/>
+<area shape="rect" title="Velocity imposition scheme following the respective paper by Nie et al., J. Fluid...." alt="" coords="89,109,290,150"/>
+<area shape="rect" href="classcoupling_1_1MomentumInsertion.html" title="used to manipulate the momentum/ velocity of the molecules contained in a coupling cell." alt="" coords="5,5,196,46"/>
+<area shape="poly" title=" " alt="" coords="130,56,175,107,171,110,126,60"/>
+<area shape="rect" href="classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="220,5,338,46"/>
+<area shape="poly" title=" " alt="" coords="254,60,209,110,205,107,250,56"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0eb080d3e8f4163c7b8e7fedeaa97d9e" id="r_a0eb080d3e8f4163c7b8e7fedeaa97d9e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0eb080d3e8f4163c7b8e7fedeaa97d9e">NieVelocityImposition</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface, const unsigned int &amp;outermostLayer, const unsigned int &amp;innermostLayer)</td></tr>
-<tr class="memdesc:a0eb080d3e8f4163c7b8e7fedeaa97d9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
-<tr class="separator:a0eb080d3e8f4163c7b8e7fedeaa97d9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4096d48286760b001371826bd314fd9f" id="r_a4096d48286760b001371826bd314fd9f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4096d48286760b001371826bd314fd9f">NieVelocityImposition</a> (<a class="el" href="classcoupling_1_1interface_1_1MDSolverInterface.html">coupling::interface::MDSolverInterface</a>&lt; LinkedCell, dim &gt; *const mdSolverInterface, const unsigned int &amp;outermostLayer, const unsigned int &amp;innermostLayer, const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt; impositionEnabled)</td></tr>
+<tr class="memdesc:a4096d48286760b001371826bd314fd9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
+<tr class="separator:a4096d48286760b001371826bd314fd9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06690fb0f347209526dcb052d5803229" id="r_a06690fb0f347209526dcb052d5803229"><td class="memItemLeft" align="right" valign="top"><a id="a06690fb0f347209526dcb052d5803229" name="a06690fb0f347209526dcb052d5803229"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~NieVelocityImposition</b> ()</td></tr>
 <tr class="memdesc:a06690fb0f347209526dcb052d5803229"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple destructor <br /></td></tr>
@@ -164,6 +166,9 @@ const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_outerm
 const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>_innermostLayer</b></td></tr>
 <tr class="memdesc:a1a882853f0567902de5d2a0546981e6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">the index of the innermost cell layer <br /></td></tr>
 <tr class="separator:a1a882853f0567902de5d2a0546981e6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf62af494fd9338c5afe5819a5945a03" id="r_abf62af494fd9338c5afe5819a5945a03"><td class="memItemLeft" align="right" valign="top"><a id="abf62af494fd9338c5afe5819a5945a03" name="abf62af494fd9338c5afe5819a5945a03"></a>
+const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_impositionEnabled</b></td></tr>
+<tr class="separator:abf62af494fd9338c5afe5819a5945a03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02cb4ddecd69c2842ca6ac8adf3adfd4" id="r_a02cb4ddecd69c2842ca6ac8adf3adfd4"><td class="memItemLeft" align="right" valign="top"><a id="a02cb4ddecd69c2842ca6ac8adf3adfd4" name="a02cb4ddecd69c2842ca6ac8adf3adfd4"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>_enableInnerImposition</b></td></tr>
 <tr class="separator:a02cb4ddecd69c2842ca6ac8adf3adfd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -186,8 +191,8 @@ class coupling::NieVelocityImposition&lt; LinkedCell, dim &gt;</div><p>Velocity 
   </dd>
 </dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a0eb080d3e8f4163c7b8e7fedeaa97d9e" name="a0eb080d3e8f4163c7b8e7fedeaa97d9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0eb080d3e8f4163c7b8e7fedeaa97d9e">&#9670;&#160;</a></span>NieVelocityImposition()</h2>
+<a id="a4096d48286760b001371826bd314fd9f" name="a4096d48286760b001371826bd314fd9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4096d48286760b001371826bd314fd9f">&#9670;&#160;</a></span>NieVelocityImposition()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -210,7 +215,12 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const unsigned int &amp;</td>          <td class="paramname"><span class="paramname"><em>innermostLayer</em></span>&#160;)</td>
+          <td class="paramtype">const unsigned int &amp;</td>          <td class="paramname"><span class="paramname"><em>innermostLayer</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 2 *dim, bool &gt;</td>          <td class="paramname"><span class="paramname"><em>impositionEnabled</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -226,6 +236,7 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
     <tr><td class="paramname">mdSolverInterface</td><td>interface to the md solver </td></tr>
     <tr><td class="paramname">outermostLayer</td><td>the index of the outermost cell layer </td></tr>
     <tr><td class="paramname">innermostLayer</td><td>the index of the innermost cell layer </td></tr>
+    <tr><td class="paramname">impositionEnabled</td><td>whether imposition is allowed at the specified domain face </td></tr>
   </table>
   </dd>
 </dl>
@@ -333,7 +344,7 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
 </div><div class="memdoc">
 
 <p>based on the cell index, the function tells if the cell is inside the imposition layer </p>
-<p>returns true if the local cell at index currentLocalCouplingCellIndex is inside the layer of imposition cells, given by outermostLayer and innermostLayer. For, e.g., outermostLayer=2 and innermostLayer=3, the layers for imposition are located in the 3rd and 4th strip of cells (we start counting from cell layer=0 which corresponds to the outermost, actually ghost-layer of cells which surrounds the MD domain). </p><dl class="params"><dt>Parameters</dt><dd>
+<p>returns true if the local cell at index currentLocalCouplingCellIndex is inside the layer of imposition cells, given by outermostLayer and innermostLayer. For, e.g., outermostLayer=2 and innermostLayer=3, the layers for imposition are located in the 3rd and 4th strip of cells (we start counting from cell layer=0 which corresponds to the outermost, actually ghost-layer of cells which surrounds the MD domain). Also checks if imposition is enabled in that direction. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">globalCellIndex</td><td>global linearised index of a coupling cell to check </td></tr>
   </table>

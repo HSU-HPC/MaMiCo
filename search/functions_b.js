@@ -9,5 +9,5 @@ var searchData=
   ['moleculeiterator_6',['MoleculeIterator',['../classcoupling_1_1interface_1_1MoleculeIterator.html#a628874b05d58d9a1bb93a8b2a90de242',1,'coupling::interface::MoleculeIterator']]],
   ['momentumcontroller_7',['MomentumController',['../classcoupling_1_1MomentumController.html#a20a13847aebdc85c639e61c2820732e8',1,'coupling::MomentumController']]],
   ['momentuminsertion_8',['MomentumInsertion',['../classcoupling_1_1MomentumInsertion.html#af10b00331787d64c1a0fdba158d8abec',1,'coupling::MomentumInsertion']]],
-  ['momentuminsertionconfiguration_9',['MomentumInsertionConfiguration',['../classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html#aef66b8b4c0aba51f25e7c1eebec2787a',1,'coupling::configurations::MomentumInsertionConfiguration']]]
+  ['momentuminsertionconfiguration_9',['MomentumInsertionConfiguration',['../classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html#a92b23f1da3f42be0f693a7907f455d47',1,'coupling::configurations::MomentumInsertionConfiguration']]]
 ];

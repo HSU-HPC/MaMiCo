@@ -186,7 +186,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>  <span class="keyword">virtual</span> ~FilterSequence() {</div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <span class="comment">// Output average application times for all filters</span></div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="preprocessor">#ifdef DEBUG_FILTER_PIPELINE</span></div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keywordflow">if</span> (IDXS.getRank() == 0){</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keywordflow">if</span> (IDXS.getRank() == 0) {</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>      std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; <span class="stringliteral">&quot;Average application times for filters in this sequence in \u03BCs:&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>      <span class="keywordflow">for</span> (<span class="keyword">auto</span> filter : _filters) {</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;  &quot;</span> &lt;&lt; filter-&gt;getType() &lt;&lt; <span class="stringliteral">&quot;: &quot;</span></div>

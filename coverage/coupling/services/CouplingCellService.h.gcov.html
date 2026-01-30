@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-26 13:19:06</td>
+            <td class="headerValue">2026-01-30 18:18:00</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">1</td>
@@ -87,9 +87,9 @@
 <a name="25"><span class="lineNum">      25 </span>            : #include &quot;coupling/indexing/IndexingService.h&quot;</a>
 <a name="26"><span class="lineNum">      26 </span>            : #include &quot;coupling/interface/MDSolverInterface.h&quot;</a>
 <a name="27"><span class="lineNum">      27 </span>            : #include &quot;coupling/interface/MacroscopicSolverInterface.h&quot;</a>
-<a name="28"><span class="lineNum">      28 </span>            : #include &quot;coupling/sendrecv/DataExchangeFromMD2Macro.h&quot;</a>
-<a name="29"><span class="lineNum">      29 </span>            : #include &quot;coupling/sendrecv/DataExchangeFromMacro2MD.h&quot;</a>
-<a name="30"><span class="lineNum">      30 </span>            : #include &quot;coupling/sendrecv/DataExchangeFromAllMacro2MD.h&quot;</a>
+<a name="28"><span class="lineNum">      28 </span>            : #include &quot;coupling/sendrecv/DataExchangeFromAllMacro2MD.h&quot;</a>
+<a name="29"><span class="lineNum">      29 </span>            : #include &quot;coupling/sendrecv/DataExchangeFromMD2Macro.h&quot;</a>
+<a name="30"><span class="lineNum">      30 </span>            : #include &quot;coupling/sendrecv/DataExchangeFromMacro2MD.h&quot;</a>
 <a name="31"><span class="lineNum">      31 </span>            : #include &quot;coupling/sendrecv/FromMD2Macro.h&quot;</a>
 <a name="32"><span class="lineNum">      32 </span>            : #include &quot;coupling/sendrecv/FromMacro2MD.h&quot;</a>
 <a name="33"><span class="lineNum">      33 </span>            : #include &quot;tarch/utils/MultiMDService.h&quot;</a>
@@ -184,17 +184,17 @@
 <a name="122"><span class="lineNum">     122 </span>            :    * routines may use those as well.</a>
 <a name="123"><span class="lineNum">     123 </span>            :    */</a>
 <a name="124"><span class="lineNum">     124 </span>            :   CouplingCellServiceImpl(</a>
-<a name="125"><span class="lineNum">     125 </span>            :       unsigned int ID, coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* mdSolverInterface,       // interface to MD simulation</a>
-<a name="126"><span class="lineNum">     126 </span>            :       coupling::interface::MacroscopicSolverInterface&lt;dim&gt;* macroscopicSolverInterface,                  // interface to macroscopic solver</a>
-<a name="127"><span class="lineNum">     127 </span>            :       tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,                                              // number of processes in all directions</a>
-<a name="128"><span class="lineNum">     128 </span>            :       unsigned int rank,                                                                                 // current rank</a>
-<a name="129"><span class="lineNum">     129 </span>            :       const coupling::configurations::ParticleInsertionConfiguration&amp; particleInsertionConfiguration,    // configuration for particle</a>
-<a name="130"><span class="lineNum">     130 </span>            :                                                                                                          // insertion</a>
-<a name="131"><span class="lineNum">     131 </span>            :       const coupling::configurations::MomentumInsertionConfiguration&amp; momentumInsertionConfiguration,    // configuration for momentum</a>
-<a name="132"><span class="lineNum">     132 </span>            :                                                                                                          // insertion</a>
-<a name="133"><span class="lineNum">     133 </span>            :       const coupling::configurations::BoundaryForceConfiguration&lt;dim&gt;&amp; boundaryForceConfiguration,       // configuration for boundary forces</a>
-<a name="134"><span class="lineNum">     134 </span>            :       const coupling::configurations::TransferStrategyConfiguration&lt;dim&gt;&amp; transferStrategyConfiguration, // configuration for transfer strategy</a>
-<a name="135"><span class="lineNum">     135 </span>            :       const coupling::configurations::ParallelTopologyConfiguration&amp; parallelTopologyConfiguration,      // configuration for parallel topology</a>
+<a name="125"><span class="lineNum">     125 </span>            :       unsigned int ID, coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* mdSolverInterface,         // interface to MD simulation</a>
+<a name="126"><span class="lineNum">     126 </span>            :       coupling::interface::MacroscopicSolverInterface&lt;dim&gt;* macroscopicSolverInterface,                    // interface to macroscopic solver</a>
+<a name="127"><span class="lineNum">     127 </span>            :       tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,                                                // number of processes in all directions</a>
+<a name="128"><span class="lineNum">     128 </span>            :       unsigned int rank,                                                                                   // current rank</a>
+<a name="129"><span class="lineNum">     129 </span>            :       const coupling::configurations::ParticleInsertionConfiguration&amp; particleInsertionConfiguration,      // configuration for particle</a>
+<a name="130"><span class="lineNum">     130 </span>            :                                                                                                            // insertion</a>
+<a name="131"><span class="lineNum">     131 </span>            :       const coupling::configurations::MomentumInsertionConfiguration&lt;dim&gt;&amp; momentumInsertionConfiguration, // configuration for momentum</a>
+<a name="132"><span class="lineNum">     132 </span>            :                                                                                                            // insertion</a>
+<a name="133"><span class="lineNum">     133 </span>            :       const coupling::configurations::BoundaryForceConfiguration&lt;dim&gt;&amp; boundaryForceConfiguration,         // configuration for boundary forces</a>
+<a name="134"><span class="lineNum">     134 </span>            :       const coupling::configurations::TransferStrategyConfiguration&lt;dim&gt;&amp; transferStrategyConfiguration,   // configuration for transfer strategy</a>
+<a name="135"><span class="lineNum">     135 </span>            :       const coupling::configurations::ParallelTopologyConfiguration&amp; parallelTopologyConfiguration,        // configuration for parallel topology</a>
 <a name="136"><span class="lineNum">     136 </span>            :       const coupling::configurations::ThermostatConfiguration&amp; thermostatConfiguration,</a>
 <a name="137"><span class="lineNum">     137 </span>            :       unsigned int numberMDTimestepsPerCouplingCycle,                                            // number MD timesteps per coupling</a>
 <a name="138"><span class="lineNum">     138 </span>            :                                                                                                  // cycle (required to initialise</a>
@@ -204,17 +204,17 @@
 <a name="142"><span class="lineNum">     142 </span>            :       const char* filterPipelineConfiguration, const tarch::utils::MultiMDService&lt;dim&gt;&amp; multiMDService, unsigned int topologyOffset, int tws = 0);</a>
 <a name="143"><span class="lineNum">     143 </span>            : </a>
 <a name="144"><span class="lineNum">     144 </span>            :   CouplingCellServiceImpl(</a>
-<a name="145"><span class="lineNum">     145 </span>            :       unsigned int ID, coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* mdSolverInterface,       // interface to MD simulation</a>
-<a name="146"><span class="lineNum">     146 </span>            :       coupling::interface::MacroscopicSolverInterface&lt;dim&gt;* macroscopicSolverInterface,                  // interface to macroscopic solver</a>
-<a name="147"><span class="lineNum">     147 </span>            :       tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,                                              // number of processes in all directions</a>
-<a name="148"><span class="lineNum">     148 </span>            :       unsigned int rank,                                                                                 // current rank</a>
-<a name="149"><span class="lineNum">     149 </span>            :       const coupling::configurations::ParticleInsertionConfiguration&amp; particleInsertionConfiguration,    // configuration for particle</a>
-<a name="150"><span class="lineNum">     150 </span>            :                                                                                                          // insertion</a>
-<a name="151"><span class="lineNum">     151 </span>            :       const coupling::configurations::MomentumInsertionConfiguration&amp; momentumInsertionConfiguration,    // configuration for momentum</a>
-<a name="152"><span class="lineNum">     152 </span>            :                                                                                                          // insertion</a>
-<a name="153"><span class="lineNum">     153 </span>            :       const coupling::configurations::BoundaryForceConfiguration&lt;dim&gt;&amp; boundaryForceConfiguration,       // configuration for boundary forces</a>
-<a name="154"><span class="lineNum">     154 </span>            :       const coupling::configurations::TransferStrategyConfiguration&lt;dim&gt;&amp; transferStrategyConfiguration, // configuration for transfer strategy</a>
-<a name="155"><span class="lineNum">     155 </span>            :       const coupling::configurations::ParallelTopologyConfiguration&amp; parallelTopologyConfiguration,      // configuration for parallel topology</a>
+<a name="145"><span class="lineNum">     145 </span>            :       unsigned int ID, coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* mdSolverInterface,         // interface to MD simulation</a>
+<a name="146"><span class="lineNum">     146 </span>            :       coupling::interface::MacroscopicSolverInterface&lt;dim&gt;* macroscopicSolverInterface,                    // interface to macroscopic solver</a>
+<a name="147"><span class="lineNum">     147 </span>            :       tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,                                                // number of processes in all directions</a>
+<a name="148"><span class="lineNum">     148 </span>            :       unsigned int rank,                                                                                   // current rank</a>
+<a name="149"><span class="lineNum">     149 </span>            :       const coupling::configurations::ParticleInsertionConfiguration&amp; particleInsertionConfiguration,      // configuration for particle</a>
+<a name="150"><span class="lineNum">     150 </span>            :                                                                                                            // insertion</a>
+<a name="151"><span class="lineNum">     151 </span>            :       const coupling::configurations::MomentumInsertionConfiguration&lt;dim&gt;&amp; momentumInsertionConfiguration, // configuration for momentum</a>
+<a name="152"><span class="lineNum">     152 </span>            :                                                                                                            // insertion</a>
+<a name="153"><span class="lineNum">     153 </span>            :       const coupling::configurations::BoundaryForceConfiguration&lt;dim&gt;&amp; boundaryForceConfiguration,         // configuration for boundary forces</a>
+<a name="154"><span class="lineNum">     154 </span>            :       const coupling::configurations::TransferStrategyConfiguration&lt;dim&gt;&amp; transferStrategyConfiguration,   // configuration for transfer strategy</a>
+<a name="155"><span class="lineNum">     155 </span>            :       const coupling::configurations::ParallelTopologyConfiguration&amp; parallelTopologyConfiguration,        // configuration for parallel topology</a>
 <a name="156"><span class="lineNum">     156 </span>            :       const coupling::configurations::ThermostatConfiguration&amp; thermostatConfiguration,</a>
 <a name="157"><span class="lineNum">     157 </span>            :       unsigned int numberMDTimestepsPerCouplingCycle,                                            // number MD timesteps per coupling</a>
 <a name="158"><span class="lineNum">     158 </span>            :                                                                                                  // cycle (required to initialise</a>
@@ -391,7 +391,7 @@
 <a name="329"><span class="lineNum">     329 </span>            : </a>
 <a name="330"><span class="lineNum">     330 </span>            :   /** needed for insertion of momentum */</a>
 <a name="331"><span class="lineNum">     331 </span>            :   coupling::MomentumInsertion&lt;LinkedCell, dim&gt;* _momentumInsertion;</a>
-<a name="332"><span class="lineNum">     332 </span>            :   coupling::configurations::MomentumInsertionConfiguration::MomentumInsertionType _momentumInsertionType;</a>
+<a name="332"><span class="lineNum">     332 </span>            :   coupling::configurations::MomentumInsertionConfiguration&lt;3&gt;::MomentumInsertionType _momentumInsertionType;</a>
 <a name="333"><span class="lineNum">     333 </span>            :   /** needed for insertion of particles, e.g. USHER */</a>
 <a name="334"><span class="lineNum">     334 </span>            :   coupling::ParticleInsertion&lt;LinkedCell, dim&gt;* _particleInsertion;</a>
 <a name="335"><span class="lineNum">     335 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _numberLinkedCellsPerCouplingCell;</a>

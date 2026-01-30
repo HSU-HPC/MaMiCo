@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-26 13:19:06</td>
+            <td class="headerValue">2026-01-30 18:18:00</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -145,7 +145,7 @@
 <a name="83"><span class="lineNum">      83 </span>            :   /**</a>
 <a name="84"><span class="lineNum">      84 </span>            :    *    @return _momentumInsertionConfiguration</a>
 <a name="85"><span class="lineNum">      85 </span>            :    */</a>
-<a name="86"><span class="lineNum">      86 </span>            :   const coupling::configurations::MomentumInsertionConfiguration&amp; getMomentumInsertionConfiguration() const {</a>
+<a name="86"><span class="lineNum">      86 </span>            :   const coupling::configurations::MomentumInsertionConfiguration&lt;dim&gt;&amp; getMomentumInsertionConfiguration() const {</a>
 <a name="87"><span class="lineNum">      87 </span>            :     if (!_isDefinedMomentumInsertion) {</a>
 <a name="88"><span class="lineNum">      88 </span>            :       std::cout &lt;&lt; &quot;ERROR coupling::configurations::MaMiCoConfiguration: &quot;</a>
 <a name="89"><span class="lineNum">      89 </span>            :                    &quot;Momentum insertion not defined!&quot;</a>
@@ -219,7 +219,7 @@
 <a name="157"><span class="lineNum">     157 </span>            :   bool _isValid;</a>
 <a name="158"><span class="lineNum">     158 </span>            :   coupling::configurations::CouplingCellConfiguration&lt;dim&gt; _couplingCellConfiguration;</a>
 <a name="159"><span class="lineNum">     159 </span>            :   coupling::configurations::ParticleInsertionConfiguration _particleInsertionConfiguration;</a>
-<a name="160"><span class="lineNum">     160 </span>            :   coupling::configurations::MomentumInsertionConfiguration _momentumInsertionConfiguration;</a>
+<a name="160"><span class="lineNum">     160 </span>            :   coupling::configurations::MomentumInsertionConfiguration&lt;dim&gt; _momentumInsertionConfiguration;</a>
 <a name="161"><span class="lineNum">     161 </span>            :   coupling::configurations::BoundaryForceConfiguration&lt;dim&gt; _boundaryForceConfiguration;</a>
 <a name="162"><span class="lineNum">     162 </span>            :   coupling::configurations::TransferStrategyConfiguration&lt;dim&gt; _transferStrategyConfiguration;</a>
 <a name="163"><span class="lineNum">     163 </span>            :   coupling::configurations::ParallelTopologyConfiguration _parallelTopologyConfiguration;</a>

@@ -1,5 +1,5 @@
-<map id="coupling::configurations::MomentumInsertionConfiguration" name="coupling::configurations::MomentumInsertionConfiguration">
-<area shape="rect" id="Node000001" title="momentum insertion configuration. friend class: NieTest" alt="" coords="5,94,223,135"/>
-<area shape="rect" id="Node000002" href="$classtarch_1_1configuration_1_1Configuration.html" title=" " alt="" coords="49,5,179,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,62,117,94,111,94,111,62"/>
+<map id="coupling::configurations::MomentumInsertionConfiguration&lt; dim &gt;" name="coupling::configurations::MomentumInsertionConfiguration&lt; dim &gt;">
+<area shape="rect" id="Node000001" title="momentum insertion configuration. friend class: NieTest" alt="" coords="5,94,266,135"/>
+<area shape="rect" id="Node000002" href="$classtarch_1_1configuration_1_1Configuration.html" title=" " alt="" coords="71,5,200,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,62,138,94,133,94,133,62"/>
 </map>

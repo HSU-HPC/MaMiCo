@@ -47,7 +47,7 @@ var searchData=
   ['_7emoleculeiterator_44',['~MoleculeIterator',['../classcoupling_1_1interface_1_1MoleculeIterator.html#a5b07e3a5bc0732fbd8bc663a2defcd2b',1,'coupling::interface::MoleculeIterator']]],
   ['_7emomentumcontroller_45',['~MomentumController',['../classcoupling_1_1MomentumController.html#ace1afc2211e36ec74a3d4ecfbbe60270',1,'coupling::MomentumController']]],
   ['_7emomentuminsertion_46',['~MomentumInsertion',['../classcoupling_1_1MomentumInsertion.html#ac890873bf7467fc67b839e5c0b0c7116',1,'coupling::MomentumInsertion']]],
-  ['_7emomentuminsertionconfiguration_47',['~MomentumInsertionConfiguration',['../classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html#a8ffc2d13421312e5ea0213ce8fa97bc6',1,'coupling::configurations::MomentumInsertionConfiguration']]],
+  ['_7emomentuminsertionconfiguration_47',['~MomentumInsertionConfiguration',['../classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html#a09c7e47436cf3d56b26652a1dd34d4e2',1,'coupling::configurations::MomentumInsertionConfiguration']]],
   ['_7enievelocityimposition_48',['~NieVelocityImposition',['../classcoupling_1_1NieVelocityImposition.html#a06690fb0f347209526dcb052d5803229',1,'coupling::NieVelocityImposition']]],
   ['_7enievelocityimpositionmapping_49',['~NieVelocityImpositionMapping',['../classcoupling_1_1cellmappings_1_1NieVelocityImpositionMapping.html#a3358564d42cb0d66976120579a5c7bee',1,'coupling::cellmappings::NieVelocityImpositionMapping']]],
   ['_7enoboundaryforce_50',['~NoBoundaryForce',['../classcoupling_1_1NoBoundaryForce.html#a2e88ef990f57e982ef0b265d171f7e0f',1,'coupling::NoBoundaryForce']]],

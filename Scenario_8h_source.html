@@ -113,14 +113,14 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">public</span>:</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  Scenario(std::string scenarioname) : _scenarioname(scenarioname) {</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <a class="code hl_function" href="classScenario.html#a1cbdd3f5c70b0335dae602aa0e0d5a81">getRootRank</a>();</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classScenario.html#aff1db6bc80a99fbc3fd3a83abe3f51f1">_isRootRank</a>){</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classScenario.html#aff1db6bc80a99fbc3fd3a83abe3f51f1">_isRootRank</a>) {</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;Run &quot;</span> &lt;&lt; scenarioname &lt;&lt; <span class="stringliteral">&quot;...&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;MaMiCo git commit hash = &quot;</span> &lt;&lt; MAMICO_STRINGIFY(MAMICO_COMMIT_HASH) &lt;&lt; std::endl;</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    }</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  }</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  <span class="keyword">virtual</span> ~Scenario() { </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classScenario.html#aff1db6bc80a99fbc3fd3a83abe3f51f1">_isRootRank</a>){</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;Shut down &quot;</span> &lt;&lt; _scenarioname &lt;&lt; std::endl; </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  <span class="keyword">virtual</span> ~Scenario() {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classScenario.html#aff1db6bc80a99fbc3fd3a83abe3f51f1">_isRootRank</a>) {</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>      std::cout &lt;&lt; <span class="stringliteral">&quot;Shut down &quot;</span> &lt;&lt; _scenarioname &lt;&lt; std::endl;</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    }</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  }</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>

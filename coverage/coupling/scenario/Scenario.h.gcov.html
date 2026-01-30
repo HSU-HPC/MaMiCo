@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-26 13:19:06</td>
+            <td class="headerValue">2026-01-30 18:18:00</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -81,14 +81,14 @@
 <a name="19"><span class="lineNum">      19 </span>            : public:</a>
 <a name="20"><span class="lineNum">      20 </span>            :   Scenario(std::string scenarioname) : _scenarioname(scenarioname) {</a>
 <a name="21"><span class="lineNum">      21 </span>            :     getRootRank();</a>
-<a name="22"><span class="lineNum">      22 </span>            :     if (_isRootRank){</a>
+<a name="22"><span class="lineNum">      22 </span>            :     if (_isRootRank) {</a>
 <a name="23"><span class="lineNum">      23 </span>            :       std::cout &lt;&lt; &quot;Run &quot; &lt;&lt; scenarioname &lt;&lt; &quot;...&quot; &lt;&lt; std::endl;</a>
 <a name="24"><span class="lineNum">      24 </span>            :       std::cout &lt;&lt; &quot;MaMiCo git commit hash = &quot; &lt;&lt; MAMICO_STRINGIFY(MAMICO_COMMIT_HASH) &lt;&lt; std::endl;</a>
 <a name="25"><span class="lineNum">      25 </span>            :     }</a>
 <a name="26"><span class="lineNum">      26 </span>            :   }</a>
-<a name="27"><span class="lineNum">      27 </span>            :   virtual ~Scenario() { </a>
-<a name="28"><span class="lineNum">      28 </span>            :     if (_isRootRank){</a>
-<a name="29"><span class="lineNum">      29 </span>            :       std::cout &lt;&lt; &quot;Shut down &quot; &lt;&lt; _scenarioname &lt;&lt; std::endl; </a>
+<a name="27"><span class="lineNum">      27 </span>            :   virtual ~Scenario() {</a>
+<a name="28"><span class="lineNum">      28 </span>            :     if (_isRootRank) {</a>
+<a name="29"><span class="lineNum">      29 </span>            :       std::cout &lt;&lt; &quot;Shut down &quot; &lt;&lt; _scenarioname &lt;&lt; std::endl;</a>
 <a name="30"><span class="lineNum">      30 </span>            :     }</a>
 <a name="31"><span class="lineNum">      31 </span>            :   }</a>
 <a name="32"><span class="lineNum">      32 </span>            : </a>

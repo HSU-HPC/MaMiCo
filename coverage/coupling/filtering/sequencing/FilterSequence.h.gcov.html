@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-26 13:19:06</td>
+            <td class="headerValue">2026-01-30 18:18:00</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -154,7 +154,7 @@
 <a name="92"><span class="lineNum">      92 </span><span class="lineNoCov">          0 :   virtual ~FilterSequence() {</span></a>
 <a name="93"><span class="lineNum">      93 </span>            :     // Output average application times for all filters</a>
 <a name="94"><span class="lineNum">      94 </span>            : #ifdef DEBUG_FILTER_PIPELINE</a>
-<a name="95"><span class="lineNum">      95 </span>            :     if (IDXS.getRank() == 0){</a>
+<a name="95"><span class="lineNum">      95 </span>            :     if (IDXS.getRank() == 0) {</a>
 <a name="96"><span class="lineNum">      96 </span>            :       std::cout &lt;&lt; PRINT_PREFIX() &lt;&lt; &quot;Average application times for filters in this sequence in \u03BCs:&quot; &lt;&lt; std::endl;</a>
 <a name="97"><span class="lineNum">      97 </span>            :       for (auto filter : _filters) {</a>
 <a name="98"><span class="lineNum">      98 </span>            :         std::cout &lt;&lt; &quot;       &quot; &lt;&lt; filter-&gt;getType() &lt;&lt; &quot;: &quot;</a>
