@@ -315,7 +315,7 @@ void simplemd::MoleculeContainer::printNonGhostCells(bool shouldPrintCells, cons
     return;
   Kokkos::printf("=== BEGIN DUMP MOLECULE CONTAINER ===\n");
   Kokkos::printf("Label: %s\n", label);
-  Kokkos::printf("cell\tpos_x\tpos_y\tpos_z\n");
+  Kokkos::printf("cell\tpos_x\tpos_y\tpos_z\tvel_x\tvel_y\tvel_z\tforce_x\tforce_y\tforce_z\n");
   size_t linkedCellCount = _linkedCellNumMolecules.size();
   size_t cellsRemaining = MD_DUMP_CELLS == 0 ? linkedCellCount : std::min(MD_DUMP_CELLS, linkedCellCount);
   for (size_t i = 0; i < linkedCellCount && cellsRemaining > 0; i++) {
