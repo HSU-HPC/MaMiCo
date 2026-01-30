@@ -73,7 +73,7 @@ public:
 
   T& operator[](unsigned int pos) {
 #ifdef NLM_DEBUG
-    if (pos < 0 || pos > _scalarSize - 1) {
+    if (pos > _scalarSize - 1) {
       std::cout << "ERROR Field T& operator[](int pos): pos out of range!" << std::endl;
       std::cout << "pos=" << pos << ", _scalarSize=" << _scalarSize << std::endl;
       exit(EXIT_FAILURE);
@@ -84,7 +84,7 @@ public:
 
   const T& operator[](unsigned int pos) const {
 #ifdef NLM_DEBUG
-    if (pos < 0 || pos > _scalarSize - 1) {
+    if (pos > _scalarSize - 1) {
       std::cout << "ERROR Field T& operator[](int pos): pos out of range!" << std::endl;
       std::cout << "pos=" << pos << ", _scalarSize=" << _scalarSize << std::endl;
       exit(EXIT_FAILURE);
@@ -120,13 +120,13 @@ private:
   unsigned int idx(const tarch::la::Vector<dim, unsigned int>& pos, const unsigned int& t) const {
 #ifdef NLM_DEBUG
     for (unsigned int d = 0; d < dim; d++) {
-      if (pos[d] < 0 || pos[d] > _spatialSize[d] - 1) {
+      if (pos[d] > _spatialSize[d] - 1) {
         std::cout << "ERROR Field idx(): pos out of range!" << std::endl;
         std::cout << "pos=" << pos << ", _spatialSize=" << _spatialSize << std::endl;
         exit(EXIT_FAILURE);
       }
     }
-    if (t < 0 || t > _temporalSize - 1) {
+    if (t > _temporalSize - 1) {
       std::cout << "ERROR Field idx(): t out of range!" << std::endl;
       std::cout << "t=" << t << ", _temporalSize=" << _temporalSize << std::endl;
       exit(EXIT_FAILURE);
@@ -170,8 +170,8 @@ public:
   double distance(const coupling::filtering::Patch<dim>& other) {
     unsigned int size = _flowfield.getScalarSize() * (dim + 1);
 
-    double* const my_data = reinterpret_cast<double* const>(_flowfield._data);
-    double* const other_data = reinterpret_cast<double* const>(other._flowfield._data);
+    double* const my_data = reinterpret_cast<double*>(_flowfield._data);
+    double* const other_data = reinterpret_cast<double*>(other._flowfield._data);
 
     double res = 0;
     for (unsigned int i = 0; i < size; i += 1) {

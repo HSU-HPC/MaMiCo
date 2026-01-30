@@ -4,15 +4,16 @@
 // www5.in.tum.de/mamico
 #include "simplemd/cell-mappings/PeriodicAndParallelBoundaryFillCellsMapping.h"
 
-void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handleCell(LinkedCell& cell) {
   // size of the local domain
-  const tarch::la::Vector<MD_DIM, unsigned int> size(_linkedCellService.getLocalNumberOfCells() + 2u * _linkedCellService.getLocalIndexOfFirstCell());
+  const tarch::la::Vector<MD_DIM, unsigned int> size(_moleculeContainer.getLocalNumberOfCells() + 2u * _moleculeContainer.getLocalIndexOfFirstCell());
   // first: send molecules to neighboring ghost cells, if needed.
-  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> localIndex = _parallelTopologyService.broadcastInnerCellViaBuffer(cell, cellIndex, _linkedCellService);
+  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> localIndex =
+      _parallelTopologyService.broadcastInnerCellViaBuffer(cell, cell.getIndex(), _moleculeContainer);
 
   // now: run over the local periodic boundaries and update those
-  const unsigned int localIndexSize = (unsigned int)localIndex.size();
-  for (unsigned int i = 0; i < localIndexSize; i++) {
+  const size_t localIndexSize = localIndex.size();
+  for (size_t i = 0; i < localIndexSize; i++) {
     // compute shift for periodic condition
     tarch::la::Vector<MD_DIM, double> shift(0.0);
     tarch::la::Vector<MD_DIM, double> positionBuffer(0.0);
@@ -24,15 +25,15 @@ void simplemd::cellmappings::PeriodicAndParallelBoundaryFillCellsMapping::handle
       }
     }
     // iterate over cell's molecules and add molecules to local ghost cell
-    for (std::list<Molecule*>::const_iterator it = cell.begin(); it != cell.end(); it++) {
-      positionBuffer = (*it)->getConstPosition();
+    for (auto it = cell.begin(); it != cell.end(); it++) {
+      positionBuffer = it->getConstPosition();
       positionBuffer += shift;
-      Molecule myMolecule(positionBuffer, (*it)->getConstVelocity());
-      myMolecule.setForceOld((*it)->getConstForceOld());
-      if ((*it)->isFixed())
+      Molecule myMolecule(positionBuffer, it->getConstVelocity());
+      myMolecule.setForceOld(it->getConstForceOld());
+      if (it->isFixed())
         myMolecule.fix();
-      Molecule* myPtr = _moleculeService.addMolecule(myMolecule);
-      _linkedCellService.addMoleculeToLinkedCell(*myPtr, localIndex[i]);
+      auto vectorCellIndex = localIndex[i];
+      _moleculeContainer.insert(vectorCellIndex, myMolecule);
     }
   }
 }

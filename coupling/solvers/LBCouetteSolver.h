@@ -233,6 +233,7 @@ public:
       // cell. This interpolation is valid for FLUID-MD_BOUNDARY neighbouring
       // relations only. determine local velocity received from MaMiCo and
       // convert it to LB units; store the velocity in _vel
+      // massFactor is used to ensure conservation of energy
       tarch::la::Vector<3, double> localVel((1.0 / couplingCell->getMacroscopicMass()) * (_dt / _dx) * couplingCell->getMacroscopicMomentum());
       for (unsigned int d = 0; d < 3; d++) {
         _vel[3 * index + d] = localVel[d];

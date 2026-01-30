@@ -526,7 +526,7 @@ protected:
       fillSendBuffer(_cfg.density, *_couetteSolver, _couplingBuffer.macro2MDBuffer);
     }
     if (_cfg.macro2Md) {
-#ifdef USE_COLLECTIVE_MPI
+#ifdef MAMICO_USE_COLLECTIVE_MPI
       _multiMDCellService->bcastFromMacro2MD(_couplingBuffer.macro2MDBuffer);
 #else
       _multiMDCellService->sendFromMacro2MD(_couplingBuffer.macro2MDBuffer);
@@ -619,7 +619,7 @@ protected:
 
       // send back data from MD instances and merge it
       if (_cfg.md2Macro) {
-#ifdef USE_COLLECTIVE_MPI
+#ifdef MAMICO_USE_COLLECTIVE_MPI
         _tv.filter += _multiMDCellService->reduceFromMD2Macro(_couplingBuffer.md2macroBuffer);
 #else
         _tv.filter += _multiMDCellService->sendFromMD2Macro(_couplingBuffer.md2macroBuffer);
@@ -634,7 +634,7 @@ protected:
         //_couplingBuffer does not get used here: Instead, the synthetic MD in the
         // SYNTHETICMD_SEQUENCE generates values. To prevent segfaults, it has
         // to be nonempty, though.
-#ifdef USE_COLLECTIVE_MPI
+#ifdef MAMICO_USE_COLLECTIVE_MPI
         _tv.filter += _multiMDCellService->reduceFromMD2Macro(_couplingBuffer.md2macroBuffer);
 #else
         _tv.filter += _multiMDCellService->sendFromMD2Macro(_couplingBuffer.md2macroBuffer);
@@ -895,7 +895,7 @@ protected:
       }
     } else if (_cfg.maSolverType == CouetteConfig::COUETTE_FD) {
       solver = new coupling::solvers::FiniteDifferenceSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "FDCouette",
-                                                             _cfg.lbNumberProcesses, 1);
+                                                             _cfg.lbNumberProcesses);
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): FD solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);

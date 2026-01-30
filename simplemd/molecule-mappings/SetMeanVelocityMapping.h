@@ -32,6 +32,8 @@ public:
     velocity = velocity - _oldVelocity + _newVelocity;
   }
 
+  static const bool IsParallel = false;
+
 private:
   const tarch::la::Vector<MD_DIM, double> _oldVelocity;
   const tarch::la::Vector<MD_DIM, double> _newVelocity;

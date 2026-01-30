@@ -455,7 +455,6 @@ PYBIND11_MODULE(mamico, mamico) {
   py::class_<simplemd::configurations::SimulationConfiguration>(configuration, "SimulationConfiguration")
       .def("getDt", &simplemd::configurations::SimulationConfiguration::getDt)
       .def("getNumberOfTimesteps", &simplemd::configurations::SimulationConfiguration::getNumberOfTimesteps)
-      .def("getReorganiseMemoryEveryTimestep", &simplemd::configurations::SimulationConfiguration::getReorganiseMemoryEveryTimestep)
       .def("computeMacroscopicQuantitiesEveryTimestep", &simplemd::configurations::SimulationConfiguration::computeMacroscopicQuantitiesEveryTimestep)
       .def("fixSeed", &simplemd::configurations::SimulationConfiguration::fixSeed)
       .def("useOverlappingCommunicationWithForceComputation",

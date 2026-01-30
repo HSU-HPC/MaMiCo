@@ -22,39 +22,41 @@ public:
 
   void endCellIteration() {}
 
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     tarch::la::Vector<MD_DIM, double> meanVelocityForCell(0.0);
     double stdDeviation = std::sqrt(MD_DIM * _kB * _temperature / _molecularMass);
 
     tarch::la::Vector<MD_DIM, double> randomNumbers(0.0);
 
-    for (std::list<Molecule*>::iterator molecule = cell.begin(); molecule != cell.end(); molecule++) {
-      meanVelocityForCell += (*molecule)->getVelocity();
+    for (auto molecule = cell.begin(); molecule != cell.end(); molecule++) {
+      meanVelocityForCell += molecule->getVelocity();
     }
-    meanVelocityForCell = meanVelocityForCell / (double)cell.getConstList().size() / _molecularMass;
+    meanVelocityForCell = meanVelocityForCell / (double)cell.numMolecules() / _molecularMass;
 
-    for (std::list<Molecule*>::iterator molecule = cell.begin(); molecule != cell.end(); molecule++) {
+    for (auto molecule = cell.begin(); molecule != cell.end(); molecule++) {
       randomNumbers[0] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
       for (unsigned int d = 1; d < MD_DIM; ++d) {
         randomNumbers[d] = tarch::utils::RandomNumberService::getInstance().getGaussianRandomNumber();
       }
 
-      tarch::la::Vector<MD_DIM, double>& mVelocity = (*molecule)->getVelocity();
+      tarch::la::Vector<MD_DIM, double>& mVelocity = molecule->getVelocity();
 #if (MD_DIM == 1)
       mVelocity = meanVelocityForCell + stdDeviation * randomNumbers;
 #elif (MD_DIM == 2)
-      mVelocity[0] = meanVelocityForCell[0] + stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));
-      mVelocity[1] = meanVelocityForCell[1] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]));
+      mVelocity[0] = meanVelocityForCell[0] + stdDeviation * (randomNumbers[0] * TARCH_COS(randomNumbers[1]));
+      mVelocity[1] = meanVelocityForCell[1] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]));
 #elif (MD_DIM == 3)
-      mVelocity[0] = meanVelocityForCell[0] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::cos(randomNumbers[2]));
-      mVelocity[1] = meanVelocityForCell[1] + stdDeviation * (randomNumbers[0] * std::sin(randomNumbers[1]) * std::sin(randomNumbers[2]));
-      mVelocity[2] = meanVelocityForCell[2] + stdDeviation * (randomNumbers[0] * std::cos(randomNumbers[1]));
+      mVelocity[0] = meanVelocityForCell[0] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]) * TARCH_COS(randomNumbers[2]));
+      mVelocity[1] = meanVelocityForCell[1] + stdDeviation * (randomNumbers[0] * TARCH_SIN(randomNumbers[1]) * TARCH_SIN(randomNumbers[2]));
+      mVelocity[2] = meanVelocityForCell[2] + stdDeviation * (randomNumbers[0] * TARCH_COS(randomNumbers[1]));
 #endif
 
-      tarch::la::Vector<MD_DIM, double>& mPosition = (*molecule)->getPosition();
+      tarch::la::Vector<MD_DIM, double>& mPosition = molecule->getPosition();
       mPosition = mPosition + 1e-6 * mVelocity;
     }
   }
+
+  static const bool IsParallel = false;
 
 private:
   const double _molecularMass;

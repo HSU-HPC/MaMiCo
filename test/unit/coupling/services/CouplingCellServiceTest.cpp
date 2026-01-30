@@ -9,7 +9,7 @@
 #include "coupling/configurations/TransferStrategyConfiguration.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
-#include "simplemd/LinkedCell.h"
+#include "coupling/interface/impl/SimpleMD/SimpleMDLinkedCellWrapper.h"
 #include "tarch/utils/MultiMDService.h"
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -36,7 +36,7 @@ public:
 
     IndexingService<3>::getInstance().initWithCells({1}, numberOfProcesses, coupling::paralleltopology::XYZ, 1, rank);
 
-    coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>* mdSolverInterface = new TestMDSolverInterface<dim>();
+    coupling::interface::MDSolverInterface<coupling::interface::SimpleMDLinkedCellWrapper, dim>* mdSolverInterface = new TestMDSolverInterface<dim>();
     coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface = new TestMacroscopicSolverInterface<dim>();
 
     TestParticleInsertionConfiguration particleInsertionConfiguration;
@@ -50,22 +50,23 @@ public:
     const char* filterPipelineConfigurationFile = nullptr;
     tarch::utils::MultiMDService<dim> multiMDService{tarch::la::Vector<dim, unsigned int>{1}, 1};
     const unsigned int topologyOffset = 1;
-    new coupling::services::CouplingCellServiceImpl<simplemd::LinkedCell, dim>(
+    new coupling::services::CouplingCellServiceImpl<coupling::interface::SimpleMDLinkedCellWrapper, dim>(
         1, mdSolverInterface, macroscopicSolverInterface, numberOfProcesses, rank, particleInsertionConfiguration, momentumInsertionConfiguration,
         boundaryForceConfiguration, transferStrategyConfiguration, parallelTopologyConfiguration, thermostatConfiguration, numberOfTimeSteps,
         couplingCellConfiguration, filterPipelineConfigurationFile, multiMDService, topologyOffset);
   }
 
 private:
-  template <unsigned int dim> class TestMDSolverInterface : public coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim> {
+  template <unsigned int dim> class TestMDSolverInterface : public coupling::interface::MDSolverInterface<coupling::interface::SimpleMDLinkedCellWrapper, dim> {
   public:
-    TestMDSolverInterface() : coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>() {}
+    TestMDSolverInterface() : coupling::interface::MDSolverInterface<coupling::interface::SimpleMDLinkedCellWrapper, dim>() {}
     virtual ~TestMDSolverInterface() {}
 
-    simplemd::LinkedCell& getLinkedCell(const typename coupling::interface::MDSolverInterface<simplemd::LinkedCell, dim>::CellIndex_T& couplingCellIndex,
-                                        const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
-                                        const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) override {
-      return _linkedcell;
+    coupling::interface::SimpleMDLinkedCellWrapper&
+    getLinkedCell(const typename coupling::interface::MDSolverInterface<coupling::interface::SimpleMDLinkedCellWrapper, dim>::CellIndex_T& couplingCellIndex,
+                  const tarch::la::Vector<dim, unsigned int>& linkedCellInCouplingCell,
+                  const tarch::la::Vector<dim, unsigned int>& linkedCellsPerCouplingCell) override {
+      return _linkedCellWrapper;
     }
 
     virtual tarch::la::Vector<dim, double> getGlobalMDDomainSize() const override { return tarch::la::Vector<dim, double>(1.0); }
@@ -78,7 +79,8 @@ private:
     virtual double getMoleculeEpsilon() const override { return 1.0; }
     virtual void getInitialVelocity(const tarch::la::Vector<dim, double>& meanVelocity, const double& kB, const double& temperature,
                                     tarch::la::Vector<dim, double>& initialVelocity) const override {}
-    virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim>& molecule, simplemd::LinkedCell& cell) override {}
+    virtual void deleteMoleculeFromMDSimulation(const coupling::interface::Molecule<dim>& molecule,
+                                                coupling::interface::SimpleMDLinkedCellWrapper& cell) override {}
     virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim>& molecule) override {}
     virtual void setupPotentialEnergyLandscape(const tarch::la::Vector<dim, unsigned int>& indexOfFirstCouplingCell,
                                                const tarch::la::Vector<dim, unsigned int>& rangeCouplingCells,
@@ -90,17 +92,18 @@ private:
     virtual void synchronizeMoleculesAfterMassModification() override {}
     virtual void synchronizeMoleculesAfterMomentumModification() override {}
     virtual double getDt() override { return 1.0; }
-    virtual coupling::interface::MoleculeIterator<simplemd::LinkedCell, dim>* getMoleculeIterator(simplemd::LinkedCell& cell) override { return NULL; }
-
-  private:
-    simplemd::LinkedCell _linkedcell;
+    virtual coupling::interface::MoleculeIterator<coupling::interface::SimpleMDLinkedCellWrapper, dim>*
+    getMoleculeIterator(coupling::interface::SimpleMDLinkedCellWrapper& cell) override {
+      return NULL;
+    }
+    coupling::interface::SimpleMDLinkedCellWrapper _linkedCellWrapper;
   };
 
   template <unsigned int dim> class TestMacroscopicSolverInterface : public coupling::interface::MacroscopicSolverInterface<dim> {
   public:
     ~TestMacroscopicSolverInterface() {}
     std::vector<unsigned int> getRanks(I01 globalCellIndex) override { return {1}; };
-    unsigned int getOuterRegion() override {return 1;}
+    unsigned int getOuterRegion() override { return 1; }
   };
 
   class TestParticleInsertionConfiguration : public coupling::configurations::ParticleInsertionConfiguration {
@@ -111,7 +114,7 @@ private:
 
     ~TestParticleInsertionConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -126,7 +129,7 @@ private:
 
     ~TestMomentumInsertionConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -141,7 +144,7 @@ private:
 
     ~TestBoundaryForceConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -156,7 +159,7 @@ private:
 
     ~TestTransferStrategyConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -169,7 +172,7 @@ private:
 
     ~TestParallelTopologyConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -183,7 +186,7 @@ private:
 
     ~TestThermostatConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 
@@ -196,7 +199,7 @@ private:
 
     ~TestCouplingCellConfiguration() {}
 
-    void parseSubtag(tinyxml2::XMLElement* node) override{};
+    void parseSubtag(tinyxml2::XMLElement* node) override {};
 
     std::string getTag() const override { return ""; };
 

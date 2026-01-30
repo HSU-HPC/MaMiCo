@@ -63,10 +63,10 @@ public:
     }
   }
 
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     double buffer;
-    for (std::list<Molecule*>::const_iterator m1 = cell.begin(); m1 != cell.end(); m1++) {
-      buffer = tarch::la::dot(_meanVelocity - (*m1)->getConstVelocity(), _meanVelocity - (*m1)->getConstVelocity());
+    for (auto m1 = cell.begin(); m1 != cell.end(); m1++) {
+      buffer = tarch::la::dot(_meanVelocity - m1->getConstVelocity(), _meanVelocity - m1->getConstVelocity());
       _temperature += buffer;
       _particleCounter++;
     }
@@ -75,6 +75,8 @@ public:
   void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) {}
 
   const double& getTemperature() const { return _temperature; }
+
+  static const bool IsParallel = false;
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;

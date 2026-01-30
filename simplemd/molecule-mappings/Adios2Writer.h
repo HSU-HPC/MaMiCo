@@ -9,7 +9,7 @@
 #include "simplemd/MolecularDynamicsDefinitions.h"
 #include "simplemd/Molecule.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
-#include "simplemd/services/MoleculeService.h"
+#include "simplemd/MoleculeContainer.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include <cstdlib>
 #include <fstream>
@@ -47,12 +47,12 @@ class simplemd::moleculemappings::Adios2Writer {
 public:
   /** Constructor
    * @param parallelTopologyService parallel topology service
-   * @param moleculeService molecule service
+   * @param moleculeContainer< molecule container
    * @param filename name for Adios2 output directory
    * @param configuration molecular dynamics configuration
    * @param communicator MPI communicator in parallel case
    */
-  Adios2Writer(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::services::MoleculeService& moleculeService,
+  Adios2Writer(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::MoleculeContainer moleculeContainer,
                const simplemd::configurations::MolecularDynamicsConfiguration& configuration
 #if (MD_PARALLEL == MD_YES)
                ,
@@ -79,9 +79,11 @@ public:
    */
   void handleMolecule(Molecule& molecule);
 
+  static const bool IsParallel = false;
+
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  const simplemd::services::MoleculeService& _moleculeService;
+  const simplemd::MoleculeContainer& _moleculeContainer;
   /** current timestep */
   unsigned int _timestep;
   /** molecular dynamics simulation*/

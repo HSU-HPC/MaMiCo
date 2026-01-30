@@ -22,8 +22,8 @@
 
 #if defined(SIMPLE_MD)
 #include "coupling/interface/impl/SimpleMD/SimpleMDSolverInterface.h"
-#include "simplemd/LinkedCell.h"
-#define MY_LINKEDCELL simplemd::LinkedCell
+#include "coupling/interface/impl/SimpleMD/SimpleMDLinkedCellWrapper.h"
+#define MY_LINKEDCELL coupling::interface::SimpleMDLinkedCellWrapper
 #include "coupling/interface/impl/SimpleMD/SimpleMDSimulation.h"
 #elif defined(LAMMPS_MD) || defined(LAMMPS_DPD)
 #if defined(LAMMPS_MD)
@@ -38,6 +38,8 @@
 #include "coupling/interface/impl/ls1/LS1RegionWrapper.h"
 #include "coupling/interface/impl/ls1/LS1StaticCommData.h"
 #define MY_LINKEDCELL ls1::LS1RegionWrapper
+#else
+#error "No MD solver defined!"
 #endif
 
 /** interface for different MD solvers.
@@ -134,8 +136,8 @@ public:
     }
     mdSolverInterface = new coupling::interface::SimpleMDSolverInterface(
         simpleMDSimulation->getBoundaryTreatment(), simpleMDSimulation->getParallelTopologyService(), simpleMDSimulation->getMoleculeService(),
-        simpleMDSimulation->getLinkedCellService(), simpleMDSimulation->getMolecularPropertiesService(),
-        (simpleMDSimulation->getParallelTopologyService()).getLocalBoundaryInformation(), configuration.getSimulationConfiguration().getDt());
+        simpleMDSimulation->getMolecularPropertiesService(), (simpleMDSimulation->getParallelTopologyService()).getLocalBoundaryInformation(),
+        configuration.getSimulationConfiguration().getDt());
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMDSolverInterface(mdSolverInterface);
 #elif defined(LAMMPS_MD)
     // as switchOnCoupling() should have been called before this method, the

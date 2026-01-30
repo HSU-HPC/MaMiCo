@@ -10,24 +10,23 @@
 #include "simplemd/ProfilePlotter.h"
 #include "simplemd/cell-mappings/ComputeMeanVelocityMapping.h"
 #include "simplemd/cell-mappings/ComputeTemperatureMapping.h"
-#include "simplemd/cell-mappings/EmptyLinkedListsMapping.h"
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
 #include "simplemd/cell-mappings/RDFMapping.h"
 #include "simplemd/configurations/MolecularDynamicsConfiguration.h"
+#include "simplemd/molecule-mappings/ConvertForcesFixedToFloatMapping.h"
 #include "simplemd/molecule-mappings/InitialPositionAndForceUpdate.h"
-#include "simplemd/molecule-mappings/UpdateLinkedCellListsMapping.h"
 #include "simplemd/molecule-mappings/VTKMoleculeWriter.h"
 #if BUILD_WITH_ADIOS2
 #include "simplemd/molecule-mappings/Adios2Writer.h"
 #endif
 #include "simplemd/molecule-mappings/VelocityStoermerVerletMapping.h"
 #include "simplemd/services/ExternalForceService.h"
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/MolecularPropertiesService.h"
 #include "simplemd/services/MoleculeService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include "tarch/utils/MultiMDService.h"
 #include "tarch/utils/RandomNumberService.h"
+#include "simplemd/MoleculeContainer.h"
 #include <iostream>
 #include <sstream>
 
@@ -68,12 +67,13 @@ private:
    */
   double getNumberDensity(unsigned int numberMolecules, const tarch::la::Vector<MD_DIM, double>& domainSize) const;
 
+  class simplemd::moleculemappings::ConvertForcesFixedToFloatMapping _convertForcesFixedToFloatMapping;
+
 protected:
   const simplemd::configurations::MolecularDynamicsConfiguration& _configuration;
 
   // molecule mappings
   simplemd::moleculemappings::VelocityStoermerVerletMapping* _timeIntegrator;
-  simplemd::moleculemappings::UpdateLinkedCellListsMapping* _updateLinkedCellListsMapping;
   simplemd::moleculemappings::VTKMoleculeWriter* _vtkMoleculeWriter;
   std::string _vtkFilestem;
 
@@ -83,7 +83,6 @@ protected:
 
   // cell mappings
   simplemd::cellmappings::LennardJonesForceMapping* _lennardJonesForce;
-  simplemd::cellmappings::EmptyLinkedListsMapping* _emptyLinkedListsMapping;
   simplemd::cellmappings::RDFMapping* _rdfMapping;
 
   // boundary treatment
@@ -100,7 +99,6 @@ protected:
   simplemd::services::MoleculeService* _moleculeService;
   std::string _checkpointFilestem;
   // for linked cell storage
-  simplemd::services::LinkedCellService* _linkedCellService;
   // molecular properties (potential parameters, mass etc)
   simplemd::services::MolecularPropertiesService* _molecularPropertiesService;
   // for external forces; has default constructor, hence we use it as object instead of ptr
