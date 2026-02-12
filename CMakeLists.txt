@@ -384,6 +384,22 @@ else()
 endif()
 
 #
+# git version info target
+#
+set(GIT_HEADER ${CMAKE_BINARY_DIR}/generated/mamico_git_version_info.h)
+add_custom_command(
+    OUTPUT ${GIT_HEADER}
+    COMMAND ${CMAKE_COMMAND}
+            -DOUTPUT_FILE=${GIT_HEADER}
+            -P ${CMAKE_SOURCE_DIR}/cmake/GenerateGitHeader.cmake
+    DEPENDS ${CMAKE_SOURCE_DIR}/.git/HEAD
+            ${CMAKE_SOURCE_DIR}/.git/index
+    COMMENT "Generating git version header"
+)
+
+add_custom_target(mamico_git_version_info DEPENDS ${GIT_HEADER})
+
+#
 # simplemd library target
 #
 set(SIMPLE_MD_SOURCES
@@ -450,30 +466,10 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 # MaMiCo interface
 #
 add_library(mamico INTERFACE)
+add_dependencies(mamico mamico_git_version_info)
+target_include_directories(mamico INTERFACE ${CMAKE_BINARY_DIR}/generated)
 target_link_libraries(mamico INTERFACE shared_defines)
 target_link_libraries(mamico INTERFACE Kokkos::kokkos)
-set(MAMICO_COMMIT_HASH "unknown")
-find_package(Git QUIET)
-if(GIT_FOUND)
-  execute_process(
-      COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-      OUTPUT_VARIABLE MAMICO_COMMIT_HASH
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-  # Check for uncommitted changes
-  execute_process(
-      COMMAND ${GIT_EXECUTABLE} status --porcelain
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-      OUTPUT_VARIABLE GIT_STATUS
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-  if(NOT "${GIT_STATUS}" STREQUAL "")
-      string(APPEND MAMICO_COMMIT_HASH "-dirty")
-  endif()
-endif()
-message(STATUS ">> MAMICO_COMMIT_HASH: " ${MAMICO_COMMIT_HASH})
-target_compile_definitions(mamico INTERFACE MAMICO_COMMIT_HASH=${MAMICO_COMMIT_HASH})
 if(BUILD_WITH_MPI)
   option(MAMICO_USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
   if(MAMICO_USE_COLLECTIVE_MPI)
