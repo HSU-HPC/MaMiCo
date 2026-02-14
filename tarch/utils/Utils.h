@@ -4,11 +4,11 @@
  * @author Piet Jarmatz
  */
 
-#define DEFINE_DECIMAL_FP6_LIMITS() \
-    constexpr double maxFP6 = 1e6; \
-    constexpr double stepFP6 = (double)(std::numeric_limits<long long>::max()) / maxFP6; \
-    constexpr double minFP6 = 1 / stepFP6; \
-    (void)minFP6; // Avoid unused variable warning/error if minFP6 is not needed.
+#define DEFINE_DECIMAL_FP_LIMITS(digits) \
+    constexpr double maxFP##digits = std::pow(10,digits); \
+    constexpr double stepFP##digits = (double)(std::numeric_limits<long long>::max()) / maxFP##digits; \
+    constexpr double minFP##digits = 1 / stepFP##digits; \
+    (void)minFP##digits; // Avoid unused variable warning/error if minFPx is not needed.
 
 namespace tarch {
 namespace utils {
