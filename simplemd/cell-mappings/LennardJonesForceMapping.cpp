@@ -144,7 +144,7 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
     const double rij6 = rij2 * rij2 * rij2;
 #if (TARCH_DEBUG == TARCH_YES)
     tarch::la::Vector<MD_DIM, double> res{24.0 * _epsilon / rij2 * (_sigma6 / rij6) * (1.0 - 2.0 * (_sigma6 / rij6)) * rij};
-    DEFINE_DECIMAL_FP6_LIMITS();
+    DEFINE_DECIMAL_FP_LIMITS(6);
     res = stepFP6 * res;
     long long fb0{(long long)(res[0])};
     long long fb1{(long long)(res[1])};

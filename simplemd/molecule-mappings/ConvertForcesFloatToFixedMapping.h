@@ -19,7 +19,7 @@ public:
   void beginMoleculeIteration() const {}
 
   KOKKOS_FUNCTION void handleMolecule(simplemd::Molecule& molecule) const {
-    DEFINE_DECIMAL_FP6_LIMITS();
+    DEFINE_DECIMAL_FP_LIMITS(6);
 
     tarch::la::Vector<MD_DIM, double> force = stepFP6 * molecule.getForce();
     long long fb0{(long long)(force[0])};

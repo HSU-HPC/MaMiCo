@@ -19,7 +19,7 @@ class simplemd::moleculemappings::ConvertForcesFixedToFloatMapping {
 public:
   void beginMoleculeIteration() const {}
   KOKKOS_FUNCTION void handleMolecule(simplemd::Molecule& molecule) const {
-    DEFINE_DECIMAL_FP6_LIMITS();
+    DEFINE_DECIMAL_FP_LIMITS(6);
 
     tarch::la::Vector<MD_DIM, double>& force = molecule.getForce();
     for (unsigned int d = 0; d < MD_DIM; d++) {
