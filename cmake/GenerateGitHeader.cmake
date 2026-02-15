@@ -32,7 +32,7 @@ if(GIT_FOUND)
         endif()
     endif()
 endif()
-message(STATUS "MAMICO_COMMIT_HASH: " ${HASH})
+message(STATUS ">> MAMICO_COMMIT_HASH: " ${HASH})
 
 # Avoid re-build if hash is unchanged
 file(WRITE "${OUTPUT_FILE}.tmp"
