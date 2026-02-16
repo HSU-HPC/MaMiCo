@@ -9,6 +9,7 @@ class Scenario;
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/solvers/CouetteSolver.h"
+#include "mamico_git_version_info.h"
 #include <iostream>
 #include <string>
 
