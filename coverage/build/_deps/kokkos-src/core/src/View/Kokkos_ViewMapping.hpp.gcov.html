@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-01-30 19:14:01</td>
+            <td class="headerValue">2026-02-16 14:39:39</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">6</td>
@@ -2601,8 +2601,8 @@
 <a name="2539"><span class="lineNum">    2539 </span>            :   static constexpr unsigned Rank = Traits::dimension::rank;</a>
 <a name="2540"><span class="lineNum">    2540 </span>            : </a>
 <a name="2541"><span class="lineNum">    2541 </span>            :   template &lt;typename iType&gt;</a>
-<a name="2542"><span class="lineNum">    2542 </span><span class="lineCov">  106864719 :   KOKKOS_INLINE_FUNCTION constexpr size_t extent(const iType&amp; r) const {</span></a>
-<a name="2543"><span class="lineNum">    2543 </span><span class="lineCov">  106864719 :     return m_impl_offset.m_dim.extent(r);</span></a>
+<a name="2542"><span class="lineNum">    2542 </span><span class="lineCov">  106864929 :   KOKKOS_INLINE_FUNCTION constexpr size_t extent(const iType&amp; r) const {</span></a>
+<a name="2543"><span class="lineNum">    2543 </span><span class="lineCov">  106864929 :     return m_impl_offset.m_dim.extent(r);</span></a>
 <a name="2544"><span class="lineNum">    2544 </span>            :   }</a>
 <a name="2545"><span class="lineNum">    2545 </span>            : </a>
 <a name="2546"><span class="lineNum">    2546 </span>            :   static KOKKOS_INLINE_FUNCTION constexpr size_t static_extent(</a>
@@ -3409,10 +3409,10 @@
 <a name="3347"><span class="lineNum">    3347 </span>            : namespace Impl {</a>
 <a name="3348"><span class="lineNum">    3348 </span>            : </a>
 <a name="3349"><span class="lineNum">    3349 </span>            : template &lt;class Map, class... Indices, std::size_t... Enumerate&gt;</a>
-<a name="3350"><span class="lineNum">    3350 </span><span class="lineCov">   73223913 : KOKKOS_FUNCTION bool within_range(Map const&amp; map,</span></a>
+<a name="3350"><span class="lineNum">    3350 </span><span class="lineCov">   73224123 : KOKKOS_FUNCTION bool within_range(Map const&amp; map,</span></a>
 <a name="3351"><span class="lineNum">    3351 </span>            :                                   std::index_sequence&lt;Enumerate...&gt;,</a>
 <a name="3352"><span class="lineNum">    3352 </span>            :                                   Indices... indices) {</a>
-<a name="3353"><span class="lineNum">    3353 </span><span class="lineCov">   73223913 :   return (((std::size_t)indices &lt; map.extent(Enumerate)) &amp;&amp; ...);</span></a>
+<a name="3353"><span class="lineNum">    3353 </span><span class="lineCov">   73224123 :   return (((std::size_t)indices &lt; map.extent(Enumerate)) &amp;&amp; ...);</span></a>
 <a name="3354"><span class="lineNum">    3354 </span>            : }</a>
 <a name="3355"><span class="lineNum">    3355 </span>            : </a>
 <a name="3356"><span class="lineNum">    3356 </span>            : // Disabled when using MDSpan because the MDSpan implementation has its own</a>
@@ -3447,10 +3447,10 @@
 <a name="3385"><span class="lineNum">    3385 </span>            : using printable_label_typedef_t = typename T::printable_label_typedef;</a>
 <a name="3386"><span class="lineNum">    3386 </span>            : </a>
 <a name="3387"><span class="lineNum">    3387 </span>            : template &lt;class MemorySpace, class ViewType, class MapType, class... Args&gt;</a>
-<a name="3388"><span class="lineNum">    3388 </span><span class="lineCov">   39447769 : KOKKOS_INLINE_FUNCTION void view_verify_operator_bounds(</span></a>
+<a name="3388"><span class="lineNum">    3388 </span><span class="lineCov">   39447979 : KOKKOS_INLINE_FUNCTION void view_verify_operator_bounds(</span></a>
 <a name="3389"><span class="lineNum">    3389 </span>            :     Kokkos::Impl::ViewTracker&lt;ViewType&gt; const&amp; tracker, const MapType&amp; map,</a>
 <a name="3390"><span class="lineNum">    3390 </span>            :     Args... args) {</a>
-<a name="3391"><span class="lineNum">    3391 </span><span class="lineCov">   39447769 :   if (!within_range(map, std::make_index_sequence&lt;sizeof...(Args)&gt;(),</span></a>
+<a name="3391"><span class="lineNum">    3391 </span><span class="lineCov">   39447979 :   if (!within_range(map, std::make_index_sequence&lt;sizeof...(Args)&gt;(),</span></a>
 <a name="3392"><span class="lineNum">    3392 </span>            :                     args...)) {</a>
 <a name="3393"><span class="lineNum">    3393 </span><span class="lineNoCov">          0 :     char err[256] = &quot;&quot;;</span></a>
 <a name="3394"><span class="lineNum">    3394 </span><span class="lineNoCov">          0 :     strcat(err, &quot;Kokkos::View ERROR: out of bounds access&quot;);</span></a>
@@ -3493,7 +3493,7 @@
 <a name="3431"><span class="lineNum">    3431 </span><span class="lineNoCov">          0 :     print_extents(err, map, std::make_index_sequence&lt;sizeof...(Args)&gt;());</span></a>
 <a name="3432"><span class="lineNum">    3432 </span>            :     Kokkos::abort(err);</a>
 <a name="3433"><span class="lineNum">    3433 </span>            :   }</a>
-<a name="3434"><span class="lineNum">    3434 </span><span class="lineCov">   39447769 : }</span></a>
+<a name="3434"><span class="lineNum">    3434 </span><span class="lineCov">   39447979 : }</span></a>
 <a name="3435"><span class="lineNum">    3435 </span>            : </a>
 <a name="3436"><span class="lineNum">    3436 </span>            : // primary template: memory space is accessible, do nothing.</a>
 <a name="3437"><span class="lineNum">    3437 </span>            : template &lt;class MemorySpace, class AccessSpace,</a>
