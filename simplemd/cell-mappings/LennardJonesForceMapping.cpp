@@ -3,7 +3,7 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
-#include <limits>
+#include "tarch/utils/Utils.h"
 
 simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simplemd::services::ExternalForceService& externalForceService,
                                                                            const simplemd::services::MolecularPropertiesService& molecularPropertiesService)
@@ -144,9 +144,8 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
     const double rij6 = rij2 * rij2 * rij2;
 #if (TARCH_DEBUG == TARCH_YES)
     tarch::la::Vector<MD_DIM, double> res{24.0 * _epsilon / rij2 * (_sigma6 / rij6) * (1.0 - 2.0 * (_sigma6 / rij6)) * rij};
-    constexpr double maxF = 1e6;
-    constexpr double stepF = (double)(std::numeric_limits<long long>::max()) / maxF;
-    res = stepF * res;
+    DEFINE_DECIMAL_FP_LIMITS(6);
+    res = stepFP6 * res;
     long long fb0{(long long)(res[0])};
     long long fb1{(long long)(res[1])};
     long long fb2{(long long)(res[2])};

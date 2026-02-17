@@ -1,5 +1,7 @@
 #pragma once
 
+#include "tarch/utils/Utils.h"
+
 namespace simplemd {
 namespace moleculemappings {
 class ConvertForcesFloatToFixedMapping;
@@ -17,10 +19,9 @@ public:
   void beginMoleculeIteration() const {}
 
   KOKKOS_FUNCTION void handleMolecule(simplemd::Molecule& molecule) const {
-    constexpr double maxF = 1e6;
-    constexpr double stepF = (double)(std::numeric_limits<long long>::max()) / maxF;
+    DEFINE_DECIMAL_FP_LIMITS(6);
 
-    tarch::la::Vector<MD_DIM, double> force = stepF * molecule.getForce();
+    tarch::la::Vector<MD_DIM, double> force = stepFP6 * molecule.getForce();
     long long fb0{(long long)(force[0])};
     long long fb1{(long long)(force[1])};
     long long fb2{(long long)(force[2])};
