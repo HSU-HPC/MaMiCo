@@ -70,7 +70,7 @@ def plot_couette_profile(coupling_cycle, color, ax=plt.gca()):
     data = load_avg_ux_from_csv(csv_path)
     z = np.linspace(0, 50, num=21)
     y = couette_analytic(
-        z, coupling_cycle / 4
+        z, (coupling_cycle + args.lb_init_adv_cycles) / 4
     )  # Multiply MD timestep by number of MD per coupling, multiply that factor with coupling_cycle here
     ax.plot(z, y, "-", color=color)
     x_start = (
@@ -104,6 +104,7 @@ def parse_args(argv=sys.argv[1:]):
     arg_parser.add_argument(
         "--overlap-size", default=3, help="In number of coupling cells", type=int
     )
+    arg_parser.add_argument("--lb-init-adv-cycles", default=10, type=int)
     arg_parser.add_argument("--coupling-cell-size", default=2.5, type=float)
     # Script parameters
     arg_parser.add_argument("--workdir", default=Path(), type=Path)
