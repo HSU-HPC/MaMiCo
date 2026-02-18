@@ -145,7 +145,7 @@ else()
 
     FetchContent_Declare(
         Kokkos
-        URL https://github.com/kokkos/kokkos/archive/refs/tags/4.6.02.tar.gz
+        URL https://github.com/kokkos/kokkos/archive/refs/tags/5.0.2.tar.gz
     )
     FetchContent_MakeAvailable(Kokkos)
 
