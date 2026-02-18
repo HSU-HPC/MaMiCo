@@ -113,7 +113,7 @@ void simplemd::MoleculeContainer::sort() {
         // parallelise loop for all cells that are to be traversed in this way
         printNonGhostCells(true, "host start sort");
         Kokkos::parallel_for(
-            Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int j) {
+            "simplemd::MoleculeContainer::sort", Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int j) {
               printNonGhostCells(j == 0, "device start sort");
               // compute index of the current cell
               unsigned int index = 0;

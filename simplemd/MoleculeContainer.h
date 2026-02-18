@@ -366,7 +366,8 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
   a.beginMoleculeIteration();
   printNonGhostCells(true, "host start iterateMoleculesParallel");
   Kokkos::parallel_for(
-      Kokkos::RangePolicy<MainExecSpace>(0, _linkedCellIsGhostCell.size()), KOKKOS_CLASS_LAMBDA(const unsigned int i) {
+      "simplemd::MoleculeContainer::iterateMoleculesParallel", Kokkos::RangePolicy<MainExecSpace>(0, _linkedCellIsGhostCell.size()),
+      KOKKOS_CLASS_LAMBDA(const unsigned int i) {
         printNonGhostCells(i == 0, "device start iterateMoleculesParallel");
         for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
           a.handleMolecule(getMoleculeAt(i, j));
@@ -575,7 +576,7 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
   // loop over domain, but with a single loop
   printNonGhostCells(true, "host start iterateCellsParallel");
   Kokkos::parallel_for(
-      Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int i) {
+      "simplemd::MoleculeContainer::iterateCellsParallel", Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int i) {
         printNonGhostCells(i == 0, "device start iterateCellsParallel");
 // compute index of the current cell
 #if (MD_DIM > 1)
@@ -723,7 +724,7 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
         // parallelise loop for all cells that are to be traversed in this way
         printNonGhostCells(true, "host start iterateCellPairsParallel");
         Kokkos::parallel_for(
-            Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int j) {
+            "simplemd::MoleculeContainer::iterateCellPairsParallel", Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int j) {
               printNonGhostCells(j == 0, "device start iterateCellPairsParallel");
               // compute index of the current cell
               unsigned int index = 0;
