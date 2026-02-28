@@ -158,6 +158,7 @@ public:
       cfg.miSolverType = LS1;
 
       cfg.totalNumberMDSimulations = 1;
+      tarch::configuration::ParseConfiguration::readStringOptional(cfg.ls1config, subtag, "ls1config");
       tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.temp, subtag, "temperature");
       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.equSteps, subtag, "equilibration-steps");
       tarch::configuration::ParseConfiguration::readIntOptional(cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
@@ -341,6 +342,8 @@ public:
   int twsLoopMax;
   /** @todo piet */
   int twsLoopStep;
+  /* @brief ls1 configuration filename (only relevant when using ls1 as MD solver)*/
+  std::string ls1config = "ls1config.xml";
 
 #if (BUILD_WITH_OPENFOAM)
   /** @brief the configurations for the OpenFoam solver */
