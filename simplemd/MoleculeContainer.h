@@ -171,6 +171,12 @@ public:
   template <class A> void iterateMolecules(A& a);
 
   /**
+   * @brief can be used to apply a molecule-with-cell-mapping which is iterated over all molecules of this process
+   * uses static member in mapping class (A::IsParallel) to determine whether the parallel or serial iterator will be called
+   */
+  template <class A> void iterateMoleculesWithCell(A& a);
+
+  /**
    * @brief iterates over all cells in the range defined by the lower left front
    * corner cell lowerLeftFrontCell and the size of the domain cellRange.
    * cellRange defines a number of cells in each spatial direction that the
@@ -219,6 +225,17 @@ public:
    * @brief applies molecule mapping while parallelising using Kokkos
    */
   template <class A> void iterateMoleculesParallel(A& a);
+
+
+  /**
+   * @brief applies molecule-with-cell mapping without any node-level parallelisation
+   */
+  template <class A> void iterateMoleculesWithCellSerial(A& a);
+
+  /**
+   * @brief applies molecule-with-cell mapping while parallelising using Kokkos
+   */
+  template <class A> void iterateMoleculesWithCellParallel(A& a);
 
   /**
    * @brief iterates over cells in parallel using Kokkos
@@ -378,6 +395,47 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
   printNonGhostCells(true, "host end iterateMoleculesParallel");
   a.endMoleculeIteration();
 #endif
+}
+
+template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCell(A& a) {
+  if constexpr (A::IsParallel) {
+    iterateMoleculesWithCellParallel(a);
+  } else {
+    iterateMoleculesWithCellSerial(a);
+  }
+}
+
+template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellSerial(A& a) {
+  a.beginMoleculeIteration();
+  for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {
+    for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
+      simplemd::LinkedCell cell = (*this)[i];
+      a.handleMolecule(getMoleculeAt(i, j), cell);
+    }
+  }
+  a.endMoleculeIteration();
+}
+
+template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellParallel(A& a) {
+  a.beginMoleculeIteration();
+  const unsigned int threads_per_cell = 5;
+  const unsigned int length = _linkedCellNumMolecules.size() * threads_per_cell;
+  Kokkos::parallel_for(
+      "simplemd::MoleculeContainer::iterateMoleculesWithCellParallel", Kokkos::RangePolicy<MainExecSpace>(0, length),
+      KOKKOS_CLASS_LAMBDA(const unsigned int i) {
+
+        const unsigned int cellIndex = i / threads_per_cell;
+        simplemd::LinkedCell cell = (*this)[cellIndex];
+       
+        for (unsigned int j = i % threads_per_cell; j < _linkedCellNumMolecules(cellIndex); j+=threads_per_cell) {
+          a.handleMolecule(getMoleculeAt(cellIdx, j),cell);
+        }
+        
+      });
+  Kokkos::fence(); // Ensure results are available on the host
+  
+  a.endMoleculeIteration();
+
 }
 
 template <class A>
