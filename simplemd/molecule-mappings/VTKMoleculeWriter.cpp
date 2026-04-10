@@ -17,10 +17,15 @@ void simplemd::moleculemappings::VTKMoleculeWriter::beginMoleculeIteration() {
   // open file
   std::stringstream ss;
   ss << _filename << "_";
+
 #if (MD_PARALLEL == MD_YES)
-  ss << _parallelTopologyService.getRank() << "_";
+  int worldrank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &worldrank);
+  ss << "wr" << worldrank << "_";
+
+  ss << "r" << _parallelTopologyService.getRank() << "_";
 #endif
-  ss << _timestep;
+  ss << "t" << _timestep;
   ss << ".vtk";
   _file.open(ss.str().c_str());
   if (!_file.is_open()) {
