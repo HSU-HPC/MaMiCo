@@ -158,7 +158,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
     }
 
 #if BUILD_WITH_ADIOS2
-    _Adios2Writer = new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _configuration
+    _Adios2Writer = new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, _moleculeService->getContainer(), _configuration
 #if (MD_PARALLEL == MD_YES)
                                                                  ,
                                                                  MPI_COMM_WORLD
@@ -368,7 +368,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
     }
 
 #if BUILD_WITH_ADIOS2
-    _Adios2Writer = new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, *_moleculeService, _configuration
+    _Adios2Writer = new simplemd::moleculemappings::Adios2Writer(*_parallelTopologyService, _moleculeService->getContainer(), _configuration
 #if (MD_PARALLEL == MD_YES)
                                                                  ,
                                                                  multiMDService.getLocalCommunicator()
