@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.0...3.28)
+cmake_minimum_required(VERSION 3.13...3.28) # 3.13 introduces policy CMP0077 needed for ls1
+cmake_policy(SET CMP0077 NEW) # can be removed when minimum version is set to 3.28
 project(mamico VERSION 2.0 LANGUAGES CXX)
 
 # Make our cmake modules visible to CMake
@@ -214,7 +215,7 @@ if("${MD_SIM}" STREQUAL "LS1_MARDYN")
   set(MAMICO_COUPLING ON)
   set(MAMICO_SRC_DIR ../..)
   set(AUTOPAS_ENABLE_ENERGY_MEASUREMENTS OFF) # default off, turn on if desired and RAPL enabled
-  set(AUTOPAS_ENABLE_DYNAMIC_CONTAINERS OFF) # untested
+  set(AUTOPAS_ENABLE_DYNAMIC_CONTAINERS OFF) # default off, performance reasons
   # if the ls1 vtk library exists, just enable it
   find_library(VTK_LIB xerces-c HINTS $ENV{XERCES_LIBDIR})
   if(VTK_LIB)
