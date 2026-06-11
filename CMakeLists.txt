@@ -217,7 +217,6 @@ if("${MD_SIM}" STREQUAL "LS1_MARDYN")
   set(MAMICO_COUPLING ON)
   set(MAMICO_SRC_DIR ../..)
   set(AUTOPAS_ENABLE_ENERGY_MEASUREMENTS OFF) # default off, turn on if desired and RAPL enabled
-  set(AUTOPAS_ENABLE_DYNAMIC_CONTAINERS OFF) # default off, performance reasons
   # if the ls1 vtk library exists, just enable it
   find_library(VTK_LIB xerces-c HINTS $ENV{XERCES_LIBDIR})
   if(VTK_LIB)
@@ -623,7 +622,7 @@ else()
   message(STATUS "Found clang-format version: ${CLANGFORMAT_VERSION}")
 endif()
 if(NOT CLANGFORMAT_VERSION MATCHES "^18\\.1\\.8")
-  message(WARNING "clang-format version must be 18.1.8 but found ${CLANGFORMAT_VERSION} (Target \"clangformat\" will not be generated)")
+  message(WARNING "clang-format version must be 18.1.8 but found ${CLANGFORMAT_VERSION} (Target \"mamico-clangformat\" will not be generated)")
 else()
   add_custom_target(
     mamico-clangformat
