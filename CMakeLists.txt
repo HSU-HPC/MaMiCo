@@ -216,6 +216,9 @@ if("${MD_SIM}" STREQUAL "LS1_MARDYN")
   set(ADIOS2_HAVE_MPI ${BUILD_WITH_MPI})
   set(MAMICO_COUPLING ON)
   set(MAMICO_SRC_DIR ../..)
+  if(${KOKKOS_TARGET} STREQUAL "OPENMP")
+    set(OPENMP ON)
+  endif()
   set(AUTOPAS_ENABLE_ENERGY_MEASUREMENTS OFF) # default off, turn on if desired and RAPL enabled
   # if the ls1 vtk library exists, just enable it
   find_library(VTK_LIB xerces-c HINTS $ENV{XERCES_LIBDIR})
