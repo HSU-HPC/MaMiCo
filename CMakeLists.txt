@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.13...3.28) # 3.13 introduces policy CMP0077 needed for ls1
-cmake_policy(SET CMP0077 NEW) # can be removed when minimum version is set to 3.28
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW) # can be removed when minimum version is set to 3.28
+set(CMAKE_POLICY_DEFAULT_CMP0126 NEW) # can be removed when minimum version is set to 3.28
+
 project(mamico VERSION 2.0 LANGUAGES CXX)
 
 # Make our cmake modules visible to CMake
