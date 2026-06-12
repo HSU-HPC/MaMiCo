@@ -58,9 +58,11 @@ make
         git submodule init
         git submodule update
 
-* Follow the instructions on the [ls1 repository](https://github.com/ls1mardyn/ls1-mardyn) to build with cmake, however remember to enable the MAMICO_COUPLING flag, and provide the MaMiCo base directory in the MAMICO_SRC_DIR variable.
+* Make MaMiCo as normal, choosing LS1_MARDYN as your MD library. Options from ls1 will be available in the CMake cache. Options such as BUILD_WITH_MPI, BUILD_WITH_ADIOS2 will be propagated down to ls1. Having the Kokkos target as OpenMP enables OpenMP in ls1. Example build string:
 
-* Make MaMiCo as normal, choosing LS1_MARDYN as your MD library.
+```bash
+cmake -DMD_SIM=LS1_MARDYN -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_MPI=ON -DBUILD_WITH_ADIOS2=ON -DENABLE_AUTOPAS=ON -DKOKKOS_TARGET=OPENMP ..
+```
 
 ### Additional instructions to build with LAMMPS
 1. [Download the LAMMPS source code](https://docs.lammps.org/Install_git.html), [build it using CMake](https://docs.lammps.org/Build_cmake.html) with the option `-DBUILD_SHARED_LIBS=ON`, and install it using `make install`.  
