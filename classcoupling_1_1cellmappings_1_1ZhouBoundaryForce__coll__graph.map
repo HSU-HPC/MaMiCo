@@ -1,7 +1,7 @@
 <map id="coupling::cellmappings::ZhouBoundaryForce&lt; LinkedCell, dim &gt;" name="coupling::cellmappings::ZhouBoundaryForce&lt; LinkedCell, dim &gt;">
-<area shape="rect" id="Node000001" title="This class applies the Zhou boundary force to all molecules assuming a cut&#45;off radius r_c=2...." alt="" coords="26,124,245,180"/>
+<area shape="rect" id="Node000001" title="This class applies the Zhou boundary force to all molecules assuming a cut&#45;off radius r_c=2...." alt="" coords="26,137,245,193"/>
 <area shape="rect" id="Node000002" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="5,5,124,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,58,122,122,117,125,81,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,59,124,135,119,138,79,61"/>
 <area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="148,5,266,46"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,61,176,101,160,125,155,122,172,99,192,59"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="201,62,180,115,163,138,159,135,175,112,196,60"/>
 </map>

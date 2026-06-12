@@ -1,7 +1,7 @@
 <map id="coupling::filtering::PatchView&lt; dim &gt;" name="coupling::filtering::PatchView&lt; dim &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="277,41,410,82"/>
-<area shape="rect" id="Node000002" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="16,5,148,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,34,277,50,276,55,163,39"/>
-<area shape="rect" id="Node000003" href="$classcoupling_1_1filtering_1_1Field.html" title=" " alt="" coords="5,70,159,126"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,82,276,68,277,73,175,88"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="285,51,418,91"/>
+<area shape="rect" id="Node000002" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="16,15,148,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,43,284,59,284,65,163,48"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1filtering_1_1Field.html" title=" " alt="" coords="5,79,159,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,94,260,83,284,80,285,85,261,89,174,100"/>
 </map>

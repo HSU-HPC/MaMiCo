@@ -1,17 +1,17 @@
 <map id="coupling::configurations::MaMiCoConfiguration&lt; dim &gt;" name="coupling::configurations::MaMiCoConfiguration&lt; dim &gt;">
-<area shape="rect" id="Node000001" title="parses all sub&#45;tags for MaMiCo configuration." alt="" coords="607,116,801,156"/>
-<area shape="rect" id="Node000002" href="$classtarch_1_1configuration_1_1Configuration.html" title=" " alt="" coords="5,116,135,156"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,102,134,65,157,49,183,36,241,17,293,6,339,3,383,6,428,14,474,28,584,65,633,88,675,113,672,117,631,92,582,70,473,33,426,19,383,11,339,8,293,12,243,22,185,41,160,53,137,69,99,106"/>
-<area shape="rect" id="Node000003" href="$classcoupling_1_1configurations_1_1ParticleInsertionConfiguration.html" title="configuration for particle insertion algorithm (e.g.: USHER)." alt="" coords="184,50,381,91"/>
-<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="149,109,213,89,215,94,150,114"/>
-<area shape="rect" id="Node000004" href="$classcoupling_1_1configurations_1_1ParallelTopologyConfiguration.html" title="reads parallel topology configuration. XYZ and ZYX are supported." alt="" coords="184,116,381,156"/>
-<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="150,133,183,133,183,139,150,139"/>
-<area shape="rect" id="Node000005" href="$classcoupling_1_1configurations_1_1TimeIntegrationConfiguration.html" title="reads time integration configuration" alt="" coords="186,181,379,222"/>
-<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="150,158,215,178,213,183,149,163"/>
-<area shape="rect" id="Node000006" href="$classcoupling_1_1configurations_1_1ThermostatConfiguration.html" title=" " alt="" coords="198,246,367,287"/>
-<area shape="poly" id="edge9_Node000006_Node000002" title=" " alt="" coords="103,165,141,199,185,231,211,243,209,248,183,236,137,204,99,169"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="397,85,584,113,607,117,607,122,583,119,396,90"/>
-<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="397,133,607,133,607,139,397,139"/>
-<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="394,183,583,154,607,150,607,155,584,159,395,188"/>
-<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="382,252,480,232,582,202,630,179,671,154,674,159,633,184,584,207,482,237,383,257"/>
+<area shape="rect" id="Node000001" title="parses all sub&#45;tags for MaMiCo configuration." alt="" coords="612,121,806,162"/>
+<area shape="rect" id="Node000002" href="$classtarch_1_1configuration_1_1Configuration.html" title=" " alt="" coords="5,121,135,162"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,108,134,71,157,55,183,42,242,22,294,9,341,4,386,4,431,10,478,21,589,58,617,70,644,86,687,119,683,123,641,91,615,75,587,63,477,27,430,15,386,9,341,9,295,15,244,27,185,47,160,59,137,75,99,112"/>
+<area shape="rect" id="Node000003" href="$classcoupling_1_1configurations_1_1ParticleInsertionConfiguration.html" title="configuration for particle insertion algorithm (e.g.: USHER)." alt="" coords="184,56,381,97"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="149,115,213,95,215,100,150,120"/>
+<area shape="rect" id="Node000004" href="$classcoupling_1_1configurations_1_1ParallelTopologyConfiguration.html" title="reads parallel topology configuration. XYZ and ZYX are supported." alt="" coords="184,121,381,162"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="150,139,183,139,183,144,150,144"/>
+<area shape="rect" id="Node000005" href="$classcoupling_1_1configurations_1_1TimeIntegrationConfiguration.html" title="reads time integration configuration" alt="" coords="186,187,379,227"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="150,163,215,184,213,189,149,169"/>
+<area shape="rect" id="Node000006" href="$classcoupling_1_1configurations_1_1ThermostatConfiguration.html" title=" " alt="" coords="198,252,367,293"/>
+<area shape="poly" id="edge9_Node000006_Node000002" title=" " alt="" coords="103,171,141,205,185,237,211,249,209,254,183,241,137,209,99,175"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="397,85,589,111,624,118,623,124,588,116,396,90"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="397,139,612,139,612,144,397,144"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="394,194,588,167,625,160,626,165,589,173,395,199"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="382,265,483,251,536,238,587,221,640,192,683,160,686,165,643,197,589,226,538,243,484,256,383,270"/>
 </map>

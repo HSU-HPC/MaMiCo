@@ -1,19 +1,19 @@
 <map id="coupling::solvers::LBCouetteSolver" name="coupling::solvers::LBCouetteSolver">
-<area shape="rect" id="Node000001" title="implements a three&#45;dimensional Lattice&#45;Boltzmann Couette flow solver." alt="" coords="678,201,801,242"/>
-<area shape="rect" id="Node000002" href="$classcoupling_1_1solvers_1_1NumericalSolver.html" title="is a virtual base class for the interface for a numerical fluid solver for the Couette scenario" alt="" coords="416,136,539,177"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="555,173,678,204,677,209,553,178"/>
+<area shape="rect" id="Node000001" title="implements a three&#45;dimensional Lattice&#45;Boltzmann Couette flow solver." alt="" coords="688,196,811,237"/>
+<area shape="rect" id="Node000002" href="$classcoupling_1_1solvers_1_1NumericalSolver.html" title="is a virtual base class for the interface for a numerical fluid solver for the Couette scenario" alt="" coords="421,131,544,171"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="560,167,688,199,687,204,558,172"/>
 <area shape="rect" id="Node000003" href="$classcoupling_1_1solvers_1_1AbstractCouetteSolver.html" title=" " alt="" coords="5,5,187,46"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="202,27,291,40,337,53,381,70,426,100,460,133,457,137,423,104,378,75,336,58,290,46,202,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="202,16,247,17,294,23,341,33,386,50,412,66,435,87,470,128,465,132,432,91,409,71,383,55,340,38,293,28,246,23,202,21"/>
 <area shape="rect" id="Node000004" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="37,71,155,111"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="171,99,380,134,416,141,415,146,379,139,170,104"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="171,94,273,104,385,122,421,130,420,135,384,127,272,110,170,99"/>
 <area shape="rect" id="Node000005" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="37,136,155,177"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="171,154,415,154,415,159,171,159"/>
-<area shape="rect" id="Node000006" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="37,201,155,242"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="170,216,270,207,379,189,425,175,427,180,380,194,271,213,171,221"/>
-<area shape="rect" id="Node000007" href="$classScenario.html" title=" " alt="" coords="60,266,132,292"/>
-<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="148,282,200,283,261,278,322,263,351,251,378,235,387,225,390,213,393,201,402,188,419,175,422,179,406,192,398,203,395,215,391,227,381,239,354,255,324,268,261,283,200,288,148,287"/>
-<area shape="rect" id="Node000008" href="$classcoupling_1_1interface_1_1PintableMacroSolver.html" title=" " alt="" coords="404,201,551,242"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="567,219,678,219,678,224,567,224"/>
-<area shape="rect" id="Node000009" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="418,267,536,307"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="551,266,677,234,678,240,552,271"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="171,153,420,149,420,155,171,158"/>
+<area shape="rect" id="Node000006" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="37,205,155,246"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="171,229,220,230,274,226,330,217,383,201,395,193,407,182,430,169,433,174,410,187,399,197,386,206,331,222,275,231,220,235,171,234"/>
+<area shape="rect" id="Node000007" href="$classScenario.html" title=" " alt="" coords="60,270,132,296"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="148,292,202,299,264,299,296,295,327,288,356,276,383,259,394,242,396,224,396,204,407,183,422,170,425,174,411,186,402,205,401,224,399,244,387,263,359,280,329,293,297,301,264,305,201,304,147,297"/>
+<area shape="rect" id="Node000008" href="$classcoupling_1_1interface_1_1PintableMacroSolver.html" title=" " alt="" coords="409,196,556,237"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="572,214,687,214,687,219,572,219"/>
+<area shape="rect" id="Node000009" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="423,261,542,302"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="556,266,663,242,688,235,690,240,665,247,557,271"/>
 </map>

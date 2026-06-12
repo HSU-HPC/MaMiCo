@@ -1,9 +1,9 @@
 <map id="coupling::indexing::IndexingService&lt; dim &gt;" name="coupling::indexing::IndexingService&lt; dim &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="369,77,531,118"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="377,77,539,118"/>
 <area shape="rect" id="Node000002" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="27,5,159,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,39,369,79,368,84,174,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,35,353,67,383,74,382,79,352,72,174,40"/>
 <area shape="rect" id="Node000003" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="5,70,181,126"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,95,368,95,368,100,196,100"/>
-<area shape="rect" id="Node000004" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="34,153,152,194"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="167,170,253,163,344,145,380,132,412,116,414,121,382,137,345,151,254,168,168,176"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,95,376,95,376,100,196,100"/>
+<area shape="rect" id="Node000004" href="$classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="34,172,152,213"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="167,192,257,186,305,177,352,164,395,142,431,116,434,121,398,147,354,169,307,183,258,191,168,197"/>
 </map>
