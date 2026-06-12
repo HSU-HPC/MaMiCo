@@ -221,7 +221,7 @@ if("${MD_SIM}" STREQUAL "LS1_MARDYN")
   endif()
   set(AUTOPAS_ENABLE_ENERGY_MEASUREMENTS OFF) # default off, turn on if desired and RAPL enabled
   # if the ls1 vtk library exists, just enable it
-  find_library(VTK_LIB xerces-c HINTS $ENV{XERCES_LIBDIR})
+  find_library(VTK_LIB xerces-c HINTS $ENV{XERCES_LIBDIR} OPTIONAL)
   if(VTK_LIB)
     set(ENABLE_VTK ON)
   endif()
