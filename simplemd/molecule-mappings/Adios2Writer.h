@@ -52,7 +52,7 @@ public:
    * @param configuration molecular dynamics configuration
    * @param communicator MPI communicator in parallel case
    */
-  Adios2Writer(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::MoleculeContainer moleculeContainer,
+  Adios2Writer(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::MoleculeContainer& moleculeContainer,
                const simplemd::configurations::MolecularDynamicsConfiguration& configuration
 #if (MD_PARALLEL == MD_YES)
                ,

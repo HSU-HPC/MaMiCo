@@ -22,7 +22,7 @@ uint64_t offset;
 int counter = 0;
 
 simplemd::moleculemappings::Adios2Writer::Adios2Writer(const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                                       const simplemd::MoleculeContainer& MoleculeContainer,
+                                                       const simplemd::MoleculeContainer& moleculeContainer,
                                                        const simplemd::configurations::MolecularDynamicsConfiguration& configuration
 #if (MD_PARALLEL == MD_YES)
                                                        ,
