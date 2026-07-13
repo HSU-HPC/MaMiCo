@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.0...3.28)
+cmake_minimum_required(VERSION 3.13...3.28) # 3.13 introduces policy CMP0077 needed for ls1
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW) # can be removed when minimum version is set to 3.28
+set(CMAKE_POLICY_DEFAULT_CMP0126 NEW) # can be removed when minimum version is set to 3.28
+
 project(mamico VERSION 2.0 LANGUAGES CXX)
 
 # Make our cmake modules visible to CMake
@@ -188,111 +191,6 @@ if(BUILD_WITH_LAMMPS)
   pkg_search_module(LAMMPS REQUIRED liblammps)
 endif()
 
-if("${MD_SIM}" STREQUAL "LS1_MARDYN")
-  set(LS1_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ls1" CACHE PATH "ls1 source directory")
-  set(LS1_BUILD_DIR_NAMES "build-seq;build-par;build" CACHE STRING "ls1 build directory names. First one working is used")
-  list(LENGTH LS1_BUILD_DIR_NAMES NUM_BUILD_DIRS)
-  # we have to use the last one anyway (no other options left in list), so skip that check
-  MATH(EXPR NUM_BUILD_DIRS "${NUM_BUILD_DIRS}-1")
-  set(BUILD_CANDIDATE_IDX 0)
-  list(GET LS1_BUILD_DIR_NAMES ${BUILD_CANDIDATE_IDX} LS1_BUILD_DIR_NAME)
-  while(BUILD_CANDIDATE_IDX LESS NUM_BUILD_DIRS)
-    # check if this build dir works
-    if(EXISTS "${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}")
-      load_cache(${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME} READ_WITH_PREFIX CANDIDATE_CACHE_ ENABLE_MPI PRECISION)
-    endif()
-    if(CANDIDATE_CACHE_PRECISION AND (CANDIDATE_CACHE_ENABLE_MPI STREQUAL BUILD_WITH_MPI))
-      # this candidate build dir seems good, stop searching and try it
-      break()
-    endif()
-    # this candidate build dir does not work, try next one in list
-    MATH(EXPR BUILD_CANDIDATE_IDX "${BUILD_CANDIDATE_IDX}+1")
-    list(GET LS1_BUILD_DIR_NAMES ${BUILD_CANDIDATE_IDX} LS1_BUILD_DIR_NAME)
-  endwhile()
-  message(STATUS ">> ls1 build directory used: " ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME})
-  load_cache(${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME} READ_WITH_PREFIX LS1_CACHE_ ENABLE_AUTOPAS ENABLE_MPI PRECISION ENABLE_VTK ENABLE_ADIOS2 FIND_PACKAGE_ADIOS2 Eigen3_ForceBundled AUTOPAS_ENABLE_ENERGY_MEASUREMENTS CMAKE_BUILD_TYPE )
-  if(NOT LS1_CACHE_PRECISION)
-    message(FATAL_ERROR "Could not read the ls1 build cache. Please ensure the path to the ls1 root folder and the name of the build folder are correct.")
-  endif()
-  if(LS1_CACHE_ENABLE_MPI AND NOT BUILD_WITH_MPI)
-    message(FATAL_ERROR "ls1 built with MPI, but MaMiCo does not have MPI enabled! Aborting...")
-  endif()
-  if(NOT LS1_CACHE_ENABLE_MPI AND BUILD_WITH_MPI)
-    message(FATAL_ERROR "ls1 not built with MPI, but MaMiCo has MPI enabled! Aborting...")
-  endif()
-  option(LS1_BUILT_WITH_AUTOPAS "Specify whether ls1 was compiled with AutoPas support." ${LS1_CACHE_ENABLE_AUTOPAS})
-  find_library(MarDyn REQUIRED NAMES "MarDyn" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/src )
-  if(LS1_BUILT_WITH_AUTOPAS)
-    if(LS1_CACHE_AUTOPAS_ENABLE_ENERGY_MEASUREMENTS)
-      message(FATAL_ERROR "Unsupported flag! Please rebuild ls1 with AUTOPAS_ENABLE_ENERGY_MEASUREMENTS turned off!")
-    endif()
-    if(NOT BUILD_WITH_EIGEN)
-      message(WARNING "AutoPas requires Eigen3 support, but BUILD_WITH_EIGEN not enabled!\nProceeding with Eigen3 enabled only for ls1")
-    endif()
-    if(NOT LS1_CACHE_Eigen3_ForceBundled)
-      find_package(Eigen3 REQUIRED NO_MODULE)
-      message(STATUS "Using Eigen3 available in environment for ls1")
-    else()
-      set(eigen3_SOURCE_DIR "${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/eigen3-src")
-      add_library(Eigen3::Eigen OBJECT IMPORTED GLOBAL)
-      target_include_directories(Eigen3::Eigen SYSTEM INTERFACE "${eigen3_SOURCE_DIR}")
-      message(STATUS "Using Eigen3 fetched by ls1")
-      if(BUILD_WITH_EIGEN)
-        message(WARNING "MaMiCo will use Eigen3 bundled with ls1. Double check the library versions/paths!")
-      endif()
-    endif()
-    find_library(autopas REQUIRED NAMES "autopas" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/src/autopas)
-    find_library(molecularDynamicsLibrary REQUIRED NAMES "molecularDynamicsLibrary" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/applicationLibrary)
-    if("${LS1_CACHE_CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-      find_library(spdlog REQUIRED NAMES "spdlogd" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/spdlog-build )
-    else()
-      find_library(spdlog REQUIRED NAMES "spdlog" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/spdlog-build)
-    endif()
-    if(LS1_CACHE_AUTOPAS_ENABLE_RULES_BASED_AND_FUZZY_TUNING)
-      find_library(antlr4-runtime REQUIRED NAMES "antlr4-runtime" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/_deps/antlr4cppPrefix/install/lib)
-    endif()
-    if(LS1_CACHE_AUTOPAS_ENABLE_HARMONY)
-      find_library(harmony REQUIRED NAMES "harmony" PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/libs/harmony/include/lib )
-    endif()
-  endif()
-  if(LS1_CACHE_ENABLE_VTK)
-    find_library(VTK_LIB xerces-c HINTS $ENV{XERCES_LIBDIR})
-    if(NOT VTK_LIB)
-      message(FATAL_ERROR "xerces-c lib not found. Disable VTK support, if you do not need it.")
-    endif()
-  endif()
-  if(BUILD_WITH_ADIOS2 AND NOT LS1_CACHE_ENABLE_ADIOS2)
-    message(FATAL_ERROR "Please rebuild ls1 with ENABLE_ADIOS2 turned on, if adios2 is needed, else turn BUILD_WITH_ADIOS2 off")
-  endif()
-  if(LS1_CACHE_ENABLE_ADIOS2)
-    if(NOT BUILD_WITH_ADIOS2)
-      message(WARNING "ls1 built with adios2, but BUILD_WITH_ADIOS2 not enabled by MaMiCo!\nProceeding with adios2 enabled only for ls1")
-    endif()
-    if(LS1_CACHE_FIND_PACKAGE_ADIOS2)
-      enable_language(C)
-      find_package(ADIOS2 REQUIRED)
-      message(STATUS "Using adios2 available in environment for ls1")
-    else()
-      enable_language(C)
-      find_package(ADIOS2 REQUIRED PATHS ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/adios2fetch-build NO_DEFAULT_PATH)
-      message(STATUS "Using adios2 fetched by ls1")
-      if(BUILD_WITH_ADIOS2)
-        message(WARNING "Both ls1 and MaMiCo will use adios2. Double check the library versions/paths!")
-      endif()
-    endif()
-  endif()
-  message(STATUS ">> ls1 found and initialized")
-endif()
-
-if(BUILD_WITH_EIGEN AND NOT LS1_BUILT_WITH_AUTOPAS) #ls1 with autopas enabled can come bundled with own eigen3, hence finding eigen3 earlier for ls1
-  find_package(Eigen3 REQUIRED NO_MODULE)
-endif()
-
-if(BUILD_TESTING)
-  find_package(CppUnit REQUIRED)
-endif()
-
-
 #
 # shared macros across targets
 #
@@ -308,6 +206,56 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
 endif()
 if(BUILD_WITH_MPI)
     target_compile_definitions(shared_defines INTERFACE MDParallel TarchParallel)
+endif()
+
+if("${MD_SIM}" STREQUAL "LS1_MARDYN")
+  # turn options into sets to make them disappear from ccmake
+  # since we don't want these options to be directly edited
+  set(ENABLE_ADIOS2 ${BUILD_WITH_ADIOS2}) # ls1 will fetch adios2, it will be available for mamico
+  set(ENABLE_MPI ${BUILD_WITH_MPI})
+  set(ADIOS2_HAVE_MPI ${BUILD_WITH_MPI})
+  set(MAMICO_COUPLING ON)
+  set(MAMICO_SRC_DIR ../..)
+  if(${KOKKOS_TARGET} STREQUAL "OPENMP")
+    set(OPENMP ON)
+  endif()
+  set(AUTOPAS_ENABLE_ENERGY_MEASUREMENTS OFF) # default off, turn on if desired and RAPL enabled
+  # if the ls1 vtk library exists, just enable it
+  find_library(LS1_VTK_LIB xerces-c HINTS $ENV{XERCES_LIBDIR} OPTIONAL)
+  if(LS1_VTK_LIB)
+    set(ENABLE_VTK ON)
+  endif()
+  # add ls1
+  add_subdirectory(ls1)
+  # post adding ls1 cleanup
+  if(ENABLE_AUTOPAS)
+    if(NOT BUILD_WITH_EIGEN)
+      message(WARNING "AutoPas requires Eigen3 support, but BUILD_WITH_EIGEN not enabled!\nProceeding with Eigen3 enabled only for ls1")
+    endif()
+    if(NOT Eigen3_ForceBundled)
+      find_package(Eigen3 REQUIRED NO_MODULE)
+      message(STATUS "Using Eigen3 available in environment for ls1")
+    else()
+      set(eigen3_SOURCE_DIR _deps/eigen3-src)
+      add_library(Eigen3::Eigen OBJECT IMPORTED GLOBAL)
+      target_include_directories(Eigen3::Eigen SYSTEM INTERFACE "${eigen3_SOURCE_DIR}")
+      message(STATUS "Using Eigen3 fetched by ls1")
+      if(BUILD_WITH_EIGEN)
+        message(WARNING "MaMiCo will use Eigen3 bundled with ls1. Double check the library versions/paths!")
+      endif()
+    endif()
+  endif()
+  target_link_libraries(MarDyn shared_defines)
+  target_link_libraries(MarDyn Kokkos::kokkos)
+  message(STATUS ">> ls1 found and initialized")
+endif()
+
+if(BUILD_WITH_EIGEN AND NOT ENABLE_AUTOPAS) #ls1 with autopas enabled can come bundled with own eigen3, hence finding eigen3 earlier for ls1
+  find_package(Eigen3 REQUIRED NO_MODULE)
+endif()
+
+if(BUILD_TESTING)
+  find_package(CppUnit REQUIRED)
 endif()
 
 #
@@ -384,6 +332,22 @@ else()
 endif()
 
 #
+# git version info target
+#
+set(GIT_HEADER ${CMAKE_BINARY_DIR}/generated/mamico_git_version_info.h)
+add_custom_command(
+    OUTPUT ${GIT_HEADER}
+    COMMAND ${CMAKE_COMMAND}
+            -DOUTPUT_FILE=${GIT_HEADER}
+            -P ${CMAKE_SOURCE_DIR}/cmake/GenerateGitHeader.cmake
+    DEPENDS ${CMAKE_SOURCE_DIR}/.git/HEAD
+            ${CMAKE_SOURCE_DIR}/.git/index
+    COMMENT "Generating git version header"
+)
+
+add_custom_target(mamico_git_version_info DEPENDS ${GIT_HEADER})
+
+#
 # simplemd library target
 #
 set(SIMPLE_MD_SOURCES
@@ -450,30 +414,10 @@ set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
 # MaMiCo interface
 #
 add_library(mamico INTERFACE)
+add_dependencies(mamico mamico_git_version_info)
+target_include_directories(mamico INTERFACE ${CMAKE_BINARY_DIR}/generated)
 target_link_libraries(mamico INTERFACE shared_defines)
 target_link_libraries(mamico INTERFACE Kokkos::kokkos)
-set(MAMICO_COMMIT_HASH "unknown")
-find_package(Git QUIET)
-if(GIT_FOUND)
-  execute_process(
-      COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-      OUTPUT_VARIABLE MAMICO_COMMIT_HASH
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-  # Check for uncommitted changes
-  execute_process(
-      COMMAND ${GIT_EXECUTABLE} status --porcelain
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-      OUTPUT_VARIABLE GIT_STATUS
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-  if(NOT "${GIT_STATUS}" STREQUAL "")
-      string(APPEND MAMICO_COMMIT_HASH "-dirty")
-  endif()
-endif()
-message(STATUS ">> MAMICO_COMMIT_HASH: " ${MAMICO_COMMIT_HASH})
-target_compile_definitions(mamico INTERFACE MAMICO_COMMIT_HASH=${MAMICO_COMMIT_HASH})
 if(BUILD_WITH_MPI)
   option(MAMICO_USE_COLLECTIVE_MPI "Use broadcast/reduce between MD instances, default is OFF." OFF)
   if(MAMICO_USE_COLLECTIVE_MPI)
@@ -526,51 +470,25 @@ if("${MD_SIM}" STREQUAL "LAMMPS_MD" OR "${MD_SIM}" STREQUAL "LAMMPS_DPD")
   #target_compile_options(mamico INTERFACE ${LAMMPS_CFLAGS_OTHER})
 elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
   target_compile_definitions(mamico INTERFACE MAMICO_COUPLING)
-  if ("${LS1_CACHE_PRECISION}" STREQUAL "DOUBLE")
+  if (PRECISION STREQUAL "DOUBLE")
     target_compile_definitions(mamico INTERFACE MARDYN_DPDP)
-  elseif("${LS1_CACHE_PRECISION}" STREQUAL "SINGLE")
+  elseif(PRECISION STREQUAL "SINGLE")
     target_compile_definitions(mamico INTERFACE MARDYN_SPSP)
-  elseif("${LS1_CACHE_PRECISION}" STREQUAL "MIXED")
+  elseif(PRECISION STREQUAL "MIXED")
     target_compile_definitions(mamico INTERFACE MARDYN_SPDP)
   endif()
-  target_include_directories(mamico INTERFACE ${LS1_SRC_DIR}/src ${LS1_SRC_DIR}/libs/rapidxml)
-  target_link_directories(mamico INTERFACE ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/src)
+  target_include_directories(mamico INTERFACE ls1/src ls1/libs/rapidxml)
   target_link_libraries(mamico INTERFACE MarDyn)
   if(BUILD_WITH_MPI)
     target_compile_definitions(mamico INTERFACE ENABLE_MPI)
   endif()
-  if(LS1_BUILT_WITH_AUTOPAS)
+  if(ENABLE_AUTOPAS)
     target_compile_definitions(mamico INTERFACE MARDYN_AUTOPAS)
-    target_include_directories(mamico INTERFACE ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-src/src ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/spdlog-src/include ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-src/applicationLibrary/molecularDynamics)
-    target_link_directories(mamico INTERFACE ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/src/autopas ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/spdlog-build ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/applicationLibrary ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/_deps/antlr4cppPrefix/install/lib)
-    target_link_libraries(mamico INTERFACE autopas pthread spdlog molecularDynamicsLibrary)
-    if(LS1_CACHE_AUTOPAS_ENABLE_HARMONY)
-      target_link_directories(mamico INTERFACE ${LS1_SRC_DIR}/${LS1_BUILD_DIR_NAME}/_deps/autopasfetch-build/libs/harmony/include/lib)
-      target_link_libraries(mamico INTERFACE harmony)
-    endif()
-    if(LS1_CACHE_AUTOPAS_ENABLE_RULES_BASED_AND_FUZZY_TUNING)
-      target_link_libraries(mamico INTERFACE antlr4-runtime)
-    endif()
-    #pthread is required by spdlog
     target_compile_definitions(mamico INTERFACE BUILD_WITH_EIGEN)
     target_link_libraries(mamico INTERFACE Eigen3::Eigen)
   endif()
-  if(LS1_CACHE_ENABLE_VTK)
-    target_compile_definitions(mamico INTERFACE VTK)
-    target_link_libraries(mamico INTERFACE ${VTK_LIB})
-  endif()
-  if(LS1_CACHE_ENABLE_ADIOS2)
-    if (NOT DEFINED ADIOS2_HAVE_MPI)
-        set(ADIOS2_HAVE_MPI OFF)
-    endif()
-    if ((ADIOS2_HAVE_MPI OR BUILD_WITH_MPI) AND (NOT (ADIOS2_HAVE_MPI AND BUILD_WITH_MPI))) # handish implementation of xor (cmake's EQUAL does not work)
-        message(FATAL_ERROR "
-        ADIOS2_HAVE_MPI set to \"${ADIOS2_HAVE_MPI}\" and mamico BUILD_WITH_MPI is set to \"${BUILD_WITH_MPI}\".
-        For a parallel build, MPI has to be enabled in the packaged ADIOS2 as well as mamico (ADIOS2_ENABLE_MPI=ON, BUILD_WITH_MPI=ON).
-        For a sequential build, deactivate MPI for both.")
-    endif()
+  if(ENABLE_ADIOS2)
     target_compile_definitions(mamico INTERFACE ENABLE_ADIOS2)
-    target_link_libraries(mamico INTERFACE adios2::adios2)
   endif()
 endif()
 if(ENABLE_COVERAGE)
@@ -707,10 +625,10 @@ else()
   message(STATUS "Found clang-format version: ${CLANGFORMAT_VERSION}")
 endif()
 if(NOT CLANGFORMAT_VERSION MATCHES "^18\\.1\\.8")
-  message(WARNING "clang-format version must be 18.1.8 but found ${CLANGFORMAT_VERSION} (Target \"clangformat\" will not be generated)")
+  message(WARNING "clang-format version must be 18.1.8 but found ${CLANGFORMAT_VERSION} (Target \"mamico-clangformat\" will not be generated)")
 else()
   add_custom_target(
-    clangformat
+    mamico-clangformat
     COMMAND /usr/bin/env clang-format --verbose
     -i
     ${CLANGFORMAT_SOURCES_ABS}
