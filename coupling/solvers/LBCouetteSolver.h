@@ -33,17 +33,18 @@ public:
   std::unique_ptr<State> operator+(const State& rhs) override;
   std::unique_ptr<State> operator-(const State& rhs) override;
 
-  bool operator==(const State& rhs) const override {
+  double* getData() override { return _pdf.data(); }
+  const double* getData() const override { return _pdf.data(); }
+
+  void print(std::ostream& os) const override { os << "<LBCouetteSolverState instance with size " << getSizeBytes() << ">"; }
+
+protected:
+  bool __equals__(const State& rhs) const override {
     const LBCouetteSolverState* other = dynamic_cast<const LBCouetteSolverState*>(&rhs);
     if (other == nullptr)
       return false;
     return _pdf == other->_pdf;
   }
-
-  double* getData() override { return _pdf.data(); }
-  const double* getData() const override { return _pdf.data(); }
-
-  void print(std::ostream& os) const override { os << "<LBCouetteSolverState instance with size " << getSizeBytes() << ">"; }
 
 private:
   std::vector<double> _pdf;
