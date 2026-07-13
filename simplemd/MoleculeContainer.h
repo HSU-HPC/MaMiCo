@@ -428,7 +428,7 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellPar
         simplemd::LinkedCell cell = (*this)[cellIndex];
        
         for (unsigned int j = i % threads_per_cell; j < _linkedCellNumMolecules(cellIndex); j+=threads_per_cell) {
-          a.handleMolecule(getMoleculeAt(cellIdx, j),cell);
+          a.handleMolecule(getMoleculeAt(cellIndex, j),cell);
         }
         
       });
