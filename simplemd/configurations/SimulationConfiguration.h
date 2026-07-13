@@ -47,7 +47,6 @@ public:
   /** getters for all parsed and computed quantities */
   const double& getDt() const { return _dt; }
   const unsigned int& getNumberOfTimesteps() const { return _numberOfTimesteps; }
-  const unsigned int& getReorganiseMemoryEveryTimestep() const { return _reorganiseMemoryEveryTimestep; }
   const unsigned int& computeMacroscopicQuantitiesEveryTimestep() const { return _computeMacroscopicQuantitiesEveryTimestep; }
   const bool& fixSeed() const { return _fixSeed; }
   const bool& useOverlappingCommunicationWithForceComputation() const { return _overlapCommWithForceComputation; }
@@ -55,18 +54,12 @@ public:
 private:
   static const std::string DT;
   static const std::string NUMBER_OF_TIMESTEPS;
-  static const std::string REORGANISE_MEMORY_EVERY_TIMESTEP;
   static const std::string COMPUTE_QUANTITIES_EVERY_TIMESTEP;
   static const std::string FIX_SEED;
   static const std::string OVERLAP_COMMUNICATION_WITH_FORCE_COMPUTATION;
 
   double _dt;
   unsigned int _numberOfTimesteps;
-
-  /** number of timesteps between subsequent memory reorganisations. If it is zero,
-   *  no reorganisation will be used.
-   */
-  unsigned int _reorganiseMemoryEveryTimestep;
 
   /** number of timesteps between subsequent macroscopic quantity evaluations */
   unsigned int _computeMacroscopicQuantitiesEveryTimestep;

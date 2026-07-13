@@ -33,6 +33,8 @@ public:
   void endMoleculeIteration();
   void handleMolecule(Molecule& molecule);
 
+  static const bool IsParallel = false;
+
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
   std::ofstream* _file;

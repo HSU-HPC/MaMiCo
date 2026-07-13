@@ -5,8 +5,7 @@
 using namespace tarch;
 using namespace la;
 
-class VectorOperationsTest : public CppUnit::TestFixture
-{
+class VectorOperationsTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(VectorOperationsTest);
   CPPUNIT_TEST(testEquality);
   CPPUNIT_TEST(testAddition);
@@ -25,22 +24,22 @@ public:
   }
 
   void testEquality() {
-    CPPUNIT_ASSERT( *v_1_2_3 == *v_1_2_3);
-    CPPUNIT_ASSERT( !(*v_1_2_3 == *v_4_5_6) );
+    CPPUNIT_ASSERT(*v_1_2_3 == *v_1_2_3);
+    CPPUNIT_ASSERT(!(*v_1_2_3 == *v_4_5_6));
   }
 
   void testAddition() {
     Vector<3, double> v{3.0};
-    CPPUNIT_ASSERT( v + *v_1_2_3 == *v_4_5_6);
+    CPPUNIT_ASSERT(v + *v_1_2_3 == *v_4_5_6);
   }
 
   void testSubstraction() {
     Vector<3, double> v{3.0};
-    CPPUNIT_ASSERT( *v_4_5_6 - v == *v_1_2_3);
+    CPPUNIT_ASSERT(*v_4_5_6 - v == *v_1_2_3);
   }
 
 private:
-  Vector<3, double> *v_1_2_3, *v_4_5_6;
+  Vector<3, double>*v_1_2_3, *v_4_5_6;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(VectorOperationsTest);

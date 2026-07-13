@@ -3,6 +3,7 @@
 // and use, please see the copyright notice in Mamico's main folder, or at
 // www5.in.tum.de/mamico
 #include "simplemd/cell-mappings/LennardJonesForceMapping.h"
+#include <limits>
 
 simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simplemd::services::ExternalForceService& externalForceService,
                                                                            const simplemd::services::MolecularPropertiesService& molecularPropertiesService)
@@ -12,47 +13,78 @@ simplemd::cellmappings::LennardJonesForceMapping::LennardJonesForceMapping(simpl
               molecularPropertiesService.getMolecularProperties().getSigma() * molecularPropertiesService.getMolecularProperties().getSigma()),
       _cutOffRadiusSquared(molecularPropertiesService.getMolecularProperties().getCutOffRadius() *
                            molecularPropertiesService.getMolecularProperties().getCutOffRadius()),
-      _externalForceService(externalForceService) {}
+      _externalForce(0) {
+  // Note: This copies the (static) external force from the configuration
+  externalForceService.addExternalForce(_externalForce);
+}
 
 void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
 #if (MD_DEBUG == MD_YES)
-  std::cout << "simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() " << std::endl;
+  Kokkos::printf("simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration()\n");
 #endif
 }
 
-void simplemd::cellmappings::LennardJonesForceMapping::handleCell(const LinkedCell& cell, const unsigned int& cellIndex) const {
+/*
+ * fixed-point math for force accumulation
+ * only active in debug mode, useful for verification of simulation results
+ * because results do not depend on order of force summation
+ * this expects force1, force2 and forceBuffer to contain correctly formatted long long data already, not double
+ */
+KOKKOS_INLINE_FUNCTION void addForce(tarch::la::Vector<MD_DIM, double>& force1, tarch::la::Vector<MD_DIM, double>& force2,
+                                     tarch::la::Vector<MD_DIM, double>& forceBuffer) {
+#if (TARCH_DEBUG == TARCH_YES)
+  *(long long*)(&force1[0]) += *(long long*)(&forceBuffer[0]);
+  *(long long*)(&force1[1]) += *(long long*)(&forceBuffer[1]);
+  *(long long*)(&force1[2]) += *(long long*)(&forceBuffer[2]);
+  *(long long*)(&force2[0]) -= *(long long*)(&forceBuffer[0]);
+  *(long long*)(&force2[1]) -= *(long long*)(&forceBuffer[1]);
+  *(long long*)(&force2[2]) -= *(long long*)(&forceBuffer[2]);
+#else
+  force1 += forceBuffer;
+  force2 -= forceBuffer;
+#endif
+}
+
+void simplemd::cellmappings::LennardJonesForceMapping::handleCell(LinkedCell& cell) const {
   // force buffer
   tarch::la::Vector<MD_DIM, double> forceBuffer(0.0);
 
   // iterate over all molecules
-  const std::list<Molecule*>::const_iterator end = cell.constEnd();
-  const std::list<Molecule*>::const_iterator begin = cell.constBegin();
-  for (std::list<Molecule*>::const_iterator m1 = begin; m1 != end; m1++) {
-    std::list<Molecule*>::const_iterator m2 = m1;
-    tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
-    const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
+  const auto end = cell.end();
+  const auto begin = cell.begin();
+  for (auto m1 = begin; m1 != end; m1++) {
+    auto m2 = m1;
+    tarch::la::Vector<MD_DIM, double>& force1 = m1->getForce();
+    const tarch::la::Vector<MD_DIM, double>& position1 = m1->getConstPosition();
 
-    // add external force
-    _externalForceService.addExternalForce(force1);
+#if (TARCH_DEBUG == TARCH_YES)
+    if (_externalForce != tarch::la::Vector<MD_DIM, double>{0.0}) {
+      Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCell(): externalForce not implemented in fixed point math debug mode!\n");
+    }
+#else
+    force1 += _externalForce;
+#endif
 
     // iterate over all other molecules not touched so far
     m2++;
     while (m2 != end) {
-      tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
-      forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
+      tarch::la::Vector<MD_DIM, double>& force2 = m2->getForce();
+      forceBuffer = getLennardJonesForce(position1, m2->getConstPosition());
 #if (MD_DEBUG == MD_YES)
       if (tarch::la::dot(forceBuffer, forceBuffer) > 1e12) {
-        std::cout << "ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCell: Force " << forceBuffer << " out of range!" << std::endl;
-        std::cout << "Position1: " << position1 << std::endl;
-        std::cout << "Position2: " << (*m2)->getConstPosition() << std::endl;
-        std::cout << "ID1: " << (*m1)->getID() << std::endl;
-        std::cout << "ID2: " << (*m2)->getID() << std::endl;
-        exit(EXIT_FAILURE);
+        const auto position2 = m2->getConstPosition();
+        Kokkos::printf("Force: %lf %lf %lf; "
+                       "Position1: %lf %lf %lf; "
+                       "Position2: %lf %lf %lf; "
+                       "ID1: %u;"
+                       "ID2: %u"
+                       "\n",
+                       forceBuffer[0], forceBuffer[1], MD_DIM3_OR0(forceBuffer[2]), position1[0], position1[1], MD_DIM3_OR0(position1[2]), position2[0],
+                       position2[1], MD_DIM3_OR0(position2[2]), m1->getID(), m2->getID());
+        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCellPair: Force out of range!\n");
       }
 #endif
-      force1 += forceBuffer;
-      force2 -= forceBuffer;
-
+      addForce(force1, force2, forceBuffer);
       m2++;
     }
   }
@@ -65,29 +97,32 @@ void simplemd::cellmappings::LennardJonesForceMapping::handleCellPair(const Link
   tarch::la::Vector<MD_DIM, double> forceBuffer(0.0);
 
   // iterate over pairs of molecules
-  const std::list<Molecule*>::const_iterator endCell1 = cell1.constEnd();
-  const std::list<Molecule*>::const_iterator endCell2 = cell2.constEnd();
-  const std::list<Molecule*>::const_iterator beginCell1 = cell1.constBegin();
-  const std::list<Molecule*>::const_iterator beginCell2 = cell2.constBegin();
-  for (std::list<Molecule*>::const_iterator m1 = beginCell1; m1 != endCell1; m1++) {
-    tarch::la::Vector<MD_DIM, double>& force1 = (*m1)->getForce();
-    const tarch::la::Vector<MD_DIM, double>& position1 = (*m1)->getConstPosition();
+  const auto endCell1 = cell1.end();
+  const auto endCell2 = cell2.end();
+  const auto beginCell1 = cell1.begin();
+  const auto beginCell2 = cell2.begin();
+  for (auto m1 = beginCell1; m1 != endCell1; m1++) {
+    tarch::la::Vector<MD_DIM, double>& force1 = m1->getForce();
+    const tarch::la::Vector<MD_DIM, double>& position1 = m1->getConstPosition();
 
-    for (std::list<Molecule*>::const_iterator m2 = beginCell2; m2 != endCell2; m2++) {
-      tarch::la::Vector<MD_DIM, double>& force2 = (*m2)->getForce();
-      forceBuffer = getLennardJonesForce(position1, (*m2)->getConstPosition());
+    for (auto m2 = beginCell2; m2 != endCell2; m2++) {
+      tarch::la::Vector<MD_DIM, double>& force2 = m2->getForce();
+      forceBuffer = getLennardJonesForce(position1, m2->getConstPosition());
 #if (MD_DEBUG == MD_YES)
       if (tarch::la::dot(forceBuffer, forceBuffer) > 1e12) {
-        std::cout << "ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCellPair: Force " << forceBuffer << " out of range!" << std::endl;
-        std::cout << "Position1: " << position1 << std::endl;
-        std::cout << "Position2: " << (*m2)->getConstPosition() << std::endl;
-        std::cout << "ID1: " << (*m1)->getID() << std::endl;
-        std::cout << "ID2: " << (*m2)->getID() << std::endl;
-        exit(EXIT_FAILURE);
+        const auto position2 = m2->getConstPosition();
+        Kokkos::printf("Force: %lf %lf %lf; "
+                       "Position1: %lf %lf %lf; "
+                       "Position2: %lf %lf %lf; "
+                       "ID1: %u;"
+                       "ID2: %u"
+                       "\n",
+                       forceBuffer[0], forceBuffer[1], MD_DIM3_OR0(forceBuffer[2]), position1[0], position1[1], MD_DIM3_OR0(position1[2]), position2[0],
+                       position2[1], MD_DIM3_OR0(position2[2]), m1->getID(), m2->getID());
+        Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::handleCellPair: Force out of range!\n");
       }
 #endif
-      force1 += forceBuffer;
-      force2 -= forceBuffer;
+      addForce(force1, force2, forceBuffer);
     }
   }
 }
@@ -99,15 +134,32 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
   const double rij2 = tarch::la::dot(rij, rij);
 #if (MD_ERROR == MD_YES)
   if (tarch::la::equals(rij2, 0.0, 1e-4)) {
-    std::cout << "ERROR simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(): Particle positions are identical!" << std::endl;
-    std::cout << "Position: " << position1 << ","
-              << "Position2: " << position2 << std::endl;
+    Kokkos::printf("Position: %lf %lf %lf, %lf %lf %lf\n", position1[0], position1[1], MD_DIM3_OR0(position1[2]), position2[0], position2[1],
+                   MD_DIM3_OR0(position2[2]));
+    Kokkos::abort("ERROR simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(): Particle positions are identical!\n");
   }
 #endif
 
   if (rij2 <= _cutOffRadiusSquared) {
     const double rij6 = rij2 * rij2 * rij2;
+#if (TARCH_DEBUG == TARCH_YES)
+    tarch::la::Vector<MD_DIM, double> res{24.0 * _epsilon / rij2 * (_sigma6 / rij6) * (1.0 - 2.0 * (_sigma6 / rij6)) * rij};
+    constexpr double maxF = 1e6;
+    constexpr double stepF = (double)(std::numeric_limits<long long>::max()) / maxF;
+    res = stepF * res;
+    long long fb0{(long long)(res[0])};
+    long long fb1{(long long)(res[1])};
+    long long fb2{(long long)(res[2])};
+    long long& fb0r = fb0;
+    long long& fb1r = fb1;
+    long long& fb2r = fb2;
+    res[0] = *(double*)(&fb0r);
+    res[1] = *(double*)(&fb1r);
+    res[2] = *(double*)(&fb2r);
+    return res;
+#else
     return 24.0 * _epsilon / rij2 * (_sigma6 / rij6) * (1.0 - 2.0 * (_sigma6 / rij6)) * rij;
+#endif
   } else {
     return tarch::la::Vector<MD_DIM, double>(0.0);
   }

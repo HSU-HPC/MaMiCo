@@ -206,6 +206,7 @@ public:
       exit(EXIT_FAILURE);
     }
 #endif
+    computeDensityAndVelocityEverywhere();
 
     // loop over all received cells
     for (auto pair : md2macroBuffer) {
@@ -232,6 +233,7 @@ public:
       // cell. This interpolation is valid for FLUID-MD_BOUNDARY neighbouring
       // relations only. determine local velocity received from MaMiCo and
       // convert it to LB units; store the velocity in _vel
+      // massFactor is used to ensure conservation of energy
       tarch::la::Vector<3, double> localVel((1.0 / couplingCell->getMacroscopicMass()) * (_dt / _dx) * couplingCell->getMacroscopicMomentum());
       for (unsigned int d = 0; d < 3; d++) {
         _vel[3 * index + d] = localVel[d];
@@ -321,10 +323,15 @@ public:
 
   std::unique_ptr<State> getState() override {
     computeDensityAndVelocityEverywhere();
+    if (skipRank())
+      return std::make_unique<LBCouetteSolverState>(0);
     return std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
   }
 
   void setState(const std::unique_ptr<State>& input, int cycle) override {
+    if (skipRank())
+      return;
+
     const LBCouetteSolverState* state = dynamic_cast<const LBCouetteSolverState*>(input.get());
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
@@ -375,8 +382,8 @@ public:
     numThreads = omp_get_num_threads();
 #endif
 
-    auto res = std::make_unique<LBCouetteSolver>(_channelheight, _wallVelocity * _dx / _dt, _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep, _plotAverageVelocity,
-                                                 _filestem + std::string("_supervising"), _processes, numThreads, _scen);
+    auto res = std::make_unique<LBCouetteSolver>(_channelheight, _wallVelocity * _dx / _dt, _kinVisc * visc_multiplier, _dx, _dt, _plotEveryTimestep,
+                                                 _plotAverageVelocity, _filestem + std::string("_supervising"), _processes, numThreads, _scen);
 
     res->_mode = Mode::supervising;
     res->_dt_pint = _dt * num_cycles;
@@ -392,6 +399,8 @@ public:
   }
 
   double get_avg_vel(const std::unique_ptr<State>& state) const override {
+    if (skipRank())
+      return 0;
     double vel[3];
     double density;
     double res[3]{0, 0, 0};
@@ -407,6 +416,22 @@ public:
       res[2] /= (_pdfsize / 19);
     }
     return std::sqrt(res[0] * res[0] + res[1] * res[1] + res[2] * res[2]);
+  }
+
+  double get_avg_velX(const std::unique_ptr<State>& state) const {
+    if (skipRank())
+      return 0;
+    double vel[3];
+    double density;
+    double res{0};
+    for (int i = 0; i < _pdfsize; i += 19) {
+      LBCouetteSolver::computeDensityAndVelocity(vel, density, state->getData() + i);
+      res += vel[0];
+    }
+    if (_pdfsize > 0) {
+      res /= (_pdfsize / 19);
+    }
+    return res;
   }
 
 private:
@@ -428,8 +453,9 @@ private:
     }
   }
 
-  void plot_avg_vel(){
-    if (!_plotAverageVelocity) return;
+  void plot_avg_vel() {
+    if (!_plotAverageVelocity)
+      return;
 
     int rank = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -441,24 +467,25 @@ private:
       auto ts = _scen->getTimeIntegrationService();
       if (ts != nullptr) {
         if (ts->isPintEnabled())
-          ss << "_i" << ts->getInteration();
+          ss << "_i" << ts->getIteration();
       }
     }
     ss << ".csv";
     std::string filename = ss.str();
-    std::ofstream file(filename.c_str(), _counter==0 ? std::ofstream::out : std::ofstream::app);
+    std::ofstream file(filename.c_str(), _counter == 0 ? std::ofstream::out : std::ofstream::app);
     if (!file.is_open()) {
       std::cout << "ERROR LBCouetteSolver::plot_avg_vel(): Could not open file " << filename << "!" << std::endl;
       exit(EXIT_FAILURE);
     }
 
-    if(_counter == 0){
-      file << "coupling_cycle ; avg_vel" << std::endl;
+    if (_counter == 0) {
+      file << "coupling_cycle ; avg_vel ; avg_velX" << std::endl;
     }
 
     std::unique_ptr<State> s = std::make_unique<LBCouetteSolverState>(_pdfsize, _pdf1);
     double vel = get_avg_vel(s);
-    file << _counter << " ; " << vel << std::endl;
+    double velX = get_avg_velX(s);
+    file << _counter << " ; " << vel << " ; " << velX << std::endl;
     file.close();
   }
 

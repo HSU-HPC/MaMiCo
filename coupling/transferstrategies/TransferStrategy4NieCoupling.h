@@ -36,7 +36,7 @@ public:
    * transferred (true) or not (false); in their order the entries refer to:
    * west, east, south, north, bottom, top boundary  */
   TransferStrategy4NieCoupling(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, unsigned int numberMDSteps,
-                               double shiftTimestep, tarch::la::Vector<2 * dim, bool> massFluxBoundary);
+                               double shiftTimestep, tarch::la::Vector<2 * dim, bool> massFluxBoundary, bool energyCorrection, double density);
 
   /** @brief a dummy destructor */
   virtual ~TransferStrategy4NieCoupling();
@@ -109,6 +109,8 @@ private:
   /** true in each entry if west/east, south/north, bottom/top boundary is a
    * mass flux boundary */
   const tarch::la::Vector<2 * dim, bool> _massFluxBoundary;
+  const bool _enableEnergyCorrection;
+  const double _density;
 };
 #include "coupling/transferstrategies/TransferStrategy4NieCoupling.cpph"
 

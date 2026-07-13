@@ -63,7 +63,7 @@ def load_avg_ux_from_csv(csv_file):
 
 def plot_couette_profile(coupling_cycle, color, ax=plt.gca()):
     """Plot the flow profile for a single cycle"""
-    csv_path = Path(f"CouetteAvgMultiMDCells_0_0_{coupling_cycle}.csv")
+    csv_path = Path(f"CouetteAvgMultiMDCells_d0_r0_c{coupling_cycle}.csv")
     if not csv_path.exists():
         print(f"File {csv_path} does not exist!", file=sys.stderr)
         return
@@ -125,7 +125,7 @@ if __name__ == "__main__":
         int(s.strip()) for s in args.coupling_cycles.strip().split(",") if len(s) > 0
     ]
     if len(coupling_cycles) == 0:
-        filename_prefix = "CouetteAvgMultiMDCells_0_0_"
+        filename_prefix = "CouetteAvgMultiMDCells_d0_r0_c"
         for path in Path(".").glob(f"{filename_prefix}*.csv"):
             coupling_cycles.append(int(path.stem[len(filename_prefix) :]))
     coupling_cycles.sort()

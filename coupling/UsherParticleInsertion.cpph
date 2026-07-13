@@ -126,10 +126,6 @@ typename coupling::ParticleInsertion<LinkedCell, dim>::Action coupling::UsherPar
   tarch::la::Vector<dim, double> positionOld(0.0);
   tarch::la::Vector<dim, double> force(0.0);
 
-  /** index of linked cell (within linked cell domain, NOT within coupling
-   * cell!) where molecule is placed in */
-  tarch::la::Vector<dim, unsigned int> linkedCellIndex(0);
-
   // current energy
   double energy = 0.0;
   // absolute value of force

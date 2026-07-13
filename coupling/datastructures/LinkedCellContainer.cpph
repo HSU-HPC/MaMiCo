@@ -13,8 +13,7 @@ coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::LinkedCellContai
 #endif
 }
 
-template <class LinkedCell, unsigned int dim>
-coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::~LinkedCellContainer() {
+template <class LinkedCell, unsigned int dim> coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::~LinkedCellContainer() {
   // de-init all coupling cells and then free the allocated memory (C-style array)
   if (_couplingCellsWithLinkedCells != NULL) {
     auto size = coupling::datastructures::CellContainer<I02, dim>::_couplingCells.size();
@@ -34,8 +33,7 @@ coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::getLinkedCellCon
 }
 
 template <class LinkedCell, unsigned int dim>
-coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>*
-coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::initLinkedCellContainer(
+coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::initLinkedCellContainer(
     tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const {
   // determine local number of coupling cells
   unsigned int numberCouplingCells = I02::linearNumberCellsInDomain;
@@ -89,7 +87,7 @@ coupling::datastructures::LinkedCellContainer<LinkedCell, dim>::initLinkedCellCo
         }
       }
     } // loop (linked cells in coupling cell)
-  }   // loop (inner coupling cells)
+  } // loop (inner coupling cells)
 
   return cells;
 }

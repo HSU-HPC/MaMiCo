@@ -17,7 +17,7 @@
 
 namespace coupling {
 namespace configurations {
-class MomentumInsertionConfiguration;
+template <unsigned int dim> class MomentumInsertionConfiguration;
 }
 } // namespace coupling
 
@@ -28,7 +28,7 @@ class NieTest;
  *	@brief momentum insertion configuration. friend class: NieTest
  *  @author Philipp Neumann
  */
-class coupling::configurations::MomentumInsertionConfiguration : public tarch::configuration::Configuration {
+template <unsigned int dim> class coupling::configurations::MomentumInsertionConfiguration : public tarch::configuration::Configuration {
 public:
   // for testing: give access to variables; will only be used in the read-sense
   friend class ::NieTest;
@@ -117,6 +117,11 @@ public:
         exit(EXIT_FAILURE);
       }
       _outerOverlap = (unsigned int)buf;
+      const std::string boundaries[6] = {"west", "east", "south", "north", "bottom", "top"}; // TODO change to +-xyz
+      for (unsigned int d = 0; d < 2 * dim; d++) {
+        _impositionEnabled[d] = true;
+        tarch::configuration::ParseConfiguration::readBoolOptional(_impositionEnabled[d], node, boundaries[d]);
+      }
     }
   }
 
@@ -153,10 +158,11 @@ public:
    * 	@param numberMDTimestepsPerCouplingCycle
    * 	@return momentum insertion config
    */
-  template <class LinkedCell, unsigned int dim>
-  MomentumInsertion<LinkedCell, dim>* interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                                                              const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells,
-                                                              unsigned int numberMDTimestepsPerCouplingCycle) const {
+  template <class LinkedCell>
+  coupling::MomentumInsertion<LinkedCell, dim>*
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                          const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells,
+                          unsigned int numberMDTimestepsPerCouplingCycle) const {
     if (_insertionType == ADDITIVE_MOMENTUM_INSERTION) {
       return new coupling::AdditiveMomentumInsertion<LinkedCell, dim>(mdSolverInterface, numberMDTimestepsPerCouplingCycle);
     } else if (_insertionType == DIRECT_VELOCITY_INSERTION) {
@@ -168,7 +174,7 @@ public:
     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION_TOPONLY) {
       return new coupling::VelocityGradientRelaxationTopOnly<LinkedCell, dim>(_velocityRelaxationFactor, mdSolverInterface, couplingCells);
     } else if (_insertionType == NIE_VELOCITY_IMPOSITION) {
-      return new coupling::NieVelocityImposition<LinkedCell, dim>(mdSolverInterface, _outerOverlap, _innerOverlap);
+      return new coupling::NieVelocityImposition<LinkedCell, dim>(mdSolverInterface, _outerOverlap, _innerOverlap, _impositionEnabled);
     }
     return NULL;
   }
@@ -178,11 +184,13 @@ protected:
 
 private:
   MomentumInsertionType _insertionType;
-  double _velocityRelaxationFactor; // required by velocity relaxation schemes
-  unsigned int _innerOverlap;       // innermost layer of overlap cells (required by
-                                    // nie velocity imposition)
-  unsigned int _outerOverlap;       // outermost layer of overlap cells (required by
-                                    // nie velocity imposition)
+  double _velocityRelaxationFactor;                    // required by velocity relaxation schemes
+  unsigned int _innerOverlap;                          // innermost layer of overlap cells (required by
+                                                       // nie velocity imposition)
+  unsigned int _outerOverlap;                          // outermost layer of overlap cells (required by
+                                                       // nie velocity imposition)
+  tarch::la::Vector<2 * dim, bool> _impositionEnabled; // true in each component, if one of the 2*dim
+                                                       // boundaries allows for velocity imposition (currently only used for nie)
   bool _isValid;
 };
 

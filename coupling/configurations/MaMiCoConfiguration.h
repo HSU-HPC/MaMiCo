@@ -83,7 +83,7 @@ public:
   /**
    * 	@return _momentumInsertionConfiguration
    */
-  const coupling::configurations::MomentumInsertionConfiguration& getMomentumInsertionConfiguration() const {
+  const coupling::configurations::MomentumInsertionConfiguration<dim>& getMomentumInsertionConfiguration() const {
     if (!_isDefinedMomentumInsertion) {
       std::cout << "ERROR coupling::configurations::MaMiCoConfiguration: "
                    "Momentum insertion not defined!"
@@ -157,7 +157,7 @@ private:
   bool _isValid;
   coupling::configurations::CouplingCellConfiguration<dim> _couplingCellConfiguration;
   coupling::configurations::ParticleInsertionConfiguration _particleInsertionConfiguration;
-  coupling::configurations::MomentumInsertionConfiguration _momentumInsertionConfiguration;
+  coupling::configurations::MomentumInsertionConfiguration<dim> _momentumInsertionConfiguration;
   coupling::configurations::BoundaryForceConfiguration<dim> _boundaryForceConfiguration;
   coupling::configurations::TransferStrategyConfiguration<dim> _transferStrategyConfiguration;
   coupling::configurations::ParallelTopologyConfiguration _parallelTopologyConfiguration;

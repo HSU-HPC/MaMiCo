@@ -348,7 +348,7 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
       throw std::runtime_error(ss.str());
     }
 
-    const auto totalWeight = std::reduce(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);
+    const auto totalWeight = std::accumulate(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);
     if (globalNumberCouplingCells[d] % totalWeight != 0) {
       std::stringstream ss;
       ss << "IndexingService: initWithCells(): ERROR: Number "
@@ -374,7 +374,7 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
   // hence cell 3 will be on x axis coord 1
   for (unsigned int d = 0; d < dim; d++) {
     // with weights 1,2,1, totalWeight = 4
-    const int totalWeight = std::reduce(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);
+    const int totalWeight = std::accumulate(subdomainWeights[d].begin(), subdomainWeights[d].end(), 0u);
     // with 8 cells on an axis and totalWeight = 4, multiplier = 2, thus weight 1 will have 2 cells
     const int multiplier = globalNumberCouplingCells[d] / totalWeight;
     _subdomainOwnership[d].clear();

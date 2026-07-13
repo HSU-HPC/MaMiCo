@@ -9,6 +9,7 @@ class Scenario;
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/solvers/CouetteSolver.h"
+#include "mamico_git_version_info.h"
 #include <iostream>
 #include <string>
 
@@ -18,10 +19,21 @@ class Scenario;
 class Scenario {
 public:
   Scenario(std::string scenarioname) : _scenarioname(scenarioname) {
-    std::cout << "Run " << scenarioname << "..." << std::endl;
-    std::cout << "MaMiCo git commit hash = " << MAMICO_STRINGIFY(MAMICO_COMMIT_HASH) << std::endl;
+    int rank = 0;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+#endif
+    _isRootRank = (rank == 0);
+    if (_isRootRank) {
+      std::cout << "Run " << scenarioname << "..." << std::endl;
+      std::cout << "MaMiCo git commit hash = " << MAMICO_STRINGIFY(MAMICO_COMMIT_HASH) << std::endl;
+    }
   }
-  virtual ~Scenario() { std::cout << "Shut down " << _scenarioname << std::endl; }
+  virtual ~Scenario() {
+    if (_isRootRank) {
+      std::cout << "Shut down " << _scenarioname << std::endl;
+    }
+  }
 
   virtual void run() = 0;
   virtual void init() = 0;
@@ -33,6 +45,9 @@ public:
 
 protected:
   std::unique_ptr<coupling::services::ParallelTimeIntegrationService<3>> _timeIntegrationService;
+
+  /** @brief if this is the world global root process */
+  bool _isRootRank;
 
 private:
   const std::string _scenarioname;

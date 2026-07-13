@@ -6,7 +6,7 @@
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_DELETEMOLECULESMAPPING_H_
 
 #include "simplemd/LinkedCell.h"
-#include "simplemd/services/MoleculeService.h"
+#include <Kokkos_Core.hpp>
 
 namespace simplemd {
 namespace cellmappings {
@@ -14,8 +14,7 @@ class DeleteMoleculesMapping;
 }
 } // namespace simplemd
 
-/** deletes all molecules within the cells. The molecules are not only removed from the lists in the cells,
- *  they are also deleted from the MoleculeService, i.e. they are completely removed.
+/** deletes all molecules within the cells. The molecules are not only removed from the lists in the cells.
  *  This mapping is applied in the BoundaryTreatment class: After the force computations, the ghost cells do not
  *  need to contain the molecules anymore. So, this mapping is used to delete all molecules within the ghost layers.
  *
@@ -23,15 +22,16 @@ class DeleteMoleculesMapping;
  */
 class simplemd::cellmappings::DeleteMoleculesMapping {
 public:
-  DeleteMoleculesMapping(simplemd::services::MoleculeService& moleculeService) : _moleculeService(moleculeService) {}
-  ~DeleteMoleculesMapping() {}
+  DeleteMoleculesMapping() {}
+  KOKKOS_FUNCTION ~DeleteMoleculesMapping() {}
 
   void beginCellIteration() {}
   void endCellIteration() {}
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
+  KOKKOS_FUNCTION void handleCell(LinkedCell& cell) const { cell.clear(); }
+
+  static const bool IsParallel = true;
 
 private:
-  simplemd::services::MoleculeService& _moleculeService;
 };
 
 #endif // _MOLECULARDYNAMICS_CELLMAPPINGS_DELETEMOLECULESMAPPING_H_
