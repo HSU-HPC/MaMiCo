@@ -112,6 +112,15 @@ set(KOKKOS_TARGET OPENMP CACHE STRING "Choose CUDA, OPENMP, or SERIAL")
 set_property(CACHE KOKKOS_TARGET PROPERTY STRINGS CUDA OPENMP SERIAL)
 message(STATUS ">> KOKKOS_TARGET: " ${KOKKOS_TARGET})
 
+# Avoid LTO conflict for pybind11 and CUDA
+if(BUILD_WITH_PYBIND11 AND KOKKOS_TARGET STREQUAL "CUDA")
+  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
+  message(WARNING
+    "CUDA and pybind11 are enabled; disabling CMake interprocedural "
+    "optimization to avoid known linker issues."
+  )
+endif()
+
 find_package(Kokkos CONFIG) # Try to find Kokkos externally
 if(Kokkos_FOUND)
     message(STATUS "Found Kokkos: ${Kokkos_DIR} (version \"${Kokkos_VERSION}\")")
