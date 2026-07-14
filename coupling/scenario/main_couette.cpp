@@ -28,8 +28,8 @@ int main(int argc, char* argv[]) {
   MPI_Init(&argc, &argv);
 #endif
 
-  MainExecSpace mainExecSpace;
   Kokkos::ScopeGuard kokkos(argc, argv);
+  MainExecSpace mainExecSpace;
   std::cout << "Kokkos using execution space \"" << mainExecSpace.name() << "\" with memory space \"" << MainExecSpace::memory_space::name() << "\""
             << std::endl;
   mainExecSpace.print_configuration(std::cout);
