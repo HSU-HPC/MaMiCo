@@ -40,7 +40,8 @@ def get_git_repo_root(cwd="."):
 # MaMiCo
 MAMICO_REPO_DIR = get_git_repo_root(Path(__file__))
 MAMICO_BUILD_DIR = MAMICO_REPO_DIR / "build"
-MAMICO_BUILD_TYPE = "DebugOptimized"
+MAMICO_BUILD_TYPE_DEFAULT = "DebugOptimized"
+MAMICO_BUILD_TYPE_DEBUG = "DebugMD"
 
 # LAMMPS
 LAMMPS_REPO_DIR = MAMICO_BUILD_DIR / "LAMMPS"
@@ -174,8 +175,9 @@ md_solvers = dict(
 )
 
 
-def build_mamico_couette_md(
-    md_solver="md", with_openfoam=False, with_mpi=False, jobs=8, clean=False, force_gcc=False
+# FIXME: LAMMPS is not found during linking
+def build_mamico_couette(
+    md_solver="md", with_openfoam=False, with_mpi=False, with_tests=False, is_debug=False, jobs=8, clean=False, force_gcc=False
 ):
     run_info = f"Started {time.strftime('%Y-%m-%d %H:%M:%S %Z')}"
     print(run_info)
@@ -200,12 +202,14 @@ def build_mamico_couette_md(
     cmake_args = ""
     if force_gcc:
         cmake_args += f" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
-    cmake_args += f"-S{MAMICO_REPO_DIR} -B{build_dir}"
-    cmake_args += f" -DCMAKE_BUILD_TYPE={MAMICO_BUILD_TYPE}"
+    #cmake_args += f"-S{MAMICO_REPO_DIR} -B{build_dir}"
+    cmake_args += f" -DCMAKE_BUILD_TYPE={MAMICO_BUILD_TYPE_DEBUG if is_debug else MAMICO_BUILD_TYPE_DEFAULT}"
     cmake_args += f" -DBUILD_WITH_MPI={'ON' if with_mpi else 'OFF'}"
+    cmake_args += f" -DBUILD_TESTING={'ON' if with_tests else 'OFF'}"
     cmake_args += f" -DMD_SIM={md_solver_cmake_flag}"
-    environement = dict()
-    environement["PKG_CONFIG_PATH"] = "$PKG_CONFIG_PATH"
+    environement = dict(
+        PKG_CONFIG_PATH = os.getenv("PKG_CONFIG_PATH", "")
+    )
     cmake_args += " -DBUILD_WITH_LAMMPS=OFF"
     if md_solver == "ls1":
         had_error |= build_ls1(MAMICO_REPO_DIR, with_mpi, jobs, force_gcc)
@@ -215,16 +219,16 @@ def build_mamico_couette_md(
         cmake_args = cmake_args.replace("LAMMPS=OFF", "LAMMPS=ON")
         for suffix in ["", "64"]:
             pkgconfig_path = Path.home() / ".local" / f"lib{suffix}" / "pkgconfig"
-            environement["PKG_CONFIG_PATH"] += f":{pkgconfig_path}"
+            environement["PKG_CONFIG_PATH"] = f"{pkgconfig_path}:{environement['PKG_CONFIG_PATH']}"
         shell(f"ln -sf {LAMMPS_REPO_DIR}/src {MAMICO_REPO_DIR}/lammps")
     cmake_args += f" -DBUILD_WITH_OPENFOAM={'ON' if with_openfoam else 'OFF'}"
     environement_prefix = " ".join(f"{k}={v}" for k, v in environement.items())
-    cmd = f"{environement_prefix} cmake {cmake_args}"
+    cmd = f"{environement_prefix} cmake {cmake_args} .."
     if with_openfoam:
         cmd = f"source {OPEN_FOAM_SRC_DIR / 'etc' / 'bashrc'}; {cmd}"
-    had_error |= 0 != shell(cmd)
-    if not had_error:
-        with ChangeDir(build_dir):
+    with ChangeDir(build_dir):
+        had_error |= 0 != shell(cmd)
+        if not had_error:
             if couette_bin_path.exists():
                 # Avoid confusing old build for different one
                 couette_bin_path.unlink()
@@ -243,15 +247,19 @@ if __name__ == "__main__":
     )
     arg_parser.add_argument("-F", "--with-foam", action="store_true")
     arg_parser.add_argument("-M", "--with-mpi", action="store_true")
+    arg_parser.add_argument("-T", "--with-tests", action="store_true")
+    arg_parser.add_argument("-d", "--debug", action="store_true")
     arg_parser.add_argument("-j", "--jobs", default=8)
     arg_parser.add_argument("-g", "--force-gcc", action="store_true")
     arg_parser.add_argument("-c", "--clean", action="store_true")
     args = arg_parser.parse_args()
 
-    exec_path = build_mamico_couette_md(
+    exec_path = build_mamico_couette(
         md_solver=args.md_solver,
         with_openfoam=args.with_foam,
         with_mpi=args.with_mpi,
+        with_tests=args.with_tests,
+        is_debug=args.debug,
         jobs=args.jobs,
         clean=args.clean,
         force_gcc=args.force_gcc

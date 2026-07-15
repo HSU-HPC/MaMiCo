@@ -90,7 +90,7 @@ public:
       std::cout << "ERROR sortMoleculesIntoCells(): couplingCellService==NULL!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    interface->updateAllCells(couplingCellService->getIndexConversion());
+    interface->updateAllCells();
   }
 
   // set coupling cell service to MamicoInterfaceProvider

@@ -76,7 +76,6 @@ for i in range(localMDInstances):
     multiMDCellService.getCouplingCellService(
         i).computeAndStoreTemperature(1.1)
 
-buf = mamico.coupling.Buffer(multiMDCellService.getCouplingCellService(0).getIndexConversion(),
-                             macroscopicSolverInterface, rank)
+buf = mamico.coupling.Buffer(macroscopicSolverInterface, rank)
 
 mamico.tarch.utils.finalizeMPI()

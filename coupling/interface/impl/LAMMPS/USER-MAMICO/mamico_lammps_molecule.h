@@ -91,8 +91,6 @@ public:
    */
   virtual double getPotentialEnergy() const {
     // helper variables and molecule position
-    const coupling::IndexConversion<dim>& indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
     const tarch::la::Vector<dim, double> position1 = getPosition();
     const tarch::la::Vector<dim, unsigned int> linkedCellInCouplingCell(0);
     const tarch::la::Vector<dim, unsigned int> linkedCellsPerCouplingCell(1);
@@ -138,7 +136,7 @@ public:
           //                       molecule that
           //                          the "outer" VTK cell iterator points to
           LAMMPS_NS::MamicoCell cell =
-              mdSolverInterface->getLinkedCell(couplingCellIndex, linkedCellInCouplingCell, linkedCellsPerCouplingCell, indexConversion);
+              mdSolverInterface->getLinkedCell(couplingCellIndex, linkedCellInCouplingCell, linkedCellsPerCouplingCell);
           coupling::interface::MoleculeIterator<MamicoCell, dim>* it = mdSolverInterface->getMoleculeIterator(cell);
           for (it->begin(); it->continueIteration(); it->next()) {
             const tarch::la::Vector<dim, double> rij = it->getConst().getPosition() - position1;
