@@ -19,7 +19,7 @@ public:
   KOKKOS_FUNCTION void beginMoleculeIteration();
 
   KOKKOS_FUNCTION void endMoleculeIteration() { Kokkos::Profiling::popRegion(); }
-  KOKKOS_FUNCTION void handleMolecule(Molecule& molecule, LinkedCell& cell) const;
+  KOKKOS_FUNCTION void handleMolecule(Molecule& molecule, const LinkedCell& cell) const;
 
   static const bool IsParallel = true;
 

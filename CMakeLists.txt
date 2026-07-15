@@ -385,6 +385,7 @@ set(SIMPLE_MD_SOURCES
   "simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
   "simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
   "simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
+  "simplemd/molecule-with-cell-mappings/LennardJonesForceMapping.cpp"
   "simplemd/services/ExternalForceService.cpp"
   "simplemd/services/MolecularPropertiesService.cpp"
   "simplemd/services/MoleculeService.cpp"

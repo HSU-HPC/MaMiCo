@@ -173,7 +173,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
 #endif
 
     // cell mappings
-    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
+    _lennardJonesForce = new simplemd::moleculewithcellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
     if (_lennardJonesForce == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_lennardJonesForce==NULL!"
@@ -383,7 +383,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
 #endif
 
     // cell mappings
-    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
+    _lennardJonesForce = new simplemd::moleculewithcellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
     if (_lennardJonesForce == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_lennardJonesForce==NULL!"
@@ -533,7 +533,12 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   if (!_configuration.getSimulationConfiguration().useOverlappingCommunicationWithForceComputation()) {
     _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
     // compute forces between molecules.
-    _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
+    constexpr bool NEWTON3 = true;
+    if constexpr ( NEWTON3 ){
+      _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
+    } else {
+      _moleculeService->getContainer().iterateMoleculesWithCell(*_lennardJonesForce);
+    }
 #if (TARCH_DEBUG == TARCH_YES)
     _moleculeService->getContainer().iterateMolecules(_convertForcesFixedToFloatMapping);
 #endif

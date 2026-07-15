@@ -226,6 +226,11 @@ public:
    */
   template <class A> void iterateMoleculesParallel(A& a);
 
+private:
+  /**
+   * @brief applies molecule-with-cell mapping to all neighbors of cell
+   */
+  template <class A> void handleCellNeighbors(A& a, Molecule& m, const LinkedCell& cell) const;
 
   /**
    * @brief applies molecule-with-cell mapping without any node-level parallelisation
@@ -237,6 +242,7 @@ public:
    */
   template <class A> void iterateMoleculesWithCellParallel(A& a);
 
+public:
   /**
    * @brief iterates over cells in parallel using Kokkos
    */
@@ -330,6 +336,9 @@ private:
   const tarch::la::Vector<MD_DIM, unsigned int> _ghostCellLayerThickness;
   const tarch::la::Vector<MD_DIM, unsigned int> _numLocalCellsNoGhost;
 
+  /** index offsets of all 26 neighbor cell directions */
+  std::vector<int> _neighborOffsets;
+
   /** maximum number of particles a cell (a row of the view) can contain
    * if this is exceeded when writing to cell, the simulation behaviour is undefined
    */
@@ -405,12 +414,22 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCell(A&
   }
 }
 
+template <class A> void simplemd::MoleculeContainer::handleCellNeighbors(A& a, Molecule& m, const LinkedCell& cell) const {
+    unsigned int index = cell.getIndex();
+    for (int offset : _neighborOffsets) {
+      auto cell2 = (*this)[index + offset];
+      a.handleMolecule(m, cell2);
+    }
+}
+
 template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellSerial(A& a) {
   a.beginMoleculeIteration();
   for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {
     for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
       simplemd::LinkedCell cell = (*this)[i];
-      a.handleMolecule(getMoleculeAt(i, j), cell);
+      Molecule& m = getMoleculeAt(i, j);
+      a.handleMolecule(m, cell);
+      handleCellNeighbors(a, m, cell);
     }
   }
   a.endMoleculeIteration();
@@ -424,14 +443,15 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellPar
       "simplemd::MoleculeContainer::iterateMoleculesWithCellParallel", Kokkos::RangePolicy<MainExecSpace>(0, length),
       KOKKOS_CLASS_LAMBDA(const unsigned int i) {
 
-        const unsigned int cellIndex = i / threads_per_cell;
-        simplemd::LinkedCell cell = (*this)[cellIndex];
-       
-        for (unsigned int j = i % threads_per_cell; j < _linkedCellNumMolecules(cellIndex); j+=threads_per_cell) {
-          a.handleMolecule(getMoleculeAt(cellIndex, j),cell);
-        }
-        
-      });
+    const unsigned int cellIndex = i / threads_per_cell;
+    simplemd::LinkedCell cell = (*this)[cellIndex];
+
+    for (unsigned int j = i % threads_per_cell; j < _linkedCellNumMolecules(cellIndex); j+=threads_per_cell) {
+        Molecule& m = getMoleculeAt(cellIndex, j);
+        a.handleMolecule(m,cell);
+        handleCellNeighbors(a, m, cell);
+    }
+  });
   Kokkos::fence(); // Ensure results are available on the host
   
   a.endMoleculeIteration();

@@ -25,7 +25,7 @@ class simplemd::cellmappings::LennardJonesForceMapping {
 public:
   LennardJonesForceMapping(simplemd::services::ExternalForceService& externalForceService,
                            const simplemd::services::MolecularPropertiesService& molecularPropertiesService);
-  KOKKOS_FUNCTION ~LennardJonesForceMapping() {}
+  KOKKOS_FUNCTION virtual ~LennardJonesForceMapping() {}
 
   KOKKOS_FUNCTION void beginCellIteration();
 
@@ -48,6 +48,7 @@ private:
   const double _sigma6;
   /** cutOffRadius*cutOffRadius */
   const double _cutOffRadiusSquared;
+protected:
   /** external forces*/
   tarch::la::Vector<MD_DIM, double> _externalForce;
 };
