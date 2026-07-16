@@ -1,4 +1,5 @@
-find_path(LAMMPS_INCLUDE_DIR lammps.h HINTS ${LAMMPS_DIR} ${LAMMPS_DIR}/build ${LAMMPS_DIR}/build/includes)
+find_path(LAMMPS_INCLUDE_DIR lammps.h HINTS ${LAMMPS_DIR} ${LAMMPS_DIR}/build 
+            ${LAMMPS_DIR}/build/includes ${LAMMPS_DIR}/build/includes/lammps)
 
 find_library(LAMMPS_LIBRARY lammps HINTS ${LAMMPS_DIR} ${LAMMPS_DIR}/build)
 
