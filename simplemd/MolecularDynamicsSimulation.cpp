@@ -533,12 +533,11 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   if (!_configuration.getSimulationConfiguration().useOverlappingCommunicationWithForceComputation()) {
     _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
     // compute forces between molecules.
-    constexpr bool NEWTON3 = true;
-    if constexpr ( NEWTON3 ){
-      _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
-    } else {
+#if defined(KOKKOS_TARGET_CUDA)
       _moleculeService->getContainer().iterateMoleculesWithCell(*_lennardJonesForce);
-    }
+#else
+      _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
+#endif
 #if (TARCH_DEBUG == TARCH_YES)
     _moleculeService->getContainer().iterateMolecules(_convertForcesFixedToFloatMapping);
 #endif
