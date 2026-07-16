@@ -217,10 +217,8 @@ def build_mamico_couette(
     elif md_solver == "lammps":
         had_error |= build_lammps()
         cmake_args = cmake_args.replace("LAMMPS=OFF", "LAMMPS=ON")
-        for suffix in ["", "64"]:
-            pkgconfig_path = Path.home() / ".local" / f"lib{suffix}" / "pkgconfig"
-            environement["PKG_CONFIG_PATH"] = f"{pkgconfig_path}:{environement['PKG_CONFIG_PATH']}"
         shell(f"ln -sf {LAMMPS_REPO_DIR}/src {MAMICO_REPO_DIR}/lammps")
+        cmake_args += f" -DLAMMPS_DIR={LAMMPS_REPO_DIR}"
     cmake_args += f" -DBUILD_WITH_OPENFOAM={'ON' if with_openfoam else 'OFF'}"
     environement_prefix = " ".join(f"{k}={v}" for k, v in environement.items())
     cmd = f"{environement_prefix} cmake {cmake_args} .."
