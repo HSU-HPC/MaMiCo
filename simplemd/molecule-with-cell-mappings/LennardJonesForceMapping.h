@@ -16,9 +16,9 @@ public:
                            const simplemd::services::MolecularPropertiesService& molecularPropertiesService);
   KOKKOS_FUNCTION virtual ~LennardJonesForceMapping() {}
 
-  KOKKOS_FUNCTION void beginMoleculeIteration();
+  void beginMoleculeIteration();
+  void endMoleculeIteration() { Kokkos::Profiling::popRegion(); }
 
-  KOKKOS_FUNCTION void endMoleculeIteration() { Kokkos::Profiling::popRegion(); }
   KOKKOS_FUNCTION void handleMolecule(Molecule& molecule, const LinkedCell& cell) const;
 
   static const bool IsParallel = true;

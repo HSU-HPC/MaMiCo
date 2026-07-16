@@ -27,9 +27,9 @@ public:
                            const simplemd::services::MolecularPropertiesService& molecularPropertiesService);
   KOKKOS_FUNCTION virtual ~LennardJonesForceMapping() {}
 
-  KOKKOS_FUNCTION void beginCellIteration();
+  void beginCellIteration();
+  void endCellIteration() { Kokkos::Profiling::popRegion(); }
 
-  KOKKOS_FUNCTION void endCellIteration() { Kokkos::Profiling::popRegion(); }
   KOKKOS_FUNCTION void handleCell(LinkedCell& cell) const;
   KOKKOS_FUNCTION void handleCellPair(const LinkedCell& cell1, const LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) const;
 
