@@ -229,7 +229,8 @@ public:
   /**
    * @brief applies molecule-with-cell mapping to all neighbors of cell
    */
-  template <class A> void handleCellNeighbors(A& a, Molecule& m, const LinkedCell& cell) const;
+  template <class A>
+  KOKKOS_FUNCTION void handleCellNeighbors(A& a, Molecule& m, const LinkedCell& cell) const;
 
   /**
    * @brief applies molecule-with-cell mapping without any node-level parallelisation
