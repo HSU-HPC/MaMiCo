@@ -43,7 +43,7 @@ public:
     SIMPLEMD = 0,  ///< the SimpleMD solver is used
     SYNTHETIC = 1, ///< the synthetic solver is used
     LS1 = 2,       ///< the LS1 solver is used
-    LAMMPS_MD = 3  ///< the LAMMPS MD solver is used
+    LAMMPSMD = 3  ///< the LAMMPS MD solver is used
   };
 
   /** @brief creates CouetteConfig if all elements exist and can be read
@@ -163,7 +163,7 @@ public:
       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.equSteps, subtag, "equilibration-steps");
       tarch::configuration::ParseConfiguration::readIntOptional(cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
     } else if (type == "lammps-md") {
-      cfg.miSolverType = LAMMPS_MD;
+      cfg.miSolverType = LAMMPSMD;
       cfg.totalNumberMDSimulations = 1;
       tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.temp, subtag, "temperature");
       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.equSteps, subtag, "equilibration-steps");
