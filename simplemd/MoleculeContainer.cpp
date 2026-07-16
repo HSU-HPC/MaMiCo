@@ -7,21 +7,24 @@
 
 simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopologyService& parallelTopologyService, int cellCapacity)
     : _numCells(parallelTopologyService.getLocalNumberOfCells(true)), _ghostCellLayerThickness(parallelTopologyService.getGhostCellLayerThickness()),
-      _numLocalCellsNoGhost(_numCells - 2u * _ghostCellLayerThickness), _neighborOffsets(),
+      _numLocalCellsNoGhost(_numCells - 2u * _ghostCellLayerThickness),
       _cellCapacity(cellCapacity), _domainSize(parallelTopologyService.getGlobalDomainSize()),
       _domainOffset(parallelTopologyService.getGlobalDomainOffset()), _meshWidth(parallelTopologyService.getMeshWidth()),
       _globalIndexOfFirstCell(parallelTopologyService.getGlobalIndexOfFirstCell()), _localIndexOfFirstCell(parallelTopologyService.getLocalIndexOfFirstCell()),
       _moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
       _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)),
-      _linkedCellIsGhostCell("linkedCellIsGhostCell", _linkedCellNumMolecules.size()) {
+      _linkedCellIsGhostCell("linkedCellIsGhostCell", _linkedCellNumMolecules.size()),
+      _neighborOffsets("neighborOffsets", 26) {
   for (unsigned int i = 0; i < _linkedCellIsGhostCell.size(); i++)
     _linkedCellIsGhostCell(i) = isGhostCell(i);
   const int nc0  = (int)_numLocalCellsNoGhost[0] + 2;
   const int nc01 = nc0*((int)_numLocalCellsNoGhost[1] + 2);
-  _neighborOffsets = {1,-1,nc0,-nc0,nc0+1,nc0-1,-nc0+1,-nc0-1,
+  const std::vector<int> buff{1,-1,nc0,-nc0,nc0+1,nc0-1,-nc0+1,-nc0-1,
     nc01,1+nc01,-1+nc01,nc0+nc01,-nc0+nc01,nc0+1+nc01,nc0-1+nc01,-nc0+1+nc01,-nc0-1+nc01,
     -nc01,1-nc01,-1-nc01,nc0-nc01,-nc0-nc01,nc0+1-nc01,nc0-1-nc01,-nc0+1-nc01,-nc0-1-nc01
   };
+  for (unsigned int i = 0; i < 26; i++)
+    _neighborOffsets(i) = buff[i];
 }
 
 void simplemd::MoleculeContainer::insert(unsigned int cellIdx, const simplemd::Molecule& molecule) {

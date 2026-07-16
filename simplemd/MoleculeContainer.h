@@ -335,9 +335,6 @@ private:
   const tarch::la::Vector<MD_DIM, unsigned int> _ghostCellLayerThickness;
   const tarch::la::Vector<MD_DIM, unsigned int> _numLocalCellsNoGhost;
 
-  /** index offsets of all 26 neighbor cell directions */
-  std::vector<int> _neighborOffsets;
-
   /** maximum number of particles a cell (a row of the view) can contain
    * if this is exceeded when writing to cell, the simulation behaviour is undefined
    */
@@ -361,6 +358,8 @@ private:
   Kokkos::View<simplemd::Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace> _moleculeData;
   Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCellNumMolecules;
   Kokkos::View<bool*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCellIsGhostCell;
+  /** index offsets of all 26 neighbor cell directions */
+  Kokkos::View<int*, Kokkos::LayoutRight, Kokkos::SharedSpace> _neighborOffsets;
 };
 
 template <class A> void simplemd::MoleculeContainer::iterateMolecules(A& a) {
@@ -415,8 +414,8 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCell(A&
 
 template <class A> void simplemd::MoleculeContainer::handleCellNeighbors(A& a, Molecule& m, const LinkedCell& cell) const {
     unsigned int index = cell.getIndex();
-    for (int offset : _neighborOffsets) {
-      auto cell2 = (*this)[index + offset];
+    for (unsigned int i = 0; i < 26; i++) {
+      auto cell2 = (*this)[index + _neighborOffsets(i)];
       a.handleMolecule(m, cell2);
     }
 }
