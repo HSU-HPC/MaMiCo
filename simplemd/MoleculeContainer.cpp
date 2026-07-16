@@ -23,8 +23,10 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
     nc01,1+nc01,-1+nc01,nc0+nc01,-nc0+nc01,nc0+1+nc01,nc0-1+nc01,-nc0+1+nc01,-nc0-1+nc01,
     -nc01,1-nc01,-1-nc01,nc0-nc01,-nc0-nc01,nc0+1-nc01,nc0-1-nc01,-nc0+1-nc01,-nc0-1-nc01
   };
+  auto host_mirror = Kokkos::create_mirror_view(_neighborOffsets);
   for (unsigned int i = 0; i < 26; i++)
-    _neighborOffsets(i) = buff[i];
+    host_mirror(i) = buff[i];
+  Kokkos::deep_copy(_neighborOffsets, host_mirror);
 }
 
 void simplemd::MoleculeContainer::insert(unsigned int cellIdx, const simplemd::Molecule& molecule) {

@@ -357,9 +357,9 @@ private:
 
   Kokkos::View<simplemd::Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace> _moleculeData;
   Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCellNumMolecules;
-  Kokkos::View<bool*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCellIsGhostCell;
+  Kokkos::View<bool*, Kokkos::SharedSpace> _linkedCellIsGhostCell;
   /** index offsets of all 26 neighbor cell directions */
-  Kokkos::View<int*, Kokkos::LayoutRight, Kokkos::SharedSpace> _neighborOffsets;
+  Kokkos::View<int*> _neighborOffsets;
 };
 
 template <class A> void simplemd::MoleculeContainer::iterateMolecules(A& a) {
