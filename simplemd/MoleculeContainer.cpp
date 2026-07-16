@@ -15,8 +15,12 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
       _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)),
       _linkedCellIsGhostCell("linkedCellIsGhostCell", _linkedCellNumMolecules.size()),
       _neighborOffsets("neighborOffsets", 26) {
+
+  auto host_mirror1 = Kokkos::create_mirror_view(_linkedCellIsGhostCell);
   for (unsigned int i = 0; i < _linkedCellIsGhostCell.size(); i++)
-    _linkedCellIsGhostCell(i) = isGhostCell(i);
+    host_mirror1(i) = isGhostCell(i);
+  Kokkos::deep_copy(_linkedCellIsGhostCell, host_mirror1);
+
   const int nc0  = (int)_numLocalCellsNoGhost[0] + 2;
   const int nc01 = nc0*((int)_numLocalCellsNoGhost[1] + 2);
   const std::vector<int> buff{1,-1,nc0,-nc0,nc0+1,nc0-1,-nc0+1,-nc0-1,
@@ -330,11 +334,21 @@ void simplemd::MoleculeContainer::printNonGhostCells(bool shouldPrintCells, cons
   Kokkos::printf("cell\tpos_x\tpos_y\tpos_z\tvel_x\tvel_y\tvel_z\tforce_x\tforce_y\tforce_z\n");
   size_t linkedCellCount = _linkedCellNumMolecules.size();
   size_t cellsRemaining = MD_DUMP_CELLS == 0 ? linkedCellCount : std::min(MD_DUMP_CELLS, linkedCellCount);
+
+  KOKKOS_IF_ON_HOST((
+    auto mirror = Kokkos::create_mirror_view(_linkedCellIsGhostCell);
+    Kokkos::deep_copy(mirror, _linkedCellIsGhostCell);
+  ))
   for (size_t i = 0; i < linkedCellCount && cellsRemaining > 0; i++) {
+    KOKKOS_IF_ON_HOST((
+    if (mirror(i))
+    ))
+    KOKKOS_IF_ON_DEVICE((
     if (_linkedCellIsGhostCell(i))
+    ))
       continue;
     cellsRemaining--;
-    printCell(i);
+    printCellMolecules(i);
   }
   Kokkos::printf("=== END DUMP MOLECULE CONTAINER ===\n");
 #endif

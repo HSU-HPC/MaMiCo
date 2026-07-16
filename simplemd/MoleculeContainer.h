@@ -357,7 +357,7 @@ private:
 
   Kokkos::View<simplemd::Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace> _moleculeData;
   Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCellNumMolecules;
-  Kokkos::View<bool*, Kokkos::SharedSpace> _linkedCellIsGhostCell;
+  Kokkos::View<bool*> _linkedCellIsGhostCell;
   /** index offsets of all 26 neighbor cell directions */
   Kokkos::View<int*> _neighborOffsets;
 };
