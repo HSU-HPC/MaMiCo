@@ -226,7 +226,6 @@ public:
    */
   template <class A> void iterateMoleculesParallel(A& a);
 
-private:
   /**
    * @brief applies molecule-with-cell mapping to all neighbors of cell
    */
@@ -242,7 +241,6 @@ private:
    */
   template <class A> void iterateMoleculesWithCellParallel(A& a);
 
-public:
   /**
    * @brief iterates over cells in parallel using Kokkos
    */
