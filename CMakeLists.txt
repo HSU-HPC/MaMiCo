@@ -146,6 +146,10 @@ else()
     # Debugging
     if(CMAKE_BUILD_TYPE MATCHES "^Debug" AND (NOT CMAKE_BUILD_TYPE STREQUAL "DebugOptimized"))
       set(KOKKOS_DEBUG "ON")
+      # Support source code view in ncu-ui
+      add_compile_options(
+        $<$<COMPILE_LANGUAGE:CUDA>:-lineinfo>
+      )
     else()
       set(KOKKOS_DEBUG "OFF")
     endif()
