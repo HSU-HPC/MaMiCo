@@ -161,8 +161,7 @@ def build_lammps(with_mpi, jobs=8):
     install_dir.mkdir(exist_ok=True)
     with ChangeDir(build_dir):
         had_error_pull = 0 != shell("git pull")  # Track latest LAMMPS release
-        had_error_cmake = 0 != shell(f"cmake -DBUILD_SHARED_LIBS=ON -DBUILD_MPI={'ON' if with_mpi else 'OFF'} \
-                                     -DCMAKE_INSTALL_PREFIX={install_dir} ../cmake/")
+        had_error_cmake = 0 != shell(f"cmake -DBUILD_SHARED_LIBS=ON -DBUILD_MPI={'ON' if with_mpi else 'OFF'} -DCMAKE_INSTALL_PREFIX={install_dir} ../cmake/")
         had_error_cmake_build = 0 != shell(f"make -j {jobs}")
         had_error_install = 0 != shell("make install")
     had_error = (

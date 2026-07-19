@@ -111,58 +111,59 @@ private:
         std::cout << ranks[i] << " =" << processCoords << " ; ";
       }
       std::cout << std::endl;
-  }
+    }
 
-  unsigned int* initRecvBuffer(std::vector<coupling::datastructures::CouplingCell<3>*>& recvBuffer, coupling::solvers::LBCouetteSolverInterface& interface,
-                               const double density, const double dx) {
-    // compute avg. mass in this cell
-    const double mass = density * dx * dx * dx;
-    tarch::la::Vector<3, unsigned int> coords(0);
-    // determine local rank
-    int rank = 0;
+    unsigned int* initRecvBuffer(std::vector<coupling::datastructures::CouplingCell<3>*> & recvBuffer, coupling::solvers::LBCouetteSolverInterface & interface,
+                                 const double density, const double dx) {
+      // compute avg. mass in this cell
+      const double mass = density * dx * dx * dx;
+      tarch::la::Vector<3, unsigned int> coords(0);
+      // determine local rank
+      int rank = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
 
-    // loop over all global coupling cells
-    std::vector<I01> myIndex;
-    recvBuffer.clear();
-    for (auto idx : I01()) {
-      tarch::la::Vector<3, unsigned int> coords(idx.get());
-      // check if thi<s cell is located on the current (target) rank
-      std::vector<unsigned int> ranks = interface.getTargetRanks(coords);
-      bool contained = false;
-      for (unsigned int i = 0; i < ranks.size(); i++) {
-        contained = contained || (ranks[i] == (unsigned int)rank);
-      }
-
-      // if this cell shall be received by the current (target) rank, create a cell in the recvBuffer and store the index in the vector
-      if (contained) {
-        myIndex.push_back(I01{coords});
-        recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
-        if (recvBuffer[recvBuffer.size() - 1] == NULL) {
-          std::cout << "ERROR TestLBCouetteSolver::initRecvBuffer(): recBuffer[..]==NULL!" << std::endl;
-          exit(EXIT_FAILURE);
+      // loop over all global coupling cells
+      std::vector<I01> myIndex;
+      recvBuffer.clear();
+      for (auto idx : I01()) {
+        tarch::la::Vector<3, unsigned int> coords(idx.get());
+        // check if thi<s cell is located on the current (target) rank
+        std::vector<unsigned int> ranks = interface.getTargetRanks(coords);
+        bool contained = false;
+        for (unsigned int i = 0; i < ranks.size(); i++) {
+          contained = contained || (ranks[i] == (unsigned int)rank);
         }
-        recvBuffer[recvBuffer.size() - 1]->setMacroscopicMass(mass);
-        // set a reference velocity between 0 and one in each component of the velocity vector for testing
-        tarch::la::Vector<3, double> localVel(((double)coords[0]) / (globalNumberCouplingCells[0] + 2),
-                                              ((double)coords[1]) / (globalNumberCouplingCells[1] + 2),
-                                              ((double)coords[2]) / (globalNumberCouplingCells[2] + 2));
-        std::cout << "Global cell=" << coords << ", mass=" << mass << ", vel=" << localVel << std::endl;
-        recvBuffer[recvBuff>er.size() - 1]->setMacroscopicMomentum(mass * localVel);
+
+        // if this cell shall be received by the current (target) rank, create a cell in the recvBuffer and store the index in the vector
+        if (contained) {
+          myIndex.push_back(I01{coords});
+          recvBuffer.push_back(new coupling::datastructures::CouplingCell<3>());
+          if (recvBuffer[recvBuffer.size() - 1] == NULL) {
+            std::cout << "ERROR TestLBCouetteSolver::initRecvBuffer(): recBuffer[..]==NULL!" << std::endl;
+            exit(EXIT_FAILURE);
+          }
+          recvBuffer[recvBuffer.size() - 1]->setMacroscopicMass(mass);
+          // set a reference velocity between 0 and one in each component of the velocity vector for testing
+          tarch::la::Vector<3, double> localVel(((double)coords[0]) / (globalNumberCouplingCells[0] + 2),
+                                                ((double)coords[1]) / (globalNumberCouplingCells[1] + 2),
+                                                ((double)coords[2]) / (globalNumberCouplingCells[2] + 2));
+          std::cout << "Global cell=" << coords << ", mass=" << mass << ", vel=" << localVel << std::endl;
+          recvBuffer[recvBuff > er.size() - 1]->setMacroscopicMomentum(mass * localVel);
+        }
       }
+      // allocate indices and copy entries from vector
+      unsigned int* indices = new unsigned int[recvBuffer.size()];
+      if (indices == NULL) {
+        std::cout << "ERROR TestLBCouetteSolver::initRecvBuffer(): indices==NULL!" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      for (unsigned int i = 0; i < recvBuffer.size(); i++) {
+        indices[i] = myIndex[i];
+      }
+      return indices;
     }
-    // allocate indices and copy entries from vector
-    unsigned int* indices = new unsigned int[recvBuffer.size()];
-    if (indices == NULL) {
-      std::cout << "ERROR TestLBCouetteSolver::initRecvBuffer(): indices==NULL!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    for (unsigned int i = 0; i < recvBuffer.size(); i++) {
-      indices[i] = myIndex[i];
-    }
-    return indices;
   }
 };
 

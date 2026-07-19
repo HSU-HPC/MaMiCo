@@ -310,7 +310,8 @@ public:
     std::cout << "Linked cell index for position " << position << ": " << idx << "( global index), corresponds to local vector index of ";
     std::cout << I03{idx} << std::endl;
 #endif
-    return I03{idx};
+    tarch::la::Vector<dim, unsigned int> toRet(I03{idx}.get());
+    return toRet;
   }
 
   /** assumes that a molecule is placed somewhere inside the linked cell at
@@ -357,7 +358,8 @@ public:
     for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
       for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
         for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-          LAMMPS_NS::MamicoCell& cell = _sorting.getMamicoCell(I03{coupling::initDimVector<dim>(loop)});
+          tarch::la::Vector<dim, int> temp(coupling::initDimVector<dim>(loop)); // cast to int from unsigned
+          LAMMPS_NS::MamicoCell& cell = _sorting.getMamicoCell(I02{I03{temp}}.get());
           coupling::interface::MoleculeIterator<MamicoCell, dim>* it = getMoleculeIterator(cell);
           for (it->begin(); it->continueIteration(); it->next()) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
@@ -512,9 +514,7 @@ public:
 
   /** prints molecules in all cells/inner cells/only ghost cells. For debugging
    * purposes only. */
-  void printMolecules(typename LAMMPS_NS::Sorting<dim>::PrintType printType) {
-    _sorting.printMolecules(printType);
-  }
+  void printMolecules(typename LAMMPS_NS::Sorting<dim>::PrintType printType) { _sorting.printMolecules(printType); }
 
 private:
   LAMMPS* _lmp;

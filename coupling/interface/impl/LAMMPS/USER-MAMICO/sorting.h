@@ -46,7 +46,7 @@ public:
 
   /** prints the molecules in the mamico cells for debugging purposes */
   void printMolecules(LAMMPS_NS::Sorting<dim>::PrintType printType) {
-    for (auto idx: I02()) {
+    for (auto idx : I02()) {
       // decied whether to output this line or not
       bool decide;
       switch (printType) {
@@ -72,8 +72,7 @@ public:
 
         for (it->begin(); it->continueIteration(); it->next()) {
           const coupling::interface::Molecule<dim>& molecule = it->getConst();
-          std::cout << "Rank " << IDXS.getRank() << ", cell " << I03{idx} << ", molecule "
-                    << molecule.getPosition() << std::endl;
+          std::cout << "Rank " << IDXS.getRank() << ", cell " << I03{idx} << ", molecule " << molecule.getPosition() << std::endl;
         }
         delete it;
       }
@@ -125,7 +124,7 @@ public:
     // reset all non-ghost cells
 
     if (clearCellLists) {
-      for(auto idx : I10()) {
+      for (auto idx : I10()) {
         _mamicoCells[idx.get()].clear();
       }
     }
@@ -169,7 +168,7 @@ private:
   /** sets the ghost flag in all local mamico cells and removes all particle ids
    * from the cells */
   void flagAndResetCells() {
-    for(auto idx : I02()) {
+    for (auto idx : I02()) {
       bool isGhostCell = !I10::contains(idx);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       std::cout << "Flag cell " << I03{idx} << " to be ghost cell: " << isGhostCell << std::endl;
@@ -207,8 +206,7 @@ private:
         // determine global cell index for this atom
         I02 idx = IDXS.getCellIndex(position);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-        std::cout << "Rank " << rank << ": Sort molecule at position " << position << " into global cell index "
-                  << I01{idx} << std::endl;
+        std::cout << "Rank " << rank << ": Sort molecule at position " << position << " into global cell index " << I01{idx} << std::endl;
         // further check if this is a ghost cell and throw and error otherwise
         if (I11::contains(idx)) {
           std::cout << "ERROR Sorting::updateGhostCells: Molecule is not "

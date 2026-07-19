@@ -201,7 +201,7 @@ private:
         }
       }
     } else {
-      for(auto idx : I10()) {
+      for (auto idx : I10()) {
         // determine linearised indices
         const unsigned int localIndex = idx.get();
         const unsigned int globalIndex = I08{idx}.get();
@@ -211,8 +211,7 @@ private:
         // determine the number of molecules as it was expected
         const unsigned int numberMoleculesExpected = findNumberMolecules(globalIndex, numberMoleculesPerCouplingCell);
         if (numberMoleculesFound != numberMoleculesExpected) {
-          std::cout << "ERROR TestLammpsMoleculeIterator: Found molecules=" << numberMoleculesFound << ", expected=" << numberMoleculesExpected
-                    << std::endl;
+          std::cout << "ERROR TestLammpsMoleculeIterator: Found molecules=" << numberMoleculesFound << ", expected=" << numberMoleculesExpected << std::endl;
           std::cout << "This process: " << indexConversion.getThisProcess() << "; considered (global cell): " << globalIndex << std::endl;
           exit(EXIT_FAILURE);
         }
