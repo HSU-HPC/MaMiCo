@@ -358,8 +358,8 @@ public:
     for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
       for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
         for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-          tarch::la::Vector<dim, int> temp(coupling::initDimVector<dim>(loop)); // cast to int from unsigned
-          LAMMPS_NS::MamicoCell& cell = _sorting.getMamicoCell(I02{I03{temp}}.get());
+          const tarch::la::Vector<dim, int> couplingCellIndex(coupling::initDimVector<dim>(loop)); // cast to int from unsigned
+          LAMMPS_NS::MamicoCell& cell = _sorting.getMamicoCell(I02{I03{couplingCellIndex}}.get());
           coupling::interface::MoleculeIterator<MamicoCell, dim>* it = getMoleculeIterator(cell);
           for (it->begin(); it->continueIteration(); it->next()) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
