@@ -531,9 +531,6 @@ set(MAMICO_SOURCES
   "coupling/configurations/ParticleInsertionConfiguration.cpp"
   "coupling/solvers/LBCouetteSolverState.cpp"
 )
-if(BUILD_WITH_LAMMPS)
-  list(APPEND MAMICO_SOURCES "coupling/interface/impl/LAMMPS/USER-MAMICO/fix_mamico.cpp")
-endif()
 #
 # Couette target
 #
