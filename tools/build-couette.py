@@ -162,7 +162,7 @@ def build_lammps(with_mpi, jobs=8):
     mamico_fix_dir = MAMICO_REPO_DIR / "coupling" / "interface" / "impl" / "LAMMPS" / "USER-MAMICO"
     with ChangeDir(build_dir):
         had_error_pull = 0 != shell("git pull")  # Track latest LAMMPS release
-        shutil.copytree(mamico_fix_dir, LAMMPS_REPO_DIR / "src" / "USER-MAMICO")
+        shutil.copytree(mamico_fix_dir, LAMMPS_REPO_DIR / "src" / "USER-MAMICO", dirs_exist_ok=True)
         with open(LAMMPS_REPO_DIR / "cmake" / "CMakeLists.txt", 'r+') as file:
             cmakefile = file.readlines()
             inject = 0
@@ -176,7 +176,7 @@ def build_lammps(with_mpi, jobs=8):
         had_error_cmake = 0 != shell("cmake -DPKG_KOKKOS=ON -DPKG_USER_MAMICO=ON -DBUILD_SHARED_LIBS=ON"
                                      f" -DBUILD_MPI={'ON' if with_mpi else 'OFF'}"
                                      f" -DCMAKE_INSTALL_PREFIX={install_dir}"
-                                     f" -DCMAKE_CXX_FLAGS=-I\ {MAMICO_REPO_DIR} ../cmake/")
+                                     f" -DCMAKE_CXX_FLAGS=-I\\ {MAMICO_REPO_DIR} ../cmake/")
         had_error_cmake_build = 0 != shell(f"make -j {jobs}")
         had_error_install = 0 != shell("make install")
     had_error = (
