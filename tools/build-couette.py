@@ -170,10 +170,10 @@ def build_lammps(with_mpi, jobs=8):
                 if line.strip() == 'set(STANDARD_PACKAGES':
                     break
                 inject += 1
-            cmakefile.insert(inject + 1, 'USER_MAMICO' + os.linesep)
+            cmakefile.insert(inject + 1, 'USER-MAMICO' + os.linesep)
             file.seek(0)
             file.writelines(cmakefile)
-        had_error_cmake = 0 != shell("cmake -DPKG_KOKKOS=ON -DPKG_USER_MAMICO=ON -DBUILD_SHARED_LIBS=ON"
+        had_error_cmake = 0 != shell("cmake -DPKG_KOKKOS=ON -DPKG_USER-MAMICO=ON -DBUILD_SHARED_LIBS=ON"
                                      f" -DBUILD_MPI={'ON' if with_mpi else 'OFF'}"
                                      f" -DCMAKE_INSTALL_PREFIX={install_dir}"
                                      f" -DCMAKE_CXX_FLAGS=-I\\ {MAMICO_REPO_DIR} ../cmake/")
