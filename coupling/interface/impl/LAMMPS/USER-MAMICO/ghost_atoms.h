@@ -5,9 +5,9 @@
 #ifndef LMP_MAMICO_GHOSTATOMS_H
 #define LMP_MAMICO_GHOSTATOMS_H
 
-#include "lammps/src/atom.h"
-#include "lammps/src/lammps.h"
-#include "lammps/src/memory.h"
+#include "atom.h"
+#include "lammps.h"
+#include "memory.h"
 
 #include "coupling/CouplingMDDefinitions.h"
 
