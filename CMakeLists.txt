@@ -83,6 +83,13 @@ endif()
 if("${MD_SIM}" STREQUAL "SIMPLE_MD" AND BUILD_WITH_LAMMPS)
   message(WARNING ">> BUILD_WITH_LAMMPS is enabled but MD_SIM is SIMPLE_MD. Are you sure?")
 endif()
+if(BUILD_WITH_LAMMPS)
+  if(NOT BUILD_WITH_MPI)
+    message(FATAL_ERROR "The MaMiCo LAMMPS coupling requires MPI to be enabled")
+  endif()
+  set(LAMMPS_DIR CACHE PATH "Path to local LAMMPS installation.")
+endif()
+
 
 # Compiler list to be used for compiletest
 set(COMPILETEST_COMPILERS "g++ clang++" CACHE STRING "Compiler list to be used for compiletest")
@@ -187,8 +194,7 @@ if(BUILD_WITH_PRECICE)
 endif()
 
 if(BUILD_WITH_LAMMPS)
-  find_package(PkgConfig REQUIRED)
-  pkg_search_module(LAMMPS REQUIRED liblammps)
+  find_package(LAMMPS REQUIRED)
 endif()
 
 #
@@ -465,8 +471,8 @@ endif()
 # we always link against libsimplemd, even if ${MD_SIM} not SIMPLE_MD, so that we can use the simpleMD configuration
 target_link_libraries(mamico INTERFACE libsimplemd)
 if("${MD_SIM}" STREQUAL "LAMMPS_MD" OR "${MD_SIM}" STREQUAL "LAMMPS_DPD")
-  target_link_libraries(mamico INTERFACE ${LAMMPS_LINK_LIBRARIES})
-  target_include_directories(mamico INTERFACE ${LAMMPS_INCLUDE_DIRS})
+  target_link_libraries(mamico INTERFACE ${LAMMPS_LIBRARY})
+  target_include_directories(mamico INTERFACE ${LAMMPS_INCLUDE_DIR} ${LAMMPS_SRC_DIR})
   #target_compile_options(mamico INTERFACE ${LAMMPS_CFLAGS_OTHER})
 elseif("${MD_SIM}" STREQUAL "LS1_MARDYN")
   target_compile_definitions(mamico INTERFACE MAMICO_COUPLING)

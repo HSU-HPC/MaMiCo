@@ -265,7 +265,7 @@ simplemd::services::ParallelTopologyService::broadcastInnerCellViaBuffer(LinkedC
               // seek out current index for buffering
               int bufferIndex = getCurrentBufferIndexFromNeighbourRank(neighbourRank);
 #if (MD_DEBUG == MD_YES)
-              std::cout << "Pack " << cell.getList().size() << " molecules in buffer " << bufferIndex << std::endl;
+              std::cout << "Pack " << cell.numMolecules() << " molecules in buffer " << bufferIndex << std::endl;
 #endif
               // push molecules into buffer
               for (auto it = cell.begin(); it != cell.end(); it++) {

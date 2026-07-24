@@ -9,12 +9,11 @@
 #include "mamico_cell.h"
 
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/IndexConversion.h"
 #include "tarch/la/Vector.h"
 
-#include "lammps/atom.h"
-#include "lammps/lammps.h"
-#include "lammps/memory.h"
+#include "atom.h"
+#include "lammps.h"
+#include "memory.h"
 
 namespace LAMMPS_NS {
 
@@ -46,53 +45,36 @@ public:
   }
 
   /** prints the molecules in the mamico cells for debugging purposes */
-  void printMolecules(const coupling::IndexConversion<dim>& indexConversion, LAMMPS_NS::Sorting<dim>::PrintType printType) {
-    tarch::la::Vector<3, unsigned int> loop(0);
-    const tarch::la::Vector<3, unsigned int> end =
-        coupling::initRange<dim>(indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(2));
+  void printMolecules(LAMMPS_NS::Sorting<dim>::PrintType printType) {
+    for (auto idx : I02()) {
+      // decied whether to output this line or not
+      bool decide;
+      switch (printType) {
+      case PRINT_ALL_CELLS:
+        decide = true;
+        break;
+      case PRINT_INNER_CELLS:
+        decide = I10::contains(idx);
+        break;
+      case PRINT_GHOST_CELLS:
+        decide = !I10::contains(idx);
+        break;
+      default:
+        std::cout << "ERROR printMolecules(): This case should never be reached!" << std::endl;
+        exit(EXIT_FAILURE);
+        break;
+      }
 
-    for (loop[2] = 0; loop[2] < end[2]; loop[2]++) {
-      for (loop[1] = 0; loop[1] < end[1]; loop[1]++) {
-        for (loop[0] = 0; loop[0] < end[0]; loop[0]++) {
-          // decied whether to output this line or not
-          bool decide = true;
-          switch (printType) {
-          case PRINT_ALL_CELLS:
-            decide = true;
-            break;
-          case PRINT_INNER_CELLS:
-            decide = true;
-            for (unsigned int d = 0; d < dim; d++) {
-              decide = decide && (loop[d] > 0) && (loop[d] < end[d] - 1);
-            }
-            break;
-          case PRINT_GHOST_CELLS:
-            decide = true;
-            for (unsigned int d = 0; d < dim; d++) {
-              decide = decide && (loop[d] > 0) && (loop[d] < end[d] - 1);
-            }
-            decide = !decide;
-            break;
-          default:
-            std::cout << "ERROR printMolecules(): This case should never be reached!" << std::endl;
-            exit(EXIT_FAILURE);
-            break;
-          }
+      if (decide) {
+        coupling::interface::MoleculeIterator<LAMMPS_NS::MamicoCell, dim>* it =
+            coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getMoleculeIterator(
+                _mamicoCells[idx.get()]);
 
-          if (decide) {
-            const unsigned int cellIndex = indexConversion.getLocalCellIndex(coupling::initDimVector<dim>(loop));
-            coupling::interface::MoleculeIterator<LAMMPS_NS::MamicoCell, dim>* it =
-                coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getMDSolverInterface()->getMoleculeIterator(
-                    _mamicoCells[cellIndex]);
-
-            for (it->begin(); it->continueIteration(); it->next()) {
-              const coupling::interface::Molecule<dim>& molecule = it->getConst();
-              std::cout << "Rank " << indexConversion.getThisRank() << ", cell " << coupling::initDimVector<dim>(loop) << ", molecule "
-                        << molecule.getPosition() << std::endl;
-            }
-            delete it;
-          }
+        for (it->begin(); it->continueIteration(); it->next()) {
+          const coupling::interface::Molecule<dim>& molecule = it->getConst();
+          std::cout << "Rank " << IDXS.getRank() << ", cell " << I03{idx} << ", molecule " << molecule.getPosition() << std::endl;
         }
+        delete it;
       }
     }
   }
@@ -100,12 +82,12 @@ public:
   /** returns the cell at index "index" */
   MamicoCell& getMamicoCell(unsigned int index) { return _mamicoCells[index]; }
 
-  void updateAllCells(const coupling::IndexConversion<dim>& indexConversion) {
+  void updateAllCells() {
 // remove all atoms from the cell lists
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Flag and reset cells..." << std::endl;
 #endif
-    flagAndResetCells(indexConversion);
+    flagAndResetCells();
 // extract ghost atoms from lammps
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Extract ghost atoms..." << std::endl;
@@ -115,15 +97,15 @@ public:
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Update non-ghost cells..." << std::endl;
 #endif
-    updateNonGhostCells(indexConversion, false);
+    updateNonGhostCells(false);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    printMolecules(indexConversion, PRINT_INNER_CELLS);
+    printMolecules(PRINT_INNER_CELLS);
 #endif
 // update all ghost cells
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Update ghost cells..." << std::endl;
 #endif
-    updateGhostCells(indexConversion);
+    updateGhostCells();
   }
 
   /** removes all atoms from the non-ghost cells and sorts the "nlocal" atoms
@@ -132,29 +114,18 @@ public:
    * the update is carried out; by default, the
    *  cells are emptied.
    */
-  void updateNonGhostCells(const coupling::IndexConversion<dim>& indexConversion, bool clearCellLists = true) {
+  void updateNonGhostCells(bool clearCellLists = true) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
-    const tarch::la::Vector<dim, double> localOffset = getLocalOffset(indexConversion);
-    const tarch::la::Vector<dim, double> localSize = getLocalSize(indexConversion);
+    const tarch::la::Vector<dim, double> localOffset = getLocalOffset();
+    const tarch::la::Vector<dim, double> localSize = getLocalSize();
     // reset all non-ghost cells
 
     if (clearCellLists) {
-      const tarch::la::Vector<dim, unsigned int> localCells = indexConversion.getLocalNumberCouplingCells() + tarch::la::Vector<dim, unsigned int>(1);
-      tarch::la::Vector<3, unsigned int> end = coupling::initRange<dim>(localCells);
-      tarch::la::Vector<3, unsigned int> start(0);
-      for (unsigned int d = 0; d < dim; d++)
-        start[d] = 1;
-      tarch::la::Vector<3, unsigned int> loop(0);
-      for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
-        for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
-          for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-            tarch::la::Vector<dim, unsigned int> index = coupling::initDimVector<dim>(loop);
-            _mamicoCells[indexConversion.getLocalCellIndex(index)].clear();
-          }
-        }
+      for (auto idx : I10()) {
+        _mamicoCells[idx.get()].clear();
       }
     }
 
@@ -170,27 +141,22 @@ public:
       // determine global cell index for this atom; convert global to local
       // vector index
       if (isInLocalDomain(position, localOffset, localSize)) {
-        tarch::la::Vector<dim, unsigned int> vectorIndex = indexConversion.getGlobalVectorCellIndex(position);
+        I00 idx = IDXS.getCellIndex(position);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-        std::cout << "Rank " << rank << ": Sort molecule at position " << position << " into global cell index " << vectorIndex << std::endl;
+        std::cout << "Rank " << rank << ": Sort molecule at position " << position << " into global cell index " << I01{idx} << std::endl;
         // check if this is a global non-ghost cell and throw error otherwise
-        bool isInnerCell = true;
-        for (unsigned int d = 0; d < dim; d++) {
-          isInnerCell = isInnerCell && (vectorIndex[d] > 0) && (vectorIndex[d] < indexConversion.getGlobalNumberCouplingCells()[d] + 1);
-        }
-        if (!isInnerCell) {
+        if (!I04::contains(idx)) {
           std::cout << "ERROR Sorting::updateNonGhostCells: Molecule is not "
                        "sorted into an inner cell!"
                     << std::endl;
           exit(EXIT_FAILURE);
         }
 #endif
-        vectorIndex = indexConversion.convertGlobalToLocalVectorCellIndex(vectorIndex);
 // add atom to cell
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-        std::cout << "Sort molecule into local cell " << vectorIndex << ", corresponding to " << indexConversion.getLocalCellIndex(vectorIndex) << std::endl;
+        std::cout << "Sort molecule into local cell " << I03{idx} << ", corresponding to " << I02{idx} << std::endl;
 #endif
-        _mamicoCells[indexConversion.getLocalCellIndex(vectorIndex)].addAtom(n);
+        _mamicoCells[I02{idx}.get()].addAtom(n);
       }
     }
   }
@@ -201,43 +167,28 @@ public:
 private:
   /** sets the ghost flag in all local mamico cells and removes all particle ids
    * from the cells */
-  void flagAndResetCells(const coupling::IndexConversion<dim>& indexConversion) {
-    const tarch::la::Vector<dim, unsigned int> localNumberCells = tarch::la::Vector<dim, unsigned int>(2) + indexConversion.getLocalNumberCouplingCells();
-    tarch::la::Vector<3, unsigned int> loop(0);
-    tarch::la::Vector<3, unsigned int> end = coupling::initRange<dim>(localNumberCells);
-
-    // loop over all local mamico cells
-    unsigned int counter = 0;
-    for (loop[2] = 0; loop[2] < end[2]; loop[2]++) {
-      for (loop[1] = 0; loop[1] < end[1]; loop[1]++) {
-        for (loop[0] = 0; loop[0] < end[0]; loop[0]++) {
-          // determine ghost flag of cell
-          bool isInnerCell = true;
-          for (unsigned int d = 0; d < dim; d++) {
-            isInnerCell = isInnerCell && (loop[d] > 0) && (loop[d] < end[d] - 1);
-          }
+  void flagAndResetCells() {
+    for (auto idx : I02()) {
+      bool isGhostCell = !I10::contains(idx);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-          std::cout << "Flag cell " << loop << " to be ghost cell: " << isInnerCell << std::endl;
+      std::cout << "Flag cell " << I03{idx} << " to be ghost cell: " << isGhostCell << std::endl;
 #endif
-          _mamicoCells[counter].setGhostCell(!isInnerCell);
-          // reset vector with ids in cell
-          _mamicoCells[counter].clear();
-          counter++;
-        }
-      }
+      _mamicoCells[idx.get()].setGhostCell(isGhostCell);
+      // reset vector with ids in cell
+      _mamicoCells[idx.get()].clear();
     }
   }
 
   /** sorts the ghost atoms from ghostX into the ghost cells */
-  void updateGhostCells(const coupling::IndexConversion<dim>& indexConversion) {
+  void updateGhostCells() {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
     // compute bounding box for ghost particles -> if atoms are outside this
     // bounding box, we do not want to consider them anymore
-    const tarch::la::Vector<dim, double> localOffset = getLocalOffset(indexConversion);
-    const tarch::la::Vector<dim, double> localSize = getLocalSize(indexConversion);
+    const tarch::la::Vector<dim, double> localOffset = getLocalOffset();
+    const tarch::la::Vector<dim, double> localSize = getLocalSize();
 
     double** ghostX = _ghostAtoms.getGhostAtomPositions();
     const int nghost = _ghostAtoms.getNGhost();
@@ -252,19 +203,12 @@ private:
       // if the current position is in the region of interest, compute cell
       // index and add it to mamico cell
       if (isInLocalDomain(position, localOffset, localSize)) {
-        // determine global cell index for this atom; convert global to local
-        // vector index
-        tarch::la::Vector<dim, unsigned int> vectorIndex =
-            indexConversion.convertGlobalToLocalVectorCellIndex(indexConversion.getGlobalVectorCellIndex(position));
+        // determine global cell index for this atom
+        I02 idx = IDXS.getCellIndex(position);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-        std::cout << "Rank " << rank << ": Sort molecule at position " << position << " into global cell index "
-                  << indexConversion.convertLocalToGlobalVectorCellIndex(vectorIndex) << std::endl;
+        std::cout << "Rank " << rank << ": Sort molecule at position " << position << " into global cell index " << I01{idx} << std::endl;
         // further check if this is a ghost cell and throw and error otherwise
-        bool isGhostCell = false;
-        for (unsigned int d = 0; d < dim; d++) {
-          isGhostCell = isGhostCell || (vectorIndex[d] == 0) || (vectorIndex[d] == indexConversion.getLocalNumberCouplingCells()[d] + 1);
-        }
-        if (!isGhostCell) {
+        if (I11::contains(idx)) {
           std::cout << "ERROR Sorting::updateGhostCells: Molecule is not "
                        "sorted into a ghost cell!"
                     << std::endl;
@@ -272,21 +216,28 @@ private:
         }
 #endif
         // add atom to cell
-        _mamicoCells[indexConversion.getLocalCellIndex(vectorIndex)].addAtom(n);
+        _mamicoCells[idx.get()].addAtom(n);
       }
     }
   }
 
+  tarch::la::Vector<dim, unsigned int> getThisProcess() const {
+    return {0}; // FIXME: Not yet implemented
+  }
+  tarch::la::Vector<dim, unsigned int> getAverageLocalNumberCouplingCells() const {
+    return {0}; // FIXME: Not yet implemented
+  }
+
   /** returns the offset of the local MD domain, incl. a ghost layer of mamico
    * cells */
-  tarch::la::Vector<dim, double> getLocalOffset(const coupling::IndexConversion<dim>& indexConversion) const {
+  tarch::la::Vector<dim, double> getLocalOffset() const {
     // init local offset to global MD offset (very lower left of ghost layer)
-    const tarch::la::Vector<dim, double> meshsize = indexConversion.getCouplingCellSize();
-    tarch::la::Vector<dim, double> localOffset = indexConversion.getGlobalMDDomainOffset() - meshsize;
+    const tarch::la::Vector<dim, double> meshsize = IDXS.getCouplingCellSize();
+    tarch::la::Vector<dim, double> localOffset = IDXS.getGlobalMDDomainOffset() - meshsize;
 
     // shift lower offset to the correct process
-    const tarch::la::Vector<dim, unsigned int> thisProcess = indexConversion.getThisProcess();
-    const tarch::la::Vector<dim, unsigned int> avgNumberCells = indexConversion.getAverageLocalNumberCouplingCells();
+    const tarch::la::Vector<dim, unsigned int> thisProcess = getThisProcess();
+    const tarch::la::Vector<dim, unsigned int> avgNumberCells = getAverageLocalNumberCouplingCells();
     for (unsigned int d = 0; d < dim; d++) {
       localOffset[d] += meshsize[d] * thisProcess[d] * avgNumberCells[d];
     }
@@ -296,9 +247,9 @@ private:
 
   /** returns the local domain size of this process, including a ghost layer of
    * mamico cells */
-  tarch::la::Vector<dim, double> getLocalSize(const coupling::IndexConversion<dim>& indexConversion) const {
-    const tarch::la::Vector<dim, double> meshsize = indexConversion.getCouplingCellSize();
-    const tarch::la::Vector<dim, unsigned int> localNumberCells = indexConversion.getLocalNumberCouplingCells();
+  tarch::la::Vector<dim, double> getLocalSize() const {
+    const tarch::la::Vector<dim, double> meshsize = IDXS.getCouplingCellSize();
+    const tarch::la::Vector<dim, unsigned int> localNumberCells = I11::numberCellsInDomain;
     tarch::la::Vector<dim, double> localSize(0.0);
     for (unsigned int d = 0; d < dim; d++) {
       localSize[d] = meshsize[d] * (localNumberCells[d] + 2);

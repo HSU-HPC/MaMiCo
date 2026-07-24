@@ -13,21 +13,21 @@
 #include "mamico_cell.h"
 #include "mamico_lammps_molecule_iterator.h"
 
-#include "lammps/atom_vec.h"
-#include "lammps/comm.h"
-#include "lammps/compute_pe_atom.h"
-#include "lammps/domain.h"
-#include "lammps/error.h"
-#include "lammps/fix.h"
-#include "lammps/force.h"
-#include "lammps/input.h"
-#include "lammps/lammps.h"
-#include "lammps/modify.h"
-#include "lammps/neighbor.h"
-#include "lammps/random_park.h"
-#include "lammps/timer.h"
-#include "lammps/update.h"
-#include "lammps/verlet.h"
+#include "atom_vec.h"
+#include "comm.h"
+#include "compute_pe_atom.h"
+#include "domain.h"
+#include "error.h"
+#include "fix.h"
+#include "force.h"
+#include "input.h"
+#include "lammps.h"
+#include "modify.h"
+#include "neighbor.h"
+#include "random_park.h"
+#include "timer.h"
+#include "update.h"
+#include "verlet.h"
 #include "sorting.h"
 // the following three lines were included since we had issues when compiling
 // with walberla -> compiler flag stcxx and INT64_MAX do not fit
@@ -53,6 +53,8 @@ namespace LAMMPS_NS {
  */
 template <unsigned int dim> class MamicoLammpsMDSolverInterface : public coupling::interface::MDSolverInterface<LAMMPS_NS::MamicoCell, dim> {
 public:
+  using CellIndex_T = I11; // FIXME: This should not be required, right?
+
   MamicoLammpsMDSolverInterface(LAMMPS* lmp, int seed, int numberCells, double cutoffRadius)
       : coupling::interface::MDSolverInterface<LAMMPS_NS::MamicoCell, dim>(), _lmp(lmp), _sorting(numberCells, lmp),
         _cutOffRadiusSquared(cutoffRadius * cutoffRadius), _cutOffRadius(cutoffRadius), _atomType(1), _precision(10), _tolerance(1.0e-8),
@@ -213,16 +215,11 @@ public:
     // -> we cannot put this to synchronizeMoleculesAfterMassModification(),
     // since the local numbering of existing atoms might
     //    have already changed as well...
-    const coupling::IndexConversion<dim>& indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
-    _sorting.updateNonGhostCells(indexConversion);
+    _sorting.updateNonGhostCells();
   }
 
   /** adds the molecule to the MD simulation. */
   virtual void addMoleculeToMDSimulation(const coupling::interface::Molecule<dim>& molecule) {
-    const coupling::IndexConversion<dim>& indexConversion =
-        coupling::interface::MamicoInterfaceProvider<MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
-
     const int nlocal_previous = _lmp->atom->nlocal;              // no. of atoms before insertion
     tarch::la::Vector<dim, double> pos = molecule.getPosition(); // position of molecule
     double posVec[3] = {0.0, 0.0, 0.0};
@@ -263,7 +260,7 @@ public:
     // method...
     if (indexAtom == -1) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-      std::cout << "Molecule not found on rank " << indexConversion.getThisRank() << std::endl;
+      std::cout << "Molecule not found on rank " << IDXS.getRank() << std::endl;
 #endif
       return;
     }
@@ -279,7 +276,7 @@ public:
     // -> we cannot put this to synchronizeMoleculesAfterMassModification(),
     // since the local numbering of existing atoms might
     //    have already changed as well...
-    _sorting.updateNonGhostCells(indexConversion);
+    _sorting.updateNonGhostCells();
   }
 
   /** sets up the potential energy landscape over the domain spanned by
@@ -308,14 +305,13 @@ public:
     // typically, one should not really access other coupling modules from an
     // interface; however, since this method is expected to be only called AFTER
     // all initialisation processes are finished, this is safe
-    const coupling::IndexConversion<dim>& indexConversion =
-        coupling::interface::MamicoInterfaceProvider<MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
-    tarch::la::Vector<dim, unsigned int> vectorIndex = indexConversion.getGlobalVectorCellIndex(position);
+    I01 idx = IDXS.getCellIndex(position);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
-    std::cout << "Linked cell index for position " << position << ": " << vectorIndex << "( global index), corresponds to local vector index of ";
-    std::cout << indexConversion.convertGlobalToLocalVectorCellIndex(vectorIndex) << std::endl;
+    std::cout << "Linked cell index for position " << position << ": " << idx << "( global index), corresponds to local vector index of ";
+    std::cout << I03{idx} << std::endl;
 #endif
-    return indexConversion.convertGlobalToLocalVectorCellIndex(vectorIndex);
+    tarch::la::Vector<dim, unsigned int> toRet(I03{idx}.get());
+    return toRet;
   }
 
   /** assumes that a molecule is placed somewhere inside the linked cell at
@@ -328,8 +324,6 @@ public:
    */
   virtual void calculateForceAndEnergy(coupling::interface::Molecule<dim>& molecule) {
     // helper variables and molecule position
-    const coupling::IndexConversion<dim>& indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
     const tarch::la::Vector<dim, double> position1 = molecule.getPosition();
     const tarch::la::Vector<dim, unsigned int> cellIndex = getLinkedCellIndexForMoleculePosition(position1);
 
@@ -364,7 +358,8 @@ public:
     for (loop[2] = start[2]; loop[2] < end[2]; loop[2]++) {
       for (loop[1] = start[1]; loop[1] < end[1]; loop[1]++) {
         for (loop[0] = start[0]; loop[0] < end[0]; loop[0]++) {
-          LAMMPS_NS::MamicoCell& cell = _sorting.getMamicoCell(indexConversion.getLocalCellIndex(coupling::initDimVector<dim>(loop)));
+          const tarch::la::Vector<dim, int> couplingCellIndex(coupling::initDimVector<dim>(loop)); // cast to int from unsigned
+          LAMMPS_NS::MamicoCell& cell = _sorting.getMamicoCell(I02{I03{couplingCellIndex}}.get());
           coupling::interface::MoleculeIterator<MamicoCell, dim>* it = getMoleculeIterator(cell);
           for (it->begin(); it->continueIteration(); it->next()) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
@@ -476,9 +471,7 @@ public:
 
     // one more sorting for all cells, since the molecules might have been
     // reordered in parallel exchange
-    const coupling::IndexConversion<dim>& indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
-    _sorting.updateAllCells(indexConversion);
+    _sorting.updateAllCells();
   }
 
   /** is called each time when MaMiCo tried to insert momentum in the MD
@@ -517,13 +510,11 @@ public:
 
   /** update all cell information -> forward call to _sorting. This is required
      once per time step before the actual coupling */
-  void updateAllCells(const coupling::IndexConversion<dim>& indexConversion) { _sorting.updateAllCells(indexConversion); }
+  void updateAllCells() { _sorting.updateAllCells(); }
 
   /** prints molecules in all cells/inner cells/only ghost cells. For debugging
    * purposes only. */
-  void printMolecules(const coupling::IndexConversion<dim>& indexConversion, typename LAMMPS_NS::Sorting<dim>::PrintType printType) {
-    _sorting.printMolecules(indexConversion, printType);
-  }
+  void printMolecules(typename LAMMPS_NS::Sorting<dim>::PrintType printType) { _sorting.printMolecules(printType); }
 
 private:
   LAMMPS* _lmp;

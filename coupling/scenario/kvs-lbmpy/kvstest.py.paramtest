@@ -267,8 +267,7 @@ class KVSTest():
         mcs.addFilterToSequence(filter_sequence="gauss-5", filter_index=0,
                                 scalar_filter_func=gauss_sca5, vector_filter_func=gauss_vec5)
 
-        self.buf = mamico.coupling.Buffer(self.multiMDCellService.getCouplingCellService(0).getIndexConversion(),
-                                          self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
+        self.buf = mamico.coupling.Buffer(self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
 
         self.csv = self.cfg.getint("coupling", "csv-every-timestep")
         self.png = self.cfg.getint("coupling", "png-every-timestep")
