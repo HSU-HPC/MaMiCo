@@ -11,9 +11,9 @@
 #include "coupling/CouplingMDDefinitions.h"
 #include "tarch/la/Vector.h"
 
-#include "lammps/atom.h"
-#include "lammps/lammps.h"
-#include "lammps/memory.h"
+#include "lammps/src/atom.h"
+#include "lammps/src/lammps.h"
+#include "lammps/src/memory.h"
 
 namespace LAMMPS_NS {
 

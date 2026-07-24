@@ -3,8 +3,8 @@
 #include "USER-MAMICO/mamico_cell.h"
 #include "USER-MAMICO/mamico_lammps_md_solver_interface.h"
 #include "coupling/interface/MDSimulation.h"
-#include "lammps/input.h"
-#include "lammps/lammps.h"
+#include "lammps/src/input.h"
+#include "lammps/src/lammps.h"
 #include <mpi.h>
 
 namespace coupling {

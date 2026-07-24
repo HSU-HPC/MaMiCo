@@ -158,7 +158,6 @@ def build_lammps(with_mpi, jobs=8):
     build_dir = LAMMPS_REPO_DIR / "build"
     install_dir = LAMMPS_REPO_DIR / "install"
     build_dir.mkdir(exist_ok=True)
-    install_dir.mkdir(exist_ok=True)
     mamico_fix_dir = MAMICO_REPO_DIR / "coupling" / "interface" / "impl" / "LAMMPS" / "USER-MAMICO"
     with ChangeDir(build_dir):
         had_error_pull = 0 != shell("git pull")  # Track latest LAMMPS release
@@ -175,12 +174,10 @@ def build_lammps(with_mpi, jobs=8):
             file.writelines(cmakefile)
         had_error_cmake = 0 != shell("cmake -DPKG_KOKKOS=ON -DPKG_USER-MAMICO=ON -DBUILD_SHARED_LIBS=ON"
                                      f" -DBUILD_MPI={'ON' if with_mpi else 'OFF'}"
-                                     f" -DCMAKE_INSTALL_PREFIX={install_dir}"
                                      f" -DCMAKE_CXX_FLAGS=-I\\ {MAMICO_REPO_DIR} ../cmake/")
         had_error_cmake_build = 0 != shell(f"make -j {jobs}")
-        had_error_install = 0 != shell("make install")
     had_error = (
-        had_error_pull | had_error_cmake | had_error_cmake_build | had_error_install
+        had_error_pull | had_error_cmake | had_error_cmake_build
     )
     return had_error
 
@@ -234,7 +231,6 @@ def build_mamico_couette(
     elif md_solver == "lammps":
         had_error |= build_lammps(with_mpi, jobs)
         cmake_args = cmake_args.replace("LAMMPS=OFF", "LAMMPS=ON")
-        shell(f"ln -sf {LAMMPS_REPO_DIR}/src {MAMICO_REPO_DIR}/lammps")
         cmake_args += f" -DLAMMPS_DIR={LAMMPS_REPO_DIR}"
     cmake_args += f" -DBUILD_WITH_OPENFOAM={'ON' if with_openfoam else 'OFF'}"
     environement_prefix = " ".join(f"{k}={v}" for k, v in environement.items())
