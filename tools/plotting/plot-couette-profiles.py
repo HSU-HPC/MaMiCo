@@ -14,6 +14,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from xml.parsers.expat import errors as xmlErrors
 import xml.etree.cElementTree as ET
 
 
@@ -93,8 +94,23 @@ def plot_couette_profile(coupling_cycle, color, args, ax=plt.gca()):
 
 def parse_xml(args, defaults):
     # Load file
-    treeF = ET.parse(args.couette_xml)
-    tree = treeF.getroot()
+    try:
+        tree = ET.parse(args.couette_xml)
+        tree = tree.getroot()
+    except ET.ParseError as err:
+        if (
+            err.code == xmlErrors.codes[xmlErrors.XML_ERROR_JUNK_AFTER_DOC_ELEMENT]
+        ):  # legacy style xml
+            with open(args.couette_xml) as file:
+                xmlList = file.readlines()
+                # add a root node
+                xmlList.insert(1, "<scenario-configuration>")
+                xmlList.append("</scenario-configuration>")
+                tree = ET.fromstringlist(xmlList)
+        else:
+            print(err)
+            exit(1)
+
     # Update all needed variables
     if args.offset == defaults.offset:
         args.offset = float(
