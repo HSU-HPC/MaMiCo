@@ -68,10 +68,10 @@ def plot_couette_profile(coupling_cycle, color, ax=plt.gca()):
         print(f"File {csv_path} does not exist!", file=sys.stderr)
         return
     data = load_avg_ux_from_csv(csv_path)
-    z = np.linspace(0, args.channel_height, num=(args.channel_height / args.coupling_cell_size)+1)
-    y = couette_analytic(
-        z, coupling_cycle / 4
-    )  # Multiply MD timestep by number of MD per coupling, multiply that factor with coupling_cycle here
+    z = np.linspace(
+        0, args.channel_height, num=(args.channel_height / args.coupling_cell_size) + 1
+    )
+    y = couette_analytic(z, coupling_cycle * args.md_ts_per_cc * args.md_ts_length)
     ax.plot(z, y, "-", color=color)
     x_start = (
         (args.overlap_size * args.coupling_cell_size)
@@ -100,12 +100,29 @@ def parse_args(argv=sys.argv[1:]):
     arg_parser.add_argument("--channel-height", default=50.0, type=float)
     arg_parser.add_argument("--density", default=0.813037037, type=float)
     arg_parser.add_argument("--viscosity", default=2.14, type=float)
-    arg_parser.add_argument("--coupling-cells", default=6, type=int)
+    arg_parser.add_argument(
+        "--coupling-cells",
+        default=6,
+        type=int,
+        help="Number of coupling cells in the z direction in the CSV file (MD cells minus overlap and ghost)",
+    )
     arg_parser.add_argument(
         "--overlap-size", default=3, help="In number of coupling cells", type=int
     )
     arg_parser.add_argument("--coupling-cell-size", default=2.5, type=float)
+    arg_parser.add_argument(
+        "--md-ts-per-cc",
+        default=50,
+        type=int,
+        help="Number of MD timesteps per coupling step",
+    )
+    arg_parser.add_argument(
+        "--md-ts-length", default=0.005, type=float, help="Length of MD timestep"
+    )
     # Script parameters
+    arg_parser.add_argument(
+        "--couette-xml", default="", type=Path, help="Path to couette.xml file"
+    )
     arg_parser.add_argument("--workdir", default=Path(), type=Path)
     arg_parser.add_argument(
         "--coupling-cycles",
