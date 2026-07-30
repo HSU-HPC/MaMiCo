@@ -68,7 +68,7 @@ def plot_couette_profile(coupling_cycle, color, ax=plt.gca()):
         print(f"File {csv_path} does not exist!", file=sys.stderr)
         return
     data = load_avg_ux_from_csv(csv_path)
-    z = np.linspace(0, 50, num=21)
+    z = np.linspace(0, args.channel_height, num=(args.channel_height / args.coupling_cell_size)+1)
     y = couette_analytic(
         z, coupling_cycle / 4
     )  # Multiply MD timestep by number of MD per coupling, multiply that factor with coupling_cycle here
