@@ -16,11 +16,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import xml.etree.cElementTree as ET
 
-args = None
-defaults = None
 
-
-def couette_analytic(z, t):
+def couette_analytic(z, t, args):
     """Analytic Couette startup equation"""
     v = args.viscosity / args.density
     k_sum = 0
@@ -63,7 +60,7 @@ def load_avg_ux_from_csv(csv_file):
     return avg_ux
 
 
-def plot_couette_profile(coupling_cycle, color, ax=plt.gca()):
+def plot_couette_profile(coupling_cycle, color, args, ax=plt.gca()):
     """Plot the flow profile for a single cycle"""
     csv_path = Path(f"CouetteAvgMultiMDCells_d0_r0_c{coupling_cycle}.csv")
     if not csv_path.exists():
@@ -73,7 +70,9 @@ def plot_couette_profile(coupling_cycle, color, ax=plt.gca()):
     z = np.linspace(
         0, args.channel_height, num=(args.channel_height / args.coupling_cell_size) + 1
     )
-    y = couette_analytic(z, coupling_cycle * args.md_ts_per_cc * args.md_ts_length)
+    y = couette_analytic(
+        z, coupling_cycle * args.md_ts_per_cc * args.md_ts_length, args
+    )
     ax.plot(z, y, "-", color=color)
     x_start = (
         (args.overlap_size * args.coupling_cell_size)
@@ -92,8 +91,7 @@ def plot_couette_profile(coupling_cycle, color, ax=plt.gca()):
     ax.fill_between([], [], [], color=color, label=f"Coupling cycle #{coupling_cycle}")
 
 
-def parse_xml():
-    global args
+def parse_xml(args, defaults):
     # Load file
     treeF = ET.parse(args.couette_xml)
     tree = treeF.getroot()
@@ -148,11 +146,11 @@ def parse_xml():
         )
         temp_numCellsInMD = int(temp_mdSize / args.coupling_cell_size)
         args.coupling_cells = temp_numCellsInMD - (2 * args.overlap_size)
+    return args
 
 
 def parse_args(argv=sys.argv[1:]):
-    """Parse all command line arguments and make them available globally"""
-    global args, defaults
+    """Parse all command line arguments"""
     arg_parser = argparse.ArgumentParser()
     # Scenario parameters
     arg_parser.add_argument("--offset", default=2.5, type=float)
@@ -193,13 +191,14 @@ def parse_args(argv=sys.argv[1:]):
     arg_parser.add_argument("--output", default=None, type=Path)
     args = arg_parser.parse_args(argv)
     defaults = arg_parser.parse_args([])
+    return args, defaults
 
 
 if __name__ == "__main__":
     plt.style.use("ggplot")
-    parse_args()
+    args, defaults = parse_args()
     if args.couette_xml != "":
-        parse_xml()
+        args = parse_xml(args, defaults)
     os.chdir(Path(args.workdir))
     coupling_cycles = [
         int(s.strip()) for s in args.coupling_cycles.strip().split(",") if len(s) > 0
@@ -210,7 +209,7 @@ if __name__ == "__main__":
             coupling_cycles.append(int(path.stem[len(filename_prefix) :]))
     coupling_cycles.sort()
     for i, cc in enumerate(coupling_cycles):
-        plot_couette_profile(cc, f"C{i}")
+        plot_couette_profile(cc, f"C{i}", args)
     plt.plot([], [], "-", color="grey", label="Analytical")
     plt.plot([], [], "o", color="grey", label="Sampled")
     plt.ylabel("$u_x$")
