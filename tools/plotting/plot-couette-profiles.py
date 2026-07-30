@@ -90,6 +90,10 @@ def plot_couette_profile(coupling_cycle, color, ax=plt.gca()):
     ax.fill_between([], [], [], color=color, label=f"Coupling cycle #{coupling_cycle}")
 
 
+def parse_xml():
+    pass
+
+
 def parse_args(argv=sys.argv[1:]):
     """Parse all command line arguments and make them available globally"""
     global args
@@ -137,6 +141,9 @@ def parse_args(argv=sys.argv[1:]):
 if __name__ == "__main__":
     plt.style.use("ggplot")
     parse_args()
+    if args.couette_xml != "":
+        parse_xml()
+        parse_args()  # Overwrite xml args with commandline args wherever applicable
     os.chdir(Path(args.workdir))
     coupling_cycles = [
         int(s.strip()) for s in args.coupling_cycles.strip().split(",") if len(s) > 0
