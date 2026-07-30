@@ -14,8 +14,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+import xml.etree.cElementTree as ET
 
 args = None
+defaults = None
 
 
 def couette_analytic(z, t):
@@ -91,12 +93,66 @@ def plot_couette_profile(coupling_cycle, color, ax=plt.gca()):
 
 
 def parse_xml():
-    pass
+    global args
+    # Load file
+    treeF = ET.parse(args.couette_xml)
+    tree = treeF.getroot()
+    # Update all needed variables
+    if args.offset == defaults.offset:
+        args.offset = float(
+            tree.find("molecular-dynamics/domain-configuration")
+            .attrib["domain-offset"]
+            .split(";")[2]
+        )
+    if args.wall_velocity == defaults.wall_velocity:
+        args.wall_velocity = float(
+            tree.find("couette-test/domain").attrib["wall-velocity"].split(";")[0]
+        )
+    if args.channel_height == defaults.channel_height:
+        args.channel_height = float(
+            tree.find("couette-test/domain").attrib["channelheight"]
+        )
+    if args.density == defaults.density:
+        args.density = float(
+            tree.find("couette-test/microscopic-solver").attrib["density"]
+        )
+    if args.viscosity == defaults.viscosity:
+        args.viscosity = float(
+            tree.find("couette-test/macroscopic-solver").attrib["viscosity"]
+        )
+    if args.overlap_size == defaults.overlap_size:
+        args.overlap_size = int(
+            tree.find("mamico/momentum-insertion").attrib["innermost-overlap-layer"]
+        )
+    if args.coupling_cell_size == defaults.coupling_cell_size:
+        args.coupling_cell_size = float(
+            tree.find("mamico/coupling-cell-configuration")
+            .attrib["cell-size"]
+            .split(";")[0]
+        )
+    if args.md_ts_per_cc == defaults.md_ts_per_cc:
+        args.md_ts_per_cc = int(
+            tree.find("molecular-dynamics/simulation-configuration").attrib[
+                "number-of-timesteps"
+            ]
+        )
+    if args.md_ts_length == defaults.md_ts_length:
+        args.md_ts_length = float(
+            tree.find("molecular-dynamics/simulation-configuration").attrib["dt"]
+        )
+    if args.coupling_cells == defaults.coupling_cells:
+        temp_mdSize = float(
+            tree.find("molecular-dynamics/domain-configuration")
+            .attrib["domain-size"]
+            .split(";")[2]
+        )
+        temp_numCellsInMD = int(temp_mdSize / args.coupling_cell_size)
+        args.coupling_cells = temp_numCellsInMD - (2 * args.overlap_size)
 
 
 def parse_args(argv=sys.argv[1:]):
     """Parse all command line arguments and make them available globally"""
-    global args
+    global args, defaults
     arg_parser = argparse.ArgumentParser()
     # Scenario parameters
     arg_parser.add_argument("--offset", default=2.5, type=float)
@@ -136,6 +192,7 @@ def parse_args(argv=sys.argv[1:]):
     )
     arg_parser.add_argument("--output", default=None, type=Path)
     args = arg_parser.parse_args(argv)
+    defaults = arg_parser.parse_args([])
 
 
 if __name__ == "__main__":
@@ -143,7 +200,6 @@ if __name__ == "__main__":
     parse_args()
     if args.couette_xml != "":
         parse_xml()
-        parse_args()  # Overwrite xml args with commandline args wherever applicable
     os.chdir(Path(args.workdir))
     coupling_cycles = [
         int(s.strip()) for s in args.coupling_cycles.strip().split(",") if len(s) > 0
