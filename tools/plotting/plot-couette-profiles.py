@@ -50,10 +50,8 @@ def load_avg_ux_from_csv(csv_file):
     # get Avg x velocity per z layer
     avg_ux = []
     idx_col = "I01_z"
-    for i in range(4, 10):
+    for i in range(df[idx_col].min(), df[idx_col].max() + 1):
         avg = 0
-        mass = 0
-        j = 0
         for _, row in df[df[idx_col] == i].iterrows():
             avg += row["vel_x"]
         if df[df[idx_col] == i].shape[0] > 0:
