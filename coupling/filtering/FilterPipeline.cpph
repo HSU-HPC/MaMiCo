@@ -5,8 +5,7 @@
 // TODO: replace exit()s with throws
 
 // constructors of coupling::filtering::FilterPipeline
-template <class CellIndex_T, unsigned int dim>
-coupling::filtering::FilterPipeline<CellIndex_T, dim>::FilterPipeline(coupling::datastructures::CellContainer<CellIndex_T, dim> inputCells,
+coupling::filtering::FilterPipeline::FilterPipeline(coupling::datastructures::BoxCellContainer inputCells,
                                                                       coupling::filtering::Scope scope, const tarch::utils::MultiMDService<dim>& multiMDService,
                                                                       const char* cfgpath)
     :
@@ -100,7 +99,7 @@ coupling::filtering::FilterPipeline<CellIndex_T, dim>::FilterPipeline(coupling::
 }
 
 // member functions of coupling::filtering::FilterPipeline
-template <class CellIndex_T, unsigned int dim> double coupling::filtering::FilterPipeline<CellIndex_T, dim>::operator()() {
+template <class CellIndex_T, unsigned int dim> double coupling::filtering::FilterPipeline::operator()() {
   timeval start;
   timeval end;
   double runtime = 0;
@@ -144,7 +143,7 @@ template <class CellIndex_T, unsigned int dim> double coupling::filtering::Filte
 }
 
 template <class CellIndex_T, unsigned int dim>
-coupling::filtering::FilterSequence<dim>* coupling::filtering::FilterPipeline<CellIndex_T, dim>::getSequence(const char* sequenceIdentifier) const {
+coupling::filtering::FilterSequence<dim>* coupling::filtering::FilterPipeline::getSequence(const char* sequenceIdentifier) const {
   for (auto sequence : _sequences) {
     if (std::strcmp(sequence->getName(), sequenceIdentifier) == 0) {
       return sequence;
@@ -155,7 +154,7 @@ coupling::filtering::FilterSequence<dim>* coupling::filtering::FilterPipeline<Ce
 
 // Private functions of coupling::filtering::FilterPipeline:
 template <class CellIndex_T, unsigned int dim>
-bool coupling::filtering::FilterPipeline<CellIndex_T, dim>::configIsValid(ParseConfiguration::XMLConfiguration& xmlConfig) {
+bool coupling::filtering::FilterPipeline::configIsValid(ParseConfiguration::XMLConfiguration& xmlConfig) {
   // Check main node
   tinyxml2::XMLElement* node = xmlConfig.root->FirstChildElement("filter-pipeline");
   if (!node) {
@@ -205,7 +204,7 @@ bool coupling::filtering::FilterPipeline<CellIndex_T, dim>::configIsValid(ParseC
   return true;
 }
 
-template <class CellIndex_T, unsigned int dim> void coupling::filtering::FilterPipeline<CellIndex_T, dim>::loadSequencesFromXML(tinyxml2::XMLElement* node) {
+template <class CellIndex_T, unsigned int dim> void coupling::filtering::FilterPipeline::loadSequencesFromXML(tinyxml2::XMLElement* node) {
 
   if (_md2MacroCells.empty()) {
     switch (_scope) { /*TODO: print rank as well */
