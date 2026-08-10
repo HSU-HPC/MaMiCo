@@ -70,36 +70,14 @@ def git_clone_shallow(repository_url, repository_dir, branch):
     return 0 != shell(cmd)
 
 
-def build_ls1(mamico_repo_dir, with_mpi=False, jobs=8, force_gcc=False):
-    print("Building ls1-MarDyn from source...")
+def download_ls1(mamico_repo_dir):
+    print("Downloading ls1-MarDyn...")
     ls1_dir = mamico_repo_dir / "ls1"
     if ls1_dir.exists():
         # Avoid issues with initializing submodule
         shutil.rmtree(ls1_dir)
     had_error = 0 != shell("git submodule init && git submodule update")
-    if had_error != 0:
-        return had_error
-    had_error = False
-    build_dir = ls1_dir / "build"
-    build_dir.mkdir(exist_ok=True)
-    cmake_args = ""
-    if force_gcc:
-        cmake_args += f" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
-    cmake_args += f" -S{ls1_dir} -B{build_dir}"
-    cmake_args += " -DENABLE_ADIOS2=OFF"
-    cmake_args += f" -DENABLE_MPI={'ON' if with_mpi else 'OFF'}"
-    cmake_args += " -DOPENMP=OFF"
-    cmake_args += " -DENABLE_AUTOPAS=OFF"
-    cmake_args += " -DENABLE_UNIT_TESTS=OFF"
-    cmake_args += " -DENABLE_ALLLBL=OFF"
-    cmake_args += " -DMAMICO_COUPLING=ON"
-    cmake_args += f" -DMAMICO_SRC_DIR={mamico_repo_dir}"
-    had_error = 0 != shell(f"cmake {cmake_args}")
-    if not had_error:
-        with ChangeDir(build_dir):
-            had_error = 0 != shell(f"make -j {jobs}")
     return had_error
-
 
 def download_open_foam():
     had_error = False
@@ -208,8 +186,11 @@ def build_mamico_couette_md(
     environement["PKG_CONFIG_PATH"] = "$PKG_CONFIG_PATH"
     cmake_args += " -DBUILD_WITH_LAMMPS=OFF"
     if md_solver == "ls1":
-        had_error |= build_ls1(MAMICO_REPO_DIR, with_mpi, jobs, force_gcc)
-        cmake_args += f" -DLS1_SRC_DIR={MAMICO_REPO_DIR / 'ls1'}"
+        had_error |= download_ls1(MAMICO_REPO_DIR)
+        cmake_args += " -DOPENMP=OFF"
+        cmake_args += " -DENABLE_AUTOPAS=OFF"
+        cmake_args += " -DENABLE_UNIT_TESTS=OFF"
+        cmake_args += " -DENABLE_ALLLBL=OFF"
     elif md_solver == "lammps":
         had_error |= build_lammps()
         cmake_args = cmake_args.replace("LAMMPS=OFF", "LAMMPS=ON")
