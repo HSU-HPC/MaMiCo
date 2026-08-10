@@ -48,6 +48,7 @@ public:
   }
 
   static const bool IsParallel = false;
+  static const bool IsReadonly = true;
 
 private:
   static constexpr double maxV = 1e3;

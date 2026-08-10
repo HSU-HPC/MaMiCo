@@ -5,7 +5,7 @@
 #include "simplemd/molecule-mappings/VTKMoleculeWriter.h"
 
 simplemd::moleculemappings::VTKMoleculeWriter::VTKMoleculeWriter(const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                                                                 const simplemd::MoleculeContainer& moleculeContainer, const std::string& filename)
+                                                                 simplemd::MoleculeContainer& moleculeContainer, const std::string& filename)
     : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer), _filename(filename), _timestep(0) {}
 
 simplemd::moleculemappings::VTKMoleculeWriter::~VTKMoleculeWriter() {}

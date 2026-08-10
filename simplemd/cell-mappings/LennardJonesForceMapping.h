@@ -40,6 +40,7 @@ public:
                                                                          const tarch::la::Vector<MD_DIM, double>& position2) const;
 
   static const bool IsParallel = true;
+  static const bool IsReadonly = false;
 
 private:
   /** epsilon */

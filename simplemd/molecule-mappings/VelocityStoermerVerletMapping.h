@@ -31,6 +31,7 @@ public:
   void handleMolecule(Molecule& molecule);
 
   static const bool IsParallel = false;
+  static const bool IsReadonly = false;
 
 private:
   tarch::la::Vector<2 * MD_DIM, bool> initReflectingBoundary(const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary) const;

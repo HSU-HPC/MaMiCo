@@ -75,6 +75,7 @@ public:
   const unsigned int& getGlobalNumberMolecules() const { return _particleCounter; }
 
   static const bool IsParallel = false;
+  static const bool IsReadonly = true;
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;

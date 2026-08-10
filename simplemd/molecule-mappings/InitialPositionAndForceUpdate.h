@@ -31,6 +31,7 @@ public:
     molecule.setForce(_zero);
   }
   static const bool IsParallel = false;
+  static const bool IsReadonly = false;
 
 private:
   const double _dt;

@@ -30,6 +30,7 @@ public:
   KOKKOS_FUNCTION void handleCell(LinkedCell& cell) const { cell.clear(); }
 
   static const bool IsParallel = true;
+  static const bool IsReadonly = false;
 
 private:
 };

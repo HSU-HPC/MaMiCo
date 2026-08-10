@@ -17,8 +17,9 @@ class LinkedCell;
 class simplemd::LinkedCell {
 public:
   KOKKOS_FUNCTION LinkedCell() : _moleculeData(nullptr), _linkedCellNumMolecules(nullptr), _cellIndex(0), _isGhostCell(false) {}
-  KOKKOS_FUNCTION LinkedCell(const Kokkos::View<Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace>* moleculeData,
-                             const Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace>* nMolecules, unsigned int cellIndex, bool isGhostCell)
+
+  KOKKOS_FUNCTION LinkedCell(const void* moleculeData,
+                             const void* nMolecules, unsigned int cellIndex, bool isGhostCell)
       : _moleculeData(moleculeData), _linkedCellNumMolecules(nMolecules), _cellIndex(cellIndex), _isGhostCell(isGhostCell) {}
 
   class Iterator {
@@ -75,7 +76,14 @@ public:
     *getMolecule(moleculeIdx) = *getMolecule(numMolecules() - 1);
     changeMoleculeCount(-1);
   }
-  KOKKOS_FUNCTION void clear() { (*_linkedCellNumMolecules)(_cellIndex) = 0; }
+  KOKKOS_FUNCTION void clear() { 
+    KOKKOS_IF_ON_HOST((
+      (*static_cast<const Kokkos::View<size_t*, Kokkos::LayoutRight>::host_mirror_type*>(_linkedCellNumMolecules))(_cellIndex) = 0; 
+    ))
+    KOKKOS_IF_ON_DEVICE((
+      (*static_cast<const Kokkos::View<size_t*, Kokkos::LayoutRight>*>(_linkedCellNumMolecules))(_cellIndex) = 0;
+    ))
+  }
 
   std::string to_string() const {
     std::stringstream to_ret;
@@ -83,19 +91,40 @@ public:
     return to_ret.str();
   }
 
-  KOKKOS_INLINE_FUNCTION unsigned int numMolecules() const { return (*_linkedCellNumMolecules)(_cellIndex); }
+  KOKKOS_INLINE_FUNCTION unsigned int numMolecules() const { 
+    KOKKOS_IF_ON_HOST((
+      return (*static_cast<const Kokkos::View<size_t*, Kokkos::LayoutRight>::host_mirror_type*>(_linkedCellNumMolecules))(_cellIndex); 
+    ))
+    KOKKOS_IF_ON_DEVICE((
+      return (*static_cast<const Kokkos::View<size_t*, Kokkos::LayoutRight>*>(_linkedCellNumMolecules))(_cellIndex); 
+    ))
+  }
 
   KOKKOS_INLINE_FUNCTION bool isGhostCell() const { return _isGhostCell; }
 
   KOKKOS_INLINE_FUNCTION size_t getIndex() const { return _cellIndex; }
 
 private:
-  KOKKOS_INLINE_FUNCTION void changeMoleculeCount(int by) { (*_linkedCellNumMolecules)(_cellIndex) += by; }
+  KOKKOS_INLINE_FUNCTION void changeMoleculeCount(int by) { 
+    KOKKOS_IF_ON_HOST((
+      (*static_cast<const Kokkos::View<size_t*, Kokkos::LayoutRight>::host_mirror_type*>(_linkedCellNumMolecules))(_cellIndex) += by; 
+    ))
+    KOKKOS_IF_ON_DEVICE((
+      (*static_cast<const Kokkos::View<size_t*, Kokkos::LayoutRight>*>(_linkedCellNumMolecules))(_cellIndex) += by; 
+    ))
+  }
 
-  KOKKOS_INLINE_FUNCTION Molecule* getMolecule(unsigned int moleculeIndex) const { return &(*_moleculeData)(_cellIndex, moleculeIndex); }
+  KOKKOS_INLINE_FUNCTION Molecule* getMolecule(unsigned int moleculeIndex) const { 
+    KOKKOS_IF_ON_HOST((
+      return &(*static_cast<const Kokkos::View<Molecule**, Kokkos::LayoutRight>::host_mirror_type*>(_moleculeData))(_cellIndex, moleculeIndex);
+    ))
+    KOKKOS_IF_ON_DEVICE((
+      return &(*static_cast<const Kokkos::View<Molecule**, Kokkos::LayoutRight>*>(_moleculeData))(_cellIndex, moleculeIndex);
+    ))
+  }
 
-  const Kokkos::View<Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace>* _moleculeData;
-  const Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace>* _linkedCellNumMolecules;
+  const void* _moleculeData;
+  const void* _linkedCellNumMolecules;
   const unsigned int _cellIndex;
   const bool _isGhostCell;
 };

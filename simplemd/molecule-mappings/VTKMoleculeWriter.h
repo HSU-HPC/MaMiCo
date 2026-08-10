@@ -33,7 +33,7 @@ public:
    * @param moleculeContainer molecule container
    * @param filename filename for .vtk output file
    */
-  VTKMoleculeWriter(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::MoleculeContainer& moleculeContainer,
+  VTKMoleculeWriter(const simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::MoleculeContainer& moleculeContainer,
                     const std::string& filename);
 
   /** Destructor */
@@ -56,10 +56,11 @@ public:
   void handleMolecule(Molecule& molecule);
 
   static const bool IsParallel = false;
+  static const bool IsReadonly = true;
 
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  const simplemd::MoleculeContainer& _moleculeContainer;
+  simplemd::MoleculeContainer& _moleculeContainer;
   /** filename */
   std::string _filename;
   /** current timestep */

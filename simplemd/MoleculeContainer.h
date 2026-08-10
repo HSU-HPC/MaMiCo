@@ -29,6 +29,9 @@ class MoleculeContainer;
  */
 class simplemd::MoleculeContainer {
 public:
+
+  enum class MemoryState { SYNCED, H_BEHIND, D_BEHIND };
+
   /**
    * @brief Construct a new MoleculeContainer object
    *
@@ -141,7 +144,7 @@ public:
    *
    * @return const size_t
    */
-  size_t getLocalNumberOfMoleculesWithGhost() const;
+  size_t getLocalNumberOfMoleculesWithGhost();
 
   /**
    * @brief returns the index of the first (non-ghost) cell along each dimension
@@ -309,6 +312,21 @@ public:
   KOKKOS_FUNCTION unsigned int positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const;
 
 private:
+  template <class A> void synchronizeMemory(const A& a);
+  void synchronizationCheck() const;
+
+  class HostOperation {
+    public: 
+      static const bool IsParallel = false;
+      static const bool IsReadonly = false;
+  };
+
+  class DeviceOperation {
+    public: 
+      static const bool IsParallel = true;
+      static const bool IsReadonly = false;
+  };
+
   /**
    * @brief Converts a 3D local linked cell index into a 1D local linked cell index.
    *
@@ -355,14 +373,21 @@ private:
   /** local index of the first cell within this domain */
   const tarch::la::Vector<MD_DIM, unsigned int> _localIndexOfFirstCell;
 
-  Kokkos::View<simplemd::Molecule**, Kokkos::LayoutRight, Kokkos::SharedSpace> _moleculeData;
-  Kokkos::View<size_t*, Kokkos::LayoutRight, Kokkos::SharedSpace> _linkedCellNumMolecules;
+  Kokkos::View<simplemd::Molecule**, Kokkos::LayoutRight> _moleculeData_d;
+  typename Kokkos::View<simplemd::Molecule**, Kokkos::LayoutRight>::host_mirror_type _moleculeData_h;
+  Kokkos::View<size_t*, Kokkos::LayoutRight> _linkedCellNumMolecules_d;
+  typename Kokkos::View<size_t*, Kokkos::LayoutRight>::host_mirror_type _linkedCellNumMolecules_h;
+
   Kokkos::View<bool*> _linkedCellIsGhostCell;
   /** index offsets of all 26 neighbor cell directions */
   Kokkos::View<int*> _neighborOffsets;
+
+  /** current status of _moleculeData and _linkedCellNumMolecules */
+  MemoryState _memoryState;
 };
 
 template <class A> void simplemd::MoleculeContainer::iterateMolecules(A& a) {
+  synchronizeMemory(a);
   if constexpr (A::IsParallel) {
     iterateMoleculesParallel(a);
   } else {
@@ -372,8 +397,8 @@ template <class A> void simplemd::MoleculeContainer::iterateMolecules(A& a) {
 
 template <class A> void simplemd::MoleculeContainer::iterateMoleculesSerial(A& a) {
   a.beginMoleculeIteration();
-  for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {
-    for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
+  for (unsigned int i = 0; i < _linkedCellNumMolecules_h.size(); i++) {
+    for (unsigned int j = 0; j < _linkedCellNumMolecules_h(i); j++) {
 #if (MD_DEBUG == MD_YES)
       std::cout << "Handle molecule " << j << " in cell #" << i << std::endl;
 #endif
@@ -393,7 +418,7 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
       "simplemd::MoleculeContainer::iterateMoleculesParallel", Kokkos::RangePolicy<MainExecSpace>(0, _linkedCellIsGhostCell.size()),
       KOKKOS_CLASS_LAMBDA(const unsigned int i) {
         printNonGhostCells(i == 0, "device start iterateMoleculesParallel");
-        for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
+        for (unsigned int j = 0; j < _linkedCellNumMolecules_d(i); j++) {
           a.handleMolecule(getMoleculeAt(i, j));
         }
         printNonGhostCells(i == 0, "device end iterateMoleculesParallel");
@@ -405,6 +430,7 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
 }
 
 template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCell(A& a) {
+  synchronizeMemory(a);
   if constexpr (A::IsParallel) {
     iterateMoleculesWithCellParallel(a);
   } else {
@@ -422,8 +448,8 @@ template <class A> void simplemd::MoleculeContainer::handleCellNeighbors(A& a, M
 
 template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellSerial(A& a) {
   a.beginMoleculeIteration();
-  for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {
-    for (unsigned int j = 0; j < _linkedCellNumMolecules(i); j++) {
+  for (unsigned int i = 0; i < _linkedCellNumMolecules_h.size(); i++) {
+    for (unsigned int j = 0; j < _linkedCellNumMolecules_h(i); j++) {
       simplemd::LinkedCell cell = (*this)[i];
       Molecule& m = getMoleculeAt(i, j);
       a.handleMolecule(m, cell);
@@ -436,7 +462,7 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellSer
 template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellParallel(A& a) {
   a.beginMoleculeIteration();
   const unsigned int threads_per_cell = 5;
-  const unsigned int length = _linkedCellNumMolecules.size() * threads_per_cell;
+  const unsigned int length = _linkedCellNumMolecules_d.size() * threads_per_cell;
   Kokkos::parallel_for(
       "simplemd::MoleculeContainer::iterateMoleculesWithCellParallel", Kokkos::RangePolicy<MainExecSpace>(0, length),
       KOKKOS_CLASS_LAMBDA(const unsigned int i) {
@@ -444,7 +470,7 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellPar
     const unsigned int cellIndex = i / threads_per_cell;
     simplemd::LinkedCell cell = (*this)[cellIndex];
 
-    for (unsigned int j = i % threads_per_cell; j < _linkedCellNumMolecules(cellIndex); j+=threads_per_cell) {
+    for (unsigned int j = i % threads_per_cell; j < _linkedCellNumMolecules_d(cellIndex); j+=threads_per_cell) {
         Molecule& m = getMoleculeAt(cellIndex, j);
         a.handleMolecule(m,cell);
         handleCellNeighbors(a, m, cell);
@@ -872,6 +898,7 @@ template <class A> void simplemd::MoleculeContainer::iterateCellPairsParallel(A&
 template <class A>
 void simplemd::MoleculeContainer::iterateCellPairs(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
                                                    const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) {
+  synchronizeMemory(a);
   if constexpr (A::IsParallel) {
     iterateCellPairsParallel(a, lowerLeftFrontCell, cellRange);
   } else {
@@ -888,6 +915,7 @@ template <class A> void simplemd::MoleculeContainer::iterateCellPairs(A& a) {
 template <class A>
 void simplemd::MoleculeContainer::iterateCells(A& a, const tarch::la::Vector<MD_DIM, unsigned int>& lowerLeftFrontCell,
                                                const tarch::la::Vector<MD_DIM, unsigned int>& cellRange) {
+  synchronizeMemory(a);
   if constexpr (A::IsParallel) {
     iterateCellsParallel(a, lowerLeftFrontCell, cellRange);
   } else {
@@ -896,5 +924,39 @@ void simplemd::MoleculeContainer::iterateCells(A& a, const tarch::la::Vector<MD_
 }
 
 template <class A> void simplemd::MoleculeContainer::iterateCells(A& a) { iterateCells(a, _ghostCellLayerThickness, _numLocalCellsNoGhost); }
+
+template <class A> 
+void simplemd::MoleculeContainer::synchronizeMemory(const A& a){
+  if(_memoryState == MemoryState::SYNCED){
+    if constexpr (A::IsReadonly) 
+      return;
+    if constexpr (A::IsParallel) 
+      _memoryState = MemoryState::H_BEHIND;
+    else
+      _memoryState = MemoryState::D_BEHIND;
+  } else if (_memoryState == MemoryState::H_BEHIND) {
+    if constexpr (A::IsParallel) 
+      return;
+    // Serial mapping to be executed here, in host behind state ==> D->H memory transfer required!
+    Kokkos::deep_copy(_moleculeData_h, _moleculeData_d);
+    Kokkos::deep_copy(_linkedCellNumMolecules_h, _linkedCellNumMolecules_d);
+    _memoryState = MemoryState::SYNCED;
+    if constexpr (A::IsReadonly) 
+      return;
+    _memoryState = MemoryState::D_BEHIND;
+  } else if (_memoryState == MemoryState::D_BEHIND) {
+    if constexpr (!A::IsParallel) 
+      return;
+    // Parallel mapping to be executed here, device behind  ==> H->D memory transfer required!
+    Kokkos::deep_copy(_moleculeData_d, _moleculeData_h);
+    Kokkos::deep_copy(_linkedCellNumMolecules_d, _linkedCellNumMolecules_h);
+    _memoryState = MemoryState::SYNCED;
+    if constexpr (A::IsReadonly) 
+      return;
+    _memoryState = MemoryState::H_BEHIND;
+  } else {
+    Kokkos::abort("simplemd::MoleculeContainer::synchronizeMemory: UNKNOWN MEMORY STATE\n");
+  }
+}
 
 #endif // _MOLECULARDYNAMICS_MOLECULARCONTAINER_H_

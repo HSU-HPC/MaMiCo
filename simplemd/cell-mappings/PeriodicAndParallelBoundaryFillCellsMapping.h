@@ -39,6 +39,7 @@ public:
   void handleCell(LinkedCell& cell);
 
   static const bool IsParallel = false;
+  static const bool IsReadonly = false;
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;

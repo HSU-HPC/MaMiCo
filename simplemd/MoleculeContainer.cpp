@@ -11,10 +11,13 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
       _cellCapacity(cellCapacity), _domainSize(parallelTopologyService.getGlobalDomainSize()),
       _domainOffset(parallelTopologyService.getGlobalDomainOffset()), _meshWidth(parallelTopologyService.getMeshWidth()),
       _globalIndexOfFirstCell(parallelTopologyService.getGlobalIndexOfFirstCell()), _localIndexOfFirstCell(parallelTopologyService.getLocalIndexOfFirstCell()),
-      _moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
-      _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)),
-      _linkedCellIsGhostCell("linkedCellIsGhostCell", _linkedCellNumMolecules.size()),
-      _neighborOffsets("neighborOffsets", 26) {
+      _moleculeData_d("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
+      _moleculeData_h(Kokkos::create_mirror_view(_moleculeData_d)),
+      _linkedCellNumMolecules_d("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)),
+      _linkedCellNumMolecules_h(Kokkos::create_mirror_view(_linkedCellNumMolecules_d)),
+      _linkedCellIsGhostCell("linkedCellIsGhostCell", _linkedCellNumMolecules_d.size()),
+      _neighborOffsets("neighborOffsets", 26),
+      _memoryState(MemoryState::SYNCED) {
 
   auto host_mirror1 = Kokkos::create_mirror_view(_linkedCellIsGhostCell);
   for (unsigned int i = 0; i < _linkedCellIsGhostCell.size(); i++)
@@ -34,54 +37,58 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
 }
 
 void simplemd::MoleculeContainer::insert(unsigned int cellIdx, const simplemd::Molecule& molecule) {
+  synchronizeMemory(HostOperation{});
 #if (MD_ERROR == MD_YES)
-  if (_linkedCellNumMolecules(cellIdx) + 1 > _cellCapacity) {
+  if (_linkedCellNumMolecules_h(cellIdx) + 1 > _cellCapacity) {
     Kokkos::printf("Cell capacity=%d would be exceeded by an operation! Exiting...", _cellCapacity);
     Kokkos::abort("simplemd::MoleculeContainer::insert\n");
   }
 #endif
-  _moleculeData(cellIdx, _linkedCellNumMolecules(cellIdx)) = molecule;
-  _linkedCellNumMolecules(cellIdx) += 1;
+  _moleculeData_h(cellIdx, _linkedCellNumMolecules_h(cellIdx)) = molecule;
+  _linkedCellNumMolecules_h(cellIdx) += 1;
 }
 
 void simplemd::MoleculeContainer::insert(const simplemd::Molecule& molecule) { insert(positionToCellIndex(molecule.getConstPosition()), molecule); }
 
 void simplemd::MoleculeContainer::remove(unsigned int cellIdx, unsigned int moleculeIdx) {
+  synchronizeMemory(HostOperation{});
 #if (MD_ERROR == MD_YES)
-  if (moleculeIdx >= _linkedCellNumMolecules(cellIdx)) {
+  if (moleculeIdx >= _linkedCellNumMolecules_h(cellIdx)) {
     Kokkos::printf("Deleting particle that does not exist! moleculeIdx: %d, cellIdx: %d, num molecules: %d\n", moleculeIdx, cellIdx,
-                   _linkedCellNumMolecules(cellIdx));
+                   _linkedCellNumMolecules_h(cellIdx));
     Kokkos::abort("ERROR simplemd::MoleculeContainer::remove\n");
   }
-  if (cellIdx >= _linkedCellNumMolecules(cellIdx)) {
+  if (cellIdx >= _linkedCellNumMolecules_h(cellIdx)) {
     Kokkos::printf("Deleting particle from cell that does not exist! moleculeIdx: %d, cellIdx: %d, num molecules: %d\n", moleculeIdx, cellIdx,
-                   _linkedCellNumMolecules(cellIdx));
+                   _linkedCellNumMolecules_h(cellIdx));
     Kokkos::abort("ERROR simplemd::MoleculeContainer::remove\n");
   }
 #endif
-  _moleculeData(cellIdx, moleculeIdx) = _moleculeData(cellIdx, _linkedCellNumMolecules(cellIdx) - 1);
-  _linkedCellNumMolecules(cellIdx) -= 1;
+  _moleculeData_h(cellIdx, moleculeIdx) = _moleculeData_h(cellIdx, _linkedCellNumMolecules_h(cellIdx) - 1);
+  _linkedCellNumMolecules_h(cellIdx) -= 1;
 }
 
 void simplemd::MoleculeContainer::clearLinkedCell(unsigned int cellIdx) {
+  synchronizeMemory(HostOperation{});
 #if (MD_ERROR == MD_YES)
-  if (cellIdx >= _linkedCellNumMolecules.size()) {
+  if (cellIdx >= _linkedCellNumMolecules_h.size()) {
     Kokkos::printf("ERROR simplemd::MoleculeContainer::clearLinkedCell: Index out of range: %i (Local cell count = %i )\n", cellIdx,
-                   _linkedCellNumMolecules.size());
+                   _linkedCellNumMolecules_h.size());
     Kokkos::abort("\n");
   }
 #endif
-  _linkedCellNumMolecules(cellIdx) = 0;
+  _linkedCellNumMolecules_h(cellIdx) = 0;
 }
 
 void simplemd::MoleculeContainer::sort(unsigned int cellIdx) { // set all outgoing molecules
-  for (size_t i = 0; i < _linkedCellNumMolecules(cellIdx); i++) {
-    unsigned int curMolIdx = positionToCellIndex(_moleculeData(cellIdx, i).getPosition());
+  synchronizeMemory(HostOperation{});
+  for (size_t i = 0; i < _linkedCellNumMolecules_h(cellIdx); i++) {
+    unsigned int curMolIdx = positionToCellIndex(_moleculeData_h(cellIdx, i).getPosition());
     if (curMolIdx != cellIdx) { // if molecule does not belong to current cell anymore
       // write data to target end
-      _moleculeData(curMolIdx, _linkedCellNumMolecules(curMolIdx)) = _moleculeData(cellIdx, i);
+      _moleculeData_h(curMolIdx, _linkedCellNumMolecules_h(curMolIdx)) = _moleculeData_h(cellIdx, i);
       // increment target end
-      _linkedCellNumMolecules(curMolIdx)++;
+      _linkedCellNumMolecules_h(curMolIdx)++;
       // delete molecule at own position
       remove(cellIdx, i);
       // decrement iterator as the molecule at position i is now new
@@ -128,6 +135,7 @@ void simplemd::MoleculeContainer::sort() {
 
         // parallelise loop for all cells that are to be traversed in this way
         printNonGhostCells(true, "host start sort");
+        synchronizeMemory(DeviceOperation{});
         Kokkos::parallel_for(
             "simplemd::MoleculeContainer::sort", Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int j) {
               printNonGhostCells(j == 0, "device start sort");
@@ -162,16 +170,16 @@ void simplemd::MoleculeContainer::sort() {
               Kokkos::printf("Handle cell %u\n", index);
 #endif
 #if (MD_ERROR == MD_YES)
-              if (index >= _linkedCellNumMolecules.size()) {
+              if (index >= _linkedCellNumMolecules_d.size()) {
                 Kokkos::abort("simplemd::MoleculeContainer::sort() out-of-bounds access to linked cell\n");
               }
 #endif
-              for (size_t i = 0; i < _linkedCellNumMolecules(index); i++) {
-                unsigned int curMolIdx = positionToCellIndex(_moleculeData(index, i).getPosition());
+              for (size_t i = 0; i < _linkedCellNumMolecules_d(index); i++) {
+                unsigned int curMolIdx = positionToCellIndex(_moleculeData_d(index, i).getPosition());
                 if (curMolIdx != index) { // if molecule does not belong to current cell anymore
                                           // write data to target end
 #if (MD_ERROR == MD_YES)
-                  if (_linkedCellNumMolecules(curMolIdx) + 1 > _cellCapacity) {
+                  if (_linkedCellNumMolecules_d(curMolIdx) + 1 > _cellCapacity) {
                     Kokkos::printf("Cell capacity=%d would be exceeded by an operation. "
                                    "(Increase \"capacity-factor\" of the \"domain-configuration\" in the config!) "
                                    "Exiting...",
@@ -179,12 +187,12 @@ void simplemd::MoleculeContainer::sort() {
                     Kokkos::abort("simplemd::MoleculeContainer::insert\n");
                   }
 #endif
-                  _moleculeData(curMolIdx, _linkedCellNumMolecules(curMolIdx)) = _moleculeData(index, i);
+                  _moleculeData_d(curMolIdx, _linkedCellNumMolecules_d(curMolIdx)) = _moleculeData_d(index, i);
                   // increment target end
-                  _linkedCellNumMolecules(curMolIdx)++;
+                  _linkedCellNumMolecules_d(curMolIdx)++;
                   // delete molecule at own position
-                  _moleculeData(index, i) = _moleculeData(index, _linkedCellNumMolecules(index) - 1);
-                  _linkedCellNumMolecules(index) -= 1;
+                  _moleculeData_d(index, i) = _moleculeData_d(index, _linkedCellNumMolecules_d(index) - 1);
+                  _linkedCellNumMolecules_d(index) -= 1;
                   // decrement iterator as the molecule at position i is now new
                   i--;
                 }
@@ -202,23 +210,37 @@ void simplemd::MoleculeContainer::sort() {
 #endif
 }
 
-simplemd::Molecule& simplemd::MoleculeContainer::getMoleculeAt(size_t i, size_t j) const { return _moleculeData(i, j); }
+simplemd::Molecule& simplemd::MoleculeContainer::getMoleculeAt(size_t i, size_t j) const { 
+  synchronizationCheck();
+  KOKKOS_IF_ON_HOST((
+    return _moleculeData_h(i, j);
+  ))
+  KOKKOS_IF_ON_DEVICE((
+    return _moleculeData_d(i, j);
+  ))
+}
 
 simplemd::LinkedCell simplemd::MoleculeContainer::operator[](const size_t idx) const {
+  synchronizationCheck();
 #if (MD_ERROR == MD_YES)
-  if (idx >= _linkedCellNumMolecules.size()) {
-    Kokkos::printf("ERROR simplemd::MoleculeContainer::operator[]: Index out of range: %i (Local cell count = %i )\n", idx, _linkedCellNumMolecules.size());
+  if (idx >= _linkedCellNumMolecules_d.size()) {
+    Kokkos::printf("ERROR simplemd::MoleculeContainer::operator[]: Index out of range: %i (Local cell count = %i )\n", idx, _linkedCellNumMolecules_d.size());
     Kokkos::abort("\n");
   }
 #endif
-  return simplemd::LinkedCell(&_moleculeData, &_linkedCellNumMolecules, idx, isGhostCell(idx));
+  KOKKOS_IF_ON_HOST((
+    return simplemd::LinkedCell(&_moleculeData_h, &_linkedCellNumMolecules_h, idx, isGhostCell(idx));
+  ))
+  KOKKOS_IF_ON_DEVICE((
+    return simplemd::LinkedCell(&_moleculeData_d, &_linkedCellNumMolecules_d, idx, isGhostCell(idx));
+  ))
 }
 
 simplemd::LinkedCell simplemd::MoleculeContainer::operator[](const tarch::la::Vector<MD_DIM, unsigned int> cellIdx) const {
   return (*this)[vectorIndexToLinear(cellIdx)];
 }
 
-size_t simplemd::MoleculeContainer::getLocalNumberOfCellsScalarWithGhost() const { return _linkedCellNumMolecules.size(); }
+size_t simplemd::MoleculeContainer::getLocalNumberOfCellsScalarWithGhost() const { return _linkedCellNumMolecules_d.size(); }
 
 unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::Vector<MD_DIM, double>& position) const {
   for (unsigned int d = 0; d < MD_DIM; d++) {
@@ -261,6 +283,21 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
   return vectorIndexToLinear(cellVectorIndex);
 }
 
+void simplemd::MoleculeContainer::synchronizationCheck() const {
+#if (MD_ERROR == MD_YES)
+  KOKKOS_IF_ON_HOST((
+    if (_memoryState == MemoryState::H_BEHIND){
+      Kokkos::abort("simplemd::MoleculeContainer::synchronizationCheck: HOST ATTEMPT TO ACCESS OUTDATED MEMORY WITHOUT SYNCHRONIZATION\n");
+    }
+  ))
+  KOKKOS_IF_ON_DEVICE((
+    if (_memoryState == MemoryState::D_BEHIND){
+      Kokkos::abort("simplemd::MoleculeContainer::synchronizationCheck: DEVICE ATTEMPT TO ACCESS OUTDATED MEMORY WITHOUT SYNCHRONIZATION\n");
+    }
+  ))
+#endif
+}
+
 size_t simplemd::MoleculeContainer::vectorIndexToLinear(const tarch::la::Vector<MD_DIM, unsigned int>& vectorIndex) const {
   unsigned int cellLinearIndex = 0;
   unsigned int stepSize = 1;
@@ -273,9 +310,9 @@ size_t simplemd::MoleculeContainer::vectorIndexToLinear(const tarch::la::Vector<
 
 tarch::la::Vector<MD_DIM, unsigned int> simplemd::MoleculeContainer::getLocalCellIndexVector(const size_t cellIndex) const {
 #if (MD_ERROR == MD_YES)
-  if (cellIndex >= _linkedCellNumMolecules.size()) {
+  if (cellIndex >= _linkedCellNumMolecules_d.size()) {
     Kokkos::printf("ERROR simplemd::MoleculeContainer::getLocalCellIndexVector: Index out of range: %i (Local cell count = %i )\n", cellIndex,
-                   _linkedCellNumMolecules.size());
+                   _linkedCellNumMolecules_d.size());
     Kokkos::abort("\n");
   }
 #endif
@@ -310,7 +347,12 @@ bool simplemd::MoleculeContainer::isGhostCell(const size_t cellIndex) const {
 
 void simplemd::MoleculeContainer::printCellMolecules(size_t cellIndex) const {
 #if (MD_DUMP_CELLS != 0)
-  auto cellMoleculeCount = _linkedCellNumMolecules(cellIndex);
+  KOKKOS_IF_ON_HOST((
+    auto cellMoleculeCount = _linkedCellNumMolecules_h(cellIndex);
+  ))
+  KOKKOS_IF_ON_DEVICE((
+    auto cellMoleculeCount = _linkedCellNumMolecules_d(cellIndex);
+  ))
   for (size_t i = 0; i < cellMoleculeCount; i++) {
     Molecule& molecule = getMoleculeAt(cellIndex, i);
     Kokkos::printf("%u\t", cellIndex);
@@ -332,7 +374,7 @@ void simplemd::MoleculeContainer::printNonGhostCells(bool shouldPrintCells, cons
   Kokkos::printf("=== BEGIN DUMP MOLECULE CONTAINER ===\n");
   Kokkos::printf("Label: %s\n", label);
   Kokkos::printf("cell\tpos_x\tpos_y\tpos_z\tvel_x\tvel_y\tvel_z\tforce_x\tforce_y\tforce_z\n");
-  size_t linkedCellCount = _linkedCellNumMolecules.size();
+  size_t linkedCellCount = _linkedCellNumMolecules_d.size();
   size_t cellsRemaining = MD_DUMP_CELLS == 0 ? linkedCellCount : std::min(MD_DUMP_CELLS, linkedCellCount);
 
   KOKKOS_IF_ON_HOST((
@@ -354,11 +396,12 @@ void simplemd::MoleculeContainer::printNonGhostCells(bool shouldPrintCells, cons
 #endif
 }
 
-size_t simplemd::MoleculeContainer::getLocalNumberOfMoleculesWithGhost() const {
+size_t simplemd::MoleculeContainer::getLocalNumberOfMoleculesWithGhost() {
   Kokkos::fence(); // Ensure molecule count per cell is up to date
+  synchronizeMemory(HostOperation{});
   size_t moleculeCount = 0;
-  for (unsigned int i = 0; i < _linkedCellNumMolecules.size(); i++) {
-    moleculeCount += _linkedCellNumMolecules(i);
+  for (unsigned int i = 0; i < _linkedCellNumMolecules_h.size(); i++) {
+    moleculeCount += _linkedCellNumMolecules_h(i);
   }
   return moleculeCount;
 }

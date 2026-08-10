@@ -28,6 +28,7 @@ public:
   }
   void endMoleculeIteration() const {}
   static const bool IsParallel = true;
+  static const bool IsReadonly = false;
 };
 
 #endif // _MOLECULARDYNAMICS_MOLECULEMAPPINGS_CONVERTFORCES_MAPPING_H_

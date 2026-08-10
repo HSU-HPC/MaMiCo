@@ -77,6 +77,7 @@ public:
   const double& getTemperature() const { return _temperature; }
 
   static const bool IsParallel = false;
+  static const bool IsReadonly = true;
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;

@@ -30,6 +30,7 @@ public:
   KOKKOS_FUNCTION void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2) const;
 
   static const bool IsParallel = true;
+  static const bool IsReadonly = false;
 
 private:
   /** epsilon */

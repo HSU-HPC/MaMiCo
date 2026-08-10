@@ -33,6 +33,7 @@ public:
   }
 
   static const bool IsParallel = false;
+  static const bool IsReadonly = false;
 
 private:
   const tarch::la::Vector<MD_DIM, double> _oldVelocity;

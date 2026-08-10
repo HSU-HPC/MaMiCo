@@ -35,6 +35,7 @@ public:
     }
   }
   static const bool IsParallel = false;
+  static const bool IsReadonly = false;
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;

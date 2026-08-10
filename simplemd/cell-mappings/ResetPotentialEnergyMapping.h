@@ -31,6 +31,7 @@ public:
   }
 
   static const bool IsParallel = true;
+  static const bool IsReadonly = false;
 
 private:
   const double _zero;

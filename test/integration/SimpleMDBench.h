@@ -30,6 +30,7 @@ public:
     unsigned long long checksum() const { return sum; }
 
     static const bool IsParallel = false;
+    static const bool IsReadonly = true;
 
   private:
     void process(const double& data) { sum ^= *((unsigned long long*)&data); }

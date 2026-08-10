@@ -41,6 +41,7 @@ public:
   void handleCellPair(LinkedCell& cell1, LinkedCell& cell2, const unsigned int& cellIndex1, const unsigned int& cellIndex2);
 
   static const bool IsParallel = false;
+  static const bool IsReadonly = true;
 
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;

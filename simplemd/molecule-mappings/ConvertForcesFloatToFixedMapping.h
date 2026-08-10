@@ -35,4 +35,5 @@ public:
   void endMoleculeIteration() const {}
 
   static const bool IsParallel = true;
+  static const bool IsReadonly = false;
 };
