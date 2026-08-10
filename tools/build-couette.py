@@ -58,8 +58,7 @@ OPEN_FOAM_THIRD_PARTY_URL = "https://dl.openfoam.com/source/v2206/ThirdParty-v22
 
 def shell(cmd):
     print(
-        f"{getpass.getuser()}@{socket.gethostname()}:{os.getcwd()}$ {cmd}",
-        flush=True
+        f"{getpass.getuser()}@{socket.gethostname()}:{os.getcwd()}$ {cmd}", flush=True
     )
     cmd = f"{cmd} 2>&1"
     return subprocess.call(["/bin/bash", "-c", "set -o pipefail; " + cmd])
@@ -78,6 +77,7 @@ def download_ls1(mamico_repo_dir):
         shutil.rmtree(ls1_dir)
     had_error = 0 != shell("git submodule init && git submodule update")
     return had_error
+
 
 def download_open_foam():
     had_error = False
@@ -121,7 +121,9 @@ def build_open_foam(jobs=8):
         )  # Building OpenFOAM has some irrelevant errors (non-zero exit code)
     if not had_error:
         # Rename unused logging macro to avoid issue when compiling MaMiCo with both OpenFOAM and ls1
-        had_error = 0 != shell(f"sed -i 's/^#define Log/#define FoamLog/g' {OPEN_FOAM_SRC_DIR}/src/OpenFOAM/lnInclude/messageStream.H")
+        had_error = 0 != shell(
+            f"sed -i 's/^#define Log/#define FoamLog/g' {OPEN_FOAM_SRC_DIR}/src/OpenFOAM/lnInclude/messageStream.H"
+        )
     return had_error
 
 
@@ -153,7 +155,12 @@ md_solvers = dict(
 
 
 def build_mamico_couette_md(
-    md_solver="md", with_openfoam=False, with_mpi=False, jobs=8, clean=False, force_gcc=False
+    md_solver="md",
+    with_openfoam=False,
+    with_mpi=False,
+    jobs=8,
+    clean=False,
+    force_gcc=False,
 ):
     run_info = f"Started {time.strftime('%Y-%m-%d %H:%M:%S %Z')}"
     print(run_info)
@@ -235,7 +242,7 @@ if __name__ == "__main__":
         with_mpi=args.with_mpi,
         jobs=args.jobs,
         clean=args.clean,
-        force_gcc=args.force_gcc
+        force_gcc=args.force_gcc,
     )
     if exec_path is not None:
         print(exec_path)
