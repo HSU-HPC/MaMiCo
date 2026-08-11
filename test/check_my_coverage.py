@@ -180,8 +180,8 @@ if __name__ == "__main__":
     else:
         print("You should write tests for:")
         print(
-            df_coverage.to_string(
+            df_coverage.to_markdown(
                 index=False,
-                formatters={c: "{:,.2%}".format for c in df_coverage.columns[1:]},
+                floatfmt=".2%",
             )
         )
