@@ -285,6 +285,7 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
 
 void simplemd::MoleculeContainer::synchronizationCheck() const {
 #if (MD_ERROR == MD_YES)
+#if defined(KOKKOS_TARGET_CUDA)
   KOKKOS_IF_ON_HOST((
     if (_memoryState == MemoryState::H_BEHIND){
       Kokkos::abort("simplemd::MoleculeContainer::synchronizationCheck: HOST ATTEMPT TO ACCESS OUTDATED MEMORY WITHOUT SYNCHRONIZATION\n");
@@ -295,6 +296,7 @@ void simplemd::MoleculeContainer::synchronizationCheck() const {
       Kokkos::abort("simplemd::MoleculeContainer::synchronizationCheck: DEVICE ATTEMPT TO ACCESS OUTDATED MEMORY WITHOUT SYNCHRONIZATION\n");
     }
   ))
+#endif
 #endif
 }
 
