@@ -313,7 +313,7 @@ public:
 
 private:
   template <class A> void synchronizeMemory(const A& a);
-  void synchronizationCheck() const;
+  KOKKOS_FUNCTION void synchronizationCheck() const;
 
   class HostOperation {
     public: 
