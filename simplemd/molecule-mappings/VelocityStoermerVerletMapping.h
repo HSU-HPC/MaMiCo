@@ -23,14 +23,14 @@ public:
   VelocityStoermerVerletMapping(const double& kB, const double& dt, const double& mass,
                                 const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& boundary,
                                 const tarch::la::Vector<MD_DIM, double>& domainOffset, const tarch::la::Vector<MD_DIM, double>& domainSize);
-  ~VelocityStoermerVerletMapping();
+  KOKKOS_FUNCTION ~VelocityStoermerVerletMapping();
 
   void beginMoleculeIteration();
   void endMoleculeIteration();
 
-  void handleMolecule(Molecule& molecule);
+  KOKKOS_FUNCTION void handleMolecule(Molecule& molecule) const;
 
-  static const bool IsParallel = false;
+  static const bool IsParallel = true;
   static const bool IsReadonly = false;
 
 private:

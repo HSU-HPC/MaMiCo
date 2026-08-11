@@ -15,7 +15,7 @@ void simplemd::moleculemappings::VelocityStoermerVerletMapping::beginMoleculeIte
 
 void simplemd::moleculemappings::VelocityStoermerVerletMapping::endMoleculeIteration() {}
 
-void simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule(Molecule& molecule) {
+void simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule(Molecule& molecule) const {
   // if the molecule is fixed in space, return immediately:
   if (molecule.isFixed())
     return;
@@ -35,21 +35,19 @@ void simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule(M
 #if (MD_ERROR == MD_YES)
   for (unsigned int d = 0; d < MD_DIM; d++) {
     if (std::isnan(position[d]) || std::isinf(position[d])) {
-      std::cout << "ERROR simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule: Position ";
-      std::cout << d << " is out of range" << std::endl;
-      std::cout << "Position: " << position << ", molecule: " << molecule.getID() << std::endl;
-      std::cout << "Velocity: " << velocity << ", molecule: " << molecule.getID() << std::endl;
-      std::cout << "OldVelocity: " << oldVelocity << ", molecule: " << molecule.getID() << std::endl;
-      std::cout << "Force: " << molecule.getConstForce() << ", old: " << molecule.getConstForceOld() << std::endl;
-      std::cout << "Old position: " << oldPosition << std::endl;
-      exit(EXIT_FAILURE);
+      Kokkos::printf("simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule: Position "
+        "%u is out of range!\n", d);
+      Kokkos::printf("Force: %lf %lf %lf; "
+                     "Position: %lf %lf %lf; "
+                     "ID: %u;"
+                     "\n",
+                     molecule.getConstForce()[0], molecule.getConstForce()[1], molecule.getConstForce()[2],
+                     position[0], position[1], position[2],
+                     molecule.getID());
+      Kokkos::abort("ERROR Position out of range");
     }
     if (std::isnan(velocity[d]) || std::isinf(velocity[d])) {
-      std::cout << "ERROR simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule: Velocity ";
-      std::cout << d << " is NaN or Inf" << std::endl;
-      std::cout << velocity << std::endl;
-      std::cout << molecule.getConstForce() << ", " << molecule.getConstForceOld() << std::endl;
-      exit(EXIT_FAILURE);
+      Kokkos::abort("ERROR simplemd::moleculemappings::VelocityStoermerVerletMapping::handleMolecule: Velocity is NaN or Inf");
     }
   }
 #endif

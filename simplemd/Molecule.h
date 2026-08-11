@@ -36,27 +36,27 @@ public:
 
   /** get/set ID */
   KOKKOS_FUNCTION const unsigned int& getID() const { return _id; }
-  void setID(const unsigned int& id) { _id = id; }
+  KOKKOS_FUNCTION void setID(const unsigned int& id) { _id = id; }
 
   /** get/ set position */
   KOKKOS_FUNCTION tarch::la::Vector<MD_DIM, double>& getPosition() { return _position; }
   KOKKOS_FUNCTION const tarch::la::Vector<MD_DIM, double>& getConstPosition() const { return _position; }
-  void setPosition(const tarch::la::Vector<MD_DIM, double>& position) { _position = position; }
+  KOKKOS_FUNCTION void setPosition(const tarch::la::Vector<MD_DIM, double>& position) { _position = position; }
 
   /** get/ set velocity */
-  tarch::la::Vector<MD_DIM, double>& getVelocity() { return _velocity; }
+  KOKKOS_FUNCTION tarch::la::Vector<MD_DIM, double>& getVelocity() { return _velocity; }
   KOKKOS_FUNCTION const tarch::la::Vector<MD_DIM, double>& getConstVelocity() const { return _velocity; }
-  void setVelocity(const tarch::la::Vector<MD_DIM, double>& velocity) { _velocity = velocity; }
+  KOKKOS_FUNCTION void setVelocity(const tarch::la::Vector<MD_DIM, double>& velocity) { _velocity = velocity; }
 
   /** get/ set force */
   KOKKOS_FUNCTION tarch::la::Vector<MD_DIM, double>& getForce() { return _force; }
   KOKKOS_FUNCTION const tarch::la::Vector<MD_DIM, double>& getConstForce() const { return _force; }
-  void setForce(const tarch::la::Vector<MD_DIM, double>& force) { _force = force; }
+  KOKKOS_FUNCTION void setForce(const tarch::la::Vector<MD_DIM, double>& force) { _force = force; }
 
   /** get/ set force of last timestep */
-  tarch::la::Vector<MD_DIM, double>& getForceOld() { return _forceOld; }
-  const tarch::la::Vector<MD_DIM, double>& getConstForceOld() const { return _forceOld; }
-  void setForceOld(const tarch::la::Vector<MD_DIM, double>& force) { _forceOld = force; }
+  KOKKOS_FUNCTION tarch::la::Vector<MD_DIM, double>& getForceOld() { return _forceOld; }
+  KOKKOS_FUNCTION const tarch::la::Vector<MD_DIM, double>& getConstForceOld() const { return _forceOld; }
+  KOKKOS_FUNCTION void setForceOld(const tarch::la::Vector<MD_DIM, double>& force) { _forceOld = force; }
 
   KOKKOS_FUNCTION double& getPotentialEnergy() { return _potentialEnergy; }
   KOKKOS_FUNCTION const double& getConstPotentialEnergy() const { return _potentialEnergy; }
