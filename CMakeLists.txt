@@ -4,7 +4,7 @@ set(CMAKE_POLICY_DEFAULT_CMP0126 NEW) # can be removed when minimum version is s
 
 project(mamico VERSION 2.0 LANGUAGES CXX)
 
-set(MAMICO_CXX_STANDARD 17) # Required by Kokkos 5.0
+set(MAMICO_CXX_STANDARD 17)
 
 # Make our cmake modules visible to CMake
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
