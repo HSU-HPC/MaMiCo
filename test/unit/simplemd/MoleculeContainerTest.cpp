@@ -22,6 +22,7 @@ public:
     }
   }
   static const bool IsParallel = par;
+  static const bool IsReadonly = false;
 };
 
 template <bool par> class CellMolPosIncrMapping {
@@ -38,6 +39,7 @@ public:
     }
   }
   static const bool IsParallel = par;
+  static const bool IsReadonly = false;
 };
 
 template <bool par> class CellPairPosMaxMapping {
@@ -62,6 +64,7 @@ public:
     }
   }
   static const bool IsParallel = par;
+  static const bool IsReadonly = false;
 };
 
 class MoleculeContainerTest : public CppUnit::TestFixture {
