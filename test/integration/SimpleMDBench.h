@@ -129,7 +129,8 @@ private:
 
     _simulation = std::make_unique<BenchSim>(_simpleMDConfig);
     _simulation->initServices();
-    std::cout << "INFO SimpleMDBench: Initial Checksum is " << _simulation->getChecksum() << std::endl;
+    unsigned long long sum = _simulation->getChecksum();
+    std::cout << "INFO SimpleMDBench: Initial Checksum is " << sum << std::endl;
   }
 
   void shutdown() { _simulation->shutdownServices(); }
@@ -137,7 +138,8 @@ private:
   void bench() {
     // warm-up timestep, for more reliable benchmarking result
     _simulation->simulateOneTimestep(0);
-    std::cout << "INFO SimpleMDBench: Warmup Checksum is " << _simulation->getChecksum() << std::endl;
+    unsigned long long sum = _simulation->getChecksum();
+    std::cout << "INFO SimpleMDBench: Warmup Checksum is " << sum << std::endl;
 
     timeval start, end;
     gettimeofday(&start, NULL);

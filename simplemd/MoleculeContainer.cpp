@@ -199,7 +199,6 @@ void simplemd::MoleculeContainer::sort() {
               }
               printNonGhostCells(j == 0, "device end sorf");
             });          // j, Kokkos::parallel_for
-        Kokkos::fence(); // Ensure results are available on the host
         printNonGhostCells(true, "host end sort");
       } // x
 #if (MD_DIM > 1)
@@ -399,7 +398,6 @@ void simplemd::MoleculeContainer::printNonGhostCells(bool shouldPrintCells, cons
 }
 
 size_t simplemd::MoleculeContainer::getLocalNumberOfMoleculesWithGhost() {
-  Kokkos::fence(); // Ensure molecule count per cell is up to date
   synchronizeMemory(HostOperation{});
   size_t moleculeCount = 0;
   for (unsigned int i = 0; i < _linkedCellNumMolecules_h.size(); i++) {

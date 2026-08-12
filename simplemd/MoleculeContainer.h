@@ -2,12 +2,15 @@
 #define _MOLECULARDYNAMICS_MOLECULARCONTAINER_H_
 
 #include <Kokkos_Core.hpp>
+#include <typeinfo>
 
 #include <simplemd/MolecularDynamicsDefinitions.h>
 #include <simplemd/Molecule.h>
 #include <simplemd/LinkedCell.h>
 #include <simplemd/services/ParallelTopologyService.h>
 #include <simplemd/services/MolecularPropertiesService.h>
+
+#define MEMSYNC_DEBUG
 
 namespace simplemd {
 namespace services {
@@ -423,7 +426,6 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesParallel(A&
         }
         printNonGhostCells(i == 0, "device end iterateMoleculesParallel");
       });
-  Kokkos::fence(); // Ensure results are available on the host
   printNonGhostCells(true, "host end iterateMoleculesParallel");
   a.endMoleculeIteration();
 #endif
@@ -476,7 +478,6 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellPar
         handleCellNeighbors(a, m, cell);
     }
   });
-  Kokkos::fence(); // Ensure results are available on the host
   
   a.endMoleculeIteration();
 
@@ -716,7 +717,6 @@ void simplemd::MoleculeContainer::iterateCellsParallel(A& a, const tarch::la::Ve
         a.handleCell(cell);
         printNonGhostCells(i == 0, "device end iterateCellsParallel");
       });          // Kokkos::parallel_for
-  Kokkos::fence(); // Ensure results are available on the host
   printNonGhostCells(true, "host end iterateCellsParallel");
   // end iteration();
   a.endCellIteration();
@@ -876,7 +876,6 @@ void simplemd::MoleculeContainer::iterateCellPairsParallel(A& a, const tarch::la
               }
               printNonGhostCells(j == 0, "device end iterateCellPairsParallel");
             });          // j, Kokkos::parallel_for
-        Kokkos::fence(); // Ensure results are available on the host
         printNonGhostCells(true, "host end iterateCellPairsParallel");
       } // x
 #if (MD_DIM > 1)
@@ -938,8 +937,12 @@ void simplemd::MoleculeContainer::synchronizeMemory(const A& a){
     if constexpr (A::IsParallel) 
       return;
     // Serial mapping to be executed here, in host behind state ==> D->H memory transfer required!
+    Kokkos::fence();
     Kokkos::deep_copy(_moleculeData_h, _moleculeData_d);
     Kokkos::deep_copy(_linkedCellNumMolecules_h, _linkedCellNumMolecules_d);
+#ifdef MEMSYNC_DEBUG
+    std::cout << "D->H memory transfer caused by " << typeid(A).name() << std::endl;
+#endif
     _memoryState = MemoryState::SYNCED;
     if constexpr (A::IsReadonly) 
       return;
@@ -950,6 +953,9 @@ void simplemd::MoleculeContainer::synchronizeMemory(const A& a){
     // Parallel mapping to be executed here, device behind  ==> H->D memory transfer required!
     Kokkos::deep_copy(_moleculeData_d, _moleculeData_h);
     Kokkos::deep_copy(_linkedCellNumMolecules_d, _linkedCellNumMolecules_h);
+#ifdef MEMSYNC_DEBUG
+    std::cout << "H->D memory transfer caused by " << typeid(A).name() << std::endl;
+#endif
     _memoryState = MemoryState::SYNCED;
     if constexpr (A::IsReadonly) 
       return;
