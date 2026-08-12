@@ -100,6 +100,22 @@ message(STATUS ">> Build with PINT_DEBUG : " ${BUILD_WITH_PINT_DEBUG})
 option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
 message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
 
+# Profiling
+if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" OR (CMAKE_BUILD_TYPE MATCHES "^Debug"))
+  # Support source code view in ncu-ui
+  add_compile_options(
+    $<$<COMPILE_LANGUAGE:CUDA>:-lineinfo>
+  )
+endif()
+
+# Force -O3 optimization in RelWithDebInfo builds
+# (Avoids multiple optimization levels in the compiler flags)
+if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+  string(REPLACE "-O2" "-O3"
+         CMAKE_CXX_FLAGS_RELWITHDEBINFO
+         "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+endif()
+
 #
 # Find dependencies
 #
@@ -146,10 +162,6 @@ else()
     # Debugging
     if(CMAKE_BUILD_TYPE MATCHES "^Debug" AND (NOT CMAKE_BUILD_TYPE STREQUAL "DebugOptimized"))
       set(KOKKOS_DEBUG "ON")
-      # Support source code view in ncu-ui
-      add_compile_options(
-        $<$<COMPILE_LANGUAGE:CUDA>:-lineinfo>
-      )
     else()
       set(KOKKOS_DEBUG "OFF")
     endif()
@@ -309,7 +321,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
     target_compile_options(simplemd_interface INTERFACE --fmad=false)
   endif()
 elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-  target_compile_options(simplemd_interface INTERFACE -O3 -g3)
+  target_compile_options(simplemd_interface INTERFACE -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   if(KOKKOS_TARGET STREQUAL "CUDA")
     target_compile_options(simplemd_interface INTERFACE -O3)
@@ -526,7 +538,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
   target_compile_definitions(mamico INTERFACE MDCoupledError)
   target_compile_options(mamico INTERFACE -O3 -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-  target_compile_options(mamico INTERFACE -O3 -g3)
+  target_compile_options(mamico INTERFACE -g3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   if(KOKKOS_TARGET STREQUAL "CUDA")
     target_compile_options(mamico INTERFACE -O3)

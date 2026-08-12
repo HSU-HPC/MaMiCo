@@ -18,7 +18,7 @@ public:
   void beginMoleculeIteration() const {}
   KOKKOS_FUNCTION void handleMolecule(simplemd::Molecule& molecule) const {
     constexpr double maxF = 1e6;
-    constexpr double stepF = (double)(std::numeric_limits<long long>::max()) / maxF;
+    constexpr double stepF = static_cast<double>(LLONG_MAX)/ maxF;
     constexpr double minF = 1 / stepF;
 
     tarch::la::Vector<MD_DIM, double>& force = molecule.getForce();

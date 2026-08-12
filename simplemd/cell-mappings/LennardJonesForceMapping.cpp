@@ -139,7 +139,7 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
 #if (TARCH_DEBUG == TARCH_YES)
     tarch::la::Vector<MD_DIM, double> res{24.0 * _epsilon / rij2 * (_sigma6 / rij6) * (1.0 - 2.0 * (_sigma6 / rij6)) * rij};
     constexpr double maxF = 1e6;
-    constexpr double stepF = (double)(std::numeric_limits<long long>::max()) / maxF;
+    constexpr double stepF = static_cast<double>(LLONG_MAX) / maxF;
     res = stepF * res;
     long long fb0{(long long)(res[0])};
     long long fb1{(long long)(res[1])};
