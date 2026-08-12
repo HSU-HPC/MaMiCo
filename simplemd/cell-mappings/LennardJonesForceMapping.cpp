@@ -134,7 +134,7 @@ simplemd::cellmappings::LennardJonesForceMapping::getLennardJonesForce(const tar
   const tarch::la::Vector<MD_DIM, double> rij(position2 - position1);
   const double rij2 = tarch::la::dot(rij, rij);
 
-  if (rij2 <= _cutOffRadiusSquared && rij2>0) {
+  if (rij2 <= _cutOffRadiusSquared && rij2 > 0) {
     const double rij6 = rij2 * rij2 * rij2;
 #if (TARCH_DEBUG == TARCH_YES)
     tarch::la::Vector<MD_DIM, double> res{24.0 * _epsilon / rij2 * (_sigma6 / rij6) * (1.0 - 2.0 * (_sigma6 / rij6)) * rij};

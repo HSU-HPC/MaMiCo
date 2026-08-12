@@ -229,8 +229,7 @@ public:
   /**
    * @brief applies molecule-with-cell mapping to all neighbors of cell
    */
-  template <class A>
-  KOKKOS_FUNCTION void handleCellNeighbors(A& a, Molecule& m, const LinkedCell& cell) const;
+  template <class A> KOKKOS_FUNCTION void handleCellNeighbors(A& a, Molecule& m, const LinkedCell& cell) const;
 
   /**
    * @brief applies molecule-with-cell mapping without any node-level parallelisation
@@ -413,11 +412,11 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCell(A&
 }
 
 template <class A> void simplemd::MoleculeContainer::handleCellNeighbors(A& a, Molecule& m, const LinkedCell& cell) const {
-    unsigned int index = cell.getIndex();
-    for (unsigned int i = 0; i < 26; i++) {
-      auto cell2 = (*this)[index + _neighborOffsets(i)];
-      a.handleMolecule(m, cell2);
-    }
+  unsigned int index = cell.getIndex();
+  for (unsigned int i = 0; i < 26; i++) {
+    auto cell2 = (*this)[index + _neighborOffsets(i)];
+    a.handleMolecule(m, cell2);
+  }
 }
 
 template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellSerial(A& a) {
@@ -440,20 +439,18 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellPar
   Kokkos::parallel_for(
       "simplemd::MoleculeContainer::iterateMoleculesWithCellParallel", Kokkos::RangePolicy<MainExecSpace>(0, length),
       KOKKOS_CLASS_LAMBDA(const unsigned int i) {
+        const unsigned int cellIndex = i / threads_per_cell;
+        simplemd::LinkedCell cell = (*this)[cellIndex];
 
-    const unsigned int cellIndex = i / threads_per_cell;
-    simplemd::LinkedCell cell = (*this)[cellIndex];
-
-    for (unsigned int j = i % threads_per_cell; j < _linkedCellNumMolecules(cellIndex); j+=threads_per_cell) {
-        Molecule& m = getMoleculeAt(cellIndex, j);
-        a.handleMolecule(m,cell);
-        handleCellNeighbors(a, m, cell);
-    }
-  });
+        for (unsigned int j = i % threads_per_cell; j < _linkedCellNumMolecules(cellIndex); j += threads_per_cell) {
+          Molecule& m = getMoleculeAt(cellIndex, j);
+          a.handleMolecule(m, cell);
+          handleCellNeighbors(a, m, cell);
+        }
+      });
   Kokkos::fence(); // Ensure results are available on the host
-  
-  a.endMoleculeIteration();
 
+  a.endMoleculeIteration();
 }
 
 template <class A>

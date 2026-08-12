@@ -534,9 +534,9 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
     _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
     // compute forces between molecules.
 #if defined(KOKKOS_TARGET_CUDA)
-      _moleculeService->getContainer().iterateMoleculesWithCell(*_lennardJonesForce);
+    _moleculeService->getContainer().iterateMoleculesWithCell(*_lennardJonesForce);
 #else
-      _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
+    _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
 #endif
 #if (TARCH_DEBUG == TARCH_YES)
     _moleculeService->getContainer().iterateMolecules(_convertForcesFixedToFloatMapping);

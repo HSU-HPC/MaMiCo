@@ -81,9 +81,7 @@ public:
   /** For Parareal algorithm, it must be possible to substract states. This is expected to operate element-wise */
   virtual std::unique_ptr<State> operator-(const State&) = 0;
 
-  friend bool operator==(const State& lhs, const State& rhs) {
-    return lhs.__equals__(rhs);
-  }
+  friend bool operator==(const State& lhs, const State& rhs) { return lhs.__equals__(rhs); }
 
   /** For MPI communication, raw pointer of the underlying data is needed */
   virtual double* getData() = 0;
@@ -98,6 +96,7 @@ public:
     s.print(os);
     return os;
   }
+
 protected:
   /** For tests, it must be possible to compare states. This is expected to operate element-wise */
   virtual bool __equals__(const State&) const = 0;

@@ -48,6 +48,7 @@ private:
   const double _sigma6;
   /** cutOffRadius*cutOffRadius */
   const double _cutOffRadiusSquared;
+
 protected:
   /** external forces*/
   tarch::la::Vector<MD_DIM, double> _externalForce;
