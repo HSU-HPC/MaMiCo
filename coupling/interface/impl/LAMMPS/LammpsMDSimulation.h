@@ -116,6 +116,7 @@ public:
 
 private:
   void initSingleSimulation(MPI_Comm comm, unsigned int localMDSimulation) {
+    tarch::utils::RandomNumberService::getInstance().init(_configuration.getSimulationConfiguration().fixSeed());
     int rank;
     MPI_Comm_rank(comm, &rank);
     std::stringstream ss;
