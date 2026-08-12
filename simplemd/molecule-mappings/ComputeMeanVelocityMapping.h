@@ -52,7 +52,7 @@ public:
 
 private:
   static constexpr double maxV = 1e3;
-  static constexpr double stepV = (double)(std::numeric_limits<long long>::max()) / maxV;
+  static constexpr double stepV = static_cast<double>(LLONG_MAX) / maxV;
   static constexpr double minV = 1 / stepV;
   tarch::la::Vector<MD_DIM, long long> _meanVelocity;
   long long _particleCounter;
