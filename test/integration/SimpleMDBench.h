@@ -160,6 +160,7 @@ private:
     for (unsigned int t = 1; t < _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps() + 1; t++) {
       _simulation->simulateOneTimestep(t);
     }
+    Kokkos::fence();
     gettimeofday(&end, NULL);
     double runtime = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);
     std::cout << "Runtime: " << (int)(runtime / 1000) << "ms" << std::endl;
