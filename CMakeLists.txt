@@ -214,6 +214,7 @@ if("${MD_SIM}" STREQUAL "LS1_MARDYN")
   set(ENABLE_ADIOS2 ${BUILD_WITH_ADIOS2}) # ls1 will fetch adios2, it will be available for mamico
   set(ENABLE_MPI ${BUILD_WITH_MPI})
   set(ADIOS2_HAVE_MPI ${BUILD_WITH_MPI})
+  set(ENABLE_ALLLBL OFF) # ls1 will not use ALL, mamico will use it if need be
   set(MAMICO_COUPLING ON)
   set(MAMICO_SRC_DIR ../..)
   if(${KOKKOS_TARGET} STREQUAL "OPENMP")
