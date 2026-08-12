@@ -48,7 +48,9 @@ public:
 
   /** getters for all parsed and computed quantities */
   const tarch::la::Vector<MD_DIM, unsigned int>& getMoleculesPerDirection() const { return _moleculesPerDirection; }
+  tarch::la::Vector<MD_DIM, unsigned int>& getMoleculesPerDirectionNonConst() { return _moleculesPerDirection; }
   const tarch::la::Vector<MD_DIM, double>& getGlobalDomainSize() const { return _domainSize; }
+  tarch::la::Vector<MD_DIM, double>& getGlobalDomainSizeNonConst() { return _domainSize; }
   const tarch::la::Vector<MD_DIM, double>& getGlobalDomainOffset() const { return _domainOffset; }
   const double& getCutoffRadius() const { return _cutoffRadius; }
   const tarch::la::Vector<MD_DIM, double>& getMeshWidth() const { return _meshWidth; }

@@ -11,6 +11,8 @@
 #include <iostream>
 #include <sys/time.h>
 
+enum class SimpleMDBenchSize { MD60, MD120, MD240 };
+
 class BenchSim : public simplemd::MolecularDynamicsSimulation {
 public:
   BenchSim(const simplemd::configurations::MolecularDynamicsConfiguration& configuration) : simplemd::MolecularDynamicsSimulation(configuration) {}
@@ -48,7 +50,8 @@ public:
 
 class SimpleMDBench : public Test {
 public:
-  SimpleMDBench() : Test("SimpleMDBench") {}
+  SimpleMDBench(SimpleMDBenchSize benchsize) :
+    Test("SimpleMDBench"), _MDSize(benchsize) {}
   virtual ~SimpleMDBench() {}
 
   virtual void run() {
@@ -126,6 +129,17 @@ private:
       std::cout << "ERROR SimpleMDBench: Invalid SimpleMD config!" << std::endl;
       exit(EXIT_FAILURE);
     }
+    if(_MDSize == SimpleMDBenchSize::MD120){
+      _simpleMDConfig.getDomainConfigurationNonConst().getMoleculesPerDirectionNonConst()
+        = tarch::la::Vector<3, unsigned int>{112,112,112};
+      _simpleMDConfig.getDomainConfigurationNonConst().getGlobalDomainSizeNonConst()
+        = tarch::la::Vector<3, double>{120,120,120};
+    } else if(_MDSize == SimpleMDBenchSize::MD240){
+      _simpleMDConfig.getDomainConfigurationNonConst().getMoleculesPerDirectionNonConst()
+        = tarch::la::Vector<3, unsigned int>{224,224,224};
+      _simpleMDConfig.getDomainConfigurationNonConst().getGlobalDomainSizeNonConst()
+        = tarch::la::Vector<3, double>{240,240,240};
+    }
 
     _simulation = std::make_unique<BenchSim>(_simpleMDConfig);
     _simulation->initServices();
@@ -174,7 +188,10 @@ private:
 
     unsigned long long sum = _simulation->getChecksum();
     std::cout << "INFO SimpleMDBench: Final XOR Checksum is " << sum << std::endl;
-    unsigned long long correct = 9224833479527670225u;
+    unsigned long long correct;
+    if(_MDSize == SimpleMDBenchSize::MD60)  correct = 9224833479527670225u;
+    if(_MDSize == SimpleMDBenchSize::MD120) correct = 18377339084083654394u;
+    if(_MDSize == SimpleMDBenchSize::MD240) correct = 18342705775936782749u;
     if (sum == correct)
       std::cout << "INFO SimpleMDBench: SUCCESS Checksum is correct :-)" << std::endl;
     else {
@@ -189,4 +206,5 @@ private:
   int _rank;
   simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
   std::unique_ptr<BenchSim> _simulation;
+  SimpleMDBenchSize _MDSize;
 };

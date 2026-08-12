@@ -30,10 +30,21 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Available concurrency: " << mainExecSpace.concurrency() << std::endl;
 
+    SimpleMDBenchSize benchsize;
     // run tests
-    runTest(new CellIdxIterBench());
-    std::cout << std::endl << "==================== ==================== ====================" << std::endl << std::endl;
-    runTest(new SimpleMDBench());
+    if(argc == 1){
+      runTest(new CellIdxIterBench());
+      std::cout << std::endl << "==================== ==================== ====================" << std::endl << std::endl;
+      benchsize = SimpleMDBenchSize::MD60;
+    } else if(argc == 2 && !strcmp(argv[1],"MD60")) benchsize = SimpleMDBenchSize::MD60;
+      else if(argc == 2 && !strcmp(argv[1],"MD120")) benchsize = SimpleMDBenchSize::MD120;
+      else if(argc == 2 && !strcmp(argv[1],"MD240")) benchsize = SimpleMDBenchSize::MD240;
+    else {
+      std::cout << "ERROR unknown parameter" << std::endl;
+      Kokkos::finalize();
+      exit(EXIT_FAILURE);
+    }
+    runTest(new SimpleMDBench(benchsize));
   }
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Finalize();
