@@ -47,6 +47,10 @@
       {
         "value": "ls1",
         "label": "ls1 mardyn"
+      },
+      {
+        "value": "lammps-md",
+        "label": "lammps MD"
       }
     ]
   },

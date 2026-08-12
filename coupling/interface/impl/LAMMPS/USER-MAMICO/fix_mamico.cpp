@@ -4,8 +4,7 @@
 // www5.in.tum.de/mamico
 #include "fix_mamico.h"
 
-LAMMPS_NS::FixMamico::FixMamico(LAMMPS* lmp, int argc, char** argv)
-    : Fix(lmp, argc, argv), _lmp(lmp), _use2D(lmp->domain->dimension == 2), _timestepCounter(0) {
+LAMMPS_NS::FixMamico::FixMamico(LAMMPS* lmp, int argc, char** argv) : Fix(lmp, argc, argv), _lmp(lmp), _use2D(false), _timestepCounter(0) {
   if (argc != 6) {
     error->all(FLERR, "Specify the mamico fix as 'fix id group-id mamico maxCells seed "
                       "cutoffRadius' where maxCells is the maximum process-local number of "
@@ -22,10 +21,7 @@ LAMMPS_NS::FixMamico::FixMamico(LAMMPS* lmp, int argc, char** argv)
 
   // access MaMiCo via InterfaceProvider
   if (_use2D) {
-    MamicoLammpsMDSolverInterface<2>* mdSolverInterface2D = new MamicoLammpsMDSolverInterface<2>(_lmp, seed, maxCells, cutoffRadius);
-    if (mdSolverInterface2D == NULL)
-      error->all(FLERR, "FixMamico: mdSolverInterface2D==NULL!");
-    coupling::interface::MamicoInterfaceProvider<MamicoCell, 2>::getInstance().setMDSolverInterface(mdSolverInterface2D);
+    error->all(FLERR, "2D not supported!");
   } else {
     MamicoLammpsMDSolverInterface<3>* mdSolverInterface3D = new MamicoLammpsMDSolverInterface<3>(_lmp, seed, maxCells, cutoffRadius);
     if (mdSolverInterface3D == NULL)
@@ -37,11 +33,7 @@ LAMMPS_NS::FixMamico::FixMamico(LAMMPS* lmp, int argc, char** argv)
 LAMMPS_NS::FixMamico::~FixMamico() {
   // destroy interface
   if (_use2D) {
-    coupling::interface::MDSolverInterface<MamicoCell, 2>* interface =
-        coupling::interface::MamicoInterfaceProvider<MamicoCell, 2>::getInstance().getMDSolverInterface();
-    if (interface != NULL)
-      delete interface;
-    coupling::interface::MamicoInterfaceProvider<MamicoCell, 2>::getInstance().setMDSolverInterface(NULL);
+    error->all(FLERR, "2D not supported!");
   } else {
     coupling::interface::MDSolverInterface<MamicoCell, 3>* interface =
         coupling::interface::MamicoInterfaceProvider<MamicoCell, 3>::getInstance().getMDSolverInterface();
@@ -57,7 +49,7 @@ void LAMMPS_NS::FixMamico::pre_force(int vflag) {
 #endif
   // branching for 2D/3D
   if (_use2D) {
-    modifyMDSystem<2>();
+    error->all(FLERR, "2D not supported!");
   } else {
     modifyMDSystem<3>();
   }
@@ -72,7 +64,7 @@ void LAMMPS_NS::FixMamico::post_force(int vflag) {
 #endif
   // branching 2D/3D
   if (_use2D) {
-    modifyMomentumAndTemperature<2>();
+    error->all(FLERR, "2D not supported!");
   } else {
     modifyMomentumAndTemperature<3>();
   }

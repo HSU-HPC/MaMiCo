@@ -88,7 +88,7 @@ private:
 
     std::cout << "macro cell index: " << macroCellIndex << std::endl;
 
-    MarDynCell& mc = mdsi->getLinkedCell(macroCellIndex, linkedCellInCouplingCell, linkedCellsPerCouplingCell, macroCellService->getIndexConversion());
+    MarDynCell& mc = mdsi->getLinkedCell(macroCellIndex, linkedCellInCouplingCell, linkedCellsPerCouplingCell);
 
     mdsi->deleteMoleculeFromMDSimulation(testMolecule, mc);
     std::cout << "molecule count in cell after: " << mc.getParticleCell()->getParticlePointers().size() << std::endl;

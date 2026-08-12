@@ -22,7 +22,7 @@ template <unsigned int dim, IndexTrait... traits> unsigned int convertToScalar(c
   if constexpr (std::is_same_v<unsigned int, typename CellIndex<dim, traits...>::value_T>) {
     return index.get();
   } else {
-    // copied from deprecated coupling::IndexConversion::getCellIndex())
+    // copied from deprecated coupling::IndexConversion::getCellIndex() (git tag: legacyIndexing)
 
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
     if (!IndexingService<dim>::getInstance().isInitialized()) {

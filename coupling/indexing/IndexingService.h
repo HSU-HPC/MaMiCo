@@ -147,7 +147,7 @@ public:
 
   /**
    * Determines all ranks that contain a certain global BaseIndex.
-   * Ripped from deprecated IndexConversion.
+   * Ripped from deprecated IndexConversion (git tag: legacyIndexing).
    *
    * @param globalCellIndex index to be looked up
    * @param globalNumberCouplingCells global number of cells in BaseIndex

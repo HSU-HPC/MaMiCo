@@ -526,7 +526,7 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
 }
 
 /*
- * This was in large parts stolen from IndexConversion.
+ * This was in large parts stolen from IndexConversion (git tag: legacyIndexing).
  */
 template <unsigned int dim>
 std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex,
@@ -540,7 +540,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 
   std::vector<unsigned int> ranks;
   // using the old meaning of 'globalNumberCouplingCells' from
-  // IndexConversion
+  // IndexConversion (git tag: legacyIndexing)
   const auto globalNumberCouplingCells = I08::numberCellsInDomain;
 
   // start and end coordinates of neighbouring cells.
@@ -596,7 +596,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 }
 
 /*
- * This was in large parts stolen from IndexConversion.
+ * This was in large parts stolen from IndexConversion (git tag: legacyIndexing).
  * Note that this uses the globalNumberCouplingCells definition excl. the
  * ghost layer.
  */

@@ -23,7 +23,7 @@ template <unsigned int dim> class DataExchangeFromMD2Macro;
  *the macroscopic solver interface: the macroscopic solver interface thus needs
  *to know on which ranks information from the MD simulation are required as
  *input. The source ranks arise from the unique rank determination within the
- *IndexConversion. We only allow transfer of non-ghost coupling cells to the
+ *indexing system. We only allow transfer of non-ghost coupling cells to the
  *macroscopic solver, i.e. cells which are completely embedded into the MD
  *domain.
  *	@brief data exchange from the MD solver to the macroscopic solver.
@@ -53,7 +53,7 @@ public:
   /** returns the ranks to which a particular cell (at index idx)
    *should be sent.
    * 	@param  idx
-   *	@return the corresponding ranks via IndexConversion, if we need
+   *	@return the corresponding ranks via the indexing system, if we need
    *information on MD side, otherwise empty vector
    */
   std::vector<unsigned int> getTargetRanks(I01 idx) override {

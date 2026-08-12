@@ -36,9 +36,6 @@ public:
       std::cout << "ERROR TestLammpsGhost: could not cast MD Solver interface!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    const coupling::IndexConversion<dim>& indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
-
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     int size;
@@ -50,9 +47,9 @@ public:
       MPI_Barrier(MPI_COMM_WORLD);
       if (rank == i) {
         std::cout << "Print molecules in inner cells:" << std::endl;
-        mdSolverInterface->printMolecules(indexConversion, LAMMPS_NS::Sorting<dim>::PRINT_INNER_CELLS);
+        mdSolverInterface->printMolecules(LAMMPS_NS::Sorting<dim>::PRINT_INNER_CELLS);
         std::cout << "Print molecules in ghost cells: " << std::endl;
-        mdSolverInterface->printMolecules(indexConversion, LAMMPS_NS::Sorting<dim>::PRINT_GHOST_CELLS);
+        mdSolverInterface->printMolecules(LAMMPS_NS::Sorting<dim>::PRINT_GHOST_CELLS);
       }
       MPI_Barrier(MPI_COMM_WORLD);
     }

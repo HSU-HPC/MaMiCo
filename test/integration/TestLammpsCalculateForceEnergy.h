@@ -44,9 +44,6 @@ public:
       std::cout << "ERROR TestLammpsGhost: could not cast MD Solver interface!" << std::endl;
       exit(EXIT_FAILURE);
     }
-    const coupling::IndexConversion<dim>& indexConversion =
-        coupling::interface::MamicoInterfaceProvider<LAMMPS_NS::MamicoCell, dim>::getInstance().getCouplingCellService()->getIndexConversion();
-
     // compute LJ parameters (copy-paste from calculateForceAndEnergy)
     const double sigma6 = pow(mdSolverInterface->getMoleculeSigma(), 6.0);
     const double epsilon = mdSolverInterface->getMoleculeEpsilon();
@@ -64,7 +61,7 @@ public:
     const tarch::la::Vector<dim, double> forceRef(0.0);
 
     // compute force/energy onto this molecule -> only do this on rank 0, since this is the rank containing the cell with the molecule at 3.0x3.0x3.0
-    if (indexConversion.getThisRank() == 0) {
+    if (IDXS.getRank() == 0) {
       mdSolverInterface->calculateForceAndEnergy(molecule);
 
       tarch::la::Vector<dim, double> force = molecule.getForce();
@@ -89,7 +86,7 @@ public:
     mdSolverInterface->synchronizeMoleculesAfterMassModification();
 
     // search for this molecule and try to extract potential energy from it; this energy should again return the same value
-    if (indexConversion.getThisRank() == 0) {
+    if (IDXS.getRank() == 0) {
       std::cout << "Molecule synchronised; do next test..." << std::endl;
       const int nlocal = lammps->atom->nlocal;
       int n = -1;

@@ -18,7 +18,6 @@ typedef Molecule MardynMolecule;
 
 // MaMiCo
 #include "coupling/CouplingMDDefinitions.h"
-#include "coupling/IndexConversion.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/impl/MarDyn/MarDynCell.h"
 #include "coupling/interface/impl/MarDyn/MarDynCoupledSimulation.h"
@@ -73,7 +72,7 @@ public:
    */
   virtual MarDynCell& getLinkedCell(const tarch::la::Vector<3, unsigned int>& couplingCellIndex,
                                     const tarch::la::Vector<3, unsigned int>& linkedCellInCouplingCell,
-                                    const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell, const coupling::IndexConversion<3>& indexConversion) {
+                                    const tarch::la::Vector<3, unsigned int>& linkedCellsPerCouplingCell) {
     // no linked cells found in outer region
     for (unsigned int d = 0; d < 3; d++) {
       if (couplingCellIndex[d] == 0) {
@@ -89,7 +88,7 @@ public:
       LinkedCellsForCoupling* cells = (LinkedCellsForCoupling*)_mySimulation->getMolecules();
 
       // size of the coupling cells
-      tarch::la::Vector<3, double> macroCellSize = indexConversion.getCouplingCellSize();
+      tarch::la::Vector<3, double> macroCellSize = IDXS.getCouplingCellSize();
       // size of the md cells
       double* mdCellsize = cells->cellLength();
       // the requested 3D cell index vector
