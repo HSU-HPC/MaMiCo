@@ -22,8 +22,9 @@ var searchData=
   ['boundaryforcetype_19',['BoundaryForceType',['../classcoupling_1_1configurations_1_1BoundaryForceConfiguration.html#a86965f71f03c562a1912e0509e8038be',1,'coupling::configurations::BoundaryForceConfiguration']]],
   ['buffercollective_20',['BufferCollective',['../structcoupling_1_1sendrecv_1_1SendReceiveBuffer_1_1BufferCollective.html',1,'coupling::sendrecv::SendReceiveBuffer']]],
   ['bufferwithid_21',['BufferWithID',['../structcoupling_1_1sendrecv_1_1SendReceiveBuffer_1_1BufferWithID.html',1,'coupling::sendrecv::SendReceiveBuffer']]],
-  ['build_20instructions_22',['Build instructions',['../index.html#autotoc_md2',1,'']]],
-  ['build_20with_20lammps_23',['Additional instructions to build with LAMMPS',['../index.html#autotoc_md5',1,'']]],
-  ['build_20with_20ls1_24',['Additional instructions to build with ls1',['../index.html#autotoc_md4',1,'']]],
-  ['building_20with_20gpu_20support_25',['Building with GPU support',['../index.html#autotoc_md3',1,'']]]
+  ['build_20couette_20scenario_22',['Build Couette Scenario',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md15',1,'']]],
+  ['build_20instructions_23',['Build instructions',['../index.html#autotoc_md2',1,'']]],
+  ['build_20with_20lammps_24',['Additional instructions to build with LAMMPS',['../index.html#autotoc_md5',1,'']]],
+  ['build_20with_20ls1_25',['Additional instructions to build with ls1',['../index.html#autotoc_md4',1,'']]],
+  ['building_20with_20gpu_20support_26',['Building with GPU support',['../index.html#autotoc_md3',1,'']]]
 ];

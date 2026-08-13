@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classcoupling_1_1interface_1_1PintableMacroSolverState-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">coupling::interface::PintableMacroSolverState Class Reference<span class="mlabels"><span class="mlabel abstract">abstract</span></span></div></div>
@@ -135,19 +136,52 @@ virtual std::unique_ptr&lt; State &gt;&#160;</td><td class="memItemRight"><b>clo
 <tr class="memitem:a2c63aeb268e18c95578679042fdc5352" id="r_a2c63aeb268e18c95578679042fdc5352"><td class="memItemLeft">virtual int&#160;</td><td class="memItemRight"><a class="el" href="#a2c63aeb268e18c95578679042fdc5352">getSizeBytes</a> () const =0</td></tr>
 <tr class="memitem:afa8ad1b3b0fe471f2ff9245911917547" id="r_afa8ad1b3b0fe471f2ff9245911917547"><td class="memItemLeft">virtual std::unique_ptr&lt; State &gt;&#160;</td><td class="memItemRight"><a class="el" href="#afa8ad1b3b0fe471f2ff9245911917547">operator+</a> (const State &amp;)=0</td></tr>
 <tr class="memitem:a2660a138d3d869d3d659c5787abe75e3" id="r_a2660a138d3d869d3d659c5787abe75e3"><td class="memItemLeft">virtual std::unique_ptr&lt; State &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a2660a138d3d869d3d659c5787abe75e3">operator-</a> (const State &amp;)=0</td></tr>
-<tr class="memitem:a9290bed2ead4bd6ab3e14b9c4e995a29" id="r_a9290bed2ead4bd6ab3e14b9c4e995a29"><td class="memItemLeft">virtual bool&#160;</td><td class="memItemRight"><a class="el" href="#a9290bed2ead4bd6ab3e14b9c4e995a29">operator==</a> (const State &amp;) const =0</td></tr>
 <tr class="memitem:a1f7fd39640090775e13d782a7b7c5869" id="r_a1f7fd39640090775e13d782a7b7c5869"><td class="memItemLeft">virtual double *&#160;</td><td class="memItemRight"><a class="el" href="#a1f7fd39640090775e13d782a7b7c5869">getData</a> ()=0</td></tr>
 <tr class="memitem:ad136d17f81dba63fb5afaec35df9d10b" id="r_ad136d17f81dba63fb5afaec35df9d10b"><td class="memItemLeft">virtual const double *&#160;</td><td class="memItemRight"><a class="el" href="#ad136d17f81dba63fb5afaec35df9d10b">getData</a> () const =0</td></tr>
 <tr class="memitem:a94e2ac461b47db0fa8de408b3c3d504a" id="r_a94e2ac461b47db0fa8de408b3c3d504a"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a94e2ac461b47db0fa8de408b3c3d504a">print</a> (std::ostream &amp;os) const =0</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pro-methods" class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:aa74210ddcfa6dbdccaefe0f1a7e47b50" id="r_aa74210ddcfa6dbdccaefe0f1a7e47b50"><td class="memItemLeft">virtual bool&#160;</td><td class="memItemRight"><a class="el" href="#aa74210ddcfa6dbdccaefe0f1a7e47b50">__equals__</a> (const State &amp;) const =0</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
+<tr class="memitem:abafb1748b72f1daa42632d1060b900d0" id="r_abafb1748b72f1daa42632d1060b900d0"><td class="memItemLeft"><a id="abafb1748b72f1daa42632d1060b900d0" name="abafb1748b72f1daa42632d1060b900d0"></a>
+bool&#160;</td><td class="memItemRight"><b>operator==</b> (const State &amp;lhs, const State &amp;rhs)</td></tr>
 <tr class="memitem:a3a388c78e6628466ac935d9c6506afe0" id="r_a3a388c78e6628466ac935d9c6506afe0"><td class="memItemLeft"><a id="a3a388c78e6628466ac935d9c6506afe0" name="a3a388c78e6628466ac935d9c6506afe0"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight"><b>operator&lt;&lt;</b> (std::ostream &amp;os, const <a class="el" href="classcoupling_1_1interface_1_1PintableMacroSolverState.html">coupling::interface::PintableMacroSolverState</a> &amp;s)</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Interface for state instances </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
+<a id="aa74210ddcfa6dbdccaefe0f1a7e47b50" name="aa74210ddcfa6dbdccaefe0f1a7e47b50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa74210ddcfa6dbdccaefe0f1a7e47b50">&#9670;&#160;</a></span>__equals__()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool coupling::interface::PintableMacroSolverState::__equals__ </td>
+          <td>(</td>
+          <td class="paramtype">const State &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel protected">protected</span><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>For tests, it must be possible to compare states. This is expected to operate element-wise </p>
+
+<p>Implemented in <a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolverState.html#a5504929d7e7f4285f094ec0dd4a5e65e">coupling::solvers::LBCouetteSolverState</a>.</p>
+
+</div>
+</div>
 <a id="ad136d17f81dba63fb5afaec35df9d10b" name="ad136d17f81dba63fb5afaec35df9d10b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad136d17f81dba63fb5afaec35df9d10b">&#9670;&#160;</a></span>getData() <span class="overload">[1/2]</span></h2>
 
@@ -285,34 +319,6 @@ std::ostream &amp;&#160;</td><td class="memItemRight"><b>operator&lt;&lt;</b> (s
 <p>For Parareal algorithm, it must be possible to substract states. This is expected to operate element-wise </p>
 
 <p>Implemented in <a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolverState.html#ab740e6cf639baf38de6af7676220be8a">coupling::solvers::LBCouetteSolverState</a>.</p>
-
-</div>
-</div>
-<a id="a9290bed2ead4bd6ab3e14b9c4e995a29" name="a9290bed2ead4bd6ab3e14b9c4e995a29"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9290bed2ead4bd6ab3e14b9c4e995a29">&#9670;&#160;</a></span>operator==()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool coupling::interface::PintableMacroSolverState::operator== </td>
-          <td>(</td>
-          <td class="paramtype">const State &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>For tests, it must be possible to compare states. This is expected to operate element-wise </p>
-
-<p>Implemented in <a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolverState.html#ae67281f07bcb9d7c39ba78059d0f43c2">coupling::solvers::LBCouetteSolverState</a>.</p>
 
 </div>
 </div>

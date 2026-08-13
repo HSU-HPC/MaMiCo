@@ -1,20 +1,13 @@
 var searchData=
 [
-  ['name_0',['Name',['../classtinyxml2_1_1XMLAttribute.html#a5a5c135d24cce7abda6f17301c6274d8',1,'tinyxml2::XMLAttribute::Name()'],['../classtinyxml2_1_1XMLElement.html#abd36e34e4428a8eeeffbe87eab0b124d',1,'tinyxml2::XMLElement::Name()']]],
-  ['newcomment_1',['NewComment',['../classtinyxml2_1_1XMLDocument.html#a386df0befd06aadb5e0cd21381aa955a',1,'tinyxml2::XMLDocument']]],
-  ['newdeclaration_2',['NewDeclaration',['../classtinyxml2_1_1XMLDocument.html#ae519030c0262fa2daff8993681990e16',1,'tinyxml2::XMLDocument']]],
-  ['newelement_3',['NewElement',['../classtinyxml2_1_1XMLDocument.html#a3c335a700a43d7c363a393142a23f234',1,'tinyxml2::XMLDocument']]],
-  ['newtext_4',['NewText',['../classtinyxml2_1_1XMLDocument.html#acece5de77a0819f2341b08c1e1ed9987',1,'tinyxml2::XMLDocument']]],
-  ['newunknown_5',['NewUnknown',['../classtinyxml2_1_1XMLDocument.html#a4954f502c5fd7f49de54c3c0c99bb73d',1,'tinyxml2::XMLDocument']]],
-  ['next_6',['Next',['../classtinyxml2_1_1XMLAttribute.html#aa8c7cf4c94a636ae75046658e551614e',1,'tinyxml2::XMLAttribute']]],
-  ['next_7',['next',['../classcoupling_1_1interface_1_1MoleculeIterator.html#a2584a0d65a215e940a6d7d35c013a654',1,'coupling::interface::MoleculeIterator']]],
-  ['nextsibling_8',['NextSibling',['../classtinyxml2_1_1XMLNode.html#af986c568061b020cf6232bec091388c0',1,'tinyxml2::XMLNode::NextSibling()'],['../classtinyxml2_1_1XMLHandle.html#aad2eccc7c7c7b18145877c978c3850b5',1,'tinyxml2::XMLHandle::NextSibling()']]],
-  ['nextsiblingelement_9',['NextSiblingElement',['../classtinyxml2_1_1XMLNode.html#a14ea560df31110ff07a9f566171bf797',1,'tinyxml2::XMLNode::NextSiblingElement()'],['../classtinyxml2_1_1XMLHandle.html#ae41d88ee061f3c49a081630ff753b2c5',1,'tinyxml2::XMLHandle::NextSiblingElement()']]],
-  ['nievelocityimposition_10',['NieVelocityImposition',['../classcoupling_1_1NieVelocityImposition.html#a4096d48286760b001371826bd314fd9f',1,'coupling::NieVelocityImposition']]],
-  ['nievelocityimpositionmapping_11',['NieVelocityImpositionMapping',['../classcoupling_1_1cellmappings_1_1NieVelocityImpositionMapping.html#a1136fc428b63e2e42e0d90040ac9e464',1,'coupling::cellmappings::NieVelocityImpositionMapping']]],
-  ['noboundaryforce_12',['NoBoundaryForce',['../classcoupling_1_1NoBoundaryForce.html#a5df7ee94202cdeebf8444a70bffe2ca3',1,'coupling::NoBoundaryForce']]],
-  ['nochildren_13',['NoChildren',['../classtinyxml2_1_1XMLNode.html#ac3ab489e6e202a3cd1762d3b332e89d4',1,'tinyxml2::XMLNode']]],
-  ['nomomentuminsertion_14',['NoMomentumInsertion',['../classcoupling_1_1NoMomentumInsertion.html#a09f250d1669b5b5b2d8c28e91b287408',1,'coupling::NoMomentumInsertion']]],
-  ['noparticleinsertion_15',['NoParticleInsertion',['../classcoupling_1_1NoParticleInsertion.html#a02b0cda8847b09a6e4fb49e18deef08b',1,'coupling::NoParticleInsertion']]],
-  ['numericalsolver_16',['NumericalSolver',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a5575988fb4542fd5afd67f51d1d1af19',1,'coupling::solvers::NumericalSolver']]]
+  ['macroscopicsolverinterface_0',['MacroscopicSolverInterface',['../classcoupling_1_1interface_1_1MacroscopicSolverInterface.html#aabc9a3c07ba90a3e8cdb0c0adcade7ae',1,'coupling::interface::MacroscopicSolverInterface']]],
+  ['mamicoconfiguration_1',['MaMiCoConfiguration',['../classcoupling_1_1configurations_1_1MaMiCoConfiguration.html#a24ae4f9b9b006d2d87a110e60bdb243d',1,'coupling::configurations::MaMiCoConfiguration']]],
+  ['mamicointerfaceprovider_2',['MamicoInterfaceProvider',['../classcoupling_1_1interface_1_1MamicoInterfaceProvider.html#a62fe5d573e4c1ca160e1a6b7b484f0c6',1,'coupling::interface::MamicoInterfaceProvider']]],
+  ['matrix_3',['Matrix',['../classtarch_1_1la_1_1Matrix.html#aa620c6ec76aa32749a197649274bec9a',1,'tarch::la::Matrix']]],
+  ['molecule_4',['Molecule',['../classcoupling_1_1datastructures_1_1Molecule.html#a63f66107f1e73619052f1903293bd252',1,'coupling::datastructures::Molecule']]],
+  ['moleculeextractor_5',['MoleculeExtractor',['../classcoupling_1_1cellmappings_1_1MoleculeExtractor.html#a842b774d1d8e92f235efcdb564e0ef95',1,'coupling::cellmappings::MoleculeExtractor']]],
+  ['moleculeiterator_6',['MoleculeIterator',['../classcoupling_1_1interface_1_1MoleculeIterator.html#a628874b05d58d9a1bb93a8b2a90de242',1,'coupling::interface::MoleculeIterator']]],
+  ['momentumcontroller_7',['MomentumController',['../classcoupling_1_1MomentumController.html#a20a13847aebdc85c639e61c2820732e8',1,'coupling::MomentumController']]],
+  ['momentuminsertion_8',['MomentumInsertion',['../classcoupling_1_1MomentumInsertion.html#af10b00331787d64c1a0fdba158d8abec',1,'coupling::MomentumInsertion']]],
+  ['momentuminsertionconfiguration_9',['MomentumInsertionConfiguration',['../classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html#a92b23f1da3f42be0f693a7907f455d47',1,'coupling::configurations::MomentumInsertionConfiguration']]]
 ];

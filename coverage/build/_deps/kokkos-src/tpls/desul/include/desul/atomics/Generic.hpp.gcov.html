@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-08-12 13:25:38</td>
+            <td class="headerValue">2026-08-13 14:48:16</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -82,9 +82,9 @@
 <a name="20"><span class="lineNum">      20 </span>            : </a>
 <a name="21"><span class="lineNum">      21 </span>            : DESUL_IMPL_ACC_ROUTINE_DIRECTIVE</a>
 <a name="22"><span class="lineNum">      22 </span>            : template &lt;class MemoryOrder, class MemoryScope&gt;</a>
-<a name="23"><span class="lineNum">      23 </span><span class="lineCov">       7416 : DESUL_INLINE_FUNCTION void atomic_thread_fence(MemoryOrder order, MemoryScope scope) {</span></a>
+<a name="23"><span class="lineNum">      23 </span><span class="lineCov">       6564 : DESUL_INLINE_FUNCTION void atomic_thread_fence(MemoryOrder order, MemoryScope scope) {</span></a>
 <a name="24"><span class="lineNum">      24 </span>            :   DESUL_IF_ON_DEVICE(return Impl::device_atomic_thread_fence(order, scope);)</a>
-<a name="25"><span class="lineNum">      25 </span><span class="lineCov">       7416 :   DESUL_IF_ON_HOST(return Impl::host_atomic_thread_fence(order, scope);)</span></a>
+<a name="25"><span class="lineNum">      25 </span><span class="lineCov">       6564 :   DESUL_IF_ON_HOST(return Impl::host_atomic_thread_fence(order, scope);)</span></a>
 <a name="26"><span class="lineNum">      26 </span>            : }</a>
 <a name="27"><span class="lineNum">      27 </span>            : </a>
 <a name="28"><span class="lineNum">      28 </span>            : DESUL_IMPL_ACC_ROUTINE_DIRECTIVE</a>
@@ -117,9 +117,9 @@
 <a name="55"><span class="lineNum">      55 </span>            : DESUL_IMPL_ACC_ROUTINE_DIRECTIVE</a>
 <a name="56"><span class="lineNum">      56 </span>            : template &lt;class T, class MemoryOrder, class MemoryScope&gt;</a>
 <a name="57"><span class="lineNum">      57 </span>            : DESUL_INLINE_FUNCTION T</a>
-<a name="58"><span class="lineNum">      58 </span><span class="lineCov">      55875 : atomic_fetch_sub(T* const dest, const T val, MemoryOrder order, MemoryScope scope) {</span></a>
+<a name="58"><span class="lineNum">      58 </span><span class="lineCov">      51408 : atomic_fetch_sub(T* const dest, const T val, MemoryOrder order, MemoryScope scope) {</span></a>
 <a name="59"><span class="lineNum">      59 </span>            :   DESUL_IF_ON_DEVICE(return Impl::device_atomic_fetch_sub(dest, val, order, scope);)</a>
-<a name="60"><span class="lineNum">      60 </span><span class="lineCov">      55875 :   DESUL_IF_ON_HOST(return Impl::host_atomic_fetch_sub(dest, val, order, scope);)</span></a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineCov">      51408 :   DESUL_IF_ON_HOST(return Impl::host_atomic_fetch_sub(dest, val, order, scope);)</span></a>
 <a name="61"><span class="lineNum">      61 </span>            : }</a>
 <a name="62"><span class="lineNum">      62 </span>            : </a>
 <a name="63"><span class="lineNum">      63 </span>            : DESUL_IMPL_ACC_ROUTINE_DIRECTIVE</a>
@@ -346,12 +346,12 @@
 <a name="284"><span class="lineNum">     284 </span>            : </a>
 <a name="285"><span class="lineNum">     285 </span>            : DESUL_IMPL_ACC_ROUTINE_DIRECTIVE</a>
 <a name="286"><span class="lineNum">     286 </span>            : template &lt;class T, class MemoryOrder, class MemoryScope&gt;</a>
-<a name="287"><span class="lineNum">     287 </span><span class="lineCov">      25128 : DESUL_INLINE_FUNCTION void atomic_add(T* const dest,</span></a>
+<a name="287"><span class="lineNum">     287 </span><span class="lineCov">      19881 : DESUL_INLINE_FUNCTION void atomic_add(T* const dest,</span></a>
 <a name="288"><span class="lineNum">     288 </span>            :                                       const T val,</a>
 <a name="289"><span class="lineNum">     289 </span>            :                                       MemoryOrder order,</a>
 <a name="290"><span class="lineNum">     290 </span>            :                                       MemoryScope scope) {</a>
 <a name="291"><span class="lineNum">     291 </span>            :   DESUL_IF_ON_DEVICE(return Impl::device_atomic_add(dest, val, order, scope);)</a>
-<a name="292"><span class="lineNum">     292 </span><span class="lineCov">      25128 :   DESUL_IF_ON_HOST(return Impl::host_atomic_add(dest, val, order, scope);)</span></a>
+<a name="292"><span class="lineNum">     292 </span><span class="lineCov">      19881 :   DESUL_IF_ON_HOST(return Impl::host_atomic_add(dest, val, order, scope);)</span></a>
 <a name="293"><span class="lineNum">     293 </span>            : }</a>
 <a name="294"><span class="lineNum">     294 </span>            : </a>
 <a name="295"><span class="lineNum">     295 </span>            : DESUL_IMPL_ACC_ROUTINE_DIRECTIVE</a>

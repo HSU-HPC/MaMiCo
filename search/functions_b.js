@@ -1,13 +1,10 @@
 var searchData=
 [
-  ['macroscopicsolverinterface_0',['MacroscopicSolverInterface',['../classcoupling_1_1interface_1_1MacroscopicSolverInterface.html#aabc9a3c07ba90a3e8cdb0c0adcade7ae',1,'coupling::interface::MacroscopicSolverInterface']]],
-  ['mamicoconfiguration_1',['MaMiCoConfiguration',['../classcoupling_1_1configurations_1_1MaMiCoConfiguration.html#a24ae4f9b9b006d2d87a110e60bdb243d',1,'coupling::configurations::MaMiCoConfiguration']]],
-  ['mamicointerfaceprovider_2',['MamicoInterfaceProvider',['../classcoupling_1_1interface_1_1MamicoInterfaceProvider.html#a62fe5d573e4c1ca160e1a6b7b484f0c6',1,'coupling::interface::MamicoInterfaceProvider']]],
-  ['matrix_3',['Matrix',['../classtarch_1_1la_1_1Matrix.html#aa620c6ec76aa32749a197649274bec9a',1,'tarch::la::Matrix']]],
-  ['molecule_4',['Molecule',['../classcoupling_1_1datastructures_1_1Molecule.html#a63f66107f1e73619052f1903293bd252',1,'coupling::datastructures::Molecule']]],
-  ['moleculeextractor_5',['MoleculeExtractor',['../classcoupling_1_1cellmappings_1_1MoleculeExtractor.html#a842b774d1d8e92f235efcdb564e0ef95',1,'coupling::cellmappings::MoleculeExtractor']]],
-  ['moleculeiterator_6',['MoleculeIterator',['../classcoupling_1_1interface_1_1MoleculeIterator.html#a628874b05d58d9a1bb93a8b2a90de242',1,'coupling::interface::MoleculeIterator']]],
-  ['momentumcontroller_7',['MomentumController',['../classcoupling_1_1MomentumController.html#a20a13847aebdc85c639e61c2820732e8',1,'coupling::MomentumController']]],
-  ['momentuminsertion_8',['MomentumInsertion',['../classcoupling_1_1MomentumInsertion.html#af10b00331787d64c1a0fdba158d8abec',1,'coupling::MomentumInsertion']]],
-  ['momentuminsertionconfiguration_9',['MomentumInsertionConfiguration',['../classcoupling_1_1configurations_1_1MomentumInsertionConfiguration.html#a92b23f1da3f42be0f693a7907f455d47',1,'coupling::configurations::MomentumInsertionConfiguration']]]
+  ['lastchild_0',['LastChild',['../classtinyxml2_1_1XMLNode.html#a69a29bb8263ff5e9815be180bf27e7af',1,'tinyxml2::XMLNode::LastChild()'],['../classtinyxml2_1_1XMLHandle.html#a9d09f04435f0f2f7d0816b0198d0517b',1,'tinyxml2::XMLHandle::LastChild()']]],
+  ['lastchildelement_1',['LastChildElement',['../classtinyxml2_1_1XMLNode.html#a609e02f02044f39b928d1a3e0de9f532',1,'tinyxml2::XMLNode::LastChildElement()'],['../classtinyxml2_1_1XMLHandle.html#a42cccd0ce8b1ce704f431025e9f19e0c',1,'tinyxml2::XMLHandle::LastChildElement()']]],
+  ['lbcouettesolver_2',['LBCouetteSolver',['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#ae9628998145318f08bd65520c478c406',1,'coupling::solvers::LBCouetteSolver']]],
+  ['lbcouettesolverinterface_3',['LBCouetteSolverInterface',['../classcoupling_1_1solvers_1_1LBCouetteSolverInterface.html#a48b23b24457671e88e91ec06ae17c7fe',1,'coupling::solvers::LBCouetteSolverInterface']]],
+  ['linkedcellcontainer_4',['LinkedCellContainer',['../classcoupling_1_1datastructures_1_1LinkedCellContainer.html#a419c3908aab50875f9dbfd40c7d5b612',1,'coupling::datastructures::LinkedCellContainer']]],
+  ['load_5',['load',['../classtarch_1_1configuration_1_1ParseConfiguration_1_1XMLConfiguration.html#a03e0283dda4335736e6d00557866a76c',1,'tarch::configuration::ParseConfiguration::XMLConfiguration::load()'],['../classParseConfiguration_1_1XMLConfiguration.html#a03e0283dda4335736e6d00557866a76c',1,'ParseConfiguration::XMLConfiguration::load()']]],
+  ['loadfile_6',['LoadFile',['../classtinyxml2_1_1XMLDocument.html#a2ebd4647a8af5fc6831b294ac26a150a',1,'tinyxml2::XMLDocument::LoadFile(const char *filename)'],['../classtinyxml2_1_1XMLDocument.html#a5f1d330fad44c52f3d265338dd2a6dc2',1,'tinyxml2::XMLDocument::LoadFile(FILE *)']]]
 ];

@@ -1,7 +1,7 @@
 var searchData=
 [
   ['gauss_0',['Gauss',['../classcoupling_1_1filtering_1_1Gauss.html',1,'coupling::filtering']]],
-  ['generator_1',['MaMiCo Config Generator',['../dir_b94d3ad9af2a4d1552e52cc0114f17f5.html#autotoc_md8',1,'']]],
+  ['generator_1',['Generator',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md16',1,'Config Generator'],['../dir_b94d3ad9af2a4d1552e52cc0114f17f5.html#autotoc_md8',1,'MaMiCo Config Generator']]],
   ['get_2',['get',['../classcoupling_1_1indexing_1_1CellIndex.html#afa3a35a5c57103fcc64781d9421d5fc0',1,'coupling::indexing::CellIndex::get()'],['../classcoupling_1_1interface_1_1MoleculeIterator.html#aae5be429db4b4aad98a1258973df62e3',1,'coupling::interface::MoleculeIterator::get()'],['../classcoupling_1_1solvers_1_1NumericalSolver.html#a1cfc38bffbe1ac3a187d0e49244d794b',1,'coupling::solvers::NumericalSolver::get(int i) const'],['../classcoupling_1_1solvers_1_1NumericalSolver.html#a0b4c0efc56df3c08b26be7be4e379220',1,'coupling::solvers::NumericalSolver::get(int x, int y, int z) const']]],
   ['get_5favg_5fvel_3',['get_avg_vel',['../classcoupling_1_1interface_1_1PintableMacroSolver.html#ad9986bfc51132405774884182755ce29',1,'coupling::interface::PintableMacroSolver::get_avg_vel()'],['../classcoupling_1_1solvers_1_1LBCouetteSolver.html#a30819e7abaae3374971d0955ad27ce30',1,'coupling::solvers::LBCouetteSolver::get_avg_vel()']]],
   ['getavgdomainsize_4',['getAvgDomainSize',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a8d2edfab5e6d2bbbca5fd5a95e6c20b6',1,'coupling::solvers::NumericalSolver']]],
