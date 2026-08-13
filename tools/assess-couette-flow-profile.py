@@ -1,11 +1,12 @@
 #! /usr/bin/env python3
 
 """
-Numerically and visually assess the difference between the sampled and analytical couette flow profile.
+Numerically and visually (Mermaid plot) assess the difference between the sampled and analytical couette flow profile.
 """
 
 import math
 import os
+import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -182,11 +183,13 @@ config:
 def compute_couette_flow_profile_match():
     """Computes the sampling error and plots the flow profile for the last cycle."""
     coupling_cycles = []
-    for path in Path().glob("CouetteAvgMultiMDCells_0_0_*.csv"):
-        coupling_cycle = int(path.stem.split("_")[-1])
-        coupling_cycles.append(coupling_cycle)
+    prefix = "CouetteAvgMultiMDCells_d0_r0_c"
+    for path in Path().glob(f"{prefix}*.csv"):
+        match = re.search(r"_c(\d+)\.csv$", path.name)
+        if match:
+            coupling_cycles.append(int(match.group(1)))
     coupling_cycle = max(coupling_cycles)
-    csv_path = Path(f"CouetteAvgMultiMDCells_0_0_{coupling_cycle}.csv")
+    csv_path = Path(f"{prefix}{coupling_cycle}.csv")
     if not csv_path.exists():
         print(f"File {csv_path} does not exist!", file=sys.stderr)
         return

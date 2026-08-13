@@ -164,7 +164,7 @@ if __name__ == "__main__":
     if not coverage_root.is_dir():
         print("Coverage has not been generated yet.", file=sys.stderr)
         exit(1)
-
+    
     coverage_index_files = iterate_coverage_indices(coverage_root)
     df_coverage = get_test_coverage(coverage_index_files)
 
@@ -178,10 +178,15 @@ if __name__ == "__main__":
     if len(df_coverage) == 0:
         print("Sufficient test coverage for changed files.")
     else:
-        print("You should write tests for:")
-        print(
-            df_coverage.to_string(
-                index=False,
-                formatters={c: "{:,.2%}".format for c in df_coverage.columns[1:]},
-            )
-        )
+        print("**You should write tests for:**")
+        headers = df_coverage.columns
+        print("| " + " | ".join(headers) + " |")
+        print("| :-- | --: | --: |")
+        for _, row in df_coverage.iterrows():
+            values = [
+                row.iloc[0]
+            ] + [
+                f"{value:.2%}" if pd.notna(value) else "NaN"
+                for value in row.iloc[1:]
+            ]
+            print("| " + " | ".join(map(str, values)) + " |")
