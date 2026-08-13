@@ -6,6 +6,7 @@
 #define _MOLECULARDYNAMICS_MOLECULEMAPPINGS_COMPUTEMEANVELOCITY_MAPPING_H_
 
 #include "simplemd/Molecule.h"
+#include "tarch/utils/Utils.h"
 
 namespace simplemd {
 namespace moleculemappings {
@@ -32,7 +33,8 @@ public:
   void endMoleculeIteration() { _meanVelocity = _meanVelocity / _particleCounter; }
 
   void handleMolecule(Molecule& molecule) {
-    tarch::la::Vector<MD_DIM, double> v{stepV * molecule.getVelocity()};
+    DEFINE_DECIMAL_FP_LIMITS(3);
+    tarch::la::Vector<MD_DIM, double> v{stepFP3 * molecule.getVelocity()};
     for (unsigned int d = 0; d < MD_DIM; d++) {
       _meanVelocity[d] += (long long)(v[d]);
     }
@@ -40,9 +42,10 @@ public:
   }
 
   tarch::la::Vector<MD_DIM, double> getMeanVelocity() const {
+    DEFINE_DECIMAL_FP_LIMITS(3);
     tarch::la::Vector<MD_DIM, double> res;
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      res[d] = _meanVelocity[d] * minV;
+      res[d] = _meanVelocity[d] * minFP3;
     }
     return res;
   }
@@ -50,9 +53,6 @@ public:
   static const bool IsParallel = false;
 
 private:
-  static constexpr double maxV = 1e3;
-  static constexpr double stepV = (double)(std::numeric_limits<long long>::max()) / maxV;
-  static constexpr double minV = 1 / stepV;
   tarch::la::Vector<MD_DIM, long long> _meanVelocity;
   long long _particleCounter;
 };

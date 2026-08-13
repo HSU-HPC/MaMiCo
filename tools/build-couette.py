@@ -45,11 +45,11 @@ MAMICO_BUILD_TYPE = "DebugOptimized"
 # LAMMPS
 LAMMPS_REPO_DIR = MAMICO_BUILD_DIR / "LAMMPS"
 LAMMPS_REPO_URL = "https://github.com/lammps/lammps.git"
-LAMMPS_REPO_BRANCH = "release"
+LAMMPS_REPO_REF = os.getenv("LAMMPS_REPO_REF", "release")
 
 # OpenFOAM
 OPEN_FOAM_BASE_DIR = MAMICO_BUILD_DIR / "openfoam"
-OPEN_FOAM_VERSION = "2206"
+OPEN_FOAM_VERSION = os.getenv("OPEN_FOAM_VERSION", "2206")
 OPEN_FOAM_SRC_DIR = OPEN_FOAM_BASE_DIR / f"OpenFOAM-v{OPEN_FOAM_VERSION}"
 OPEN_FOAM_URL = f"https://dl.openfoam.com/source/v{OPEN_FOAM_VERSION}/OpenFOAM-v{OPEN_FOAM_VERSION}.tgz"
 OPEN_FOAM_THIRD_PARTY_REPO_DIR = OPEN_FOAM_SRC_DIR / "ThirdParty"
@@ -65,9 +65,25 @@ def shell(cmd):
     return subprocess.call(["/bin/bash", "-c", "set -o pipefail; " + cmd])
 
 
-def git_clone_shallow(repository_url, repository_dir, branch):
-    cmd = f"git clone -b {branch} --depth 1 --single-branch {repository_url} {repository_dir}"
-    return 0 != shell(cmd)
+def git_clone_shallow(repository_url, repository_dir, ref):
+    if not os.path.exists(repository_dir):
+        if shell(f"git clone --no-checkout {repository_url} {repository_dir}") != 0:
+            return True
+
+        return git_clone_shallow(repository_url, repository_dir, ref)
+
+    if not os.path.isdir(os.path.join(repository_dir, ".git")):
+        print(f"{repository_dir} exists but is not a git repository")
+        return True
+
+    if shell(
+        f"git -C {repository_dir} fetch --depth 1 origin {ref}"
+    ) != 0:
+        return True
+
+    return shell(
+        f"git -C {repository_dir} checkout --detach FETCH_HEAD"
+    ) != 0
 
 
 def build_ls1(mamico_repo_dir, with_mpi=False, jobs=8, force_gcc=False):
@@ -152,7 +168,7 @@ def build_lammps():
     had_error = False
     if not LAMMPS_REPO_DIR.exists():
         had_error = git_clone_shallow(
-            LAMMPS_REPO_URL, LAMMPS_REPO_DIR, LAMMPS_REPO_BRANCH
+            LAMMPS_REPO_URL, LAMMPS_REPO_DIR, LAMMPS_REPO_REF
         )
     build_dir = LAMMPS_REPO_DIR / "build"
     build_dir.mkdir(exist_ok=True)
