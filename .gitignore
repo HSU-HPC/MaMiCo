@@ -1,4 +1,6 @@
 build/
+builds/
+dependencies/
 .sconsign.dblite
 *.csv
 *.vtk

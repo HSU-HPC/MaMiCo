@@ -39,16 +39,17 @@ def get_git_repo_root(cwd="."):
 
 # MaMiCo
 MAMICO_REPO_DIR = get_git_repo_root(Path(__file__))
-MAMICO_BUILD_DIR = MAMICO_REPO_DIR / "build"
+MAMICO_DEPENDENCIES_DIR = MAMICO_REPO_DIR / "dependencies"
+MAMICO_DEPENDENCIES_DIR.mkdir(parents=True, exist_ok=True)
 MAMICO_BUILD_TYPE = "DebugOptimized"
 
 # LAMMPS
-LAMMPS_REPO_DIR = MAMICO_BUILD_DIR / "LAMMPS"
+LAMMPS_REPO_DIR = MAMICO_DEPENDENCIES_DIR / "LAMMPS"
 LAMMPS_REPO_URL = "https://github.com/lammps/lammps.git"
 LAMMPS_REPO_BRANCH = "release"
 
 # OpenFOAM
-OPEN_FOAM_BASE_DIR = MAMICO_BUILD_DIR / "openfoam"
+OPEN_FOAM_BASE_DIR = MAMICO_DEPENDENCIES_DIR / "openfoam"
 OPEN_FOAM_VERSION = "2206"
 OPEN_FOAM_SRC_DIR = OPEN_FOAM_BASE_DIR / f"OpenFOAM-v{OPEN_FOAM_VERSION}"
 OPEN_FOAM_URL = f"https://dl.openfoam.com/source/v{OPEN_FOAM_VERSION}/OpenFOAM-v{OPEN_FOAM_VERSION}.tgz"
@@ -70,12 +71,9 @@ def git_clone_shallow(repository_url, repository_dir, branch):
 
 
 def download_ls1(mamico_repo_dir):
-    print("Downloading ls1-MarDyn...")
-    ls1_dir = mamico_repo_dir / "ls1"
-    if ls1_dir.exists():
-        # Avoid issues with initializing submodule
-        shutil.rmtree(ls1_dir)
-    had_error = 0 != shell("git submodule init && git submodule update")
+    print("Updating ls1-MarDyn submodule...")
+    with ChangeDir(mamico_repo_dir):
+        had_error = 0 != shell("git submodule update --init ls1")
     return had_error
 
 
@@ -159,21 +157,20 @@ def build_mamico_couette_md(
     with_openfoam=False,
     with_mpi=False,
     jobs=8,
-    clean=False,
     force_gcc=False,
 ):
     run_info = f"Started {time.strftime('%Y-%m-%d %H:%M:%S %Z')}"
     print(run_info)
     had_error = False
-    build_dir = MAMICO_REPO_DIR / "build"
-    if clean:
-        shutil.rmtree(build_dir, ignore_errors=True)
+    build_id = time.strftime("%Y-%m-%d_%H-%M-%S")
+    build_dir = MAMICO_REPO_DIR / "builds" / build_id
+
     couette_bin_path = build_dir / "couette"
     build_info = f"Building {couette_bin_path} ({md_solver})"
     if with_openfoam:
         build_info += " with OpenFOAM"
     print(f"::: {build_info} :::")
-    build_dir.mkdir(exist_ok=True)
+    build_dir.mkdir(parents=True, exist_ok=True)
     try:
         md_solver_cmake_flag = md_solvers[md_solver]
     except:
@@ -183,40 +180,54 @@ def build_mamico_couette_md(
         if had_error:
             return None
     cmake_args = ""
+
     if force_gcc:
         cmake_args += f" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
+
     cmake_args += f"-S{MAMICO_REPO_DIR} -B{build_dir}"
     cmake_args += f" -DCMAKE_BUILD_TYPE={MAMICO_BUILD_TYPE}"
     cmake_args += f" -DBUILD_WITH_MPI={'ON' if with_mpi else 'OFF'}"
     cmake_args += f" -DMD_SIM={md_solver_cmake_flag}"
+
     environement = dict()
     environement["PKG_CONFIG_PATH"] = "$PKG_CONFIG_PATH"
+
     cmake_args += " -DBUILD_WITH_LAMMPS=OFF"
+
     if md_solver == "ls1":
         had_error |= download_ls1(MAMICO_REPO_DIR)
         cmake_args += " -DOPENMP=OFF"
         cmake_args += " -DENABLE_AUTOPAS=OFF"
         cmake_args += " -DENABLE_UNIT_TESTS=OFF"
         cmake_args += " -DENABLE_ALLLBL=OFF"
+
     elif md_solver == "lammps":
         had_error |= build_lammps()
         cmake_args = cmake_args.replace("LAMMPS=OFF", "LAMMPS=ON")
+
         for suffix in ["", "64"]:
             pkgconfig_path = Path.home() / ".local" / f"lib{suffix}" / "pkgconfig"
             environement["PKG_CONFIG_PATH"] += f":{pkgconfig_path}"
+
         shell(f"ln -sf {LAMMPS_REPO_DIR}/src {MAMICO_REPO_DIR}/lammps")
+
     cmake_args += f" -DBUILD_WITH_OPENFOAM={'ON' if with_openfoam else 'OFF'}"
-    environement_prefix = " ".join(f"{k}={v}" for k, v in environement.items())
+
+    environement_prefix = " ".join(
+        f"{k}={v}" for k, v in environement.items()
+    )
+
     cmd = f"{environement_prefix} cmake {cmake_args}"
+
     if with_openfoam:
         cmd = f"source {OPEN_FOAM_SRC_DIR / 'etc' / 'bashrc'}; {cmd}"
+
     had_error |= 0 != shell(cmd)
+
     if not had_error:
         with ChangeDir(build_dir):
-            if couette_bin_path.exists():
-                # Avoid confusing old build for different one
-                couette_bin_path.unlink()
             had_error = 0 != shell(f"make -j {jobs} couette")
+
     print(f"::: Completed (Successful: {not had_error}) :::")
     return None if had_error else couette_bin_path
 
@@ -233,7 +244,6 @@ if __name__ == "__main__":
     arg_parser.add_argument("-M", "--with-mpi", action="store_true")
     arg_parser.add_argument("-j", "--jobs", default=8)
     arg_parser.add_argument("-g", "--force-gcc", action="store_true")
-    arg_parser.add_argument("-c", "--clean", action="store_true")
     args = arg_parser.parse_args()
 
     exec_path = build_mamico_couette_md(
@@ -241,7 +251,6 @@ if __name__ == "__main__":
         with_openfoam=args.with_foam,
         with_mpi=args.with_mpi,
         jobs=args.jobs,
-        clean=args.clean,
         force_gcc=args.force_gcc,
     )
     if exec_path is not None:
