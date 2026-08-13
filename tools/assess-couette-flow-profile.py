@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 """
-Numerically and visually assess the difference between the sampled and analytical couette flow profile.
+Numerically and visually (Mermaid plot) assess the difference between the sampled and analytical couette flow profile.
 """
 
 import math

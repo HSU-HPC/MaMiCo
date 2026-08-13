@@ -4,6 +4,8 @@ set(CMAKE_POLICY_DEFAULT_CMP0126 NEW) # can be removed when minimum version is s
 
 project(mamico VERSION 2.0 LANGUAGES CXX)
 
+set(MAMICO_CXX_STANDARD 17)
+
 # Make our cmake modules visible to CMake
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
@@ -112,6 +114,15 @@ set(KOKKOS_TARGET OPENMP CACHE STRING "Choose CUDA, OPENMP, or SERIAL")
 set_property(CACHE KOKKOS_TARGET PROPERTY STRINGS CUDA OPENMP SERIAL)
 message(STATUS ">> KOKKOS_TARGET: " ${KOKKOS_TARGET})
 
+# Avoid LTO conflict for pybind11 and CUDA
+if(BUILD_WITH_PYBIND11 AND KOKKOS_TARGET STREQUAL "CUDA")
+  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
+  message(WARNING
+    "CUDA and pybind11 are enabled; disabling CMake interprocedural "
+    "optimization to avoid known linker issues."
+  )
+endif()
+
 find_package(Kokkos CONFIG) # Try to find Kokkos externally
 if(Kokkos_FOUND)
     message(STATUS "Found Kokkos: ${Kokkos_DIR} (version \"${Kokkos_VERSION}\")")
@@ -128,6 +139,7 @@ else()
       set(Kokkos_ENABLE_OPENMP ON CACHE STRING "Build Kokkos with OpenMP support when not targeting Serial" FORCE)
     endif()
     if(KOKKOS_TARGET STREQUAL "CUDA")
+      set(Kokkos_ENABLE_CUDA_LAMBDA ON CACHE STRING "Allow lambda expressions on the device (Deprecated)" FORCE)
       set(Kokkos_ENABLE_CUDA ON CACHE STRING "Build MaMiCo/Kokkos with CUDA support" FORCE)
       set(Kokkos_ENABLE_CUDA_RELOCATABLE_DEVICE_CODE ON CACHE STRING "MaMiCo requires CUDA relocatable device code (RDC)" FORCE)
     else()
@@ -148,7 +160,7 @@ else()
 
     FetchContent_Declare(
         Kokkos
-        URL https://github.com/kokkos/kokkos/archive/refs/tags/4.6.02.tar.gz
+        URL https://github.com/kokkos/kokkos/archive/refs/tags/5.0.2.tar.gz
     )
     FetchContent_MakeAvailable(Kokkos)
 
@@ -287,7 +299,11 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
   endif()
 elseif(CMAKE_BUILD_TYPE STREQUAL "DebugOptimized")
   # Note: -fexpensive-optimizations breaks SimpleMDBench
-  target_compile_options(simplemd_interface INTERFACE -O3 -fno-expensive-optimizations -g3)
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(simplemd_interface INTERFACE -O3 -ffp-contract=off -g3)
+  else()
+    target_compile_options(simplemd_interface INTERFACE -O3 -fno-expensive-optimizations -g3)
+  endif()
   if(KOKKOS_TARGET STREQUAL "CUDA")
     target_compile_options(simplemd_interface INTERFACE --fmad=false)
   endif()
@@ -297,7 +313,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   if(KOKKOS_TARGET STREQUAL "CUDA")
     target_compile_options(simplemd_interface INTERFACE -O3)
   else()
-    target_compile_options(simplemd_interface INTERFACE -Ofast)
+    target_compile_options(simplemd_interface INTERFACE -O3 -ffast-math  -Wno-nan-infinity-disabled)
   endif()
 else()
   message(FATAL_ERROR "Unsupported build type")
@@ -372,6 +388,7 @@ set(SIMPLE_MD_SOURCES
   "simplemd/molecule-mappings/VelocityStoermerVerletMapping.cpp"
   "simplemd/molecule-mappings/VTKMoleculeWriter.cpp"
   "simplemd/molecule-mappings/WriteCheckPointMapping.cpp"
+  "simplemd/molecule-with-cell-mappings/LennardJonesForceMapping.cpp"
   "simplemd/services/ExternalForceService.cpp"
   "simplemd/services/MolecularPropertiesService.cpp"
   "simplemd/services/MoleculeService.cpp"
@@ -390,7 +407,7 @@ endif()
 add_library(libsimplemd ${SIMPLE_MD_SOURCES})
 target_link_libraries(libsimplemd INTERFACE shared_defines)
 target_link_libraries(libsimplemd PRIVATE simplemd_interface)
-set_target_properties(libsimplemd PROPERTIES CXX_STANDARD 17)
+set_target_properties(libsimplemd PROPERTIES CXX_STANDARD ${MAMICO_CXX_STANDARD})
 set_target_properties(libsimplemd PROPERTIES OUTPUT_NAME simplemd)
 
 #
@@ -399,7 +416,7 @@ set_target_properties(libsimplemd PROPERTIES OUTPUT_NAME simplemd)
 add_executable(simplemd ${SIMPLE_MD_SOURCES} "simplemd/main.cpp")
 target_link_libraries(simplemd INTERFACE shared_defines)
 target_link_libraries(simplemd PRIVATE simplemd_interface)
-set_target_properties(simplemd PROPERTIES CXX_STANDARD 17)
+set_target_properties(simplemd PROPERTIES CXX_STANDARD ${MAMICO_CXX_STANDARD})
 set_target_properties(simplemd PROPERTIES OUTPUT_NAME simplemd)
 
 #
@@ -408,7 +425,7 @@ set_target_properties(simplemd PROPERTIES OUTPUT_NAME simplemd)
 add_executable(multi-simplemd ${SIMPLE_MD_SOURCES} "simplemd/main_multi.cpp")
 target_link_libraries(multi-simplemd INTERFACE shared_defines)
 target_link_libraries(multi-simplemd PRIVATE simplemd_interface)
-set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD 17)
+set_target_properties(multi-simplemd PROPERTIES CXX_STANDARD ${MAMICO_CXX_STANDARD})
 
 #
 # MaMiCo interface
@@ -513,7 +530,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   if(KOKKOS_TARGET STREQUAL "CUDA")
     target_compile_options(mamico INTERFACE -O3)
   else()
-    target_compile_options(mamico INTERFACE -Ofast)
+    target_compile_options(mamico INTERFACE -O3 -ffast-math -Wno-nan-infinity-disabled)
   endif()
 else()
   message(FATAL_ERROR "Unsupported build type")
@@ -534,9 +551,9 @@ set(COUETTE_SOURCES
 )
 add_executable(couette ${COUETTE_SOURCES})
 target_link_libraries(couette INTERFACE shared_defines)
-set_target_properties(couette PROPERTIES CXX_STANDARD 17)
+set_target_properties(couette PROPERTIES CXX_STANDARD ${MAMICO_CXX_STANDARD})
 if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
-  target_compile_options(couette PRIVATE -std=c++17)
+  target_compile_options(couette PRIVATE -std=c++${MAMICO_CXX_STANDARD})
 endif()
 target_link_libraries(couette PRIVATE mamico)
 
@@ -552,9 +569,9 @@ if("${MD_SIM}" STREQUAL "LAMMPS_MD")
   )
   add_executable(test_lammps ${TEST_LAMMPS_SOURCES})
   target_link_libraries(test_lammps INTERFACE shared_defines)
-  set_target_properties(test_lammps PROPERTIES CXX_STANDARD 17)
+  set_target_properties(test_lammps PROPERTIES CXX_STANDARD ${MAMICO_CXX_STANDARD})
   if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
-    target_compile_options(test_lammps PRIVATE -std=c++17)
+    target_compile_options(test_lammps PRIVATE -std=c++${MAMICO_CXX_STANDARD})
   endif()
   target_link_libraries(test_lammps PRIVATE mamico)
 endif()
@@ -573,7 +590,7 @@ if(BUILD_WITH_PYBIND11)
   target_link_libraries(mamico_pybind INTERFACE shared_defines)
   set_target_properties(mamico_pybind PROPERTIES OUTPUT_NAME mamico)
   target_compile_options(mamico_pybind PRIVATE -fPIC)
-  set_target_properties(mamico_pybind PROPERTIES CXX_STANDARD 17)
+  set_target_properties(mamico_pybind PROPERTIES CXX_STANDARD ${MAMICO_CXX_STANDARD})
   target_link_libraries(mamico_pybind PRIVATE mamico)
 endif()
 
@@ -655,7 +672,7 @@ set(BENCHMARKS_SOURCES
 )
 add_executable(benchmarks ${BENCHMARKS_SOURCES})
 target_link_libraries(benchmarks INTERFACE shared_defines)
-set_target_properties(benchmarks PROPERTIES CXX_STANDARD 17)
+set_target_properties(benchmarks PROPERTIES CXX_STANDARD ${MAMICO_CXX_STANDARD})
 target_link_libraries(benchmarks PRIVATE mamico)
 target_compile_definitions(benchmarks PRIVATE TarchDebug)
 
@@ -713,11 +730,10 @@ if (BUILD_TESTING)
       ${TEST_SOURCES}
     )
     target_link_libraries(getTestNames INTERFACE shared_defines)
-    set_target_properties(getTestNames PROPERTIES CXX_STANDARD 17)
+    set_target_properties(getTestNames PROPERTIES CXX_STANDARD ${MAMICO_CXX_STANDARD})
     target_link_libraries(getTestNames PRIVATE mamico)
     target_include_directories(getTestNames PRIVATE ${CPPUNIT_INCLUDE_DIRS})
-    target_link_directories(getTestNames PRIVATE ${CPPUNIT_LIBRARY})
-    target_link_libraries(getTestNames PRIVATE cppunit)
+    target_link_libraries(getTestNames PRIVATE ${CPPUNIT_LIBRARIES})
     unset(GET_TEST_NAMES CACHE)
     return()
   endif()
@@ -728,12 +744,11 @@ if (BUILD_TESTING)
     ${TEST_SOURCES}
   )
   target_link_libraries(testmamico INTERFACE shared_defines)
-  set_target_properties(testmamico PROPERTIES CXX_STANDARD 17)
+  set_target_properties(testmamico PROPERTIES CXX_STANDARD ${MAMICO_CXX_STANDARD})
   target_compile_definitions(testmamico PRIVATE MDCoupledError MDError)
   target_link_libraries(testmamico PRIVATE mamico)
   target_include_directories(testmamico PRIVATE ${CPPUNIT_INCLUDE_DIRS})
-  target_link_directories(testmamico PRIVATE ${CPPUNIT_LIBRARY})
-  target_link_libraries(testmamico PRIVATE cppunit)
+  target_link_libraries(testmamico PRIVATE ${CPPUNIT_LIBRARIES})
 
   message(STATUS ">> Running cmake with GET_TEST_NAMES ON ...")
   message(STATUS "(((((((((((((((((((((((((((((((((( SUBPROCESSES_START ")
