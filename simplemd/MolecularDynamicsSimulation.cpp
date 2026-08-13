@@ -531,7 +531,8 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   //     buffers to arrive, then compute forces near boundaries, all within
   //     putBoundaryParticlesToInnerCellsFillBoundaryCellsAndOverlapWithForceComputations.
   if (!_configuration.getSimulationConfiguration().useOverlappingCommunicationWithForceComputation()) {
-    _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
+    // TODO refactor boundaryTreatment
+    //_boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
     // compute forces between molecules.
 #if defined(KOKKOS_TARGET_CUDA)
       _moleculeService->getContainer().iterateMoleculesWithCell(*_lennardJonesForce);
@@ -548,7 +549,8 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
 
   evaluateStatistics(t);
 
-  _boundaryTreatment->emptyGhostBoundaryCells();
+  // TODO refactor boundaryTreatment
+  //_boundaryTreatment->emptyGhostBoundaryCells();
 
   // plot VTK output
   if ((_configuration.getVTKConfiguration().getWriteEveryTimestep() > 0) && (t % _configuration.getVTKConfiguration().getWriteEveryTimestep() == 0)) {
