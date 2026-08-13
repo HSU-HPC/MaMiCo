@@ -17,11 +17,10 @@ public:
   KOKKOS_FUNCTION virtual ~LennardJonesForceMapping() {}
 
   void beginMoleculeIteration();
-  void endMoleculeIteration() { Kokkos::Profiling::popRegion(); }
+  void endMoleculeIteration() { }
 
   KOKKOS_FUNCTION void handleMolecule(Molecule& molecule, const LinkedCell& cell) const;
 
   static const bool IsParallel = true;
   static const bool IsReadonly = false;
-
 };
