@@ -218,6 +218,8 @@ public:
                 << std::endl;
       std::exit(EXIT_FAILURE);
     }
+    // NB: ls1 coupling will break if getMDSolverInterface does not happen immediately after init()
+    // since the solver interface relies on the global simulation instance set by ls1 in init()
 
     mdSim->init(_multiMDService, slot);
 
