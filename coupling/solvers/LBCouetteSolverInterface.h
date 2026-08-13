@@ -36,7 +36,7 @@ public:
    *  @param outerRegion defines, how many cell layers will be sent to the macro
    * solver */
   LBCouetteSolverInterface(tarch::la::Vector<3, unsigned int> avgNumberLBCells, tarch::la::Vector<3, unsigned int> numberProcesses,
-                           tarch::la::Vector<3, unsigned int> offsetMDDomain, tarch::la::Vector<3, unsigned int> globalNumberCouplingCells,
+                           tarch::la::Vector<3, int> offsetMDDomain, tarch::la::Vector<3, unsigned int> globalNumberCouplingCells,
                            unsigned int outerRegion = 1)
       : _avgNumberLBCells(avgNumberLBCells), _numberProcesses(numberProcesses), _offsetMDDomain(offsetMDDomain), _outerRegion(outerRegion),
         _globalNumberCouplingCells(globalNumberCouplingCells) {}
@@ -51,15 +51,13 @@ public:
   std::vector<unsigned int> getRanks(I01 idx) override {
     std::vector<unsigned int> ranks;
     // determine global index of cell in LB simulation
-    tarch::la::Vector<3, unsigned int> globalLBCellIndex(tarch::la::Vector<3, unsigned int>(idx.get()) + _offsetMDDomain);
+    tarch::la::Vector<3, int> globalLBCellIndex(idx.get() + _offsetMDDomain);
     // modify global LB cell index due to ghost layer
     for (int d = 0; d < 3; d++) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       std::cout << "LB cell index for global cell index " << idx << ": " << globalLBCellIndex << std::endl;
 #endif
-      if (globalLBCellIndex[d] > 0) {
         globalLBCellIndex[d]--;
-      }
     }
     // loop over all neighbouring cells within a one-cell surrounding and detect
     // the respective ranks. IMPROVE: This currently only allows for simulations
@@ -72,6 +70,9 @@ public:
           // coordinates of process of neighbour celll
           const tarch::la::Vector<3, unsigned int> processCoordinates((nbIndex[0] / _avgNumberLBCells[0]), (nbIndex[1] / _avgNumberLBCells[1]),
                                                                       (nbIndex[2] / _avgNumberLBCells[2]));
+          if(processCoordinates[0] < 0 || processCoordinates[0] > _numberProcesses[0] - 1) continue;
+          if(processCoordinates[1] < 0 || processCoordinates[1] > _numberProcesses[1] - 1) continue;
+          if(processCoordinates[2] < 0 || processCoordinates[2] > _numberProcesses[2] - 1) continue;
           // corresponding rank
           const unsigned int rank = processCoordinates[0] + _numberProcesses[0] * (processCoordinates[1] + processCoordinates[2] * _numberProcesses[1]);
 
@@ -108,21 +109,24 @@ public:
    *  @returns the vector of the correct rank  */
   std::vector<unsigned int> getSourceRanks(I01 idx) override {
     // determine global index of cell in LB simulation
-    tarch::la::Vector<3, unsigned int> globalLBCellIndex(tarch::la::Vector<3, unsigned int>(idx.get()) + _offsetMDDomain);
+    tarch::la::Vector<3, int> globalLBCellIndex(idx.get() + _offsetMDDomain);
     // modify global LB cell index due to ghost layer
     for (int d = 0; d < 3; d++) {
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       std::cout << "LB cell index for global cell index " << idx << ": " << globalLBCellIndex << std::endl;
 #endif
-      if (globalLBCellIndex[d] > 0) {
-        globalLBCellIndex[d]--;
-      }
+      globalLBCellIndex[d]--;
     }
+    std::vector<unsigned int> ranks;
     // determine process coordinates and respective rank
     const tarch::la::Vector<3, unsigned int> processCoordinates(globalLBCellIndex[0] / _avgNumberLBCells[0], globalLBCellIndex[1] / _avgNumberLBCells[1],
                                                                 globalLBCellIndex[2] / _avgNumberLBCells[2]);
+    // if idx is outside of LB domain, return no ranks
+    for (int d = 0; d < 3; d++)
+      if(processCoordinates[d] < 0 || processCoordinates[d] > _numberProcesses[d] - 1)
+        return ranks;
+
     const unsigned int rank = processCoordinates[0] + _numberProcesses[0] * (processCoordinates[1] + processCoordinates[2] * _numberProcesses[1]);
-    std::vector<unsigned int> ranks;
     ranks.push_back(rank);
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
     std::cout << "Source rank for cell " << idx << ": " << ranks[0] << std::endl;
@@ -137,7 +141,7 @@ private:
   /** @brief number of processes used by LB solver */
   const tarch::la::Vector<3, unsigned int> _numberProcesses;
   /** @brief offset of MD domain (excl. any ghost layers on MD or LB side) */
-  const tarch::la::Vector<3, unsigned int> _offsetMDDomain;
+  const tarch::la::Vector<3, int> _offsetMDDomain;
   /** @brief defines an offset of cells which is considered to be the outer
    * region */
   const unsigned int _outerRegion;

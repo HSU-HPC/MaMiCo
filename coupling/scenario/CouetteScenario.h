@@ -842,11 +842,12 @@ protected:
       I01 idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;
       std::tie(couplingCell, idx) = pair;
-      auto midPoint = idx.getCellMidPoint();
-      if (_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD)
-        mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(midPoint);
+      //auto midPoint = idx.getCellMidPoint();
+      //if (_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD)
+        //mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(midPoint);
       // compute momentum
-      tarch::la::Vector<3, double> momentum(mass * couetteSolver.getVelocity(midPoint));
+      //tarch::la::Vector<3, double> momentum(mass * couetteSolver.getVelocity(midPoint));
+      tarch::la::Vector<3, double> momentum(mass * _cfg.wallVelocity);
       couplingCell->setMicroscopicMass(mass);
       couplingCell->setMicroscopicMomentum(momentum);
     }
@@ -919,12 +920,8 @@ protected:
       interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberCouplingCells, outerRegion);
     } else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
       // compute number of cells of MD offset; detect any mismatches!
-      tarch::la::Vector<3, unsigned int> offsetMDDomain(0);
+      tarch::la::Vector<3, int> offsetMDDomain(0);
       for (unsigned int d = 0; d < 3; d++) {
-        if (mdOffset[d] < 0.0) {
-          std::cout << "ERROR CouetteScenario::getCouetteSolverInterface(...): mdOffset[" << d << "]<0.0!" << std::endl;
-          exit(EXIT_FAILURE);
-        }
         offsetMDDomain[d] = floor(mdOffset[d] / mamicoMeshsize[d] + 0.5);
         if (fabs((offsetMDDomain[d] * mamicoMeshsize[d] - mdOffset[d]) / mamicoMeshsize[d]) > 1.0e-8) {
           std::cout << "ERROR CouetteScenario::getCouetteSolverInterface: MD offset and mesh size mismatch!" << std::endl;
@@ -945,12 +942,8 @@ protected:
 #endif
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FD) {
       // compute number of cells of MD offset; detect any mismatches!
-      tarch::la::Vector<3, unsigned int> offsetMDDomain(0);
+      tarch::la::Vector<3, int> offsetMDDomain(0);
       for (unsigned int d = 0; d < 3; d++) {
-        if (mdOffset[d] < 0.0) {
-          std::cout << "ERROR CouetteScenario::getCouetteSolverInterface(...): mdOffset[" << d << "]<0.0!" << std::endl;
-          exit(EXIT_FAILURE);
-        }
         offsetMDDomain[d] = floor(mdOffset[d] / mamicoMeshsize[d] + 0.5);
         if (fabs((offsetMDDomain[d] * mamicoMeshsize[d] - mdOffset[d]) / mamicoMeshsize[d]) > 1.0e-8) {
           std::cout << "ERROR CouetteScenario::getCouetteSolverInterface: MD offset and mesh size mismatch!" << std::endl;
