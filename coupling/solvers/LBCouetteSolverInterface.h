@@ -36,8 +36,7 @@ public:
    *  @param outerRegion defines, how many cell layers will be sent to the macro
    * solver */
   LBCouetteSolverInterface(tarch::la::Vector<3, unsigned int> avgNumberLBCells, tarch::la::Vector<3, unsigned int> numberProcesses,
-                           tarch::la::Vector<3, int> offsetMDDomain, tarch::la::Vector<3, unsigned int> globalNumberCouplingCells,
-                           unsigned int outerRegion = 1)
+                           tarch::la::Vector<3, int> offsetMDDomain, tarch::la::Vector<3, unsigned int> globalNumberCouplingCells, unsigned int outerRegion = 1)
       : _avgNumberLBCells(avgNumberLBCells), _numberProcesses(numberProcesses), _offsetMDDomain(offsetMDDomain), _outerRegion(outerRegion),
         _globalNumberCouplingCells(globalNumberCouplingCells) {}
   ~LBCouetteSolverInterface() {}
@@ -57,7 +56,7 @@ public:
 #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)
       std::cout << "LB cell index for global cell index " << idx << ": " << globalLBCellIndex << std::endl;
 #endif
-        globalLBCellIndex[d]--;
+      globalLBCellIndex[d]--;
     }
     // loop over all neighbouring cells within a one-cell surrounding and detect
     // the respective ranks. IMPROVE: This currently only allows for simulations
@@ -70,9 +69,12 @@ public:
           // coordinates of process of neighbour celll
           const tarch::la::Vector<3, unsigned int> processCoordinates((nbIndex[0] / _avgNumberLBCells[0]), (nbIndex[1] / _avgNumberLBCells[1]),
                                                                       (nbIndex[2] / _avgNumberLBCells[2]));
-          if(processCoordinates[0] < 0 || processCoordinates[0] > _numberProcesses[0] - 1) continue;
-          if(processCoordinates[1] < 0 || processCoordinates[1] > _numberProcesses[1] - 1) continue;
-          if(processCoordinates[2] < 0 || processCoordinates[2] > _numberProcesses[2] - 1) continue;
+          if (processCoordinates[0] < 0 || processCoordinates[0] > _numberProcesses[0] - 1)
+            continue;
+          if (processCoordinates[1] < 0 || processCoordinates[1] > _numberProcesses[1] - 1)
+            continue;
+          if (processCoordinates[2] < 0 || processCoordinates[2] > _numberProcesses[2] - 1)
+            continue;
           // corresponding rank
           const unsigned int rank = processCoordinates[0] + _numberProcesses[0] * (processCoordinates[1] + processCoordinates[2] * _numberProcesses[1]);
 
@@ -123,7 +125,7 @@ public:
                                                                 globalLBCellIndex[2] / _avgNumberLBCells[2]);
     // if idx is outside of LB domain, return no ranks
     for (int d = 0; d < 3; d++)
-      if(processCoordinates[d] < 0 || processCoordinates[d] > _numberProcesses[d] - 1)
+      if (processCoordinates[d] < 0 || processCoordinates[d] > _numberProcesses[d] - 1)
         return ranks;
 
     const unsigned int rank = processCoordinates[0] + _numberProcesses[0] * (processCoordinates[1] + processCoordinates[2] * _numberProcesses[1]);
