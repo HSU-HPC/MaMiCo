@@ -12,19 +12,17 @@
 #endif
 #include "simplemd/LinkedCell.h"
 #include "simplemd/Molecule.h"
-#include "simplemd/services/MoleculeService.h"
 #include "simplemd/services/ParallelAndLocalBufferService.h"
+#include "simplemd/MoleculeContainer.h"
 #include <cstdlib>
 #include <iostream>
 #include <vector>
 
 namespace simplemd {
+// forward declarations to circumvent circular includes
+class MoleculeContainer;
 namespace services {
 class ParallelTopologyService;
-
-// forward declarations to circumvent circular includes
-class MoleculeService;
-class LinkedCellService;
 } // namespace services
 } // namespace simplemd
 
@@ -59,7 +57,7 @@ public:
 
   /** finish initialization by allocating buffers
    *
-   *  Needs to be called after MoleculeService has been initialised.
+   *  Needs to be called after MoleculeContainer has been initialised.
    */
   void initBuffers(const unsigned int& localNumberOfMolecules);
 
@@ -88,7 +86,19 @@ public:
   const tarch::la::Vector<MD_DIM, unsigned int>& getGlobalNumberOfCells() const { return _globalNumberOfCells; }
 
   /** returns the local number of cells in each spatial direction (i.e. only the cells of this process) */
-  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalNumberOfCells() const { return _localNumberOfCells; }
+  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalNumberOfCells(bool includingGhostCells = false) const {
+    return includingGhostCells ? _localNumberOfCellsWithGhostCells : _localNumberOfCells;
+  }
+
+  /** returns the local number of cells (i.e. only the cells of this process) */
+  size_t getLocalNumberOfCellsLinear(bool includingGhostCells = false) const {
+    auto numCells = getLocalNumberOfCells(includingGhostCells);
+    size_t numCellsLinear = 1;
+    for (int d = 0; d < MD_DIM; d++) {
+      numCellsLinear *= numCells[d];
+    }
+    return numCellsLinear;
+  }
 
   /** returns the number of processes used in each spatial direction */
   const tarch::la::Vector<MD_DIM, unsigned int>& getNumberOfProcesses() const { return _numberProcesses; }
@@ -101,6 +111,8 @@ public:
 
   /** returns the global index of the first (non-ghost) cell */
   const tarch::la::Vector<MD_DIM, unsigned int>& getGlobalIndexOfFirstCell() const { return _globalIndexOfFirstCell; }
+
+  const tarch::la::Vector<MD_DIM, unsigned int>& getLocalIndexOfFirstCell() const { return _localIndexOfFirstCell; }
 
   /** returns true, if this process does not carry any work. This can be the case, if we have more ranks available
    *  in the NodePool than specified in the xml config.
@@ -124,8 +136,8 @@ public:
    *
    * The MPI send calls are executed later (from within BoundaryTreatment).
    */
-  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> broadcastInnerCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex,
-                                                                                   const simplemd::services::LinkedCellService& linkedCellService);
+  std::vector<tarch::la::Vector<MD_DIM, unsigned int>> broadcastInnerCellViaBuffer(LinkedCell& cell, const size_t cellIndex,
+                                                                                   const simplemd::MoleculeContainer& moleculeContainer);
 
   /** sends all molecules from cell cellIndex to the respective neighbouring process. The cell
    * cellIndex needs to be a ghost cell.
@@ -136,11 +148,11 @@ public:
    *
    * The MPI send calls are executed later (from within BoundaryTreatment).
    */
-  bool reduceGhostCellViaBuffer(LinkedCell& cell, const unsigned int& cellIndex, const simplemd::services::LinkedCellService& linkedCellService);
+  bool reduceGhostCellViaBuffer(LinkedCell& cell, const size_t cellIndex, const simplemd::MoleculeContainer& moleculeContainer);
 
   /** unpack and resort local buffer
    */
-  void unpackLocalBuffer(simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService);
+  void unpackLocalBuffer(simplemd::MoleculeContainer& moleculeContainer);
 
   /** Communication schedule:
    * 1. Irecv on buffers
@@ -153,7 +165,7 @@ public:
   void communicationSteps_1_2();
 
   /** See comment of communicationSteps_1_2() */
-  void communicationSteps_3_4(simplemd::services::MoleculeService& moleculeService, simplemd::services::LinkedCellService& linkedCellService);
+  void communicationSteps_3_4(simplemd::MoleculeContainer& MoleculeContainer);
 
   /** Compute (non-overlapping) intersection of a global region of interest (ROI) with local domain.
       For example for purposes of profile plotter. */
@@ -168,6 +180,8 @@ public:
     return MPI_Allreduce(sendbuf, recvbuf, count, datatype, op, _communicator);
   }
 #endif
+
+  tarch::la::Vector<MD_DIM, unsigned int> getGhostCellLayerThickness() const { return _ghostCellLayerThickness; }
 
 private:
   /** computes all neighbour ranks and stores the results in neighbourRanks.
@@ -191,9 +205,7 @@ private:
                                                      const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses,
                                                      const tarch::la::Vector<MD_DIM, double>& domainSize) const;
 
-  /** computes the number of cells in each process block. The
-   *  number of cells computed by this service should also be used
-   *  by the LinkedCellService!
+  /** computes the number of cells in each process block.
    */
   tarch::la::Vector<MD_DIM, unsigned int> computeNumberOfCells(const tarch::la::Vector<MD_DIM, double>& meshWidth,
                                                                const tarch::la::Vector<MD_DIM, unsigned int>& numberProcesses,
@@ -249,8 +261,7 @@ private:
 
   /** Read off all molecules from buffer and resort them in the respective linked cells.
    */
-  void unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf, simplemd::services::MoleculeService& moleculeService,
-                    simplemd::services::LinkedCellService& linkedCellService);
+  void unpackBuffer(ParallelAndLocalBufferService::SimpleBuffer* buf, simplemd::MoleculeContainer& MoleculeContainer);
 
   /** place position, velocity, forceOld and isFixed at the end of the respective local buffer.
    */
@@ -278,11 +289,18 @@ private:
   /** domain offset */
   const tarch::la::Vector<MD_DIM, double> _domainOffset;
 
+  /** The size of a linked cell along each axis */
   const tarch::la::Vector<MD_DIM, double> _meshWidth;
 
-  /** index of first cell w.r.t. to global grid
+  /** The number of ghost cells around the local domain along each axis */
+  static constexpr unsigned int _ghostCellLayerThickness = 1; // NOTE: This MUST be 1 (otherwise nothing will work anymore)
+
+  /** index of first cell w.r.t. global grid
    */
   tarch::la::Vector<MD_DIM, unsigned int> _globalIndexOfFirstCell;
+
+  /** index of first cell w.r.t. local grid (including ghost cells )*/
+  const tarch::la::Vector<MD_DIM, unsigned int> _localIndexOfFirstCell;
 
   /** definition of the process matrix, i.e. how many processes work in each
    *  spatial direction.
@@ -291,6 +309,9 @@ private:
 
   /** local number of cells (i.e. on each process) in all d directions */
   const tarch::la::Vector<MD_DIM, unsigned int> _localNumberOfCells;
+
+  /** local number of cells (i.e. on each process) in all d directions including ghost cells */
+  const tarch::la::Vector<MD_DIM, unsigned int> _localNumberOfCellsWithGhostCells;
 
   /** global number of cells in all d directions */
   const tarch::la::Vector<MD_DIM, unsigned int> _globalNumberOfCells;

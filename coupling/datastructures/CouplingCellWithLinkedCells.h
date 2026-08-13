@@ -60,9 +60,9 @@ public:
    * We refer to the lexicographic ordering of the linked cells here.
    * @param cell the linked cell that should be inserted into the coupling
    * cell
-   * @param index specifies the position, at which cell shoeld be inserted
+   * @param index specifies the position, at which cell should be inserted
    */
-  void addLinkedCell(LinkedCell& cell, const unsigned int& index) { _linkedCells[index] = &cell; }
+  void addLinkedCell(LinkedCell& cell, const size_t index) { _linkedCells[index] = &cell; }
 
   /** This template fuction applies class A to all linked cells of this
    *coupling cell. The syntax is exactly the same as for regular cell
@@ -110,7 +110,7 @@ private:
   }
 
   /** total number of linked cells contained in this coupling cell */
-  const unsigned int _numberCells;
+  const size_t _numberCells;
 
   /** holds pointers to all linked cells that describe the microscopic dynamics
    * within the coupling cell */

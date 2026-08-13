@@ -19,7 +19,7 @@ namespace LAMMPS_NS {
  */
 template <unsigned int dim> class GhostAtoms {
 public:
-  GhostAtoms(LAMMPS_NS::LAMMPS *lmp) : _lmp(lmp), _ghostX(NULL), _nghost(0), _nghostBufferSize(0) {}
+  GhostAtoms(LAMMPS_NS::LAMMPS* lmp) : _lmp(lmp), _ghostX(NULL), _nghost(0), _nghostBufferSize(0) {}
   ~GhostAtoms() {
     if (_ghostX != NULL)
       _lmp->memory->destroy(_ghostX);
@@ -29,7 +29,7 @@ public:
   }
 
   /** access the ghost atom buffer */
-  double **const getGhostAtomPositions() const { return _ghostX; }
+  double** const getGhostAtomPositions() const { return _ghostX; }
   /** returns the number of ghost atoms */
   unsigned int getNGhost() const { return _nghost; }
 
@@ -74,8 +74,8 @@ public:
   }
 
 private:
-  LAMMPS_NS::LAMMPS *_lmp;        // pointer to lammps instance
-  double **_ghostX;               // stores the positions of the ghost atoms; allocated using
+  LAMMPS_NS::LAMMPS* _lmp;        // pointer to lammps instance
+  double** _ghostX;               // stores the positions of the ghost atoms; allocated using
                                   // Lammps memory class
   unsigned int _nghost;           // number of ghost atoms in the buffer
   unsigned int _nghostBufferSize; // size of the buffer; this value is always >= _nghost

@@ -143,8 +143,8 @@ public:
     coupling::datastructures::CouplingCell<3>* cell;
     for (auto pair : md2macroBuffer) {
       std::tie(cell, idx) = pair;
-      if(_boundaryPointMap.count(idx) > 0){
-        for(auto[it, rangeEnd] = _boundaryPointMap.equal_range(idx); it != rangeEnd; ++it){
+      if (_boundaryPointMap.count(idx) > 0) {
+        for (auto [it, rangeEnd] = _boundaryPointMap.equal_range(idx); it != rangeEnd; ++it) {
           unsigned int boundarypoint = it->second;
           tarch::la::Vector<3, double> localOuterVel = getVelocity(_boundaryPointsOuter.at(boundarypoint));
           tarch::la::Vector<3, double> localInnerVel = (1.0 / cell->getMacroscopicMass()) * cell->getMacroscopicMomentum();
@@ -155,7 +155,7 @@ public:
         }
       }
     }
-    if(pointsWritten != _numberBoundaryPoints)
+    if (pointsWritten != _numberBoundaryPoints)
       throw std::runtime_error(std::string("IcoFoamInterface::setMDBoundaryValues(): boundary point mapping error!"));
   }
 
@@ -186,7 +186,7 @@ public:
         }
       }
     }
-    if(counter != _numberBoundaryPoints)
+    if (counter != _numberBoundaryPoints)
       throw std::runtime_error(std::string("IcoFoamInterface::setupMDBoundary(): boundary point mapping error!"));
     for (size_t i = 0; i < _numberBoundaryPoints; i++)
       _boundaryPointMap.insert({_boundaryIndicesInner[i], i});
@@ -315,15 +315,15 @@ private:
   // the entries define which boundaries are for coupling with MD
   // 0 means no MD boundary and 1 means MD boundary
   tarch::la::Vector<12, unsigned int> _boundariesWithMD;
-  float _dx;                                      // mesh size
-  double _channelheight;                          // overall height of the Couette channel
+  float _dx;             // mesh size
+  double _channelheight; // overall height of the Couette channel
   std::multimap<I00, unsigned int> _boundaryPointMap;
   std::vector<tarch::la::Vector<3, double>> _boundaryPointsOuter;
-  I00* _boundaryIndicesInner{nullptr};             // pointer to an array with data for communication
-  Foam::vector** _boundaryIndices{nullptr};       // pointer to OpenFOAM data for communication
-  int _rank;                                      // rank of the actual process
-  int _plotEveryTimestep;                         // every n-th time step should be plotted
-  int _timestepCounter{0};                        // actual time step number
+  I00* _boundaryIndicesInner{nullptr};      // pointer to an array with data for communication
+  Foam::vector** _boundaryIndices{nullptr}; // pointer to OpenFOAM data for communication
+  int _rank;                                // rank of the actual process
+  int _plotEveryTimestep;                   // every n-th time step should be plotted
+  int _timestepCounter{0};                  // actual time step number
   // the following are original OpenFOAM variables, their names shall not be changed
   Foam::label pRefCell{0};
   Foam::scalar pRefValue{0.0};

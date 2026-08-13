@@ -7,7 +7,7 @@
 
 #include "simplemd/MolecularDynamicsDefinitions.h"
 #include "simplemd/Molecule.h"
-#include "simplemd/services/MoleculeService.h"
+#include "simplemd/MoleculeContainer.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include <cstdlib>
 #include <fstream>
@@ -30,10 +30,10 @@ class simplemd::moleculemappings::VTKMoleculeWriter {
 public:
   /** Constructor
    * @param parallelTopologyService parallel topology service
-   * @param moleculeService molecule service
+   * @param moleculeContainer molecule container
    * @param filename filename for .vtk output file
    */
-  VTKMoleculeWriter(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::services::MoleculeService& moleculeService,
+  VTKMoleculeWriter(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::MoleculeContainer& moleculeContainer,
                     const std::string& filename);
 
   /** Destructor */
@@ -55,9 +55,11 @@ public:
    */
   void handleMolecule(Molecule& molecule);
 
+  static const bool IsParallel = false;
+
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  const simplemd::services::MoleculeService& _moleculeService;
+  const simplemd::MoleculeContainer& _moleculeContainer;
   /** filename */
   std::string _filename;
   /** current timestep */

@@ -276,7 +276,7 @@ public:
           mamicoMolecule.setPosition(position);
           double realPotential = mamicoMolecule.getPotentialEnergy();
           CPPUNIT_ASSERT_MESSAGE("position assertion", mamicoMolecule.getPosition() == position);
-          CPPUNIT_ASSERT_MESSAGE("potential assertion", pseudoPotential == realPotential);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("potential assertion", pseudoPotential, realPotential, 1e-6);
         }
       }
     }

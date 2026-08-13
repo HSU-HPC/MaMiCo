@@ -8,8 +8,7 @@
 using namespace tarch;
 using namespace utils;
 
-class MultiMDServiceTest : public CppUnit::TestFixture
-{
+class MultiMDServiceTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(MultiMDServiceTest);
   CPPUNIT_TEST(testAvgNumberOfMDSimulations);
   CPPUNIT_TEST(testNumberLocalComms);
@@ -18,11 +17,11 @@ class MultiMDServiceTest : public CppUnit::TestFixture
 
 public:
   void setUp() {
-    _multiMDService_122_1 = new MultiMDService<3>(tarch::la::Vector<3, unsigned int>{1,2,2}, 1);
-    _multiMDService_122_2 = new MultiMDService<3>(tarch::la::Vector<3, unsigned int>{1,2,2}, 2);
-    _multiMDService_121_2 = new MultiMDService<3>(tarch::la::Vector<3, unsigned int>{1,2,1}, 2);
-    _multiMDService_111_4 = new MultiMDService<3>(tarch::la::Vector<3, unsigned int>{1,1,1}, 4);
-    _multiMDService_111_10 = new MultiMDService<3>(tarch::la::Vector<3, unsigned int>{1,1,1}, 10);
+    _multiMDService_122_1 = new MultiMDService<3>(tarch::la::Vector<3, unsigned int>{1, 2, 2}, 1);
+    _multiMDService_122_2 = new MultiMDService<3>(tarch::la::Vector<3, unsigned int>{1, 2, 2}, 2);
+    _multiMDService_121_2 = new MultiMDService<3>(tarch::la::Vector<3, unsigned int>{1, 2, 1}, 2);
+    _multiMDService_111_4 = new MultiMDService<3>(tarch::la::Vector<3, unsigned int>{1, 1, 1}, 4);
+    _multiMDService_111_10 = new MultiMDService<3>(tarch::la::Vector<3, unsigned int>{1, 1, 1}, 10);
   }
 
   void tearDown() {
@@ -34,7 +33,7 @@ public:
   }
 
   void testAvgNumberOfMDSimulations() {
-  #if (TARCH_PARALLEL == TARCH_YES)
+#if (TARCH_PARALLEL == TARCH_YES)
     unsigned int expectedAvgNumberOfMDSimulations = 1;
     unsigned int actualAvgNumberOfMDSimulations = _multiMDService_122_1->getAvgNumberOfMDSimulations();
     CPPUNIT_ASSERT_EQUAL(expectedAvgNumberOfMDSimulations, actualAvgNumberOfMDSimulations);
@@ -54,7 +53,7 @@ public:
     expectedAvgNumberOfMDSimulations = 2;
     actualAvgNumberOfMDSimulations = _multiMDService_111_10->getAvgNumberOfMDSimulations();
     CPPUNIT_ASSERT_EQUAL(expectedAvgNumberOfMDSimulations, actualAvgNumberOfMDSimulations);
-  #else
+#else
     unsigned int expectedAvgNumberOfMDSimulations = 4;
     unsigned int actualAvgNumberOfMDSimulations = _multiMDService_111_4->getAvgNumberOfMDSimulations();
     CPPUNIT_ASSERT_EQUAL(expectedAvgNumberOfMDSimulations, actualAvgNumberOfMDSimulations);
@@ -62,11 +61,11 @@ public:
     expectedAvgNumberOfMDSimulations = 10;
     actualAvgNumberOfMDSimulations = _multiMDService_111_10->getAvgNumberOfMDSimulations();
     CPPUNIT_ASSERT_EQUAL(expectedAvgNumberOfMDSimulations, actualAvgNumberOfMDSimulations);
-  #endif
+#endif
   }
 
   void testNumberLocalComms() {
- #if (TARCH_PARALLEL == TARCH_YES) 
+#if (TARCH_PARALLEL == TARCH_YES)
     unsigned int expectedNumberOfLocalComms = 1;
     unsigned int actualNumberOfLocalComms = _multiMDService_122_1->getNumberLocalComms();
     CPPUNIT_ASSERT_EQUAL(expectedNumberOfLocalComms, actualNumberOfLocalComms);
@@ -86,7 +85,7 @@ public:
     expectedNumberOfLocalComms = 4;
     actualNumberOfLocalComms = _multiMDService_111_10->getNumberLocalComms();
     CPPUNIT_ASSERT_EQUAL(expectedNumberOfLocalComms, actualNumberOfLocalComms);
-  #else
+#else
     unsigned int expectedNumberOfLocalComms = 1;
     unsigned int actualNumberOfLocalComms = _multiMDService_111_4->getNumberLocalComms();
     CPPUNIT_ASSERT_EQUAL(expectedNumberOfLocalComms, actualNumberOfLocalComms);
@@ -94,11 +93,11 @@ public:
     expectedNumberOfLocalComms = 1;
     actualNumberOfLocalComms = _multiMDService_111_10->getNumberLocalComms();
     CPPUNIT_ASSERT_EQUAL(expectedNumberOfLocalComms, actualNumberOfLocalComms);
-  #endif
+#endif
   }
 
   void testLocalNumberOfMDSimulations() {
- #if (TARCH_PARALLEL == TARCH_YES)  
+#if (TARCH_PARALLEL == TARCH_YES)
     CPPUNIT_ASSERT_EQUAL(_multiMDService_122_1->getLocalNumberOfMDSimulations(), _multiMDService_122_1->getAvgNumberOfMDSimulations());
 
     CPPUNIT_ASSERT_EQUAL(_multiMDService_122_2->getLocalNumberOfMDSimulations(), _multiMDService_122_2->getAvgNumberOfMDSimulations());
@@ -111,18 +110,19 @@ public:
     int rank = 0;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     if (rank == 3) {
-      expectedLocalNumberOfMDSimulations = _multiMDService_111_10->getTotalNumberOfMDSimulations() - expectedLocalNumberOfMDSimulations * (_multiMDService_111_10->getNumberLocalComms()-1);
+      expectedLocalNumberOfMDSimulations =
+          _multiMDService_111_10->getTotalNumberOfMDSimulations() - expectedLocalNumberOfMDSimulations * (_multiMDService_111_10->getNumberLocalComms() - 1);
     }
     unsigned int actualLocalNumberOfMDSimulations = _multiMDService_111_10->getLocalNumberOfMDSimulations();
     CPPUNIT_ASSERT_EQUAL(expectedLocalNumberOfMDSimulations, actualLocalNumberOfMDSimulations);
-  #else
+#else
     CPPUNIT_ASSERT_EQUAL(_multiMDService_111_4->getLocalNumberOfMDSimulations(), _multiMDService_111_4->getAvgNumberOfMDSimulations());
     CPPUNIT_ASSERT_EQUAL(_multiMDService_111_10->getLocalNumberOfMDSimulations(), _multiMDService_111_10->getAvgNumberOfMDSimulations());
-  #endif
+#endif
   }
 
 private:
-  MultiMDService<3> *_multiMDService_122_1, *_multiMDService_122_2, *_multiMDService_121_2, *_multiMDService_111_4, *_multiMDService_111_10;
+  MultiMDService<3>*_multiMDService_122_1, *_multiMDService_122_2, *_multiMDService_121_2, *_multiMDService_111_4, *_multiMDService_111_10;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(MultiMDServiceTest);

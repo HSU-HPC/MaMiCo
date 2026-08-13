@@ -5,8 +5,6 @@
 #ifndef _MOLECULARDYNAMICS_CELLMAPPINGS_PERIODICBOUNDARYEMPTYCELLSMAPPING_H_
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_PERIODICBOUNDARYEMPTYCELLSMAPPING_H_
 
-#include "simplemd/services/LinkedCellService.h"
-#include "simplemd/services/MoleculeService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 
 namespace simplemd {
@@ -23,8 +21,7 @@ class PeriodicBoundaryEmptyCellsMapping;
  */
 class simplemd::cellmappings::PeriodicBoundaryEmptyCellsMapping {
 public:
-  PeriodicBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::services::MoleculeService& moleculeService,
-                                    simplemd::services::LinkedCellService& linkedCellService);
+  PeriodicBoundaryEmptyCellsMapping(simplemd::services::ParallelTopologyService& parallelTopologyService, simplemd::MoleculeContainer& moleculeContainer);
   ~PeriodicBoundaryEmptyCellsMapping() {}
 
   /** sets the global domain size (hopefully received from the ParallelTopologyService...) */
@@ -37,12 +34,13 @@ public:
   void beginCellIteration() {}
   void endCellIteration() {}
 
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex);
+  void handleCell(LinkedCell& cell);
+
+  static const bool IsParallel = false;
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  simplemd::services::MoleculeService& _moleculeService;
-  simplemd::services::LinkedCellService& _linkedCellService;
+  simplemd::MoleculeContainer& _moleculeContainer;
   /** domain size and offset */
   tarch::la::Vector<MD_DIM, double> _domainSize;
   tarch::la::Vector<MD_DIM, unsigned int> _processCoordinates;

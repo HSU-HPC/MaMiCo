@@ -158,6 +158,7 @@ public:
       cfg.miSolverType = LS1;
 
       cfg.totalNumberMDSimulations = 1;
+      tarch::configuration::ParseConfiguration::readStringOptional(cfg.ls1config, subtag, "ls1config");
       tarch::configuration::ParseConfiguration::readDoubleMandatory(cfg.temp, subtag, "temperature");
       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.equSteps, subtag, "equilibration-steps");
       tarch::configuration::ParseConfiguration::readIntOptional(cfg.totalNumberMDSimulations, subtag, "number-md-simulations");
@@ -184,6 +185,8 @@ public:
       cfg.maSolverType = COUETTE_LB;
       tarch::configuration::ParseConfiguration::readVectorMandatory<3, unsigned int>(cfg.lbNumberProcesses, subtag, "number-of-processes");
       tarch::configuration::ParseConfiguration::readIntMandatory(cfg.plotEveryTimestep, subtag, "plot-every-timestep");
+      cfg.plotAverageVelocity = false;
+      tarch::configuration::ParseConfiguration::readBoolOptional(cfg.plotAverageVelocity, subtag, "plot-average-velocity");
     } else if (type == "fd") {
       cfg.maSolverType = COUETTE_FD;
       tarch::configuration::ParseConfiguration::readVectorMandatory<3, unsigned int>(cfg.lbNumberProcesses, subtag, "number-of-processes");
@@ -309,6 +312,8 @@ public:
   tarch::la::Vector<3, unsigned int> lbNumberProcesses;
   /** @brief  only for LB couette solver: VTK plotting per time step */
   int plotEveryTimestep;
+  /** @brief  only for LB couette solver: CSV plotting of average velocity */
+  bool plotAverageVelocity;
   /** @brief number of cycles the continuum solver is advanced before the
    * coupling is enabled */
   int initAdvanceCycles;
@@ -337,6 +342,8 @@ public:
   int twsLoopMax;
   /** @todo piet */
   int twsLoopStep;
+  /* @brief ls1 configuration filename (only relevant when using ls1 as MD solver)*/
+  std::string ls1config = "ls1config.xml";
 
 #if (BUILD_WITH_OPENFOAM)
   /** @brief the configurations for the OpenFoam solver */

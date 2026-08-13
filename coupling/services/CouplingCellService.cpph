@@ -11,7 +11,7 @@ coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::CouplingCellServic
     unsigned int ID, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface,
     coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface, tarch::la::Vector<dim, unsigned int> numberProcesses, unsigned int rank,
     const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,
-    const coupling::configurations::MomentumInsertionConfiguration& momentumInsertionConfiguration,
+    const coupling::configurations::MomentumInsertionConfiguration<dim>& momentumInsertionConfiguration,
     const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,
     const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,
     const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,
@@ -21,14 +21,12 @@ coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::CouplingCellServic
     : coupling::services::CouplingCellService<dim>(ID, topologyOffset), _numberMDTimestepsPerCouplingCycle(numberMDTimestepsPerCouplingCycle),
       // initialise interface pointers before coupling cells are initialised
       _mdSolverInterface(mdSolverInterface), _macroscopicSolverInterface(macroscopicSolverInterface),
-      _deFromMacro2MD(_macroscopicSolverInterface, topologyOffset, ID),
-      _deFromAllMacro2MD(_macroscopicSolverInterface, topologyOffset, ID),
-      _enableInnerImposition(false),
-      _deFromMD2Macro(_macroscopicSolverInterface, topologyOffset, ID),
+      _deFromMacro2MD(_macroscopicSolverInterface, topologyOffset, ID), _deFromAllMacro2MD(_macroscopicSolverInterface, topologyOffset, ID),
+      _enableInnerImposition(false), _deFromMD2Macro(_macroscopicSolverInterface, topologyOffset, ID),
       _couplingCells(couplingCellConfiguration.getNumberLinkedCellsPerCouplingCell(), mdSolverInterface), _filterPipeline(nullptr),
       _filterPipelineConfiguration(filterPipelineConfiguration), _multiMDService(multiMDService),
-      _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(mdSolverInterface, _couplingCells.getLinkedCellContainer(),
-                                                                                                 numberMDTimestepsPerCouplingCycle)),
+      _momentumInsertion(momentumInsertionConfiguration.interpreteConfiguration(mdSolverInterface, _couplingCells.getLinkedCellContainer(),
+                                                                                numberMDTimestepsPerCouplingCycle)),
       _momentumInsertionType(momentumInsertionConfiguration.getMomentumInsertionType()),
       _particleInsertion(particleInsertionConfiguration.interpreteConfiguration<LinkedCell, dim>(mdSolverInterface)),
       _numberLinkedCellsPerCouplingCell(couplingCellConfiguration.getNumberLinkedCellsPerCouplingCell()),
@@ -132,7 +130,7 @@ void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::sendFromMacro
   _couplingCells.applyToLocalGhostCouplingCellsWithLinkedCells(wrapper2);
 
   // carry out send-receive steps
-  if(_enableInnerImposition)
+  if (_enableInnerImposition)
     _fromMacro2MD.sendFromMacro2MD(_deFromAllMacro2MD, _couplingCells, macro2MDBuffer);
   else
     _fromMacro2MD.sendFromMacro2MD(_deFromMacro2MD, _couplingCells, macro2MDBuffer);
@@ -178,7 +176,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
 }
 
 template <class LinkedCell, unsigned int dim> void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::distributeMomentum(unsigned int t) {
-  if (_momentumInsertionType == coupling::configurations::MomentumInsertionConfiguration::NO_INSERTION) {
+  if (_momentumInsertionType == coupling::configurations::MomentumInsertionConfiguration<3>::NO_INSERTION) {
     return;
   }
 
@@ -213,8 +211,7 @@ template <class LinkedCell, unsigned int dim> void coupling::services::CouplingC
   _couplingCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper);
 }
 
-template <class LinkedCell, unsigned int dim>
-void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::initIndexVectors4Usher() {
+template <class LinkedCell, unsigned int dim> void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::initIndexVectors4Usher() {
 
   const tarch::la::Vector<dim, unsigned int> firstNonGhostCouplingCell(1);
 

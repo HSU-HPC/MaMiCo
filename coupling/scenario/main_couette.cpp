@@ -28,6 +28,14 @@ int main(int argc, char* argv[]) {
   MPI_Init(&argc, &argv);
 #endif
 
+  Kokkos::ScopeGuard kokkos(argc, argv);
+  MainExecSpace mainExecSpace;
+  std::cout << "Kokkos using execution space \"" << mainExecSpace.name() << "\" with memory space \"" << MainExecSpace::memory_space::name() << "\""
+            << std::endl;
+  mainExecSpace.print_configuration(std::cout);
+
+  std::cout << "Available concurrency: " << mainExecSpace.concurrency() << std::endl;
+
   // run scenarios
   runScenario(new CouetteScenario());
 

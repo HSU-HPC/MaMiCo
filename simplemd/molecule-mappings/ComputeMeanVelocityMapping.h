@@ -6,6 +6,7 @@
 #define _MOLECULARDYNAMICS_MOLECULEMAPPINGS_COMPUTEMEANVELOCITY_MAPPING_H_
 
 #include "simplemd/Molecule.h"
+#include "tarch/utils/Utils.h"
 
 namespace simplemd {
 namespace moleculemappings {
@@ -13,7 +14,7 @@ class ComputeMeanVelocityMapping;
 }
 } // namespace simplemd
 
-/** computes mean velocity.
+/** computes mean velocity. Uses fixed-point math so that result does not depend on iteration order
  *
  *  @author Philipp Neumann
  */
@@ -25,21 +26,35 @@ public:
   void beginMoleculeIteration() {
     _particleCounter = 0;
     for (unsigned int d = 0; d < MD_DIM; d++) {
-      _meanVelocity[d] = 0.0;
+      _meanVelocity[d] = 0;
     }
   }
-  void endMoleculeIteration() { _meanVelocity = (1.0 / ((double)_particleCounter)) * _meanVelocity; }
+
+  void endMoleculeIteration() { _meanVelocity = _meanVelocity / _particleCounter; }
+
   void handleMolecule(Molecule& molecule) {
-    const tarch::la::Vector<MD_DIM, double>& velocity = molecule.getVelocity();
-    _meanVelocity += velocity;
+    DEFINE_DECIMAL_FP_LIMITS(3);
+    tarch::la::Vector<MD_DIM, double> v{stepFP3 * molecule.getVelocity()};
+    for (unsigned int d = 0; d < MD_DIM; d++) {
+      _meanVelocity[d] += (long long)(v[d]);
+    }
     _particleCounter++;
   }
 
-  tarch::la::Vector<MD_DIM, double> getMeanVelocity() const { return _meanVelocity; }
+  tarch::la::Vector<MD_DIM, double> getMeanVelocity() const {
+    DEFINE_DECIMAL_FP_LIMITS(3);
+    tarch::la::Vector<MD_DIM, double> res;
+    for (unsigned int d = 0; d < MD_DIM; d++) {
+      res[d] = _meanVelocity[d] * minFP3;
+    }
+    return res;
+  }
+
+  static const bool IsParallel = false;
 
 private:
-  tarch::la::Vector<MD_DIM, double> _meanVelocity;
-  unsigned int _particleCounter;
+  tarch::la::Vector<MD_DIM, long long> _meanVelocity;
+  long long _particleCounter;
 };
 
 #endif // _MOLECULARDYNAMICS_MOLECULEMAPPINGS_COMPUTEMEANVELOCITY_MAPPING_H_
