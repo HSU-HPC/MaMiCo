@@ -129,18 +129,20 @@ Collaboration diagram for coupling::solvers::LBCouetteSolverInterface:</div>
 <div class="dyncontent">
 <div class="center"><img src="classcoupling_1_1solvers_1_1LBCouetteSolverInterface__coll__graph.png" border="0" usemap="#acoupling_1_1solvers_1_1LBCouetteSolverInterface_coll__map" loading="lazy" alt="Collaboration graph"/></div>
 <map name="acoupling_1_1solvers_1_1LBCouetteSolverInterface_coll__map" id="acoupling_1_1solvers_1_1LBCouetteSolverInterface_coll__map">
-<area shape="rect" title="interface for the LBCouetteSolver" alt="" coords="446,57,617,98"/>
+<area shape="rect" title="interface for the LBCouetteSolver" alt="" coords="446,89,617,130"/>
 <area shape="rect" href="classcoupling_1_1interface_1_1MacroscopicSolverInterface.html" title=" " alt="" coords="5,5,224,46"/>
-<area shape="poly" title=" " alt="" coords="239,24,329,30,422,42,472,54,470,59,421,47,329,35,239,29"/>
-<area shape="rect" href="classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="55,109,174,150"/>
-<area shape="poly" title=" " alt="" coords="189,138,300,144,361,141,421,131,462,116,498,96,501,101,464,121,422,136,362,146,300,150,189,143"/>
+<area shape="poly" title=" " alt="" coords="240,17,330,23,377,30,423,42,468,62,505,87,502,91,465,67,421,47,376,36,330,28,239,23"/>
+<area shape="rect" href="classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="55,89,174,130"/>
+<area shape="poly" title=" " alt="" coords="189,107,445,107,445,112,189,112"/>
+<area shape="rect" href="classtarch_1_1la_1_1Vector.html" title=" " alt="" coords="55,155,174,195"/>
+<area shape="poly" title=" " alt="" coords="189,166,299,154,421,135,455,128,456,133,422,141,300,160,190,172"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a48b23b24457671e88e91ec06ae17c7fe" id="r_a48b23b24457671e88e91ec06ae17c7fe"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a48b23b24457671e88e91ec06ae17c7fe">LBCouetteSolverInterface</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; avgNumberLBCells, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; numberProcesses, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; offsetMDDomain, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; globalNumberCouplingCells, unsigned int outerRegion=1)</td></tr>
-<tr class="memdesc:a48b23b24457671e88e91ec06ae17c7fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
+<tr class="memitem:a4a0ed0305a661868e87534aecee1e9ee" id="r_a4a0ed0305a661868e87534aecee1e9ee"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a4a0ed0305a661868e87534aecee1e9ee">LBCouetteSolverInterface</a> (<a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; avgNumberLBCells, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; numberProcesses, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, int &gt; offsetMDDomain, <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt; globalNumberCouplingCells, unsigned int outerRegion=1)</td></tr>
+<tr class="memdesc:a4a0ed0305a661868e87534aecee1e9ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">a simple constructor  <br /></td></tr>
 <tr class="memitem:a00dc27c361c0a8568605dd218006c978" id="r_a00dc27c361c0a8568605dd218006c978"><td class="memItemLeft">unsigned int&#160;</td><td class="memItemRight"><a class="el" href="#a00dc27c361c0a8568605dd218006c978">getOuterRegion</a> () override</td></tr>
 <tr class="memitem:a57e3522ed4e76fc0d3de5a53c37f4359" id="r_a57e3522ed4e76fc0d3de5a53c37f4359"><td class="memItemLeft">std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a57e3522ed4e76fc0d3de5a53c37f4359">getRanks</a> (I01 idx) override</td></tr>
 <tr class="memdesc:a57e3522ed4e76fc0d3de5a53c37f4359"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns for a given coupling cell index, which rank holds the correct data @oaram idx global dimensioned cell index to check for  <br /></td></tr>
@@ -159,9 +161,9 @@ const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>
 <tr class="memitem:ad00f92399a94e7f418b5baf43935204c" id="r_ad00f92399a94e7f418b5baf43935204c"><td class="memItemLeft"><a id="ad00f92399a94e7f418b5baf43935204c" name="ad00f92399a94e7f418b5baf43935204c"></a>
 const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt;&#160;</td><td class="memItemRight"><b>_numberProcesses</b></td></tr>
 <tr class="memdesc:ad00f92399a94e7f418b5baf43935204c"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of processes used by LB solver <br /></td></tr>
-<tr class="memitem:ab01d31b133511dfd0701013aae209e33" id="r_ab01d31b133511dfd0701013aae209e33"><td class="memItemLeft"><a id="ab01d31b133511dfd0701013aae209e33" name="ab01d31b133511dfd0701013aae209e33"></a>
-const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt;&#160;</td><td class="memItemRight"><b>_offsetMDDomain</b></td></tr>
-<tr class="memdesc:ab01d31b133511dfd0701013aae209e33"><td class="mdescLeft">&#160;</td><td class="mdescRight">offset of MD domain (excl. any ghost layers on MD or LB side) <br /></td></tr>
+<tr class="memitem:a88bcb9f98f69b8f34f9918b7c8c84f78" id="r_a88bcb9f98f69b8f34f9918b7c8c84f78"><td class="memItemLeft"><a id="a88bcb9f98f69b8f34f9918b7c8c84f78" name="a88bcb9f98f69b8f34f9918b7c8c84f78"></a>
+const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, int &gt;&#160;</td><td class="memItemRight"><b>_offsetMDDomain</b></td></tr>
+<tr class="memdesc:a88bcb9f98f69b8f34f9918b7c8c84f78"><td class="mdescLeft">&#160;</td><td class="mdescRight">offset of MD domain (excl. any ghost layers on MD or LB side) <br /></td></tr>
 <tr class="memitem:adac724a8c001b24b1e6f59ef6170a22b" id="r_adac724a8c001b24b1e6f59ef6170a22b"><td class="memItemLeft"><a id="adac724a8c001b24b1e6f59ef6170a22b" name="adac724a8c001b24b1e6f59ef6170a22b"></a>
 const unsigned int&#160;</td><td class="memItemRight"><b>_outerRegion</b></td></tr>
 <tr class="memdesc:adac724a8c001b24b1e6f59ef6170a22b"><td class="mdescLeft">&#160;</td><td class="mdescRight">defines an offset of cells which is considered to be the outer region <br /></td></tr>
@@ -173,8 +175,8 @@ const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>
 <div class="textblock"><p>interface for the <a class="el" href="classcoupling_1_1solvers_1_1LBCouetteSolver.html" title="implements a three-dimensional Lattice-Boltzmann Couette flow solver.">LBCouetteSolver</a> </p>
 <p>We only receive data from MD in the inner region, and we only send data for the outer region to MD. What "outer" means is specified by the arguments of the interface; moreover, we do not send the ghost layer data from Couette to MD. "inner" refers to "not outer" ;-) By default, the argument outerRegion is set to 1: this yields that only the first non-ghost layer of coupling cells shall be sent to MD, and all other inner coupling cells are received from MD. </p><dl class="section author"><dt>Author</dt><dd>Philipp Neumann </dd></dl>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a48b23b24457671e88e91ec06ae17c7fe" name="a48b23b24457671e88e91ec06ae17c7fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a48b23b24457671e88e91ec06ae17c7fe">&#9670;&#160;</a></span>LBCouetteSolverInterface()</h2>
+<a id="a4a0ed0305a661868e87534aecee1e9ee" name="a4a0ed0305a661868e87534aecee1e9ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a0ed0305a661868e87534aecee1e9ee">&#9670;&#160;</a></span>LBCouetteSolverInterface()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -195,7 +197,7 @@ const <a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, unsigned int &gt;</td>          <td class="paramname"><span class="paramname"><em>offsetMDDomain</em></span>, </td>
+          <td class="paramtype"><a class="el" href="classtarch_1_1la_1_1Vector.html">tarch::la::Vector</a>&lt; 3, int &gt;</td>          <td class="paramname"><span class="paramname"><em>offsetMDDomain</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

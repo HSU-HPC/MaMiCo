@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-08-13 14:48:16</td>
+            <td class="headerValue">2026-08-13 15:36:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">3</td>
@@ -122,7 +122,7 @@
 <a name="60"><span class="lineNum">      60 </span>            : // clang-format off</a>
 <a name="61"><span class="lineNum">      61 </span>            : </a>
 <a name="62"><span class="lineNum">      62 </span>            : // fences</a>
-<a name="63"><span class="lineNum">      63 </span><span class="lineCov">       6564 : KOKKOS_INLINE_FUNCTION void memory_fence() { desul::atomic_thread_fence(desul::MemoryOrderSeqCst(),  KOKKOS_DESUL_MEM_SCOPE); }</span></a>
+<a name="63"><span class="lineNum">      63 </span><span class="lineCov">       6540 : KOKKOS_INLINE_FUNCTION void memory_fence() { desul::atomic_thread_fence(desul::MemoryOrderSeqCst(),  KOKKOS_DESUL_MEM_SCOPE); }</span></a>
 <a name="64"><span class="lineNum">      64 </span>            : KOKKOS_INLINE_FUNCTION void load_fence()   { desul::atomic_thread_fence(desul::MemoryOrderAcquire(), KOKKOS_DESUL_MEM_SCOPE); }</a>
 <a name="65"><span class="lineNum">      65 </span>            : KOKKOS_INLINE_FUNCTION void store_fence()  { desul::atomic_thread_fence(desul::MemoryOrderRelease(), KOKKOS_DESUL_MEM_SCOPE); }</a>
 <a name="66"><span class="lineNum">      66 </span>            : </a>
@@ -135,7 +135,7 @@
 <a name="73"><span class="lineNum">      73 </span>            : </a>
 <a name="74"><span class="lineNum">      74 </span>            : // atomic_fetch_op</a>
 <a name="75"><span class="lineNum">      75 </span>            : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, T&gt; atomic_fetch_add(T* ptr, Impl::not_deduced_atomic_t&lt;T&gt; val) { return desul::atomic_fetch_add(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), val, desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</a>
-<a name="76"><span class="lineNum">      76 </span><span class="lineCov">      51408 : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, T&gt; atomic_fetch_sub(T* ptr, Impl::not_deduced_atomic_t&lt;T&gt; val) { return desul::atomic_fetch_sub(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), val, desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</span></a>
+<a name="76"><span class="lineNum">      76 </span><span class="lineCov">      51384 : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, T&gt; atomic_fetch_sub(T* ptr, Impl::not_deduced_atomic_t&lt;T&gt; val) { return desul::atomic_fetch_sub(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), val, desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</span></a>
 <a name="77"><span class="lineNum">      77 </span>            : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, T&gt; atomic_fetch_max(T* ptr, Impl::not_deduced_atomic_t&lt;T&gt; val) { return desul::atomic_fetch_max(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), val, desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</a>
 <a name="78"><span class="lineNum">      78 </span>            : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, T&gt; atomic_fetch_min(T* ptr, Impl::not_deduced_atomic_t&lt;T&gt; val) { return desul::atomic_fetch_min(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), val, desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</a>
 <a name="79"><span class="lineNum">      79 </span>            : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, T&gt; atomic_fetch_mul(T* ptr, Impl::not_deduced_atomic_t&lt;T&gt; val) { return desul::atomic_fetch_mul(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), val, desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</a>
@@ -168,7 +168,7 @@
 <a name="106"><span class="lineNum">     106 </span>            : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, T&gt; atomic_dec_fetch(T* ptr) { return desul::atomic_dec_fetch(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</a>
 <a name="107"><span class="lineNum">     107 </span>            : </a>
 <a name="108"><span class="lineNum">     108 </span>            : // atomic_op</a>
-<a name="109"><span class="lineNum">     109 </span><span class="lineCov">      19881 : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, void&gt; atomic_add(T* ptr, Impl::not_deduced_atomic_t&lt;T&gt; val) { desul::atomic_add(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), val, desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</span></a>
+<a name="109"><span class="lineNum">     109 </span><span class="lineCov">      19857 : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, void&gt; atomic_add(T* ptr, Impl::not_deduced_atomic_t&lt;T&gt; val) { desul::atomic_add(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), val, desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</span></a>
 <a name="110"><span class="lineNum">     110 </span>            : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, void&gt; atomic_sub(T* ptr, Impl::not_deduced_atomic_t&lt;T&gt; val) { desul::atomic_sub(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), val, desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</a>
 <a name="111"><span class="lineNum">     111 </span>            : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, void&gt; atomic_max(T* ptr, Impl::not_deduced_atomic_t&lt;T&gt; val) { desul::atomic_max(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), val, desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</a>
 <a name="112"><span class="lineNum">     112 </span>            : template&lt;class T&gt; KOKKOS_FUNCTION Impl::enable_if_atomic_t&lt;T, void&gt; atomic_min(T* ptr, Impl::not_deduced_atomic_t&lt;T&gt; val) { desul::atomic_min(const_cast&lt;std::remove_volatile_t&lt;T&gt;*&gt;(ptr), val, desul::MemoryOrderRelaxed(), KOKKOS_DESUL_MEM_SCOPE); }</a>

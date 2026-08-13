@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-08-13 14:48:16</td>
+            <td class="headerValue">2026-08-13 15:36:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">2</td>
@@ -166,8 +166,8 @@
 <a name="104"><span class="lineNum">     104 </span>            : </a>
 <a name="105"><span class="lineNum">     105 </span>            :  private:</a>
 <a name="106"><span class="lineNum">     106 </span>            :   // NOLINTNEXTLINE(bugprone-exception-escape)</a>
-<a name="107"><span class="lineNum">     107 </span><span class="lineCov">       7872 :   KOKKOS_FUNCTION void cleanup() noexcept {</span></a>
-<a name="108"><span class="lineNum">     108 </span><span class="lineCov">       9888 :     KOKKOS_IF_ON_HOST((</span></a>
+<a name="107"><span class="lineNum">     107 </span><span class="lineCov">       7840 :   KOKKOS_FUNCTION void cleanup() noexcept {</span></a>
+<a name="108"><span class="lineNum">     108 </span><span class="lineCov">       9856 :     KOKKOS_IF_ON_HOST((</span></a>
 <a name="109"><span class="lineNum">     109 </span>            :         // If m_counter is set, then this instance is responsible for managing</a>
 <a name="110"><span class="lineNum">     110 </span>            :         // the object pointed to by m_counter and m_element_ptr.</a>
 <a name="111"><span class="lineNum">     111 </span>            :         if (m_control) {</a>
@@ -183,7 +183,7 @@
 <a name="121"><span class="lineNum">     121 </span>            :             m_control = nullptr;</a>
 <a name="122"><span class="lineNum">     122 </span>            :           }</a>
 <a name="123"><span class="lineNum">     123 </span>            :         }))</a>
-<a name="124"><span class="lineNum">     124 </span><span class="lineCov">       7872 :   }</span></a>
+<a name="124"><span class="lineNum">     124 </span><span class="lineCov">       7840 :   }</span></a>
 <a name="125"><span class="lineNum">     125 </span>            : </a>
 <a name="126"><span class="lineNum">     126 </span><span class="lineCov">       2016 :   struct Control {</span></a>
 <a name="127"><span class="lineNum">     127 </span>            :     std::function&lt;void(T*)&gt; m_deleter;</a>
