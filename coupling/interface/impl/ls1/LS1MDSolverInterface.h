@@ -194,9 +194,15 @@ public:
    *  layers and re-fills the ghost layers again.
    */
   virtual void synchronizeMoleculesAfterMassModification() {
+    // delete halo particles in ls1 linked cells
+    // this should technically delete leaving particles too, since this is occuring after position update
+    // however at this point positions are only updates within molecules, and as long as moleculecontainer->update()
+    // is not called, the particles are not actually marked to be outside the bounding box, hence this is safe
 #ifndef MARDYN_AUTOPAS
     global_simulation->getMoleculeContainer()->deleteOuterParticles();
 #endif
+    // after deleting halos, update them again, this time including the usher inserted particles
+    // the leaving particles will also get communicated
     global_simulation->updateParticleContainerAndDecomposition(1.0, false);
   }
 
