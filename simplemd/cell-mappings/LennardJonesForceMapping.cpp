@@ -22,7 +22,6 @@ void simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration() {
 #if (MD_DEBUG == MD_YES)
   Kokkos::printf("simplemd::cellmappings::LennardJonesForceMapping::beginCellIteration()\n");
 #endif
-  Kokkos::Profiling::pushRegion("simplemd::cellmappings::LennardJonesForceMapping");
 }
 
 /*

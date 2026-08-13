@@ -8,7 +8,6 @@ void simplemd::moleculewithcellmappings::LennardJonesForceMapping::beginMolecule
 #if (MD_DEBUG == MD_YES)
   Kokkos::printf("simplemd::moleculewithcellmappings::LennardJonesForceMapping::beginMoleculeIteration()\n");
 #endif
-  Kokkos::Profiling::pushRegion("simplemd::moleculewithcellmappings::LennardJonesForceMapping");
 }
 
 /*
