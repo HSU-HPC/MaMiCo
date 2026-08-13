@@ -842,12 +842,11 @@ protected:
       I01 idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;
       std::tie(couplingCell, idx) = pair;
-      //auto midPoint = idx.getCellMidPoint();
-      //if (_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD)
-        //mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(midPoint);
+      auto midPoint = idx.getCellMidPoint();
+      if (_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD)
+        mass *= static_cast<const coupling::solvers::LBCouetteSolver*>(&couetteSolver)->getDensity(midPoint);
       // compute momentum
-      //tarch::la::Vector<3, double> momentum(mass * couetteSolver.getVelocity(midPoint));
-      tarch::la::Vector<3, double> momentum(mass * _cfg.wallVelocity);
+      tarch::la::Vector<3, double> momentum(mass * couetteSolver.getVelocity(midPoint));
       couplingCell->setMicroscopicMass(mass);
       couplingCell->setMicroscopicMomentum(momentum);
     }
