@@ -17,16 +17,16 @@ public:
   KOKKOS_FUNCTION virtual ~LennardJonesForceMapping() {}
 
   void beginMoleculeIteration(const Kokkos::View<double**[3], Kokkos::LayoutRight>& posData,
-    const Kokkos::View<size_t*, Kokkos::LayoutRight>& linkedCellNumMolecules);
+    const Kokkos::View<int*, Kokkos::LayoutRight>& linkedCellNumMolecules);
   void endMoleculeIteration() { }
 
   KOKKOS_FUNCTION void handleMolecule(Molecule& molecule, const LinkedCell& cell) const;
-  KOKKOS_FUNCTION void handleMoleculeVeryFast(Molecule& molecule, unsigned int cellIndex) const;
+  KOKKOS_FUNCTION void handleMoleculeVeryFast(Molecule& molecule, int cellIndex) const;
 
   static const bool IsParallel = true;
   static const bool IsReadonly = false;
 
 private:
   Kokkos::View<const double**[3], Kokkos::LayoutRight> _posData;
-  Kokkos::View<const size_t*, Kokkos::LayoutRight> _linkedCellNumMolecules;
+  Kokkos::View<const int*, Kokkos::LayoutRight> _linkedCellNumMolecules;
 };

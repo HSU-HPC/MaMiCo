@@ -6,7 +6,7 @@ simplemd::moleculewithcellmappings::LennardJonesForceMapping::LennardJonesForceM
     : simplemd::cellmappings::LennardJonesForceMapping(externalForceService, molecularPropertiesService) {}
 
 void simplemd::moleculewithcellmappings::LennardJonesForceMapping::beginMoleculeIteration(const Kokkos::View<double**[3], Kokkos::LayoutRight>& posData,
-    const Kokkos::View<size_t*, Kokkos::LayoutRight>& linkedCellNumMolecules) {
+    const Kokkos::View<int*, Kokkos::LayoutRight>& linkedCellNumMolecules) {
 #if (MD_DEBUG == MD_YES)
   Kokkos::printf("simplemd::moleculewithcellmappings::LennardJonesForceMapping::beginMoleculeIteration()\n");
 #endif
@@ -68,17 +68,19 @@ void simplemd::moleculewithcellmappings::LennardJonesForceMapping::handleMolecul
   }
 }
 
-void simplemd::moleculewithcellmappings::LennardJonesForceMapping::handleMoleculeVeryFast(Molecule& m, unsigned int cellIndex) const {
+void simplemd::moleculewithcellmappings::LennardJonesForceMapping::handleMoleculeVeryFast(Molecule& m, int cellIndex) const {
   tarch::la::Vector<MD_DIM, double>& target = m.getForce();
 #if (TARCH_DEBUG == TARCH_YES)
+#if (MD_DEBUG == MD_YES)
   if (_externalForce != tarch::la::Vector<MD_DIM, double>{0.0}) {
     Kokkos::abort(
         "ERROR simplemd::moleculewithcellmappings::LennardJonesForceMapping::handleCell(): externalForce not implemented in fixed point math debug mode!\n");
   }
+#endif
 #else
   target += _externalForce;
 #endif
-  for(unsigned int molIndex=0; molIndex<_linkedCellNumMolecules(cellIndex);molIndex++){
+  for(int molIndex=0; molIndex<_linkedCellNumMolecules(cellIndex);molIndex++){
     const double rijx = _posData(cellIndex,molIndex,0) - m.getConstPosition()[0];
     const double rijy = _posData(cellIndex,molIndex,1) - m.getConstPosition()[1];
     const double rijz = _posData(cellIndex,molIndex,2) - m.getConstPosition()[2];
