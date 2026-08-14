@@ -60,22 +60,22 @@ jobs:
           # Change the directory if changes in Doxyfile
           publish_dir: ./docs/html
 
-      # ========== Comment test coverage on corresponding PR ==========
-      - name: Parse Coverage
+      
+      # ==========vvv Comment test coverage on corresponding PR vvv==========
+      - name: Check Formatting and Coverage
         if: github.event_name == 'pull_request'
-        id: "parse_coverage"
         run: |
-          chown -R $(whoami):$(whoami) .. # Fix issue of reading files in repo
-          python test/check_my_coverage.py --skip-make-coverage > coverage-comment.md
-          cat coverage-comment.md
-          COVERAGE_REACTION=$(grep -q "^Sufficient test coverage" coverage-comment.md && echo "rocket" || echo "eyes")
-          echo "COVERAGE_REACTION=$COVERAGE_REACTION" >> "$GITHUB_OUTPUT"
+          touch bot-comment.md
+          ./test/check_my_formatting.sh >/dev/null 2>> bot-comment.md
+          echo "" >> bot-comment.md
+          ./test/check_my_coverage.py --skip-make-coverage >> bot-comment.md
+          cat bot-comment.md
 
       - name: Comment Test Coverage
         if: github.event_name == 'pull_request'
         uses: thollander/actions-comment-pull-request@v3
         with:
-          file-path: coverage-comment.md
-          comment_tag: coverage
+          file-path: bot-comment.md
+          comment_tag: formatting-and-coverage
           mode: recreate
-          reactions: ${{steps.parse_coverage.outputs.COVERAGE_REACTION}}
+      # ==========^^^ Comment on corresponding PR ^^^==========
