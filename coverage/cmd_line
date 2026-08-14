@@ -1,0 +1,1 @@
+genhtml --rc check_data_consistency=0 --demangle-cpp -o coverage coverage.info

@@ -10,114 +10,114 @@
 
 <body>
 
-  <table width="100%" border=0 cellspacing=0 cellpadding=0>
-    <tr><td class="title">LCOV - code coverage report</td></tr>
-    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
 
-    <tr>
-      <td width="100%">
-        <table cellpadding=1 border=0 width="100%">
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
           <tr>
             <td width="10%" class="headerItem">Current view:</td>
-            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tarch/configuration</a> - Configuration.h<span style="font-size: 80%;"> (source / <a href="Configuration.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory tarch/configuration">tarch/configuration</a> - Configuration.h</td>
             <td width="5%"></td>
-            <td width="15%"></td>
-            <td width="10%" class="headerCovTableHead">Hit</td>
-            <td width="10%" class="headerCovTableHead">Total</td>
-            <td width="15%" class="headerCovTableHead">Coverage</td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
           </tr>
           <tr>
             <td class="headerItem">Test:</td>
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
             <td class="headerCovTableEntry">2</td>
             <td class="headerCovTableEntry">2</td>
-            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr>
-            <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-08-13 15:36:34</td>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-08-14 11:08:15</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">0</td>
             <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
           </tr>
-          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
-        </table>
-      </td>
-    </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
 
-    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
-  </table>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
 
-  <table cellpadding=0 cellspacing=0 border=0>
-    <tr>
-      <td><br></td>
-    </tr>
-    <tr>
-      <td>
-<pre class="sourceHeading">          Line data    Source code</pre>
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
 <pre class="source">
-<a name="1"><span class="lineNum">       1 </span>            : // Copyright (C) 2015 Technische Universitaet Muenchen</a>
-<a name="2"><span class="lineNum">       2 </span>            : // This file is part of the Mamico project. For conditions of distribution</a>
-<a name="3"><span class="lineNum">       3 </span>            : // and use, please see the copyright notice in Mamico's main folder, or at</a>
-<a name="4"><span class="lineNum">       4 </span>            : // www5.in.tum.de/mamico</a>
-<a name="5"><span class="lineNum">       5 </span>            : #ifndef _TARCH_CONFIGURATION_CONFIGURATION_H_</a>
-<a name="6"><span class="lineNum">       6 </span>            : #define _TARCH_CONFIGURATION_CONFIGURATION_H_</a>
-<a name="7"><span class="lineNum">       7 </span>            : </a>
-<a name="8"><span class="lineNum">       8 </span>            : #include &quot;tarch/tinyxml2/tinyxml2.h&quot;</a>
-<a name="9"><span class="lineNum">       9 </span>            : #include &lt;string&gt;</a>
-<a name="10"><span class="lineNum">      10 </span>            : </a>
-<a name="11"><span class="lineNum">      11 </span>            : namespace tarch {</a>
-<a name="12"><span class="lineNum">      12 </span>            : /**     namespace tarch */</a>
-<a name="13"><span class="lineNum">      13 </span>            : namespace configuration {</a>
-<a name="14"><span class="lineNum">      14 </span>            : /**     namespace configuration */</a>
-<a name="15"><span class="lineNum">      15 </span>            : class Configuration;</a>
-<a name="16"><span class="lineNum">      16 </span>            : } // namespace configuration</a>
-<a name="17"><span class="lineNum">      17 </span>            : } // namespace tarch</a>
-<a name="18"><span class="lineNum">      18 </span>            : </a>
-<a name="19"><span class="lineNum">      19 </span>            : /**     interface for configuration using tinyxml2.</a>
-<a name="20"><span class="lineNum">      20 </span>            :  *  @author Philipp Neumann</a>
-<a name="21"><span class="lineNum">      21 </span>            :  */</a>
-<a name="22"><span class="lineNum">      22 </span><span class="lineCov">       1616 : class tarch::configuration::Configuration {</span></a>
-<a name="23"><span class="lineNum">      23 </span>            : public:</a>
-<a name="24"><span class="lineNum">      24 </span>            :   /**</a>
-<a name="25"><span class="lineNum">      25 </span>            :    * Destructor</a>
-<a name="26"><span class="lineNum">      26 </span>            :    */</a>
-<a name="27"><span class="lineNum">      27 </span><span class="lineCov">        804 :   virtual ~Configuration() {}</span></a>
-<a name="28"><span class="lineNum">      28 </span>            : </a>
-<a name="29"><span class="lineNum">      29 </span>            :   /** Parses a XML-element.</a>
-<a name="30"><span class="lineNum">      30 </span>            :    * @param node a pointer to the xml-element from tinyxml2 class</a>
-<a name="31"><span class="lineNum">      31 </span>            :    */</a>
-<a name="32"><span class="lineNum">      32 </span>            :   virtual void parseSubtag(tinyxml2::XMLElement* node) = 0;</a>
-<a name="33"><span class="lineNum">      33 </span>            : </a>
-<a name="34"><span class="lineNum">      34 </span>            :   /**</a>
-<a name="35"><span class="lineNum">      35 </span>            :    * @return the name of the current xml-element</a>
-<a name="36"><span class="lineNum">      36 </span>            :    */</a>
-<a name="37"><span class="lineNum">      37 </span>            :   virtual std::string getTag() const = 0;</a>
-<a name="38"><span class="lineNum">      38 </span>            : </a>
-<a name="39"><span class="lineNum">      39 </span>            :   /**</a>
-<a name="40"><span class="lineNum">      40 </span>            :    *  @returns true if the configuration is valid; false otherwise.</a>
-<a name="41"><span class="lineNum">      41 </span>            :    *  This method is basically for debugging purposes and detection of invalid</a>
-<a name="42"><span class="lineNum">      42 </span>            :    * input.</a>
-<a name="43"><span class="lineNum">      43 </span>            :    */</a>
-<a name="44"><span class="lineNum">      44 </span>            :   virtual bool isValid() const = 0;</a>
-<a name="45"><span class="lineNum">      45 </span>            : };</a>
-<a name="46"><span class="lineNum">      46 </span>            : </a>
-<a name="47"><span class="lineNum">      47 </span>            : #endif</a>
-</pre>
-      </td>
-    </tr>
-  </table>
-  <br>
+<span id="L1"><span class="lineNum">       1</span>              : // Copyright (C) 2015 Technische Universitaet Muenchen</span>
+<span id="L2"><span class="lineNum">       2</span>              : // This file is part of the Mamico project. For conditions of distribution</span>
+<span id="L3"><span class="lineNum">       3</span>              : // and use, please see the copyright notice in Mamico's main folder, or at</span>
+<span id="L4"><span class="lineNum">       4</span>              : // www5.in.tum.de/mamico</span>
+<span id="L5"><span class="lineNum">       5</span>              : #ifndef _TARCH_CONFIGURATION_CONFIGURATION_H_</span>
+<span id="L6"><span class="lineNum">       6</span>              : #define _TARCH_CONFIGURATION_CONFIGURATION_H_</span>
+<span id="L7"><span class="lineNum">       7</span>              : </span>
+<span id="L8"><span class="lineNum">       8</span>              : #include &quot;tarch/tinyxml2/tinyxml2.h&quot;</span>
+<span id="L9"><span class="lineNum">       9</span>              : #include &lt;string&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>              : </span>
+<span id="L11"><span class="lineNum">      11</span>              : namespace tarch {</span>
+<span id="L12"><span class="lineNum">      12</span>              : /**     namespace tarch */</span>
+<span id="L13"><span class="lineNum">      13</span>              : namespace configuration {</span>
+<span id="L14"><span class="lineNum">      14</span>              : /**     namespace configuration */</span>
+<span id="L15"><span class="lineNum">      15</span>              : class Configuration;</span>
+<span id="L16"><span class="lineNum">      16</span>              : } // namespace configuration</span>
+<span id="L17"><span class="lineNum">      17</span>              : } // namespace tarch</span>
+<span id="L18"><span class="lineNum">      18</span>              : </span>
+<span id="L19"><span class="lineNum">      19</span>              : /**     interface for configuration using tinyxml2.</span>
+<span id="L20"><span class="lineNum">      20</span>              :  *  @author Philipp Neumann</span>
+<span id="L21"><span class="lineNum">      21</span>              :  */</span>
+<span id="L22"><span class="lineNum">      22</span> <span class="tlaGNC">        1616 : class tarch::configuration::Configuration {</span></span>
+<span id="L23"><span class="lineNum">      23</span>              : public:</span>
+<span id="L24"><span class="lineNum">      24</span>              :   /**</span>
+<span id="L25"><span class="lineNum">      25</span>              :    * Destructor</span>
+<span id="L26"><span class="lineNum">      26</span>              :    */</span>
+<span id="L27"><span class="lineNum">      27</span> <span class="tlaGNC">         804 :   virtual ~Configuration() {}</span></span>
+<span id="L28"><span class="lineNum">      28</span>              : </span>
+<span id="L29"><span class="lineNum">      29</span>              :   /** Parses a XML-element.</span>
+<span id="L30"><span class="lineNum">      30</span>              :    * @param node a pointer to the xml-element from tinyxml2 class</span>
+<span id="L31"><span class="lineNum">      31</span>              :    */</span>
+<span id="L32"><span class="lineNum">      32</span>              :   virtual void parseSubtag(tinyxml2::XMLElement* node) = 0;</span>
+<span id="L33"><span class="lineNum">      33</span>              : </span>
+<span id="L34"><span class="lineNum">      34</span>              :   /**</span>
+<span id="L35"><span class="lineNum">      35</span>              :    * @return the name of the current xml-element</span>
+<span id="L36"><span class="lineNum">      36</span>              :    */</span>
+<span id="L37"><span class="lineNum">      37</span>              :   virtual std::string getTag() const = 0;</span>
+<span id="L38"><span class="lineNum">      38</span>              : </span>
+<span id="L39"><span class="lineNum">      39</span>              :   /**</span>
+<span id="L40"><span class="lineNum">      40</span>              :    *  @returns true if the configuration is valid; false otherwise.</span>
+<span id="L41"><span class="lineNum">      41</span>              :    *  This method is basically for debugging purposes and detection of invalid</span>
+<span id="L42"><span class="lineNum">      42</span>              :    * input.</span>
+<span id="L43"><span class="lineNum">      43</span>              :    */</span>
+<span id="L44"><span class="lineNum">      44</span>              :   virtual bool isValid() const = 0;</span>
+<span id="L45"><span class="lineNum">      45</span>              : };</span>
+<span id="L46"><span class="lineNum">      46</span>              : </span>
+<span id="L47"><span class="lineNum">      47</span>              : #endif</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
 
-  <table width="100%" border=0 cellspacing=0 cellpadding=0>
-    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
-    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
-  </table>
-  <br>
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
 
 </body>
 </html>

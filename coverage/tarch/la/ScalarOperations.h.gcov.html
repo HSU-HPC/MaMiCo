@@ -10,95 +10,95 @@
 
 <body>
 
-  <table width="100%" border=0 cellspacing=0 cellpadding=0>
-    <tr><td class="title">LCOV - code coverage report</td></tr>
-    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
 
-    <tr>
-      <td width="100%">
-        <table cellpadding=1 border=0 width="100%">
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
           <tr>
             <td width="10%" class="headerItem">Current view:</td>
-            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tarch/la</a> - ScalarOperations.h<span style="font-size: 80%;"> (source / <a href="ScalarOperations.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory tarch/la">tarch/la</a> - ScalarOperations.h</td>
             <td width="5%"></td>
-            <td width="15%"></td>
-            <td width="10%" class="headerCovTableHead">Hit</td>
-            <td width="10%" class="headerCovTableHead">Total</td>
-            <td width="15%" class="headerCovTableHead">Coverage</td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
           </tr>
           <tr>
             <td class="headerItem">Test:</td>
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
             <td class="headerCovTableEntry">1</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntry">0</td>
           </tr>
           <tr>
-            <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-08-13 15:36:34</td>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-08-14 11:08:15</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">0</td>
             <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
           </tr>
-          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
-        </table>
-      </td>
-    </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
 
-    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
-  </table>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
 
-  <table cellpadding=0 cellspacing=0 border=0>
-    <tr>
-      <td><br></td>
-    </tr>
-    <tr>
-      <td>
-<pre class="sourceHeading">          Line data    Source code</pre>
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
 <pre class="source">
-<a name="1"><span class="lineNum">       1 </span>            : // Copyright (C) 2015 Technische Universitaet Muenchen</a>
-<a name="2"><span class="lineNum">       2 </span>            : // This file is part of the Mamico project. For conditions of distribution</a>
-<a name="3"><span class="lineNum">       3 </span>            : // and use, please see the copyright notice in Mamico's main folder, or at</a>
-<a name="4"><span class="lineNum">       4 </span>            : // www5.in.tum.de/mamico</a>
-<a name="5"><span class="lineNum">       5 </span>            : #ifndef _TARCH_LA_SCALAROPERATIONS_H_</a>
-<a name="6"><span class="lineNum">       6 </span>            : #define _TARCH_LA_SCALAROPERATIONS_H_</a>
-<a name="7"><span class="lineNum">       7 </span>            : #include &lt;cmath&gt;</a>
-<a name="8"><span class="lineNum">       8 </span>            : #include &lt;Kokkos_Core.hpp&gt;</a>
-<a name="9"><span class="lineNum">       9 </span>            : /**     namespace tarch */</a>
-<a name="10"><span class="lineNum">      10 </span>            : namespace tarch {</a>
-<a name="11"><span class="lineNum">      11 </span>            : /** namespace la */</a>
-<a name="12"><span class="lineNum">      12 </span>            : namespace la {</a>
-<a name="13"><span class="lineNum">      13 </span>            : </a>
-<a name="14"><span class="lineNum">      14 </span>            : /**     This function template checks if the difference of two given numbers is</a>
-<a name="15"><span class="lineNum">      15 </span>            :  *smaller than a given tolerance i.e. if they are mathematically equal.</a>
-<a name="16"><span class="lineNum">      16 </span>            :  *  @tparam T data type</a>
-<a name="17"><span class="lineNum">      17 </span>            :  *  @param l First number</a>
-<a name="18"><span class="lineNum">      18 </span>            :  *  @param r Second number</a>
-<a name="19"><span class="lineNum">      19 </span>            :  *  @param tolerance Tolerance</a>
-<a name="20"><span class="lineNum">      20 </span>            :  *      @return 1: if they are equal. 0: if the are not equal.</a>
-<a name="21"><span class="lineNum">      21 </span>            :  *  @author Philipp Neumann</a>
-<a name="22"><span class="lineNum">      22 </span>            :  */</a>
-<a name="23"><span class="lineNum">      23 </span>            : </a>
-<a name="24"><span class="lineNum">      24 </span><span class="lineNoCov">          0 : template &lt;class T&gt; KOKKOS_INLINE_FUNCTION bool equals(const T&amp; l, const T&amp; r, const T&amp; tolerance) { return std::abs(l - r) &lt;= tolerance; }</span></a>
-<a name="25"><span class="lineNum">      25 </span>            : </a>
-<a name="26"><span class="lineNum">      26 </span>            : } // namespace la</a>
-<a name="27"><span class="lineNum">      27 </span>            : } // namespace tarch</a>
-<a name="28"><span class="lineNum">      28 </span>            : #endif</a>
-</pre>
-      </td>
-    </tr>
-  </table>
-  <br>
+<span id="L1"><span class="lineNum">       1</span>              : // Copyright (C) 2015 Technische Universitaet Muenchen</span>
+<span id="L2"><span class="lineNum">       2</span>              : // This file is part of the Mamico project. For conditions of distribution</span>
+<span id="L3"><span class="lineNum">       3</span>              : // and use, please see the copyright notice in Mamico's main folder, or at</span>
+<span id="L4"><span class="lineNum">       4</span>              : // www5.in.tum.de/mamico</span>
+<span id="L5"><span class="lineNum">       5</span>              : #ifndef _TARCH_LA_SCALAROPERATIONS_H_</span>
+<span id="L6"><span class="lineNum">       6</span>              : #define _TARCH_LA_SCALAROPERATIONS_H_</span>
+<span id="L7"><span class="lineNum">       7</span>              : #include &lt;cmath&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>              : #include &lt;Kokkos_Core.hpp&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>              : /**     namespace tarch */</span>
+<span id="L10"><span class="lineNum">      10</span>              : namespace tarch {</span>
+<span id="L11"><span class="lineNum">      11</span>              : /** namespace la */</span>
+<span id="L12"><span class="lineNum">      12</span>              : namespace la {</span>
+<span id="L13"><span class="lineNum">      13</span>              : </span>
+<span id="L14"><span class="lineNum">      14</span>              : /**     This function template checks if the difference of two given numbers is</span>
+<span id="L15"><span class="lineNum">      15</span>              :  *smaller than a given tolerance i.e. if they are mathematically equal.</span>
+<span id="L16"><span class="lineNum">      16</span>              :  *  @tparam T data type</span>
+<span id="L17"><span class="lineNum">      17</span>              :  *  @param l First number</span>
+<span id="L18"><span class="lineNum">      18</span>              :  *  @param r Second number</span>
+<span id="L19"><span class="lineNum">      19</span>              :  *  @param tolerance Tolerance</span>
+<span id="L20"><span class="lineNum">      20</span>              :  *      @return 1: if they are equal. 0: if the are not equal.</span>
+<span id="L21"><span class="lineNum">      21</span>              :  *  @author Philipp Neumann</span>
+<span id="L22"><span class="lineNum">      22</span>              :  */</span>
+<span id="L23"><span class="lineNum">      23</span>              : </span>
+<span id="L24"><span class="lineNum">      24</span> <span class="tlaUNC">           0 : template &lt;class T&gt; KOKKOS_INLINE_FUNCTION bool equals(const T&amp; l, const T&amp; r, const T&amp; tolerance) { return std::abs(l - r) &lt;= tolerance; }</span></span>
+<span id="L25"><span class="lineNum">      25</span>              : </span>
+<span id="L26"><span class="lineNum">      26</span>              : } // namespace la</span>
+<span id="L27"><span class="lineNum">      27</span>              : } // namespace tarch</span>
+<span id="L28"><span class="lineNum">      28</span>              : #endif</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
 
-  <table width="100%" border=0 cellspacing=0 cellpadding=0>
-    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
-    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
-  </table>
-  <br>
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
 
 </body>
 </html>

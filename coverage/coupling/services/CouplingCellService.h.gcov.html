@@ -10,437 +10,437 @@
 
 <body>
 
-  <table width="100%" border=0 cellspacing=0 cellpadding=0>
-    <tr><td class="title">LCOV - code coverage report</td></tr>
-    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
 
-    <tr>
-      <td width="100%">
-        <table cellpadding=1 border=0 width="100%">
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
           <tr>
             <td width="10%" class="headerItem">Current view:</td>
-            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">coupling/services</a> - CouplingCellService.h<span style="font-size: 80%;"> (source / <a href="CouplingCellService.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory coupling/services">coupling/services</a> - CouplingCellService.h<span style="font-size: 80%;"> (source / <a href="CouplingCellService.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
             <td width="5%"></td>
-            <td width="15%"></td>
-            <td width="10%" class="headerCovTableHead">Hit</td>
-            <td width="10%" class="headerCovTableHead">Total</td>
-            <td width="15%" class="headerCovTableHead">Coverage</td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
           </tr>
           <tr>
             <td class="headerItem">Test:</td>
             <td class="headerValue">coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryLo">27.3&nbsp;%</td>
             <td class="headerCovTableEntry">22</td>
-            <td class="headerCovTableEntryLo">27.3 %</td>
+            <td class="headerCovTableEntry">6</td>
           </tr>
           <tr>
-            <td class="headerItem">Date:</td>
-            <td class="headerValue">2026-08-13 15:36:34</td>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-08-14 11:08:15</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">16.7&nbsp;%</td>
             <td class="headerCovTableEntry">6</td>
-            <td class="headerCovTableEntryLo">16.7 %</td>
+            <td class="headerCovTableEntry">1</td>
           </tr>
-          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
-        </table>
-      </td>
-    </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
 
-    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
-  </table>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
 
-  <table cellpadding=0 cellspacing=0 border=0>
-    <tr>
-      <td><br></td>
-    </tr>
-    <tr>
-      <td>
-<pre class="sourceHeading">          Line data    Source code</pre>
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
 <pre class="source">
-<a name="1"><span class="lineNum">       1 </span>            : // Copyright (C) 2015 Technische Universitaet Muenchen</a>
-<a name="2"><span class="lineNum">       2 </span>            : // This file is part of the Mamico project. For conditions of distribution</a>
-<a name="3"><span class="lineNum">       3 </span>            : // and use, please see the copyright notice in Mamico's main folder, or at</a>
-<a name="4"><span class="lineNum">       4 </span>            : // www5.in.tum.de/mamico</a>
-<a name="5"><span class="lineNum">       5 </span>            : #ifndef _MOLECULARDYNAMICS_COUPLING_SERVICES_COUPLINGCELLSERVICE_H_</a>
-<a name="6"><span class="lineNum">       6 </span>            : #define _MOLECULARDYNAMICS_COUPLING_SERVICES_COUPLINGCELLSERVICE_H_</a>
-<a name="7"><span class="lineNum">       7 </span>            : </a>
-<a name="8"><span class="lineNum">       8 </span>            : #pragma once</a>
-<a name="9"><span class="lineNum">       9 </span>            : </a>
-<a name="10"><span class="lineNum">      10 </span>            : #include &quot;coupling/CouplingCellPlotter.h&quot;</a>
-<a name="11"><span class="lineNum">      11 </span>            : #include &quot;coupling/KineticEnergyController.h&quot;</a>
-<a name="12"><span class="lineNum">      12 </span>            : #include &quot;coupling/MomentumController.h&quot;</a>
-<a name="13"><span class="lineNum">      13 </span>            : #include &quot;coupling/cell-mappings/ComputeMeanPotentialEnergyMapping.h&quot;</a>
-<a name="14"><span class="lineNum">      14 </span>            : #include &quot;coupling/cell-mappings/ComputeMomentumMapping.h&quot;</a>
-<a name="15"><span class="lineNum">      15 </span>            : #include &quot;coupling/cell-mappings/PerturbateVelocityMapping.h&quot;</a>
-<a name="16"><span class="lineNum">      16 </span>            : #include &quot;coupling/configurations/BoundaryForceConfiguration.h&quot;</a>
-<a name="17"><span class="lineNum">      17 </span>            : #include &quot;coupling/configurations/CouplingCellConfiguration.h&quot;</a>
-<a name="18"><span class="lineNum">      18 </span>            : #include &quot;coupling/configurations/MaMiCoConfiguration.h&quot;</a>
-<a name="19"><span class="lineNum">      19 </span>            : #include &quot;coupling/configurations/MomentumInsertionConfiguration.h&quot;</a>
-<a name="20"><span class="lineNum">      20 </span>            : #include &quot;coupling/configurations/ParallelTopologyConfiguration.h&quot;</a>
-<a name="21"><span class="lineNum">      21 </span>            : #include &quot;coupling/configurations/ParticleInsertionConfiguration.h&quot;</a>
-<a name="22"><span class="lineNum">      22 </span>            : #include &quot;coupling/configurations/ThermostatConfiguration.h&quot;</a>
-<a name="23"><span class="lineNum">      23 </span>            : #include &quot;coupling/configurations/TransferStrategyConfiguration.h&quot;</a>
-<a name="24"><span class="lineNum">      24 </span>            : #include &quot;coupling/datastructures/CellContainer.h&quot;</a>
-<a name="25"><span class="lineNum">      25 </span>            : #include &quot;coupling/indexing/IndexingService.h&quot;</a>
-<a name="26"><span class="lineNum">      26 </span>            : #include &quot;coupling/interface/MDSolverInterface.h&quot;</a>
-<a name="27"><span class="lineNum">      27 </span>            : #include &quot;coupling/interface/MacroscopicSolverInterface.h&quot;</a>
-<a name="28"><span class="lineNum">      28 </span>            : #include &quot;coupling/sendrecv/DataExchangeFromAllMacro2MD.h&quot;</a>
-<a name="29"><span class="lineNum">      29 </span>            : #include &quot;coupling/sendrecv/DataExchangeFromMD2Macro.h&quot;</a>
-<a name="30"><span class="lineNum">      30 </span>            : #include &quot;coupling/sendrecv/DataExchangeFromMacro2MD.h&quot;</a>
-<a name="31"><span class="lineNum">      31 </span>            : #include &quot;coupling/sendrecv/FromMD2Macro.h&quot;</a>
-<a name="32"><span class="lineNum">      32 </span>            : #include &quot;coupling/sendrecv/FromMacro2MD.h&quot;</a>
-<a name="33"><span class="lineNum">      33 </span>            : #include &quot;tarch/utils/MultiMDService.h&quot;</a>
-<a name="34"><span class="lineNum">      34 </span>            : </a>
-<a name="35"><span class="lineNum">      35 </span>            : #include &quot;coupling/filtering/FilterPipeline.h&quot;</a>
-<a name="36"><span class="lineNum">      36 </span>            : </a>
-<a name="37"><span class="lineNum">      37 </span>            : namespace coupling {</a>
-<a name="38"><span class="lineNum">      38 </span>            : namespace services {</a>
-<a name="39"><span class="lineNum">      39 </span>            : </a>
-<a name="40"><span class="lineNum">      40 </span>            : template &lt;unsigned int dim&gt; class CouplingCellService;</a>
-<a name="41"><span class="lineNum">      41 </span>            : </a>
-<a name="42"><span class="lineNum">      42 </span>            : template &lt;class LinkedCell, unsigned int dim&gt; class CouplingCellServiceImpl;</a>
-<a name="43"><span class="lineNum">      43 </span>            : } // namespace services</a>
-<a name="44"><span class="lineNum">      44 </span>            : } // namespace coupling</a>
-<a name="45"><span class="lineNum">      45 </span>            : </a>
-<a name="46"><span class="lineNum">      46 </span>            : /** generic interface class for functionality of data exchange in hybrid</a>
-<a name="47"><span class="lineNum">      47 </span>            :  * Micro-Macro simulations.</a>
-<a name="48"><span class="lineNum">      48 </span>            :  *  @author Philipp Neumann</a>
-<a name="49"><span class="lineNum">      49 </span>            :  */</a>
-<a name="50"><span class="lineNum">      50 </span>            : template &lt;unsigned int dim&gt; class coupling::services::CouplingCellService {</a>
-<a name="51"><span class="lineNum">      51 </span>            : public:</a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineCov">          4 :   CouplingCellService(unsigned int ID, unsigned int topologyOffset) : _id(ID), _topologyOffset(topologyOffset) {</span></a>
-<a name="53"><span class="lineNum">      53 </span>            : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</a>
-<a name="54"><span class="lineNum">      54 </span>            :     std::cout &lt;&lt; &quot;CouplingCellService::CouplingCellService(): Set ID=&quot; &lt;&lt; _id &lt;&lt; std::endl;</a>
-<a name="55"><span class="lineNum">      55 </span>            : #endif</a>
-<a name="56"><span class="lineNum">      56 </span>            :   }</a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :   virtual ~CouplingCellService() {}</span></a>
-<a name="58"><span class="lineNum">      58 </span>            : </a>
-<a name="59"><span class="lineNum">      59 </span>            :   virtual double applyFilterPipeline() = 0;</a>
-<a name="60"><span class="lineNum">      60 </span>            :   virtual void sendFromMacro2MDPreProcess() = 0;</a>
-<a name="61"><span class="lineNum">      61 </span>            :   virtual void sendFromMacro2MDPostProcess() = 0;</a>
-<a name="62"><span class="lineNum">      62 </span>            :   virtual void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer&lt;dim&gt;&amp; macro2MDBuffer) = 0;</a>
-<a name="63"><span class="lineNum">      63 </span>            :   virtual void sendFromMD2MacroPreProcess() = 0;</a>
-<a name="64"><span class="lineNum">      64 </span>            :   virtual void sendFromMD2MacroPostProcess() = 0;</a>
-<a name="65"><span class="lineNum">      65 </span>            :   virtual double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer&lt;dim&gt;&amp; couplingCellContainerFromMacroscopicSolver) = 0;</a>
-<a name="66"><span class="lineNum">      66 </span>            :   virtual void processInnerCouplingCellAfterMDTimestep() = 0;</a>
-<a name="67"><span class="lineNum">      67 </span>            :   virtual void computeAndStoreTemperature(double temperature) = 0;</a>
-<a name="68"><span class="lineNum">      68 </span>            :   virtual void applyTemperatureToMolecules(unsigned int t) = 0;</a>
-<a name="69"><span class="lineNum">      69 </span>            :   virtual void distributeMass(unsigned int t) = 0;</a>
-<a name="70"><span class="lineNum">      70 </span>            :   virtual void distributeMomentum(unsigned int t) = 0;</a>
-<a name="71"><span class="lineNum">      71 </span>            :   virtual void applyBoundaryForce(unsigned int t) = 0;</a>
-<a name="72"><span class="lineNum">      72 </span>            :   virtual void perturbateVelocity() = 0;</a>
-<a name="73"><span class="lineNum">      73 </span>            :   virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;</a>
-<a name="74"><span class="lineNum">      74 </span>            :   virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;</a>
-<a name="75"><span class="lineNum">      75 </span>            :   virtual void setInnerMomentumImposition(bool enable) = 0;</a>
-<a name="76"><span class="lineNum">      76 </span>            : </a>
-<a name="77"><span class="lineNum">      77 </span><span class="lineNoCov">          0 :   virtual void initFiltering() {</span></a>
-<a name="78"><span class="lineNum">      78 </span><span class="lineNoCov">          0 :     throw std::runtime_error(&quot;CouplingCellService: Error: Called &quot;</span></a>
-<a name="79"><span class="lineNum">      79 </span>            :                              &quot;initFiltering for non-Impl object.&quot;);</a>
-<a name="80"><span class="lineNum">      80 </span>            :   } /*Note: This is not pure virtual, because some implementations of this</a>
-<a name="81"><span class="lineNum">      81 </span>            :        interface don't have a FilterPipeline. */</a>
-<a name="82"><span class="lineNum">      82 </span><span class="lineNoCov">          0 :   virtual const coupling::filtering::FilterPipeline&lt;I02, dim&gt;* getFilterPipeline() const {</span></a>
-<a name="83"><span class="lineNum">      83 </span><span class="lineNoCov">          0 :     throw std::runtime_error(&quot;CouplingCellService: Error: Called getFilterPipeline() in instance &quot;</span></a>
-<a name="84"><span class="lineNum">      84 </span>            :                              &quot;without FilterPipeline.&quot;);</a>
-<a name="85"><span class="lineNum">      85 </span>            :   } /*Note: This is not pure virtual, because some implementations of this</a>
-<a name="86"><span class="lineNum">      86 </span>            :        interface don't have a FilterPipeline. */</a>
-<a name="87"><span class="lineNum">      87 </span>            : </a>
-<a name="88"><span class="lineNum">      88 </span><span class="lineNoCov">          0 :   unsigned int getID() const { return _id; }</span></a>
-<a name="89"><span class="lineNum">      89 </span>            : </a>
-<a name="90"><span class="lineNum">      90 </span>            : protected:</a>
-<a name="91"><span class="lineNum">      91 </span>            :   const unsigned int _id; /** (unique) identifier of this coupling cell service */</a>
-<a name="92"><span class="lineNum">      92 </span>            :   unsigned int _topologyOffset;</a>
-<a name="93"><span class="lineNum">      93 </span>            : };</a>
-<a name="94"><span class="lineNum">      94 </span>            : </a>
-<a name="95"><span class="lineNum">      95 </span>            : /** This class put together all ingredients for coupling MD and some macroscopic</a>
-<a name="96"><span class="lineNum">      96 </span>            :  * solver. It thus triggers send/recv-operations between the coupling tool and</a>
-<a name="97"><span class="lineNum">      97 </span>            :  * MD as well as between the coupling tool and the macroscopic solver.</a>
-<a name="98"><span class="lineNum">      98 </span>            :  *  @author Philipp Neumann</a>
-<a name="99"><span class="lineNum">      99 </span>            :  */</a>
-<a name="100"><span class="lineNum">     100 </span>            : template &lt;class LinkedCell, unsigned int dim&gt; class coupling::services::CouplingCellServiceImpl : public coupling::services::CouplingCellService&lt;dim&gt; {</a>
-<a name="101"><span class="lineNum">     101 </span>            : public:</a>
-<a name="102"><span class="lineNum">     102 </span>            :   /** constructor. Arguments:</a>
-<a name="103"><span class="lineNum">     103 </span>            :    *  mdSolverInterface                 - pointer to the MD solver interface</a>
-<a name="104"><span class="lineNum">     104 </span>            :    *  macroscopicSolverInterface        - pointer to the macroscopic solver</a>
-<a name="105"><span class="lineNum">     105 </span>            :    * interface numberProcesses                   - number of processes assuming</a>
-<a name="106"><span class="lineNum">     106 </span>            :    * a block-like domain decomposition rank                              - rank</a>
-<a name="107"><span class="lineNum">     107 </span>            :    * of the current process particleInsertionConfiguration    - configuration</a>
-<a name="108"><span class="lineNum">     108 </span>            :    * object for (USHER-based) particle insertion and particle removal</a>
-<a name="109"><span class="lineNum">     109 </span>            :    *  momentumInsertionConfiguration    - configuration object which determines</a>
-<a name="110"><span class="lineNum">     110 </span>            :    * the momentum transfer on MD side transferStrategyConfiguration     -</a>
-<a name="111"><span class="lineNum">     111 </span>            :    * configuration object which determines the respective transfer strategy</a>
-<a name="112"><span class="lineNum">     112 </span>            :    *  parallelTopologyConfiguration     - configuratio object which defines the</a>
-<a name="113"><span class="lineNum">     113 </span>            :    * parallel topology of the simulation (domain decomposition of the MD</a>
-<a name="114"><span class="lineNum">     114 </span>            :    * simulation) numberMDTimestepsPerCouplingCycle - number of MD time steps per</a>
-<a name="115"><span class="lineNum">     115 </span>            :    * coupling cycle couplingCellConfiguration      - configuration object</a>
-<a name="116"><span class="lineNum">     116 </span>            :    * which determines the properties of the coupling cells topologyOffset -</a>
-<a name="117"><span class="lineNum">     117 </span>            :    * offset in linearized topology of ranks topologyGlobalNumberProcesses     -</a>
-<a name="118"><span class="lineNum">     118 </span>            :    * global number of processes available in overall topology</a>
-<a name="119"><span class="lineNum">     119 </span>            :    *</a>
-<a name="120"><span class="lineNum">     120 </span>            :    *  Note: the interface pointers are used by the CouplingCellServiceImpl;</a>
-<a name="121"><span class="lineNum">     121 </span>            :    * they are not deleted at the end of the simulation since other (external)</a>
-<a name="122"><span class="lineNum">     122 </span>            :    * routines may use those as well.</a>
-<a name="123"><span class="lineNum">     123 </span>            :    */</a>
-<a name="124"><span class="lineNum">     124 </span>            :   CouplingCellServiceImpl(</a>
-<a name="125"><span class="lineNum">     125 </span>            :       unsigned int ID, coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* mdSolverInterface,         // interface to MD simulation</a>
-<a name="126"><span class="lineNum">     126 </span>            :       coupling::interface::MacroscopicSolverInterface&lt;dim&gt;* macroscopicSolverInterface,                    // interface to macroscopic solver</a>
-<a name="127"><span class="lineNum">     127 </span>            :       tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,                                                // number of processes in all directions</a>
-<a name="128"><span class="lineNum">     128 </span>            :       unsigned int rank,                                                                                   // current rank</a>
-<a name="129"><span class="lineNum">     129 </span>            :       const coupling::configurations::ParticleInsertionConfiguration&amp; particleInsertionConfiguration,      // configuration for particle</a>
-<a name="130"><span class="lineNum">     130 </span>            :                                                                                                            // insertion</a>
-<a name="131"><span class="lineNum">     131 </span>            :       const coupling::configurations::MomentumInsertionConfiguration&lt;dim&gt;&amp; momentumInsertionConfiguration, // configuration for momentum</a>
-<a name="132"><span class="lineNum">     132 </span>            :                                                                                                            // insertion</a>
-<a name="133"><span class="lineNum">     133 </span>            :       const coupling::configurations::BoundaryForceConfiguration&lt;dim&gt;&amp; boundaryForceConfiguration,         // configuration for boundary forces</a>
-<a name="134"><span class="lineNum">     134 </span>            :       const coupling::configurations::TransferStrategyConfiguration&lt;dim&gt;&amp; transferStrategyConfiguration,   // configuration for transfer strategy</a>
-<a name="135"><span class="lineNum">     135 </span>            :       const coupling::configurations::ParallelTopologyConfiguration&amp; parallelTopologyConfiguration,        // configuration for parallel topology</a>
-<a name="136"><span class="lineNum">     136 </span>            :       const coupling::configurations::ThermostatConfiguration&amp; thermostatConfiguration,</a>
-<a name="137"><span class="lineNum">     137 </span>            :       unsigned int numberMDTimestepsPerCouplingCycle,                                            // number MD timesteps per coupling</a>
-<a name="138"><span class="lineNum">     138 </span>            :                                                                                                  // cycle (required to initialise</a>
-<a name="139"><span class="lineNum">     139 </span>            :                                                                                                  // transfer strategy)</a>
-<a name="140"><span class="lineNum">     140 </span>            :       const coupling::configurations::CouplingCellConfiguration&lt;dim&gt;&amp; couplingCellConfiguration, // configuration for coupling cells</a>
-<a name="141"><span class="lineNum">     141 </span>            :                                                                                                  // and respective plotting</a>
-<a name="142"><span class="lineNum">     142 </span>            :       const char* filterPipelineConfiguration, const tarch::utils::MultiMDService&lt;dim&gt;&amp; multiMDService, unsigned int topologyOffset, int tws = 0);</a>
-<a name="143"><span class="lineNum">     143 </span>            : </a>
-<a name="144"><span class="lineNum">     144 </span>            :   CouplingCellServiceImpl(</a>
-<a name="145"><span class="lineNum">     145 </span>            :       unsigned int ID, coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* mdSolverInterface,         // interface to MD simulation</a>
-<a name="146"><span class="lineNum">     146 </span>            :       coupling::interface::MacroscopicSolverInterface&lt;dim&gt;* macroscopicSolverInterface,                    // interface to macroscopic solver</a>
-<a name="147"><span class="lineNum">     147 </span>            :       tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,                                                // number of processes in all directions</a>
-<a name="148"><span class="lineNum">     148 </span>            :       unsigned int rank,                                                                                   // current rank</a>
-<a name="149"><span class="lineNum">     149 </span>            :       const coupling::configurations::ParticleInsertionConfiguration&amp; particleInsertionConfiguration,      // configuration for particle</a>
-<a name="150"><span class="lineNum">     150 </span>            :                                                                                                            // insertion</a>
-<a name="151"><span class="lineNum">     151 </span>            :       const coupling::configurations::MomentumInsertionConfiguration&lt;dim&gt;&amp; momentumInsertionConfiguration, // configuration for momentum</a>
-<a name="152"><span class="lineNum">     152 </span>            :                                                                                                            // insertion</a>
-<a name="153"><span class="lineNum">     153 </span>            :       const coupling::configurations::BoundaryForceConfiguration&lt;dim&gt;&amp; boundaryForceConfiguration,         // configuration for boundary forces</a>
-<a name="154"><span class="lineNum">     154 </span>            :       const coupling::configurations::TransferStrategyConfiguration&lt;dim&gt;&amp; transferStrategyConfiguration,   // configuration for transfer strategy</a>
-<a name="155"><span class="lineNum">     155 </span>            :       const coupling::configurations::ParallelTopologyConfiguration&amp; parallelTopologyConfiguration,        // configuration for parallel topology</a>
-<a name="156"><span class="lineNum">     156 </span>            :       const coupling::configurations::ThermostatConfiguration&amp; thermostatConfiguration,</a>
-<a name="157"><span class="lineNum">     157 </span>            :       unsigned int numberMDTimestepsPerCouplingCycle,                                            // number MD timesteps per coupling</a>
-<a name="158"><span class="lineNum">     158 </span>            :                                                                                                  // cycle (required to initialise</a>
-<a name="159"><span class="lineNum">     159 </span>            :                                                                                                  // transfer strategy)</a>
-<a name="160"><span class="lineNum">     160 </span>            :       const coupling::configurations::CouplingCellConfiguration&lt;dim&gt;&amp; couplingCellConfiguration, // configuration for coupling cells</a>
-<a name="161"><span class="lineNum">     161 </span>            :                                                                                                  // and respective plotting</a>
-<a name="162"><span class="lineNum">     162 </span>            :       const char* filterPipelineConfiguration, const tarch::utils::MultiMDService&lt;dim&gt;&amp; multiMDService)</a>
-<a name="163"><span class="lineNum">     163 </span>            :       : CouplingCellServiceImpl&lt;LinkedCell, dim&gt;(ID, mdSolverInterface, macroscopicSolverInterface, numberProcesses, rank, particleInsertionConfiguration,</a>
-<a name="164"><span class="lineNum">     164 </span>            :                                                  momentumInsertionConfiguration, boundaryForceConfiguration, transferStrategyConfiguration,</a>
-<a name="165"><span class="lineNum">     165 </span>            :                                                  parallelTopologyConfiguration, thermostatConfiguration, numberMDTimestepsPerCouplingCycle,</a>
-<a name="166"><span class="lineNum">     166 </span>            :                                                  couplingCellConfiguration, filterPipelineConfiguration, multiMDService, 0) {}</a>
-<a name="167"><span class="lineNum">     167 </span>            : </a>
-<a name="168"><span class="lineNum">     168 </span>            :   /** destructor. Frees dynamically allocated memory for particle insertion,</a>
-<a name="169"><span class="lineNum">     169 </span>            :    * momentum insertion and the transfer strategy.</a>
-<a name="170"><span class="lineNum">     170 </span>            :    */</a>
-<a name="171"><span class="lineNum">     171 </span>            :   virtual ~CouplingCellServiceImpl();</a>
-<a name="172"><span class="lineNum">     172 </span>            : </a>
-<a name="173"><span class="lineNum">     173 </span>            :   /** sends information from macroscopic solver to MD. The cell information from</a>
-<a name="174"><span class="lineNum">     174 </span>            :    * the macroscopic solver is handed over as a flexible cell container</a>
-<a name="175"><span class="lineNum">     175 </span>            :    * The coupling tool internally triggers send/recv-operations</a>
-<a name="176"><span class="lineNum">     176 </span>            :    * (this also comprises the distributed memory parallelisation via MPI)</a>
-<a name="177"><span class="lineNum">     177 </span>            :    * and writes the respective information to the coupling cells of the tool</a>
-<a name="178"><span class="lineNum">     178 </span>            :    */</a>
-<a name="179"><span class="lineNum">     179 </span>            :   void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer&lt;dim&gt;&amp; macro2MDBuffer) override;</a>
-<a name="180"><span class="lineNum">     180 </span>            : </a>
-<a name="181"><span class="lineNum">     181 </span>            :   /** sends information from MD to the macroscopic solver. After the</a>
-<a name="182"><span class="lineNum">     182 </span>            :    * send/recv-operations (this also comprises the distributed memory</a>
-<a name="183"><span class="lineNum">     183 </span>            :    * parallelisation scenario), the information from the coupling tool is</a>
-<a name="184"><span class="lineNum">     184 </span>            :    * written to the buffer couplingCellsFromMacroscopicSolver together with</a>
-<a name="185"><span class="lineNum">     185 </span>            :    * the respective global cell indices</a>
-<a name="186"><span class="lineNum">     186 </span>            :    *  (-&gt; indices).</a>
-<a name="187"><span class="lineNum">     187 </span>            :    *</a>
-<a name="188"><span class="lineNum">     188 </span>            :    * @returns The runtime of filtering related code in usec.</a>
-<a name="189"><span class="lineNum">     189 </span>            :    */</a>
-<a name="190"><span class="lineNum">     190 </span>            :   double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer&lt;dim&gt;&amp; macroscopicSolverCellContainer) override;</a>
-<a name="191"><span class="lineNum">     191 </span>            : </a>
-<a name="192"><span class="lineNum">     192 </span>            :   /** applies the filter pipeline and returns the runtime of this operation */</a>
-<a name="193"><span class="lineNum">     193 </span>            :   double applyFilterPipeline() override;</a>
-<a name="194"><span class="lineNum">     194 </span>            : </a>
-<a name="195"><span class="lineNum">     195 </span>            :   void sendFromMacro2MDPreProcess() override;</a>
-<a name="196"><span class="lineNum">     196 </span>            : </a>
-<a name="197"><span class="lineNum">     197 </span>            :   void sendFromMacro2MDPostProcess() override;</a>
-<a name="198"><span class="lineNum">     198 </span>            : </a>
-<a name="199"><span class="lineNum">     199 </span>            :   void sendFromMD2MacroPreProcess() override;</a>
-<a name="200"><span class="lineNum">     200 </span>            : </a>
-<a name="201"><span class="lineNum">     201 </span><span class="lineNoCov">          0 :   void sendFromMD2MacroPostProcess() override {}</span></a>
-<a name="202"><span class="lineNum">     202 </span>            : </a>
-<a name="203"><span class="lineNum">     203 </span>            :   /** carries out coupling-dependent operations (such as sampling) on the</a>
-<a name="204"><span class="lineNum">     204 </span>            :    * non-ghost coupling cells after each MD time step. This method needs thus</a>
-<a name="205"><span class="lineNum">     205 </span>            :    * to be called from the MD simulation.</a>
-<a name="206"><span class="lineNum">     206 </span>            :    */</a>
-<a name="207"><span class="lineNum">     207 </span>            :   void processInnerCouplingCellAfterMDTimestep() override;</a>
-<a name="208"><span class="lineNum">     208 </span>            : </a>
-<a name="209"><span class="lineNum">     209 </span>            :   /** sets the temperature value in all coupling cells. If the value of</a>
-<a name="210"><span class="lineNum">     210 </span>            :    * temperature is -1.0, we set the local temperature of each coupling cell</a>
-<a name="211"><span class="lineNum">     211 </span>            :    * (and just store this value in the coupling cell). Otherwise, we apply</a>
-<a name="212"><span class="lineNum">     212 </span>            :    * the given temperature in all cells. In the latter case, this also resembles</a>
-<a name="213"><span class="lineNum">     213 </span>            :    * a first thermostat-like operation.</a>
-<a name="214"><span class="lineNum">     214 </span>            :    */</a>
-<a name="215"><span class="lineNum">     215 </span>            :   void computeAndStoreTemperature(double temperature) override;</a>
-<a name="216"><span class="lineNum">     216 </span>            : </a>
-<a name="217"><span class="lineNum">     217 </span>            :   /** applies a thermostat in all non-ghost coupling cells. */</a>
-<a name="218"><span class="lineNum">     218 </span>            :   void applyTemperatureToMolecules(unsigned int t) override;</a>
-<a name="219"><span class="lineNum">     219 </span>            : </a>
-<a name="220"><span class="lineNum">     220 </span>            :   /** applies a boundary force to molecules which are close to an open boundary.</a>
-<a name="221"><span class="lineNum">     221 </span>            :    */</a>
-<a name="222"><span class="lineNum">     222 </span>            :   void applyBoundaryForce(unsigned int t) override;</a>
-<a name="223"><span class="lineNum">     223 </span>            : </a>
-<a name="224"><span class="lineNum">     224 </span>            :   /** distributes mass in the system. */</a>
-<a name="225"><span class="lineNum">     225 </span>            :   void distributeMass(unsigned int t) override;</a>
-<a name="226"><span class="lineNum">     226 </span>            : </a>
-<a name="227"><span class="lineNum">     227 </span>            :   /** distributes momentum in MD. Should typically be called after force</a>
-<a name="228"><span class="lineNum">     228 </span>            :    * accumulation since momentum distribution may depend on current forces. */</a>
-<a name="229"><span class="lineNum">     229 </span>            :   void distributeMomentum(unsigned int t) override;</a>
-<a name="230"><span class="lineNum">     230 </span>            : </a>
-<a name="231"><span class="lineNum">     231 </span>            :   /** applies a new velocity to each particle according to its cell's mean</a>
-<a name="232"><span class="lineNum">     232 </span>            :    * velocity. */</a>
-<a name="233"><span class="lineNum">     233 </span>            :   void perturbateVelocity() override;</a>
-<a name="234"><span class="lineNum">     234 </span>            : </a>
-<a name="235"><span class="lineNum">     235 </span>            :   /** plots coupling cell and molecule information at some time step t. The</a>
-<a name="236"><span class="lineNum">     236 </span>            :    * correct triggering of plotting needs to be established from the main</a>
-<a name="237"><span class="lineNum">     237 </span>            :    * coupling loop which is outside the coupling tool (not included in this</a>
-<a name="238"><span class="lineNum">     238 </span>            :    * function).</a>
-<a name="239"><span class="lineNum">     239 </span>            :    */</a>
-<a name="240"><span class="lineNum">     240 </span>            :   void plotEveryMicroscopicTimestep(unsigned int t) override;</a>
-<a name="241"><span class="lineNum">     241 </span>            :   void plotEveryMacroscopicTimestep(unsigned int t) override;</a>
-<a name="242"><span class="lineNum">     242 </span>            :   void setInnerMomentumImposition(bool enable) override;</a>
-<a name="243"><span class="lineNum">     243 </span>            : </a>
-<a name="244"><span class="lineNum">     244 </span>            :   /**</a>
-<a name="245"><span class="lineNum">     245 </span>            :    * Initialises the _filterPipeline member. Called from _multiMDCellService's</a>
-<a name="246"><span class="lineNum">     246 </span>            :    * constructFilterPipelines(). Make sure to delete _filterPipeline in</a>
-<a name="247"><span class="lineNum">     247 </span>            :    * ~CouplingCellServiceImpl()</a>
-<a name="248"><span class="lineNum">     248 </span>            :    */</a>
-<a name="249"><span class="lineNum">     249 </span><span class="lineNoCov">          0 :   void initFiltering() override {</span></a>
-<a name="250"><span class="lineNum">     250 </span><span class="lineNoCov">          0 :     _filterPipeline = new coupling::filtering::FilterPipeline&lt;I02, dim&gt;(_couplingCells, coupling::filtering::Scope::perInstance, _multiMDService,</span></a>
-<a name="251"><span class="lineNum">     251 </span>            :                                                                         _filterPipelineConfiguration);</a>
-<a name="252"><span class="lineNum">     252 </span><span class="lineNoCov">          0 :   }</span></a>
-<a name="253"><span class="lineNum">     253 </span>            : </a>
-<a name="254"><span class="lineNum">     254 </span><span class="lineNoCov">          0 :   const coupling::filtering::FilterPipeline&lt;I02, dim&gt;* getFilterPipeline() const override { return _filterPipeline; }</span></a>
-<a name="255"><span class="lineNum">     255 </span>            : </a>
-<a name="256"><span class="lineNum">     256 </span>            :   /**</a>
-<a name="257"><span class="lineNum">     257 </span>            :    * Creates a new filter from scratch and appends it to a sequence that is part</a>
-<a name="258"><span class="lineNum">     258 </span>            :    * of this service's filter pipelining system. For that, the desired</a>
-<a name="259"><span class="lineNum">     259 </span>            :    * sequence's identifier and two functions are needed:</a>
-<a name="260"><span class="lineNum">     260 </span>            :    *  - applyScalar What to do with scalar properties of the sequence's</a>
-<a name="261"><span class="lineNum">     261 </span>            :    * Coupling Cells.</a>
-<a name="262"><span class="lineNum">     262 </span>            :    *  - applyVector: What to do with properties stored as vectors of the</a>
-<a name="263"><span class="lineNum">     263 </span>            :    * sequence's of Coupling Cells.</a>
-<a name="264"><span class="lineNum">     264 </span>            :    */</a>
-<a name="265"><span class="lineNum">     265 </span>            :   /*</a>
-<a name="266"><span class="lineNum">     266 </span>            :    * TODO: MOVE COMMENT</a>
-<a name="267"><span class="lineNum">     267 </span>            :   void addFilterToSequence(     const char *sequenceIdentifier,</a>
-<a name="268"><span class="lineNum">     268 </span>            :                                                           const</a>
-<a name="269"><span class="lineNum">     269 </span>            :   std::function&lt;std::vector&lt;double&gt; (std::vector&lt;double&gt; cells_s,</a>
-<a name="270"><span class="lineNum">     270 </span>            :   std::vector&lt;std::array&lt;unsigned int, dim&gt;&gt; indices)&gt;* applyScalar, const</a>
-<a name="271"><span class="lineNum">     271 </span>            :   std::function&lt;std::vector&lt;std::array&lt;double, dim&gt;&gt;</a>
-<a name="272"><span class="lineNum">     272 </span>            :   (std::vector&lt;std::array&lt;double, dim&gt;&gt; cells_v, std::vector&lt;std::array&lt;unsigned</a>
-<a name="273"><span class="lineNum">     273 </span>            :   int, dim&gt;&gt; indices)&gt;* applyVector, int filterIndex = -1</a>
-<a name="274"><span class="lineNum">     274 </span>            :   );*/</a>
-<a name="275"><span class="lineNum">     275 </span>            : </a>
-<a name="276"><span class="lineNum">     276 </span>            :   /** returns the coupling cells. This functions is meant to be used in test</a>
-<a name="277"><span class="lineNum">     277 </span>            :    * scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */</a>
-<a name="278"><span class="lineNum">     278 </span>            :   coupling::datastructures::LinkedCellContainer&lt;LinkedCell, dim&gt;&amp; getCouplingCells() { return _couplingCells; }</a>
-<a name="279"><span class="lineNum">     279 </span>            : </a>
-<a name="280"><span class="lineNum">     280 </span>            : private:</a>
-<a name="281"><span class="lineNum">     281 </span>            : // ------------------- INCLUDE WRAPPER DEFINITIONS</a>
-<a name="282"><span class="lineNum">     282 </span>            : // -------------------------------------</a>
-<a name="283"><span class="lineNum">     283 </span>            : #include &quot;CouplingCellTraversalWrappers.cpph&quot;</a>
-<a name="284"><span class="lineNum">     284 </span>            : </a>
-<a name="285"><span class="lineNum">     285 </span>            :   /** initialises the index structures for USHER scheme */</a>
-<a name="286"><span class="lineNum">     286 </span>            :   void initIndexVectors4Usher();</a>
-<a name="287"><span class="lineNum">     287 </span>            : </a>
-<a name="288"><span class="lineNum">     288 </span>            :   tarch::la::Vector&lt;dim, double&gt; getPositionOfFirstLocalGhostCell() const;</a>
-<a name="289"><span class="lineNum">     289 </span>            : </a>
-<a name="290"><span class="lineNum">     290 </span><span class="lineCov">          4 :   std::function&lt;void(Wrapper&amp;)&gt; initCorrectApplicationOfThermostat(const coupling::configurations::ThermostatConfiguration&amp; thermostatConfiguration) {</span></a>
-<a name="291"><span class="lineNum">     291 </span><span class="lineCov">          4 :     if (thermostatConfiguration.getThermostatRegionType() == coupling::configurations::ThermostatConfiguration::ThermostatRegion::all)</span></a>
-<a name="292"><span class="lineNum">     292 </span><span class="lineNoCov">          0 :       return [this](Wrapper&amp; wrapper) { _couplingCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(wrapper); };</span></a>
-<a name="293"><span class="lineNum">     293 </span><span class="lineCov">          4 :     else if (thermostatConfiguration.getThermostatRegionType() == coupling::configurations::ThermostatConfiguration::ThermostatRegion::outerLayers)</span></a>
-<a name="294"><span class="lineNum">     294 </span><span class="lineNoCov">          0 :       return [this, &amp;thermostatConfiguration](Wrapper&amp; wrapper) {</span></a>
-<a name="295"><span class="lineNum">     295 </span><span class="lineNoCov">          0 :         _couplingCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCells(wrapper, thermostatConfiguration.getCells2Use());</span></a>
-<a name="296"><span class="lineNum">     296 </span><span class="lineNoCov">          0 :       };</span></a>
-<a name="297"><span class="lineNum">     297 </span><span class="lineCov">          4 :     else if (thermostatConfiguration.getThermostatRegionType() == coupling::configurations::ThermostatConfiguration::ThermostatRegion::onlyOutestLayer)</span></a>
-<a name="298"><span class="lineNum">     298 </span><span class="lineNoCov">          0 :       return [this](Wrapper&amp; wrapper) { _couplingCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper); };</span></a>
-<a name="299"><span class="lineNum">     299 </span>            :     else</a>
-<a name="300"><span class="lineNum">     300 </span><span class="lineCov">          4 :       return [](Wrapper&amp; wrapper) {};</span></a>
-<a name="301"><span class="lineNum">     301 </span>            :   }</a>
-<a name="302"><span class="lineNum">     302 </span>            : </a>
-<a name="303"><span class="lineNum">     303 </span>            :   /** number of MD time steps in each coupling cycle */</a>
-<a name="304"><span class="lineNum">     304 </span>            :   const unsigned int _numberMDTimestepsPerCouplingCycle;</a>
-<a name="305"><span class="lineNum">     305 </span>            : </a>
-<a name="306"><span class="lineNum">     306 </span>            :   /** interface for MD solver */</a>
-<a name="307"><span class="lineNum">     307 </span>            :   coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* _mdSolverInterface;</a>
-<a name="308"><span class="lineNum">     308 </span>            : </a>
-<a name="309"><span class="lineNum">     309 </span>            :   /** interface for macroscopic solver */</a>
-<a name="310"><span class="lineNum">     310 </span>            :   coupling::interface::MacroscopicSolverInterface&lt;dim&gt;* _macroscopicSolverInterface;</a>
-<a name="311"><span class="lineNum">     311 </span>            : </a>
-<a name="312"><span class="lineNum">     312 </span>            :   /** for quantity transfer between solvers */</a>
-<a name="313"><span class="lineNum">     313 </span>            :   coupling::sendrecv::FromMacro2MD&lt;coupling::datastructures::CouplingCell&lt;dim&gt;, dim&gt; _fromMacro2MD;</a>
-<a name="314"><span class="lineNum">     314 </span>            :   coupling::sendrecv::DataExchangeFromMacro2MD&lt;dim&gt; _deFromMacro2MD;</a>
-<a name="315"><span class="lineNum">     315 </span>            :   coupling::sendrecv::DataExchangeFromAllMacro2MD&lt;dim&gt; _deFromAllMacro2MD;</a>
-<a name="316"><span class="lineNum">     316 </span>            :   bool _enableInnerImposition;</a>
-<a name="317"><span class="lineNum">     317 </span>            :   coupling::sendrecv::FromMD2Macro&lt;coupling::datastructures::CouplingCell&lt;dim&gt;, dim&gt; _fromMD2Macro;</a>
-<a name="318"><span class="lineNum">     318 </span>            :   coupling::sendrecv::DataExchangeFromMD2Macro&lt;dim&gt; _deFromMD2Macro;</a>
-<a name="319"><span class="lineNum">     319 </span>            : </a>
-<a name="320"><span class="lineNum">     320 </span>            :   /** storage for coupling cells in coupling tool */</a>
-<a name="321"><span class="lineNum">     321 </span>            :   coupling::datastructures::LinkedCellContainer&lt;LinkedCell, dim&gt; _couplingCells;</a>
-<a name="322"><span class="lineNum">     322 </span>            : </a>
-<a name="323"><span class="lineNum">     323 </span>            :   /** filter pipeline, used to apply filters in sendFromMD2Macro */</a>
-<a name="324"><span class="lineNum">     324 </span>            :   coupling::filtering::FilterPipeline&lt;I02, dim&gt;* _filterPipeline;</a>
-<a name="325"><span class="lineNum">     325 </span>            : </a>
-<a name="326"><span class="lineNum">     326 </span>            :   /**parameters needed in initFiltering() */</a>
-<a name="327"><span class="lineNum">     327 </span>            :   const char* _filterPipelineConfiguration;</a>
-<a name="328"><span class="lineNum">     328 </span>            :   const tarch::utils::MultiMDService&lt;dim&gt; _multiMDService;</a>
-<a name="329"><span class="lineNum">     329 </span>            : </a>
-<a name="330"><span class="lineNum">     330 </span>            :   /** needed for insertion of momentum */</a>
-<a name="331"><span class="lineNum">     331 </span>            :   coupling::MomentumInsertion&lt;LinkedCell, dim&gt;* _momentumInsertion;</a>
-<a name="332"><span class="lineNum">     332 </span>            :   coupling::configurations::MomentumInsertionConfiguration&lt;3&gt;::MomentumInsertionType _momentumInsertionType;</a>
-<a name="333"><span class="lineNum">     333 </span>            :   /** needed for insertion of particles, e.g. USHER */</a>
-<a name="334"><span class="lineNum">     334 </span>            :   coupling::ParticleInsertion&lt;LinkedCell, dim&gt;* _particleInsertion;</a>
-<a name="335"><span class="lineNum">     335 </span>            :   const tarch::la::Vector&lt;dim, unsigned int&gt; _numberLinkedCellsPerCouplingCell;</a>
-<a name="336"><span class="lineNum">     336 </span>            :   const coupling::configurations::ParticleInsertionConfiguration::ParticleInsertionType _particleInsertionType;</a>
-<a name="337"><span class="lineNum">     337 </span>            :   /** coupling strategy */</a>
-<a name="338"><span class="lineNum">     338 </span>            :   coupling::transferstrategies::TransferStrategy&lt;LinkedCell, dim&gt;* _transferStrategy;</a>
-<a name="339"><span class="lineNum">     339 </span>            : </a>
-<a name="340"><span class="lineNum">     340 </span>            :   /** controls the kinetic energy of the system, i.e. maintains temperature in</a>
-<a name="341"><span class="lineNum">     341 </span>            :    * case of changing mass/momentum. */</a>
-<a name="342"><span class="lineNum">     342 </span>            :   coupling::KineticEnergyController&lt;LinkedCell, dim&gt; _kineticEnergyController;</a>
-<a name="343"><span class="lineNum">     343 </span>            :   /** controls and apply boundary forces to molecules close to open</a>
-<a name="344"><span class="lineNum">     344 </span>            :    * boundaries.*/</a>
-<a name="345"><span class="lineNum">     345 </span>            :   coupling::BoundaryForceController&lt;LinkedCell, dim&gt;* _boundaryForceController;</a>
-<a name="346"><span class="lineNum">     346 </span>            :   /** controls/ maintains momentum, e.g. after particle insertion */</a>
-<a name="347"><span class="lineNum">     347 </span>            :   coupling::MomentumController&lt;LinkedCell, dim&gt; _momentumController;</a>
-<a name="348"><span class="lineNum">     348 </span>            : </a>
-<a name="349"><span class="lineNum">     349 </span>            :   std::function&lt;void(Wrapper&amp;)&gt; _applyAccordingToConfiguration;</a>
-<a name="350"><span class="lineNum">     350 </span>            : </a>
-<a name="351"><span class="lineNum">     351 </span>            :   /** information for plotting */</a>
-<a name="352"><span class="lineNum">     352 </span>            :   const std::string _microscopicFilename;</a>
-<a name="353"><span class="lineNum">     353 </span>            :   const unsigned int _writeEveryMicroscopicTimestep;</a>
-<a name="354"><span class="lineNum">     354 </span>            :   const std::string _macroscopicFilename;</a>
-<a name="355"><span class="lineNum">     355 </span>            :   const unsigned int _writeEveryMacroscopicTimestep;</a>
-<a name="356"><span class="lineNum">     356 </span>            : </a>
-<a name="357"><span class="lineNum">     357 </span>            :   /** index vectors for block-usher scheme</a>
-<a name="358"><span class="lineNum">     358 </span>            :    * -----------------------------------------------------*/</a>
-<a name="359"><span class="lineNum">     359 </span>            :   // start and end coordinate for block loop over coupling cells (with 3</a>
-<a name="360"><span class="lineNum">     360 </span>            :   // entries always!)</a>
-<a name="361"><span class="lineNum">     361 </span>            :   tarch::la::Vector&lt;3, unsigned int&gt; _usherCellStart[1 &lt;&lt; dim];</a>
-<a name="362"><span class="lineNum">     362 </span>            :   tarch::la::Vector&lt;3, unsigned int&gt; _usherCellEnd[1 &lt;&lt; dim];</a>
-<a name="363"><span class="lineNum">     363 </span>            :   tarch::la::Vector&lt;dim, unsigned int&gt; _usherRange[1 &lt;&lt; dim];</a>
-<a name="364"><span class="lineNum">     364 </span>            :   // offset in red-black loops nested within the block loops (always 0 or 1</a>
-<a name="365"><span class="lineNum">     365 </span>            :   // entries)</a>
-<a name="366"><span class="lineNum">     366 </span>            :   tarch::la::Vector&lt;3, unsigned int&gt; _usherCellOffset[1 &lt;&lt; dim];</a>
-<a name="367"><span class="lineNum">     367 </span>            : };</a>
-<a name="368"><span class="lineNum">     368 </span>            : #include &quot;CouplingCellService.cpph&quot;</a>
-<a name="369"><span class="lineNum">     369 </span>            : </a>
-<a name="370"><span class="lineNum">     370 </span>            : #endif // _MOLECULARDYNAMICS_COUPLING_SERVICES_COUPLINGCELLSERVICE_H_</a>
-</pre>
-      </td>
-    </tr>
-  </table>
-  <br>
+<span id="L1"><span class="lineNum">       1</span>              : // Copyright (C) 2015 Technische Universitaet Muenchen</span>
+<span id="L2"><span class="lineNum">       2</span>              : // This file is part of the Mamico project. For conditions of distribution</span>
+<span id="L3"><span class="lineNum">       3</span>              : // and use, please see the copyright notice in Mamico's main folder, or at</span>
+<span id="L4"><span class="lineNum">       4</span>              : // www5.in.tum.de/mamico</span>
+<span id="L5"><span class="lineNum">       5</span>              : #ifndef _MOLECULARDYNAMICS_COUPLING_SERVICES_COUPLINGCELLSERVICE_H_</span>
+<span id="L6"><span class="lineNum">       6</span>              : #define _MOLECULARDYNAMICS_COUPLING_SERVICES_COUPLINGCELLSERVICE_H_</span>
+<span id="L7"><span class="lineNum">       7</span>              : </span>
+<span id="L8"><span class="lineNum">       8</span>              : #pragma once</span>
+<span id="L9"><span class="lineNum">       9</span>              : </span>
+<span id="L10"><span class="lineNum">      10</span>              : #include &quot;coupling/CouplingCellPlotter.h&quot;</span>
+<span id="L11"><span class="lineNum">      11</span>              : #include &quot;coupling/KineticEnergyController.h&quot;</span>
+<span id="L12"><span class="lineNum">      12</span>              : #include &quot;coupling/MomentumController.h&quot;</span>
+<span id="L13"><span class="lineNum">      13</span>              : #include &quot;coupling/cell-mappings/ComputeMeanPotentialEnergyMapping.h&quot;</span>
+<span id="L14"><span class="lineNum">      14</span>              : #include &quot;coupling/cell-mappings/ComputeMomentumMapping.h&quot;</span>
+<span id="L15"><span class="lineNum">      15</span>              : #include &quot;coupling/cell-mappings/PerturbateVelocityMapping.h&quot;</span>
+<span id="L16"><span class="lineNum">      16</span>              : #include &quot;coupling/configurations/BoundaryForceConfiguration.h&quot;</span>
+<span id="L17"><span class="lineNum">      17</span>              : #include &quot;coupling/configurations/CouplingCellConfiguration.h&quot;</span>
+<span id="L18"><span class="lineNum">      18</span>              : #include &quot;coupling/configurations/MaMiCoConfiguration.h&quot;</span>
+<span id="L19"><span class="lineNum">      19</span>              : #include &quot;coupling/configurations/MomentumInsertionConfiguration.h&quot;</span>
+<span id="L20"><span class="lineNum">      20</span>              : #include &quot;coupling/configurations/ParallelTopologyConfiguration.h&quot;</span>
+<span id="L21"><span class="lineNum">      21</span>              : #include &quot;coupling/configurations/ParticleInsertionConfiguration.h&quot;</span>
+<span id="L22"><span class="lineNum">      22</span>              : #include &quot;coupling/configurations/ThermostatConfiguration.h&quot;</span>
+<span id="L23"><span class="lineNum">      23</span>              : #include &quot;coupling/configurations/TransferStrategyConfiguration.h&quot;</span>
+<span id="L24"><span class="lineNum">      24</span>              : #include &quot;coupling/datastructures/CellContainer.h&quot;</span>
+<span id="L25"><span class="lineNum">      25</span>              : #include &quot;coupling/indexing/IndexingService.h&quot;</span>
+<span id="L26"><span class="lineNum">      26</span>              : #include &quot;coupling/interface/MDSolverInterface.h&quot;</span>
+<span id="L27"><span class="lineNum">      27</span>              : #include &quot;coupling/interface/MacroscopicSolverInterface.h&quot;</span>
+<span id="L28"><span class="lineNum">      28</span>              : #include &quot;coupling/sendrecv/DataExchangeFromAllMacro2MD.h&quot;</span>
+<span id="L29"><span class="lineNum">      29</span>              : #include &quot;coupling/sendrecv/DataExchangeFromMD2Macro.h&quot;</span>
+<span id="L30"><span class="lineNum">      30</span>              : #include &quot;coupling/sendrecv/DataExchangeFromMacro2MD.h&quot;</span>
+<span id="L31"><span class="lineNum">      31</span>              : #include &quot;coupling/sendrecv/FromMD2Macro.h&quot;</span>
+<span id="L32"><span class="lineNum">      32</span>              : #include &quot;coupling/sendrecv/FromMacro2MD.h&quot;</span>
+<span id="L33"><span class="lineNum">      33</span>              : #include &quot;tarch/utils/MultiMDService.h&quot;</span>
+<span id="L34"><span class="lineNum">      34</span>              : </span>
+<span id="L35"><span class="lineNum">      35</span>              : #include &quot;coupling/filtering/FilterPipeline.h&quot;</span>
+<span id="L36"><span class="lineNum">      36</span>              : </span>
+<span id="L37"><span class="lineNum">      37</span>              : namespace coupling {</span>
+<span id="L38"><span class="lineNum">      38</span>              : namespace services {</span>
+<span id="L39"><span class="lineNum">      39</span>              : </span>
+<span id="L40"><span class="lineNum">      40</span>              : template &lt;unsigned int dim&gt; class CouplingCellService;</span>
+<span id="L41"><span class="lineNum">      41</span>              : </span>
+<span id="L42"><span class="lineNum">      42</span>              : template &lt;class LinkedCell, unsigned int dim&gt; class CouplingCellServiceImpl;</span>
+<span id="L43"><span class="lineNum">      43</span>              : } // namespace services</span>
+<span id="L44"><span class="lineNum">      44</span>              : } // namespace coupling</span>
+<span id="L45"><span class="lineNum">      45</span>              : </span>
+<span id="L46"><span class="lineNum">      46</span>              : /** generic interface class for functionality of data exchange in hybrid</span>
+<span id="L47"><span class="lineNum">      47</span>              :  * Micro-Macro simulations.</span>
+<span id="L48"><span class="lineNum">      48</span>              :  *  @author Philipp Neumann</span>
+<span id="L49"><span class="lineNum">      49</span>              :  */</span>
+<span id="L50"><span class="lineNum">      50</span>              : template &lt;unsigned int dim&gt; class coupling::services::CouplingCellService {</span>
+<span id="L51"><span class="lineNum">      51</span>              : public:</span>
+<span id="L52"><span class="lineNum">      52</span> <span class="tlaGNC">           4 :   CouplingCellService(unsigned int ID, unsigned int topologyOffset) : _id(ID), _topologyOffset(topologyOffset) {</span></span>
+<span id="L53"><span class="lineNum">      53</span>              : #if (COUPLING_MD_DEBUG == COUPLING_MD_YES)</span>
+<span id="L54"><span class="lineNum">      54</span>              :     std::cout &lt;&lt; &quot;CouplingCellService::CouplingCellService(): Set ID=&quot; &lt;&lt; _id &lt;&lt; std::endl;</span>
+<span id="L55"><span class="lineNum">      55</span>              : #endif</span>
+<span id="L56"><span class="lineNum">      56</span>              :   }</span>
+<span id="L57"><span class="lineNum">      57</span> <span class="tlaUNC">           0 :   virtual ~CouplingCellService() {}</span></span>
+<span id="L58"><span class="lineNum">      58</span>              : </span>
+<span id="L59"><span class="lineNum">      59</span>              :   virtual double applyFilterPipeline() = 0;</span>
+<span id="L60"><span class="lineNum">      60</span>              :   virtual void sendFromMacro2MDPreProcess() = 0;</span>
+<span id="L61"><span class="lineNum">      61</span>              :   virtual void sendFromMacro2MDPostProcess() = 0;</span>
+<span id="L62"><span class="lineNum">      62</span>              :   virtual void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer&lt;dim&gt;&amp; macro2MDBuffer) = 0;</span>
+<span id="L63"><span class="lineNum">      63</span>              :   virtual void sendFromMD2MacroPreProcess() = 0;</span>
+<span id="L64"><span class="lineNum">      64</span>              :   virtual void sendFromMD2MacroPostProcess() = 0;</span>
+<span id="L65"><span class="lineNum">      65</span>              :   virtual double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer&lt;dim&gt;&amp; couplingCellContainerFromMacroscopicSolver) = 0;</span>
+<span id="L66"><span class="lineNum">      66</span>              :   virtual void processInnerCouplingCellAfterMDTimestep() = 0;</span>
+<span id="L67"><span class="lineNum">      67</span>              :   virtual void computeAndStoreTemperature(double temperature) = 0;</span>
+<span id="L68"><span class="lineNum">      68</span>              :   virtual void applyTemperatureToMolecules(unsigned int t) = 0;</span>
+<span id="L69"><span class="lineNum">      69</span>              :   virtual void distributeMass(unsigned int t) = 0;</span>
+<span id="L70"><span class="lineNum">      70</span>              :   virtual void distributeMomentum(unsigned int t) = 0;</span>
+<span id="L71"><span class="lineNum">      71</span>              :   virtual void applyBoundaryForce(unsigned int t) = 0;</span>
+<span id="L72"><span class="lineNum">      72</span>              :   virtual void perturbateVelocity() = 0;</span>
+<span id="L73"><span class="lineNum">      73</span>              :   virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;</span>
+<span id="L74"><span class="lineNum">      74</span>              :   virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;</span>
+<span id="L75"><span class="lineNum">      75</span>              :   virtual void setInnerMomentumImposition(bool enable) = 0;</span>
+<span id="L76"><span class="lineNum">      76</span>              : </span>
+<span id="L77"><span class="lineNum">      77</span> <span class="tlaUNC">           0 :   virtual void initFiltering() {</span></span>
+<span id="L78"><span class="lineNum">      78</span> <span class="tlaUNC">           0 :     throw std::runtime_error(&quot;CouplingCellService: Error: Called &quot;</span></span>
+<span id="L79"><span class="lineNum">      79</span>              :                              &quot;initFiltering for non-Impl object.&quot;);</span>
+<span id="L80"><span class="lineNum">      80</span>              :   } /*Note: This is not pure virtual, because some implementations of this</span>
+<span id="L81"><span class="lineNum">      81</span>              :        interface don't have a FilterPipeline. */</span>
+<span id="L82"><span class="lineNum">      82</span> <span class="tlaUNC">           0 :   virtual const coupling::filtering::FilterPipeline&lt;I02, dim&gt;* getFilterPipeline() const {</span></span>
+<span id="L83"><span class="lineNum">      83</span> <span class="tlaUNC">           0 :     throw std::runtime_error(&quot;CouplingCellService: Error: Called getFilterPipeline() in instance &quot;</span></span>
+<span id="L84"><span class="lineNum">      84</span>              :                              &quot;without FilterPipeline.&quot;);</span>
+<span id="L85"><span class="lineNum">      85</span>              :   } /*Note: This is not pure virtual, because some implementations of this</span>
+<span id="L86"><span class="lineNum">      86</span>              :        interface don't have a FilterPipeline. */</span>
+<span id="L87"><span class="lineNum">      87</span>              : </span>
+<span id="L88"><span class="lineNum">      88</span> <span class="tlaUNC">           0 :   unsigned int getID() const { return _id; }</span></span>
+<span id="L89"><span class="lineNum">      89</span>              : </span>
+<span id="L90"><span class="lineNum">      90</span>              : protected:</span>
+<span id="L91"><span class="lineNum">      91</span>              :   const unsigned int _id; /** (unique) identifier of this coupling cell service */</span>
+<span id="L92"><span class="lineNum">      92</span>              :   unsigned int _topologyOffset;</span>
+<span id="L93"><span class="lineNum">      93</span>              : };</span>
+<span id="L94"><span class="lineNum">      94</span>              : </span>
+<span id="L95"><span class="lineNum">      95</span>              : /** This class put together all ingredients for coupling MD and some macroscopic</span>
+<span id="L96"><span class="lineNum">      96</span>              :  * solver. It thus triggers send/recv-operations between the coupling tool and</span>
+<span id="L97"><span class="lineNum">      97</span>              :  * MD as well as between the coupling tool and the macroscopic solver.</span>
+<span id="L98"><span class="lineNum">      98</span>              :  *  @author Philipp Neumann</span>
+<span id="L99"><span class="lineNum">      99</span>              :  */</span>
+<span id="L100"><span class="lineNum">     100</span>              : template &lt;class LinkedCell, unsigned int dim&gt; class coupling::services::CouplingCellServiceImpl : public coupling::services::CouplingCellService&lt;dim&gt; {</span>
+<span id="L101"><span class="lineNum">     101</span>              : public:</span>
+<span id="L102"><span class="lineNum">     102</span>              :   /** constructor. Arguments:</span>
+<span id="L103"><span class="lineNum">     103</span>              :    *  mdSolverInterface                 - pointer to the MD solver interface</span>
+<span id="L104"><span class="lineNum">     104</span>              :    *  macroscopicSolverInterface        - pointer to the macroscopic solver</span>
+<span id="L105"><span class="lineNum">     105</span>              :    * interface numberProcesses                   - number of processes assuming</span>
+<span id="L106"><span class="lineNum">     106</span>              :    * a block-like domain decomposition rank                              - rank</span>
+<span id="L107"><span class="lineNum">     107</span>              :    * of the current process particleInsertionConfiguration    - configuration</span>
+<span id="L108"><span class="lineNum">     108</span>              :    * object for (USHER-based) particle insertion and particle removal</span>
+<span id="L109"><span class="lineNum">     109</span>              :    *  momentumInsertionConfiguration    - configuration object which determines</span>
+<span id="L110"><span class="lineNum">     110</span>              :    * the momentum transfer on MD side transferStrategyConfiguration     -</span>
+<span id="L111"><span class="lineNum">     111</span>              :    * configuration object which determines the respective transfer strategy</span>
+<span id="L112"><span class="lineNum">     112</span>              :    *  parallelTopologyConfiguration     - configuratio object which defines the</span>
+<span id="L113"><span class="lineNum">     113</span>              :    * parallel topology of the simulation (domain decomposition of the MD</span>
+<span id="L114"><span class="lineNum">     114</span>              :    * simulation) numberMDTimestepsPerCouplingCycle - number of MD time steps per</span>
+<span id="L115"><span class="lineNum">     115</span>              :    * coupling cycle couplingCellConfiguration      - configuration object</span>
+<span id="L116"><span class="lineNum">     116</span>              :    * which determines the properties of the coupling cells topologyOffset -</span>
+<span id="L117"><span class="lineNum">     117</span>              :    * offset in linearized topology of ranks topologyGlobalNumberProcesses     -</span>
+<span id="L118"><span class="lineNum">     118</span>              :    * global number of processes available in overall topology</span>
+<span id="L119"><span class="lineNum">     119</span>              :    *</span>
+<span id="L120"><span class="lineNum">     120</span>              :    *  Note: the interface pointers are used by the CouplingCellServiceImpl;</span>
+<span id="L121"><span class="lineNum">     121</span>              :    * they are not deleted at the end of the simulation since other (external)</span>
+<span id="L122"><span class="lineNum">     122</span>              :    * routines may use those as well.</span>
+<span id="L123"><span class="lineNum">     123</span>              :    */</span>
+<span id="L124"><span class="lineNum">     124</span>              :   CouplingCellServiceImpl(</span>
+<span id="L125"><span class="lineNum">     125</span>              :       unsigned int ID, coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* mdSolverInterface,         // interface to MD simulation</span>
+<span id="L126"><span class="lineNum">     126</span>              :       coupling::interface::MacroscopicSolverInterface&lt;dim&gt;* macroscopicSolverInterface,                    // interface to macroscopic solver</span>
+<span id="L127"><span class="lineNum">     127</span>              :       tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,                                                // number of processes in all directions</span>
+<span id="L128"><span class="lineNum">     128</span>              :       unsigned int rank,                                                                                   // current rank</span>
+<span id="L129"><span class="lineNum">     129</span>              :       const coupling::configurations::ParticleInsertionConfiguration&amp; particleInsertionConfiguration,      // configuration for particle</span>
+<span id="L130"><span class="lineNum">     130</span>              :                                                                                                            // insertion</span>
+<span id="L131"><span class="lineNum">     131</span>              :       const coupling::configurations::MomentumInsertionConfiguration&lt;dim&gt;&amp; momentumInsertionConfiguration, // configuration for momentum</span>
+<span id="L132"><span class="lineNum">     132</span>              :                                                                                                            // insertion</span>
+<span id="L133"><span class="lineNum">     133</span>              :       const coupling::configurations::BoundaryForceConfiguration&lt;dim&gt;&amp; boundaryForceConfiguration,         // configuration for boundary forces</span>
+<span id="L134"><span class="lineNum">     134</span>              :       const coupling::configurations::TransferStrategyConfiguration&lt;dim&gt;&amp; transferStrategyConfiguration,   // configuration for transfer strategy</span>
+<span id="L135"><span class="lineNum">     135</span>              :       const coupling::configurations::ParallelTopologyConfiguration&amp; parallelTopologyConfiguration,        // configuration for parallel topology</span>
+<span id="L136"><span class="lineNum">     136</span>              :       const coupling::configurations::ThermostatConfiguration&amp; thermostatConfiguration,</span>
+<span id="L137"><span class="lineNum">     137</span>              :       unsigned int numberMDTimestepsPerCouplingCycle,                                            // number MD timesteps per coupling</span>
+<span id="L138"><span class="lineNum">     138</span>              :                                                                                                  // cycle (required to initialise</span>
+<span id="L139"><span class="lineNum">     139</span>              :                                                                                                  // transfer strategy)</span>
+<span id="L140"><span class="lineNum">     140</span>              :       const coupling::configurations::CouplingCellConfiguration&lt;dim&gt;&amp; couplingCellConfiguration, // configuration for coupling cells</span>
+<span id="L141"><span class="lineNum">     141</span>              :                                                                                                  // and respective plotting</span>
+<span id="L142"><span class="lineNum">     142</span>              :       const char* filterPipelineConfiguration, const tarch::utils::MultiMDService&lt;dim&gt;&amp; multiMDService, unsigned int topologyOffset, int tws = 0);</span>
+<span id="L143"><span class="lineNum">     143</span>              : </span>
+<span id="L144"><span class="lineNum">     144</span>              :   CouplingCellServiceImpl(</span>
+<span id="L145"><span class="lineNum">     145</span>              :       unsigned int ID, coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* mdSolverInterface,         // interface to MD simulation</span>
+<span id="L146"><span class="lineNum">     146</span>              :       coupling::interface::MacroscopicSolverInterface&lt;dim&gt;* macroscopicSolverInterface,                    // interface to macroscopic solver</span>
+<span id="L147"><span class="lineNum">     147</span>              :       tarch::la::Vector&lt;dim, unsigned int&gt; numberProcesses,                                                // number of processes in all directions</span>
+<span id="L148"><span class="lineNum">     148</span>              :       unsigned int rank,                                                                                   // current rank</span>
+<span id="L149"><span class="lineNum">     149</span>              :       const coupling::configurations::ParticleInsertionConfiguration&amp; particleInsertionConfiguration,      // configuration for particle</span>
+<span id="L150"><span class="lineNum">     150</span>              :                                                                                                            // insertion</span>
+<span id="L151"><span class="lineNum">     151</span>              :       const coupling::configurations::MomentumInsertionConfiguration&lt;dim&gt;&amp; momentumInsertionConfiguration, // configuration for momentum</span>
+<span id="L152"><span class="lineNum">     152</span>              :                                                                                                            // insertion</span>
+<span id="L153"><span class="lineNum">     153</span>              :       const coupling::configurations::BoundaryForceConfiguration&lt;dim&gt;&amp; boundaryForceConfiguration,         // configuration for boundary forces</span>
+<span id="L154"><span class="lineNum">     154</span>              :       const coupling::configurations::TransferStrategyConfiguration&lt;dim&gt;&amp; transferStrategyConfiguration,   // configuration for transfer strategy</span>
+<span id="L155"><span class="lineNum">     155</span>              :       const coupling::configurations::ParallelTopologyConfiguration&amp; parallelTopologyConfiguration,        // configuration for parallel topology</span>
+<span id="L156"><span class="lineNum">     156</span>              :       const coupling::configurations::ThermostatConfiguration&amp; thermostatConfiguration,</span>
+<span id="L157"><span class="lineNum">     157</span>              :       unsigned int numberMDTimestepsPerCouplingCycle,                                            // number MD timesteps per coupling</span>
+<span id="L158"><span class="lineNum">     158</span>              :                                                                                                  // cycle (required to initialise</span>
+<span id="L159"><span class="lineNum">     159</span>              :                                                                                                  // transfer strategy)</span>
+<span id="L160"><span class="lineNum">     160</span>              :       const coupling::configurations::CouplingCellConfiguration&lt;dim&gt;&amp; couplingCellConfiguration, // configuration for coupling cells</span>
+<span id="L161"><span class="lineNum">     161</span>              :                                                                                                  // and respective plotting</span>
+<span id="L162"><span class="lineNum">     162</span>              :       const char* filterPipelineConfiguration, const tarch::utils::MultiMDService&lt;dim&gt;&amp; multiMDService)</span>
+<span id="L163"><span class="lineNum">     163</span>              :       : CouplingCellServiceImpl&lt;LinkedCell, dim&gt;(ID, mdSolverInterface, macroscopicSolverInterface, numberProcesses, rank, particleInsertionConfiguration,</span>
+<span id="L164"><span class="lineNum">     164</span>              :                                                  momentumInsertionConfiguration, boundaryForceConfiguration, transferStrategyConfiguration,</span>
+<span id="L165"><span class="lineNum">     165</span>              :                                                  parallelTopologyConfiguration, thermostatConfiguration, numberMDTimestepsPerCouplingCycle,</span>
+<span id="L166"><span class="lineNum">     166</span>              :                                                  couplingCellConfiguration, filterPipelineConfiguration, multiMDService, 0) {}</span>
+<span id="L167"><span class="lineNum">     167</span>              : </span>
+<span id="L168"><span class="lineNum">     168</span>              :   /** destructor. Frees dynamically allocated memory for particle insertion,</span>
+<span id="L169"><span class="lineNum">     169</span>              :    * momentum insertion and the transfer strategy.</span>
+<span id="L170"><span class="lineNum">     170</span>              :    */</span>
+<span id="L171"><span class="lineNum">     171</span>              :   virtual ~CouplingCellServiceImpl();</span>
+<span id="L172"><span class="lineNum">     172</span>              : </span>
+<span id="L173"><span class="lineNum">     173</span>              :   /** sends information from macroscopic solver to MD. The cell information from</span>
+<span id="L174"><span class="lineNum">     174</span>              :    * the macroscopic solver is handed over as a flexible cell container</span>
+<span id="L175"><span class="lineNum">     175</span>              :    * The coupling tool internally triggers send/recv-operations</span>
+<span id="L176"><span class="lineNum">     176</span>              :    * (this also comprises the distributed memory parallelisation via MPI)</span>
+<span id="L177"><span class="lineNum">     177</span>              :    * and writes the respective information to the coupling cells of the tool</span>
+<span id="L178"><span class="lineNum">     178</span>              :    */</span>
+<span id="L179"><span class="lineNum">     179</span>              :   void sendFromMacro2MD(const coupling::datastructures::FlexibleCellContainer&lt;dim&gt;&amp; macro2MDBuffer) override;</span>
+<span id="L180"><span class="lineNum">     180</span>              : </span>
+<span id="L181"><span class="lineNum">     181</span>              :   /** sends information from MD to the macroscopic solver. After the</span>
+<span id="L182"><span class="lineNum">     182</span>              :    * send/recv-operations (this also comprises the distributed memory</span>
+<span id="L183"><span class="lineNum">     183</span>              :    * parallelisation scenario), the information from the coupling tool is</span>
+<span id="L184"><span class="lineNum">     184</span>              :    * written to the buffer couplingCellsFromMacroscopicSolver together with</span>
+<span id="L185"><span class="lineNum">     185</span>              :    * the respective global cell indices</span>
+<span id="L186"><span class="lineNum">     186</span>              :    *  (-&gt; indices).</span>
+<span id="L187"><span class="lineNum">     187</span>              :    *</span>
+<span id="L188"><span class="lineNum">     188</span>              :    * @returns The runtime of filtering related code in usec.</span>
+<span id="L189"><span class="lineNum">     189</span>              :    */</span>
+<span id="L190"><span class="lineNum">     190</span>              :   double sendFromMD2Macro(const coupling::datastructures::FlexibleCellContainer&lt;dim&gt;&amp; macroscopicSolverCellContainer) override;</span>
+<span id="L191"><span class="lineNum">     191</span>              : </span>
+<span id="L192"><span class="lineNum">     192</span>              :   /** applies the filter pipeline and returns the runtime of this operation */</span>
+<span id="L193"><span class="lineNum">     193</span>              :   double applyFilterPipeline() override;</span>
+<span id="L194"><span class="lineNum">     194</span>              : </span>
+<span id="L195"><span class="lineNum">     195</span>              :   void sendFromMacro2MDPreProcess() override;</span>
+<span id="L196"><span class="lineNum">     196</span>              : </span>
+<span id="L197"><span class="lineNum">     197</span>              :   void sendFromMacro2MDPostProcess() override;</span>
+<span id="L198"><span class="lineNum">     198</span>              : </span>
+<span id="L199"><span class="lineNum">     199</span>              :   void sendFromMD2MacroPreProcess() override;</span>
+<span id="L200"><span class="lineNum">     200</span>              : </span>
+<span id="L201"><span class="lineNum">     201</span> <span class="tlaUNC">           0 :   void sendFromMD2MacroPostProcess() override {}</span></span>
+<span id="L202"><span class="lineNum">     202</span>              : </span>
+<span id="L203"><span class="lineNum">     203</span>              :   /** carries out coupling-dependent operations (such as sampling) on the</span>
+<span id="L204"><span class="lineNum">     204</span>              :    * non-ghost coupling cells after each MD time step. This method needs thus</span>
+<span id="L205"><span class="lineNum">     205</span>              :    * to be called from the MD simulation.</span>
+<span id="L206"><span class="lineNum">     206</span>              :    */</span>
+<span id="L207"><span class="lineNum">     207</span>              :   void processInnerCouplingCellAfterMDTimestep() override;</span>
+<span id="L208"><span class="lineNum">     208</span>              : </span>
+<span id="L209"><span class="lineNum">     209</span>              :   /** sets the temperature value in all coupling cells. If the value of</span>
+<span id="L210"><span class="lineNum">     210</span>              :    * temperature is -1.0, we set the local temperature of each coupling cell</span>
+<span id="L211"><span class="lineNum">     211</span>              :    * (and just store this value in the coupling cell). Otherwise, we apply</span>
+<span id="L212"><span class="lineNum">     212</span>              :    * the given temperature in all cells. In the latter case, this also resembles</span>
+<span id="L213"><span class="lineNum">     213</span>              :    * a first thermostat-like operation.</span>
+<span id="L214"><span class="lineNum">     214</span>              :    */</span>
+<span id="L215"><span class="lineNum">     215</span>              :   void computeAndStoreTemperature(double temperature) override;</span>
+<span id="L216"><span class="lineNum">     216</span>              : </span>
+<span id="L217"><span class="lineNum">     217</span>              :   /** applies a thermostat in all non-ghost coupling cells. */</span>
+<span id="L218"><span class="lineNum">     218</span>              :   void applyTemperatureToMolecules(unsigned int t) override;</span>
+<span id="L219"><span class="lineNum">     219</span>              : </span>
+<span id="L220"><span class="lineNum">     220</span>              :   /** applies a boundary force to molecules which are close to an open boundary.</span>
+<span id="L221"><span class="lineNum">     221</span>              :    */</span>
+<span id="L222"><span class="lineNum">     222</span>              :   void applyBoundaryForce(unsigned int t) override;</span>
+<span id="L223"><span class="lineNum">     223</span>              : </span>
+<span id="L224"><span class="lineNum">     224</span>              :   /** distributes mass in the system. */</span>
+<span id="L225"><span class="lineNum">     225</span>              :   void distributeMass(unsigned int t) override;</span>
+<span id="L226"><span class="lineNum">     226</span>              : </span>
+<span id="L227"><span class="lineNum">     227</span>              :   /** distributes momentum in MD. Should typically be called after force</span>
+<span id="L228"><span class="lineNum">     228</span>              :    * accumulation since momentum distribution may depend on current forces. */</span>
+<span id="L229"><span class="lineNum">     229</span>              :   void distributeMomentum(unsigned int t) override;</span>
+<span id="L230"><span class="lineNum">     230</span>              : </span>
+<span id="L231"><span class="lineNum">     231</span>              :   /** applies a new velocity to each particle according to its cell's mean</span>
+<span id="L232"><span class="lineNum">     232</span>              :    * velocity. */</span>
+<span id="L233"><span class="lineNum">     233</span>              :   void perturbateVelocity() override;</span>
+<span id="L234"><span class="lineNum">     234</span>              : </span>
+<span id="L235"><span class="lineNum">     235</span>              :   /** plots coupling cell and molecule information at some time step t. The</span>
+<span id="L236"><span class="lineNum">     236</span>              :    * correct triggering of plotting needs to be established from the main</span>
+<span id="L237"><span class="lineNum">     237</span>              :    * coupling loop which is outside the coupling tool (not included in this</span>
+<span id="L238"><span class="lineNum">     238</span>              :    * function).</span>
+<span id="L239"><span class="lineNum">     239</span>              :    */</span>
+<span id="L240"><span class="lineNum">     240</span>              :   void plotEveryMicroscopicTimestep(unsigned int t) override;</span>
+<span id="L241"><span class="lineNum">     241</span>              :   void plotEveryMacroscopicTimestep(unsigned int t) override;</span>
+<span id="L242"><span class="lineNum">     242</span>              :   void setInnerMomentumImposition(bool enable) override;</span>
+<span id="L243"><span class="lineNum">     243</span>              : </span>
+<span id="L244"><span class="lineNum">     244</span>              :   /**</span>
+<span id="L245"><span class="lineNum">     245</span>              :    * Initialises the _filterPipeline member. Called from _multiMDCellService's</span>
+<span id="L246"><span class="lineNum">     246</span>              :    * constructFilterPipelines(). Make sure to delete _filterPipeline in</span>
+<span id="L247"><span class="lineNum">     247</span>              :    * ~CouplingCellServiceImpl()</span>
+<span id="L248"><span class="lineNum">     248</span>              :    */</span>
+<span id="L249"><span class="lineNum">     249</span> <span class="tlaUNC">           0 :   void initFiltering() override {</span></span>
+<span id="L250"><span class="lineNum">     250</span> <span class="tlaUNC">           0 :     _filterPipeline = new coupling::filtering::FilterPipeline&lt;I02, dim&gt;(_couplingCells, coupling::filtering::Scope::perInstance, _multiMDService,</span></span>
+<span id="L251"><span class="lineNum">     251</span>              :                                                                         _filterPipelineConfiguration);</span>
+<span id="L252"><span class="lineNum">     252</span> <span class="tlaUNC">           0 :   }</span></span>
+<span id="L253"><span class="lineNum">     253</span>              : </span>
+<span id="L254"><span class="lineNum">     254</span> <span class="tlaUNC">           0 :   const coupling::filtering::FilterPipeline&lt;I02, dim&gt;* getFilterPipeline() const override { return _filterPipeline; }</span></span>
+<span id="L255"><span class="lineNum">     255</span>              : </span>
+<span id="L256"><span class="lineNum">     256</span>              :   /**</span>
+<span id="L257"><span class="lineNum">     257</span>              :    * Creates a new filter from scratch and appends it to a sequence that is part</span>
+<span id="L258"><span class="lineNum">     258</span>              :    * of this service's filter pipelining system. For that, the desired</span>
+<span id="L259"><span class="lineNum">     259</span>              :    * sequence's identifier and two functions are needed:</span>
+<span id="L260"><span class="lineNum">     260</span>              :    *  - applyScalar What to do with scalar properties of the sequence's</span>
+<span id="L261"><span class="lineNum">     261</span>              :    * Coupling Cells.</span>
+<span id="L262"><span class="lineNum">     262</span>              :    *  - applyVector: What to do with properties stored as vectors of the</span>
+<span id="L263"><span class="lineNum">     263</span>              :    * sequence's of Coupling Cells.</span>
+<span id="L264"><span class="lineNum">     264</span>              :    */</span>
+<span id="L265"><span class="lineNum">     265</span>              :   /*</span>
+<span id="L266"><span class="lineNum">     266</span>              :    * TODO: MOVE COMMENT</span>
+<span id="L267"><span class="lineNum">     267</span>              :   void addFilterToSequence(     const char *sequenceIdentifier,</span>
+<span id="L268"><span class="lineNum">     268</span>              :                                                           const</span>
+<span id="L269"><span class="lineNum">     269</span>              :   std::function&lt;std::vector&lt;double&gt; (std::vector&lt;double&gt; cells_s,</span>
+<span id="L270"><span class="lineNum">     270</span>              :   std::vector&lt;std::array&lt;unsigned int, dim&gt;&gt; indices)&gt;* applyScalar, const</span>
+<span id="L271"><span class="lineNum">     271</span>              :   std::function&lt;std::vector&lt;std::array&lt;double, dim&gt;&gt;</span>
+<span id="L272"><span class="lineNum">     272</span>              :   (std::vector&lt;std::array&lt;double, dim&gt;&gt; cells_v, std::vector&lt;std::array&lt;unsigned</span>
+<span id="L273"><span class="lineNum">     273</span>              :   int, dim&gt;&gt; indices)&gt;* applyVector, int filterIndex = -1</span>
+<span id="L274"><span class="lineNum">     274</span>              :   );*/</span>
+<span id="L275"><span class="lineNum">     275</span>              : </span>
+<span id="L276"><span class="lineNum">     276</span>              :   /** returns the coupling cells. This functions is meant to be used in test</span>
+<span id="L277"><span class="lineNum">     277</span>              :    * scenarios and for debugging only! DO NOT USE IT FOR OTHER PURPOSES! */</span>
+<span id="L278"><span class="lineNum">     278</span>              :   coupling::datastructures::LinkedCellContainer&lt;LinkedCell, dim&gt;&amp; getCouplingCells() { return _couplingCells; }</span>
+<span id="L279"><span class="lineNum">     279</span>              : </span>
+<span id="L280"><span class="lineNum">     280</span>              : private:</span>
+<span id="L281"><span class="lineNum">     281</span>              : // ------------------- INCLUDE WRAPPER DEFINITIONS</span>
+<span id="L282"><span class="lineNum">     282</span>              : // -------------------------------------</span>
+<span id="L283"><span class="lineNum">     283</span>              : #include &quot;CouplingCellTraversalWrappers.cpph&quot;</span>
+<span id="L284"><span class="lineNum">     284</span>              : </span>
+<span id="L285"><span class="lineNum">     285</span>              :   /** initialises the index structures for USHER scheme */</span>
+<span id="L286"><span class="lineNum">     286</span>              :   void initIndexVectors4Usher();</span>
+<span id="L287"><span class="lineNum">     287</span>              : </span>
+<span id="L288"><span class="lineNum">     288</span>              :   tarch::la::Vector&lt;dim, double&gt; getPositionOfFirstLocalGhostCell() const;</span>
+<span id="L289"><span class="lineNum">     289</span>              : </span>
+<span id="L290"><span class="lineNum">     290</span> <span class="tlaGNC">           4 :   std::function&lt;void(Wrapper&amp;)&gt; initCorrectApplicationOfThermostat(const coupling::configurations::ThermostatConfiguration&amp; thermostatConfiguration) {</span></span>
+<span id="L291"><span class="lineNum">     291</span> <span class="tlaGNC">           4 :     if (thermostatConfiguration.getThermostatRegionType() == coupling::configurations::ThermostatConfiguration::ThermostatRegion::all)</span></span>
+<span id="L292"><span class="lineNum">     292</span> <span class="tlaUNC">           0 :       return [this](Wrapper&amp; wrapper) { _couplingCells.applyToLocalNonGhostCouplingCellsWithLinkedCells(wrapper); };</span></span>
+<span id="L293"><span class="lineNum">     293</span> <span class="tlaGNC">           4 :     else if (thermostatConfiguration.getThermostatRegionType() == coupling::configurations::ThermostatConfiguration::ThermostatRegion::outerLayers)</span></span>
+<span id="L294"><span class="lineNum">     294</span> <span class="tlaUNC">           0 :       return [this, &amp;thermostatConfiguration](Wrapper&amp; wrapper) {</span></span>
+<span id="L295"><span class="lineNum">     295</span> <span class="tlaUNC">           0 :         _couplingCells.applyXLayersOfGlobalNonGhostCellsWithLinkedCells(wrapper, thermostatConfiguration.getCells2Use());</span></span>
+<span id="L296"><span class="lineNum">     296</span> <span class="tlaUNC">           0 :       };</span></span>
+<span id="L297"><span class="lineNum">     297</span> <span class="tlaGNC">           4 :     else if (thermostatConfiguration.getThermostatRegionType() == coupling::configurations::ThermostatConfiguration::ThermostatRegion::onlyOutestLayer)</span></span>
+<span id="L298"><span class="lineNum">     298</span> <span class="tlaUNC">           0 :       return [this](Wrapper&amp; wrapper) { _couplingCells.applyToFirstLayerOfGlobalNonGhostCellsWithLinkedCells(wrapper); };</span></span>
+<span id="L299"><span class="lineNum">     299</span>              :     else</span>
+<span id="L300"><span class="lineNum">     300</span> <span class="tlaGNC">           4 :       return [](Wrapper&amp; wrapper) {};</span></span>
+<span id="L301"><span class="lineNum">     301</span>              :   }</span>
+<span id="L302"><span class="lineNum">     302</span>              : </span>
+<span id="L303"><span class="lineNum">     303</span>              :   /** number of MD time steps in each coupling cycle */</span>
+<span id="L304"><span class="lineNum">     304</span>              :   const unsigned int _numberMDTimestepsPerCouplingCycle;</span>
+<span id="L305"><span class="lineNum">     305</span>              : </span>
+<span id="L306"><span class="lineNum">     306</span>              :   /** interface for MD solver */</span>
+<span id="L307"><span class="lineNum">     307</span>              :   coupling::interface::MDSolverInterface&lt;LinkedCell, dim&gt;* _mdSolverInterface;</span>
+<span id="L308"><span class="lineNum">     308</span>              : </span>
+<span id="L309"><span class="lineNum">     309</span>              :   /** interface for macroscopic solver */</span>
+<span id="L310"><span class="lineNum">     310</span>              :   coupling::interface::MacroscopicSolverInterface&lt;dim&gt;* _macroscopicSolverInterface;</span>
+<span id="L311"><span class="lineNum">     311</span>              : </span>
+<span id="L312"><span class="lineNum">     312</span>              :   /** for quantity transfer between solvers */</span>
+<span id="L313"><span class="lineNum">     313</span>              :   coupling::sendrecv::FromMacro2MD&lt;coupling::datastructures::CouplingCell&lt;dim&gt;, dim&gt; _fromMacro2MD;</span>
+<span id="L314"><span class="lineNum">     314</span>              :   coupling::sendrecv::DataExchangeFromMacro2MD&lt;dim&gt; _deFromMacro2MD;</span>
+<span id="L315"><span class="lineNum">     315</span>              :   coupling::sendrecv::DataExchangeFromAllMacro2MD&lt;dim&gt; _deFromAllMacro2MD;</span>
+<span id="L316"><span class="lineNum">     316</span>              :   bool _enableInnerImposition;</span>
+<span id="L317"><span class="lineNum">     317</span>              :   coupling::sendrecv::FromMD2Macro&lt;coupling::datastructures::CouplingCell&lt;dim&gt;, dim&gt; _fromMD2Macro;</span>
+<span id="L318"><span class="lineNum">     318</span>              :   coupling::sendrecv::DataExchangeFromMD2Macro&lt;dim&gt; _deFromMD2Macro;</span>
+<span id="L319"><span class="lineNum">     319</span>              : </span>
+<span id="L320"><span class="lineNum">     320</span>              :   /** storage for coupling cells in coupling tool */</span>
+<span id="L321"><span class="lineNum">     321</span>              :   coupling::datastructures::LinkedCellContainer&lt;LinkedCell, dim&gt; _couplingCells;</span>
+<span id="L322"><span class="lineNum">     322</span>              : </span>
+<span id="L323"><span class="lineNum">     323</span>              :   /** filter pipeline, used to apply filters in sendFromMD2Macro */</span>
+<span id="L324"><span class="lineNum">     324</span>              :   coupling::filtering::FilterPipeline&lt;I02, dim&gt;* _filterPipeline;</span>
+<span id="L325"><span class="lineNum">     325</span>              : </span>
+<span id="L326"><span class="lineNum">     326</span>              :   /**parameters needed in initFiltering() */</span>
+<span id="L327"><span class="lineNum">     327</span>              :   const char* _filterPipelineConfiguration;</span>
+<span id="L328"><span class="lineNum">     328</span>              :   const tarch::utils::MultiMDService&lt;dim&gt; _multiMDService;</span>
+<span id="L329"><span class="lineNum">     329</span>              : </span>
+<span id="L330"><span class="lineNum">     330</span>              :   /** needed for insertion of momentum */</span>
+<span id="L331"><span class="lineNum">     331</span>              :   coupling::MomentumInsertion&lt;LinkedCell, dim&gt;* _momentumInsertion;</span>
+<span id="L332"><span class="lineNum">     332</span>              :   coupling::configurations::MomentumInsertionConfiguration&lt;3&gt;::MomentumInsertionType _momentumInsertionType;</span>
+<span id="L333"><span class="lineNum">     333</span>              :   /** needed for insertion of particles, e.g. USHER */</span>
+<span id="L334"><span class="lineNum">     334</span>              :   coupling::ParticleInsertion&lt;LinkedCell, dim&gt;* _particleInsertion;</span>
+<span id="L335"><span class="lineNum">     335</span>              :   const tarch::la::Vector&lt;dim, unsigned int&gt; _numberLinkedCellsPerCouplingCell;</span>
+<span id="L336"><span class="lineNum">     336</span>              :   const coupling::configurations::ParticleInsertionConfiguration::ParticleInsertionType _particleInsertionType;</span>
+<span id="L337"><span class="lineNum">     337</span>              :   /** coupling strategy */</span>
+<span id="L338"><span class="lineNum">     338</span>              :   coupling::transferstrategies::TransferStrategy&lt;LinkedCell, dim&gt;* _transferStrategy;</span>
+<span id="L339"><span class="lineNum">     339</span>              : </span>
+<span id="L340"><span class="lineNum">     340</span>              :   /** controls the kinetic energy of the system, i.e. maintains temperature in</span>
+<span id="L341"><span class="lineNum">     341</span>              :    * case of changing mass/momentum. */</span>
+<span id="L342"><span class="lineNum">     342</span>              :   coupling::KineticEnergyController&lt;LinkedCell, dim&gt; _kineticEnergyController;</span>
+<span id="L343"><span class="lineNum">     343</span>              :   /** controls and apply boundary forces to molecules close to open</span>
+<span id="L344"><span class="lineNum">     344</span>              :    * boundaries.*/</span>
+<span id="L345"><span class="lineNum">     345</span>              :   coupling::BoundaryForceController&lt;LinkedCell, dim&gt;* _boundaryForceController;</span>
+<span id="L346"><span class="lineNum">     346</span>              :   /** controls/ maintains momentum, e.g. after particle insertion */</span>
+<span id="L347"><span class="lineNum">     347</span>              :   coupling::MomentumController&lt;LinkedCell, dim&gt; _momentumController;</span>
+<span id="L348"><span class="lineNum">     348</span>              : </span>
+<span id="L349"><span class="lineNum">     349</span>              :   std::function&lt;void(Wrapper&amp;)&gt; _applyAccordingToConfiguration;</span>
+<span id="L350"><span class="lineNum">     350</span>              : </span>
+<span id="L351"><span class="lineNum">     351</span>              :   /** information for plotting */</span>
+<span id="L352"><span class="lineNum">     352</span>              :   const std::string _microscopicFilename;</span>
+<span id="L353"><span class="lineNum">     353</span>              :   const unsigned int _writeEveryMicroscopicTimestep;</span>
+<span id="L354"><span class="lineNum">     354</span>              :   const std::string _macroscopicFilename;</span>
+<span id="L355"><span class="lineNum">     355</span>              :   const unsigned int _writeEveryMacroscopicTimestep;</span>
+<span id="L356"><span class="lineNum">     356</span>              : </span>
+<span id="L357"><span class="lineNum">     357</span>              :   /** index vectors for block-usher scheme</span>
+<span id="L358"><span class="lineNum">     358</span>              :    * -----------------------------------------------------*/</span>
+<span id="L359"><span class="lineNum">     359</span>              :   // start and end coordinate for block loop over coupling cells (with 3</span>
+<span id="L360"><span class="lineNum">     360</span>              :   // entries always!)</span>
+<span id="L361"><span class="lineNum">     361</span>              :   tarch::la::Vector&lt;3, unsigned int&gt; _usherCellStart[1 &lt;&lt; dim];</span>
+<span id="L362"><span class="lineNum">     362</span>              :   tarch::la::Vector&lt;3, unsigned int&gt; _usherCellEnd[1 &lt;&lt; dim];</span>
+<span id="L363"><span class="lineNum">     363</span>              :   tarch::la::Vector&lt;dim, unsigned int&gt; _usherRange[1 &lt;&lt; dim];</span>
+<span id="L364"><span class="lineNum">     364</span>              :   // offset in red-black loops nested within the block loops (always 0 or 1</span>
+<span id="L365"><span class="lineNum">     365</span>              :   // entries)</span>
+<span id="L366"><span class="lineNum">     366</span>              :   tarch::la::Vector&lt;3, unsigned int&gt; _usherCellOffset[1 &lt;&lt; dim];</span>
+<span id="L367"><span class="lineNum">     367</span>              : };</span>
+<span id="L368"><span class="lineNum">     368</span>              : #include &quot;CouplingCellService.cpph&quot;</span>
+<span id="L369"><span class="lineNum">     369</span>              : </span>
+<span id="L370"><span class="lineNum">     370</span>              : #endif // _MOLECULARDYNAMICS_COUPLING_SERVICES_COUPLINGCELLSERVICE_H_</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
 
-  <table width="100%" border=0 cellspacing=0 cellpadding=0>
-    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
-    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
-  </table>
-  <br>
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
 
 </body>
 </html>
