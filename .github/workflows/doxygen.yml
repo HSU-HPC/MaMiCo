@@ -66,7 +66,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           touch bot-comment.md
-          ./test/gh-act/checks/check_my_formatting.sh >/dev/null 2>> bot-comment.md || :
+          ./test/gh-act/checks/check_my_formatting.sh >> bot-comment.md || :
           echo "" >> bot-comment.md
           ./test/gh-act/checks/check_my_coverage.py --skip-make-coverage >> bot-comment.md || :
           cat bot-comment.md
@@ -76,6 +76,6 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           file-path: bot-comment.md
-          comment_tag: formatting-and-coverage
+          comment-tag: formatting-and-coverage
           mode: recreate
       # ==========^^^ Comment on corresponding PR ^^^==========

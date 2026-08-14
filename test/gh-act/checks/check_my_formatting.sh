@@ -9,7 +9,7 @@ CLANG_FORMAT_TARGET=mamico-clangformat
 set -e
 
 cd "$(dirname "$0")"
-cd ..
+cd ../../..
 CWD=$(pwd)
 
 # Make an ephemeral copy of the working copy
