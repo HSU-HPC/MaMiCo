@@ -11,7 +11,7 @@
 #include <iostream>
 #include <sys/time.h>
 
-enum class SimpleMDBenchSize { MD60, MD120, MD240 };
+enum class SimpleMDBenchSize { MD60, MD120, MD240, MD480 };
 
 class BenchSim : public simplemd::MolecularDynamicsSimulation {
 public:
@@ -107,6 +107,7 @@ private:
     linked-cell-size="2.5 ; 2.5 ; 2.5"
     k_B="1.0"
     block-size="100"
+    capacity-factor="2.25"
 
     bottom-south-west="reflecting" bottom-south="reflecting" bottom-south-east="reflecting"
     bottom-west="reflecting"       bottom="reflecting"       bottom-east="reflecting"
@@ -139,6 +140,11 @@ private:
         = tarch::la::Vector<3, unsigned int>{224,224,224};
       _simpleMDConfig.getDomainConfigurationNonConst().getGlobalDomainSizeNonConst()
         = tarch::la::Vector<3, double>{240,240,240};
+    } else if(_MDSize == SimpleMDBenchSize::MD480){
+      _simpleMDConfig.getDomainConfigurationNonConst().getMoleculesPerDirectionNonConst()
+        = tarch::la::Vector<3, unsigned int>{448,448,448};
+      _simpleMDConfig.getDomainConfigurationNonConst().getGlobalDomainSizeNonConst()
+        = tarch::la::Vector<3, double>{480,480,480};
     }
 
     _simulation = std::make_unique<BenchSim>(_simpleMDConfig);
@@ -193,6 +199,7 @@ private:
     if(_MDSize == SimpleMDBenchSize::MD60)  correct = 9224833479527670225u;
     if(_MDSize == SimpleMDBenchSize::MD120) correct = 18377339084083654394u;
     if(_MDSize == SimpleMDBenchSize::MD240) correct = 18342705775936782749u;
+    if(_MDSize == SimpleMDBenchSize::MD480) correct = 18349058309621237939u;
     if (sum == correct)
       std::cout << "INFO SimpleMDBench: SUCCESS Checksum is correct :-)" << std::endl;
     else {

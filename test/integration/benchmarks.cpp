@@ -39,6 +39,7 @@ int main(int argc, char* argv[]) {
     } else if(argc == 2 && !strcmp(argv[1],"MD60")) benchsize = SimpleMDBenchSize::MD60;
       else if(argc == 2 && !strcmp(argv[1],"MD120")) benchsize = SimpleMDBenchSize::MD120;
       else if(argc == 2 && !strcmp(argv[1],"MD240")) benchsize = SimpleMDBenchSize::MD240;
+      else if(argc == 2 && !strcmp(argv[1],"MD480")) benchsize = SimpleMDBenchSize::MD480;
     else {
       std::cout << "ERROR unknown parameter" << std::endl;
       Kokkos::finalize();
