@@ -17,7 +17,7 @@ public:
   KOKKOS_FUNCTION virtual ~LennardJonesForceMapping() {}
 
   void beginMoleculeIteration();
-  void endMoleculeIteration() { }
+  void endMoleculeIteration() {}
 
   KOKKOS_FUNCTION void handleMolecule(Molecule& molecule, const LinkedCell& cell) const;
 

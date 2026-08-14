@@ -87,7 +87,7 @@ def get_test_coverage(index_files):
 
 
 if __name__ == "__main__":
-    base_dir = Path(__file__).parents[3].resolve()
+    base_dir = Path(__file__).resolve().parents[3]
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument(
         "-d", "--build-directory", type=Path, default=base_dir / Path("build")
@@ -95,6 +95,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("-M", "--skip-make-coverage", action="store_true")
     args = arg_parser.parse_args()
     build_dir = args.build_directory.absolute()
+    build_dir.mkdir(exist_ok=True, parents=True)
 
     if not args.skip_make_coverage:
         os.chdir(build_dir)
@@ -136,7 +137,7 @@ if __name__ == "__main__":
         current_branch = os.environ["GITHUB_HEAD_REF"]
     if len(current_branch) == 0:
         print("Could not determine current branch!", file=sys.stderr)
-        exit(1)
+        sys.exit(1)
     changed_files = []
     remote = "origin"
     for branch_prefix in ["", f"{remote}/"]:
@@ -155,8 +156,8 @@ if __name__ == "__main__":
                 .strip()
                 .splitlines()
             )
-        except:
-            pass  # No such branch
+        except Exception as e:
+            print(e, file=sys.stderr)
     touched_files = set(uncommited_files + changed_files)
 
     coverage_root = build_dir / "coverage"
