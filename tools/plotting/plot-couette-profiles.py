@@ -67,7 +67,9 @@ def plot_couette_profile(coupling_cycle, color, args, ax=plt.gca()):
         return
     data = load_avg_ux_from_csv(csv_path)
     z = np.linspace(
-        0, args.channel_height, num=(args.channel_height / args.coupling_cell_size) + 1
+        0,
+        args.channel_height,
+        num=int(args.channel_height / args.coupling_cell_size) + 1,
     )
     y = couette_analytic(
         z, coupling_cycle * args.md_ts_per_cc * args.md_ts_length, args

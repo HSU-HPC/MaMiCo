@@ -66,17 +66,16 @@ jobs:
         id: "parse_coverage"
         run: |
           chown -R $(whoami):$(whoami) .. # Fix issue of reading files in repo
-          echo 'PARSED_COVERAGE<<EOF' >> "$GITHUB_OUTPUT"
-          python test/check_my_coverage.py --skip-make-coverage | tee -a "$GITHUB_OUTPUT"
-          echo 'EOF' >> "$GITHUB_OUTPUT"
-          COVERAGE_REACTION=$(grep "^Sufficient test coverage" $GITHUB_OUTPUT -q && echo "rocket" || echo "eyes")
+          python test/check_my_coverage.py --skip-make-coverage > coverage-comment.md
+          cat coverage-comment.md
+          COVERAGE_REACTION=$(grep -q "^Sufficient test coverage" coverage-comment.md && echo "rocket" || echo "eyes")
           echo "COVERAGE_REACTION=$COVERAGE_REACTION" >> "$GITHUB_OUTPUT"
 
       - name: Comment Test Coverage
         if: github.event_name == 'pull_request'
-        uses: thollander/actions-comment-pull-request@v2
+        uses: thollander/actions-comment-pull-request@v3
         with:
-          message: ${{steps.parse_coverage.outputs.PARSED_COVERAGE}}
+          file-path: coverage-comment.md
           comment_tag: coverage
           mode: recreate
           reactions: ${{steps.parse_coverage.outputs.COVERAGE_REACTION}}
