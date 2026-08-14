@@ -62,16 +62,17 @@ jobs:
 
       
       # ==========vvv Comment test coverage on corresponding PR vvv==========
-      - name: Check Formatting and Coverage
+      - name: Check Formatting and Test Coverage
         if: github.event_name == 'pull_request'
         run: |
+          chown -R $(whoami):$(whoami) .. # Fix issue of reading files in repo
           touch bot-comment.md
           ./test/check_my_formatting.sh >/dev/null 2>> bot-comment.md
           echo "" >> bot-comment.md
           ./test/check_my_coverage.py --skip-make-coverage >> bot-comment.md
           cat bot-comment.md
 
-      - name: Comment Test Coverage
+      - name: Comment Formatting and Test Coverage
         if: github.event_name == 'pull_request'
         uses: thollander/actions-comment-pull-request@v3
         with:
