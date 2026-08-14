@@ -62,7 +62,7 @@ jobs:
     - name: Compiletest
       run: |
         mkdir build; cd build
-        cmake -DCOMPILETEST_MODES=Release ..
+        cmake -DCOMPILETEST_MODES=Release -DCOMPILETEST_MPI_MODES=ON -DCOMPILETEST_KOKKOS_TARGETS=SERIAL ..
         make compiletest
 
     - name: CMake
