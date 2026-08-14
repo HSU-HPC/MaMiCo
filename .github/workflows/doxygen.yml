@@ -68,7 +68,7 @@ jobs:
           touch bot-comment.md
           ./test/gh-act/checks/check_my_formatting.sh >> bot-comment.md || :
           echo "" >> bot-comment.md
-          ./test/gh-act/checks/check_my_coverage.py --skip-make-coverage >> bot-comment.md || :
+          python3 ./test/gh-act/checks/check_my_coverage.py --skip-make-coverage >> bot-comment.md || :
           cat bot-comment.md
 
       - name: Comment Formatting and Test Coverage

@@ -1,4 +1,11 @@
-#! /usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# dependencies = [
+#   "numpy",
+#   "pandas",
+#   "beautifulsoup4",
+# ]
+# ///
 
 """
 This script parses the current remote and local state of git and the HTML output of the test coverage
@@ -80,7 +87,7 @@ def get_test_coverage(index_files):
 
 
 if __name__ == "__main__":
-    base_dir = Path(__file__).parent.parent
+    base_dir = Path(__file__).parents[3].resolve()
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument(
         "-d", "--build-directory", type=Path, default=base_dir / Path("build")
