@@ -68,9 +68,7 @@ jobs:
     - name: CMake
       run: |
         cd build
-        # Clean build (compiletest uses unsupported Unity build)
-        rm -rf ./*
-        cmake -DBUILD_TESTING=ON -DBUILD_WITH_MPI=ON ..
+        cmake -DCMAKE_UNITY_BUILD=OFF -DBUILD_TESTING=ON -DBUILD_WITH_MPI=ON ..
 
     - name: Build
       run: cd build; make -j4 testmamico
