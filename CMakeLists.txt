@@ -5,7 +5,6 @@ set(CMAKE_POLICY_DEFAULT_CMP0126 NEW) # can be removed when minimum version is s
 project(mamico VERSION 2.0 LANGUAGES CXX)
 
 set(MAMICO_CXX_STANDARD 17)
-set(CMAKE_UNITY_BUILD ON)
 
 # Make our cmake modules visible to CMake
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -110,6 +109,11 @@ message(STATUS ">> Build with PINT_DEBUG : " ${BUILD_WITH_PINT_DEBUG})
 # Enable Adios2 output for megamol
 option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
 message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
+
+# Optimize compile times for release builds
+if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT BUILD_TESTING)  
+  set(CMAKE_UNITY_BUILD ON)
+endif()
 
 #
 # Find dependencies
