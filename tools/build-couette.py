@@ -253,12 +253,12 @@ def build_mamico_couette_md(
         installed_couette_path = MAMICO_INSTALL_DIR / couette_name
         shutil.copy2(couette_bin_path, installed_couette_path)
 
-    couette_link = MAMICO_INSTALL_DIR / "couette"
+        couette_link = MAMICO_INSTALL_DIR / "couette"
 
-    if couette_link.exists() or couette_link.is_symlink():
-        couette_link.unlink()
+        if couette_link.exists() or couette_link.is_symlink():
+            couette_link.unlink()
 
-    couette_link.symlink_to(installed_couette_path)
+        couette_link.symlink_to(installed_couette_path)
 
     print(f"::: Completed (Successful: {not had_error}) :::")
     return None if had_error else couette_bin_path
