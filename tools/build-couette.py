@@ -171,6 +171,15 @@ def build_mamico_couette_md(
         f"git -C {MAMICO_REPO_DIR} rev-parse --short HEAD"
     )
 
+    is_dirty = bool(
+        subprocess.getoutput(
+            f"git -C {MAMICO_REPO_DIR} status --porcelain"
+        )
+    )
+
+    if is_dirty:
+        commit += "-dirty"
+
     couette_name = f"couette-{commit}-{md_solver}"
 
     if with_openfoam:
@@ -194,7 +203,7 @@ def build_mamico_couette_md(
     build_dir.mkdir(parents=True, exist_ok=True)
     try:
         md_solver_cmake_flag = md_solvers[md_solver]
-    except:
+    except KeyError:
         raise ValueError("Unknown MD solver")
     if with_openfoam:
         had_error |= build_open_foam(jobs)
@@ -210,8 +219,8 @@ def build_mamico_couette_md(
     cmake_args += f" -DBUILD_WITH_MPI={'ON' if with_mpi else 'OFF'}"
     cmake_args += f" -DMD_SIM={md_solver_cmake_flag}"
 
-    environement = dict()
-    environement["PKG_CONFIG_PATH"] = "$PKG_CONFIG_PATH"
+    environment = dict()
+    environment["PKG_CONFIG_PATH"] = "$PKG_CONFIG_PATH"
 
     cmake_args += " -DBUILD_WITH_LAMMPS=OFF"
 
@@ -228,17 +237,20 @@ def build_mamico_couette_md(
 
         for suffix in ["", "64"]:
             pkgconfig_path = Path.home() / ".local" / f"lib{suffix}" / "pkgconfig"
-            environement["PKG_CONFIG_PATH"] += f":{pkgconfig_path}"
+            environment["PKG_CONFIG_PATH"] += f":{pkgconfig_path}"
 
         shell(f"ln -sf {LAMMPS_REPO_DIR}/src {MAMICO_REPO_DIR}/lammps")
+    if had_error:
+        print("Failed to prepare MD solver.")
+        return None
 
     cmake_args += f" -DBUILD_WITH_OPENFOAM={'ON' if with_openfoam else 'OFF'}"
 
-    environement_prefix = " ".join(
-        f"{k}={v}" for k, v in environement.items()
+    environment_prefix = " ".join(
+        f"{k}={v}" for k, v in environment.items()
     )
 
-    cmd = f"{environement_prefix} cmake {cmake_args}"
+    cmd = f"{environment_prefix} cmake {cmake_args}"
 
     if with_openfoam:
         cmd = f"source {OPEN_FOAM_SRC_DIR / 'etc' / 'bashrc'}; {cmd}"
@@ -274,7 +286,7 @@ if __name__ == "__main__":
     )
     arg_parser.add_argument("-F", "--with-foam", action="store_true")
     arg_parser.add_argument("-M", "--with-mpi", action="store_true")
-    arg_parser.add_argument("-j", "--jobs", default=8)
+    arg_parser.add_argument("-j", "--jobs", type=int, default=8)
     arg_parser.add_argument("-g", "--force-gcc", action="store_true")
     args = arg_parser.parse_args()
 
