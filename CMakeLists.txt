@@ -139,6 +139,9 @@ else()
       set(Kokkos_ENABLE_OPENMP ON CACHE STRING "Build Kokkos with OpenMP support when not targeting Serial" FORCE)
     endif()
     if(KOKKOS_TARGET STREQUAL "CUDA")
+      if("${MD_SIM}" STREQUAL "LS1_MARDYN")
+        message(FATAL_ERROR "ls1 mardyn does not support CUDA yet! Please pick OpenMP as the CUDA backend!")
+      endif()
       set(Kokkos_ENABLE_CUDA_LAMBDA ON CACHE STRING "Allow lambda expressions on the device (Deprecated)" FORCE)
       set(Kokkos_ENABLE_CUDA ON CACHE STRING "Build MaMiCo/Kokkos with CUDA support" FORCE)
       set(Kokkos_ENABLE_CUDA_RELOCATABLE_DEVICE_CODE ON CACHE STRING "MaMiCo requires CUDA relocatable device code (RDC)" FORCE)
@@ -158,9 +161,15 @@ else()
       set(Kokkos_ENABLE_CUDA_CONSTEXPR ON CACHE STRING "Allow host constexpr code for CUDA" FORCE)
     endif()
 
+    set(KOKKOS_VERSION 5.0.2 CACHE STRING "Version of Kokkos to use (git tag)")
+    if(ENABLE_AUTOPAS AND KOKKOS_VERSION MATCHES "^([5-9]+)\\.([0-9]+)\\.([0-9]+)$")
+      message(WARNING "AutoPas does not support C++20 yet (needed for Kokkos 5)! Downgrading Kokkos version...")
+      set(KOKKOS_VERSION 4.6.02 CACHE STRING "Version of Kokkos to use (git tag)" FORCE)
+    endif()
     FetchContent_Declare(
         Kokkos
-        URL https://github.com/kokkos/kokkos/archive/refs/tags/5.0.2.tar.gz
+        GIT_REPOSITORY https://github.com/kokkos/kokkos
+        GIT_TAG ${KOKKOS_VERSION}
     )
     FetchContent_MakeAvailable(Kokkos)
 
