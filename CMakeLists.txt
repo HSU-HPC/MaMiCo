@@ -94,6 +94,14 @@ message(STATUS ">> Compiler list to be used for compiletest : " ${COMPILETEST_CO
 set(COMPILETEST_MODES "Debug DebugOptimized RelWithDebInfo Release" CACHE STRING "Build mode list to be used for compiletest")
 message(STATUS ">> Build mode list to be used for compiletest : " ${COMPILETEST_MODES})
 
+# MPI switch list to be used for compiletest
+set(COMPILETEST_MPI_MODES "ON OFF" CACHE STRING "MPI switch list to be used for compiletest")
+message(STATUS ">> MPI switch list to be used for compiletest : " ${COMPILETEST_MPI_MODES})
+
+# Build mode list to be used for compiletest
+set(COMPILETEST_KOKKOS_TARGETS "SERIAL OPENMP CUDA" CACHE STRING "Kokkos target list to be used for compiletest")
+message(STATUS ">> Kokkos target list to be used for compiletest : " ${COMPILETEST_KOKKOS_TARGETS})
+
 # Enable coupling with pint debug, default is off
 option(BUILD_WITH_PINT_DEBUG "Enable parallel-in-time integration debugging, default is off." OFF)
 message(STATUS ">> Build with PINT_DEBUG : " ${BUILD_WITH_PINT_DEBUG})
@@ -101,6 +109,11 @@ message(STATUS ">> Build with PINT_DEBUG : " ${BUILD_WITH_PINT_DEBUG})
 # Enable Adios2 output for megamol
 option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
 message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
+
+# Optimize compile times for release builds
+if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT BUILD_TESTING)  
+  set(CMAKE_UNITY_BUILD ON)
+endif()
 
 #
 # Find dependencies
@@ -139,6 +152,9 @@ else()
       set(Kokkos_ENABLE_OPENMP ON CACHE STRING "Build Kokkos with OpenMP support when not targeting Serial" FORCE)
     endif()
     if(KOKKOS_TARGET STREQUAL "CUDA")
+      if("${MD_SIM}" STREQUAL "LS1_MARDYN")
+        message(FATAL_ERROR "ls1 mardyn does not support CUDA yet! Please pick OpenMP as the CUDA backend!")
+      endif()
       set(Kokkos_ENABLE_CUDA_LAMBDA ON CACHE STRING "Allow lambda expressions on the device (Deprecated)" FORCE)
       set(Kokkos_ENABLE_CUDA ON CACHE STRING "Build MaMiCo/Kokkos with CUDA support" FORCE)
       set(Kokkos_ENABLE_CUDA_RELOCATABLE_DEVICE_CODE ON CACHE STRING "MaMiCo requires CUDA relocatable device code (RDC)" FORCE)
@@ -158,9 +174,15 @@ else()
       set(Kokkos_ENABLE_CUDA_CONSTEXPR ON CACHE STRING "Allow host constexpr code for CUDA" FORCE)
     endif()
 
+    set(KOKKOS_VERSION 5.0.2 CACHE STRING "Version of Kokkos to use (git tag)")
+    if(ENABLE_AUTOPAS AND KOKKOS_VERSION MATCHES "^([5-9]+)\\.([0-9]+)\\.([0-9]+)$")
+      message(WARNING "AutoPas does not support C++20 yet (needed for Kokkos 5)! Downgrading Kokkos version...")
+      set(KOKKOS_VERSION 4.6.02 CACHE STRING "Version of Kokkos to use (git tag)" FORCE)
+    endif()
     FetchContent_Declare(
         Kokkos
-        URL https://github.com/kokkos/kokkos/archive/refs/tags/5.0.2.tar.gz
+        GIT_REPOSITORY https://github.com/kokkos/kokkos
+        GIT_TAG ${KOKKOS_VERSION}
     )
     FetchContent_MakeAvailable(Kokkos)
 
@@ -661,6 +683,8 @@ add_custom_target(
   COMMAND ${COMPILETEST_SCRIPT}
   ${COMPILETEST_COMPILERS}
   ${COMPILETEST_MODES}
+  ${COMPILETEST_MPI_MODES}
+  ${COMPILETEST_KOKKOS_TARGETS}
 )
 
 #

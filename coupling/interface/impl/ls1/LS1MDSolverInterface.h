@@ -25,7 +25,8 @@ class LS1MDSolverInterface;
 class coupling::interface::LS1MDSolverInterface : public coupling::interface::MDSolverInterface<ls1::LS1RegionWrapper, 3> {
 public:
   LS1MDSolverInterface(tarch::la::Vector<3, double> couplingCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell)
-      : _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) {
+      : _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation),
+      _locSimulation(global_simulation) {
     _fullDomainWrapper.setupIDcounterForParticleAddition();
     for (int i = 0; i < 3; i++)
       _linkedCellSize[i] = couplingCellSize[i] / linkedCellsPerCouplingCell[i];
@@ -71,7 +72,7 @@ public:
       regionEndpoint[i] = regionOffset[i] + currentLinkedCellSize;
     }
 
-    ls1::LS1RegionWrapper* cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint, global_simulation); // temporary till ls1 offset is natively supported
+    ls1::LS1RegionWrapper* cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint, _locSimulation); // temporary till ls1 offset is natively supported
     // when offset is supported, the offset min will need to be added to both regions
     // store pointer to delete later
     _linkedCellPointers.push_back(cell);
@@ -80,15 +81,15 @@ public:
 
   /** returns the global size of the box-shaped MD domain */
   virtual tarch::la::Vector<3, double> getGlobalMDDomainSize() const {
-    auto up = global_simulation->getEnsemble()->domain()->rmax();
-    auto down = global_simulation->getEnsemble()->domain()->rmin();
+    auto up = _locSimulation->getEnsemble()->domain()->rmax();
+    auto down = _locSimulation->getEnsemble()->domain()->rmin();
     tarch::la::Vector<3, double> globalSize = {up[0] - down[0], up[1] - down[1], up[2] - down[2]};
     return globalSize;
   }
 
   /** returns the offset (i.e. lower,left corner) of MD domain */
   virtual tarch::la::Vector<3, double> getGlobalMDDomainOffset() const {
-    // auto down = global_simulation->getEnsemble()->domain()->rmin();
+    // auto down = _locSimulation->getEnsemble()->domain()->rmin();
     // tarch::la::Vector<3, double> globalOffset(down[0], down[1], down[2]);
     tarch::la::Vector<3, double> globalOffset(coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(0),
                                               coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(1),
@@ -97,16 +98,16 @@ public:
   }
 
   /** returns the mass of a single fluid molecule */
-  virtual double getMoleculeMass() const { return global_simulation->getEnsemble()->getComponent(0)->m(); }
+  virtual double getMoleculeMass() const { return _locSimulation->getEnsemble()->getComponent(0)->m(); }
 
   /** returns Boltzmann's constant */
   virtual double getKB() const { return 1.0; }
 
   /** returns the sigma parameter of the LJ potential */
-  virtual double getMoleculeSigma() const { return global_simulation->getEnsemble()->getComponent(0)->getSigma(0); }
+  virtual double getMoleculeSigma() const { return _locSimulation->getEnsemble()->getComponent(0)->getSigma(0); }
 
   /** returns the epsilon parameter of the LJ potential */
-  virtual double getMoleculeEpsilon() const { return global_simulation->getEnsemble()->getComponent(0)->ljcenter(0).eps(); }
+  virtual double getMoleculeEpsilon() const { return _locSimulation->getEnsemble()->getComponent(0)->ljcenter(0).eps(); }
 
   /** sets a random velocity in the vector 'initialVelocity'. This velocity is sampled from
    *  a Maxwellian assuming a mean flow velocity 'meanVelocity' and a temperature 'temperature'
@@ -158,7 +159,7 @@ public:
     // get bounds of current process
     double bBoxMin[3];
     double bBoxMax[3];
-    global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
+    _locSimulation->domainDecomposition().getBoundingBoxMinMax(_locSimulation->getDomain(), bBoxMin, bBoxMax);
 
     // calculate the index
     for (int i = 0; i < 3; i++) {
@@ -194,11 +195,16 @@ public:
    *  layers and re-fills the ghost layers again.
    */
   virtual void synchronizeMoleculesAfterMassModification() {
+    // delete halo particles in ls1 linked cells
+    // this should technically delete leaving particles too, since this is occuring after position update
+    // however at this point positions are only updates within molecules, and as long as moleculecontainer->update()
+    // is not called, the particles are not actually marked to be outside the bounding box, hence this is safe
 #ifndef MARDYN_AUTOPAS
-    global_simulation->getMoleculeContainer()->deleteOuterParticles();
+    _locSimulation->getMoleculeContainer()->deleteOuterParticles();
 #endif
-    global_simulation->updateParticleContainerAndDecomposition(1.0, false);
-    global_simulation->domainDecomposition().removeNonPeriodicHalos(global_simulation->getMoleculeContainer());
+    // after deleting halos, update them again, this time including the usher inserted particles
+    // the leaving particles will also get communicated
+    _locSimulation->updateParticleContainerAndDecomposition(1.0, false);
   }
 
   /** is called each time when MaMiCo tried to insert momentum in the MD simulation. For the builtin MD simulation,
@@ -209,7 +215,7 @@ public:
   virtual void synchronizeMoleculesAfterMomentumModification() {}
 
   /** returns the timestep of the MD simulation */
-  virtual double getDt() { return global_simulation->getIntegrator()->getTimestepLength(); }
+  virtual double getDt() { return _locSimulation->getIntegrator()->getTimestepLength(); }
 
   /** returns a new molecule iterator for a certain linked cell */
   virtual coupling::interface::MoleculeIterator<ls1::LS1RegionWrapper, 3>* getMoleculeIterator(ls1::LS1RegionWrapper& cell) {
@@ -218,6 +224,7 @@ public:
 
 private:
   ls1::LS1RegionWrapper _fullDomainWrapper;
+  Simulation* _locSimulation;
   tarch::la::Vector<3, double> _linkedCellSize;
   // take ownership of created cell pointers to delete later
   std::vector<ls1::LS1RegionWrapper*> _linkedCellPointers;
