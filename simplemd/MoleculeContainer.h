@@ -235,7 +235,7 @@ public:
   /**
    * @brief applies molecule-with-cell mapping to all neighbors of cell
    */
-  template <class A> KOKKOS_FUNCTION void handleCellNeighbors(A& a, Molecule& m, const LinkedCell& cell) const;
+  template <class A> KOKKOS_FUNCTION void handleCellNeighbors(A& a, Molecule& m, unsigned int index) const;
 
   /**
    * @brief applies molecule-with-cell mapping without any node-level parallelisation
@@ -439,11 +439,9 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCell(A&
   }
 }
 
-template <class A> void simplemd::MoleculeContainer::handleCellNeighbors(A& a, Molecule& m, const LinkedCell& cell) const {
-  unsigned int index = cell.getIndex();
+template <class A> void simplemd::MoleculeContainer::handleCellNeighbors(A& a, Molecule& m, unsigned int index) const {
   for (unsigned int i = 0; i < 26; i++) {
-    auto cell2 = (*this)[index + _neighborOffsets(i)];
-    a.handleMolecule(m, cell2);
+    a.handleMoleculeVeryFast(m, index + _neighborOffsets(i));
   }
 }
 
@@ -461,19 +459,30 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellSer
 }
 
 template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellParallel(A& a) {
-  a.beginMoleculeIteration();
+  Kokkos::View<double**[3], Kokkos::LayoutRight> posData("posData",_linkedCellNumMolecules_d.size(),_cellCapacity);
+  Kokkos::parallel_for("simplemd::MoleculeContainer fill posData", Kokkos::RangePolicy<MainExecSpace>(0, _linkedCellNumMolecules_d.size() * _cellCapacity),
+      KOKKOS_CLASS_LAMBDA(const unsigned int i) {
+        const unsigned int cellIndex = i / _cellCapacity;
+        unsigned int molIndex = i % _cellCapacity;
+        if (molIndex < _linkedCellNumMolecules_d(cellIndex)) {
+          const Molecule& m = getMoleculeAt(cellIndex, molIndex);
+          posData(cellIndex,molIndex,0) = m.getConstPosition()[0];
+          posData(cellIndex,molIndex,1) = m.getConstPosition()[1];
+          posData(cellIndex,molIndex,2) = m.getConstPosition()[2];
+        }
+  });
+  a.beginMoleculeIteration(posData, _linkedCellNumMolecules_d);
+  
   const unsigned int threads_per_cell = _cellCapacity;
   const unsigned int length = _linkedCellNumMolecules_d.size() * threads_per_cell;
   Kokkos::parallel_for(
       "simplemd::MoleculeContainer::iterateMoleculesWithCellParallel", Kokkos::RangePolicy<MainExecSpace>(0, length),
       KOKKOS_CLASS_LAMBDA(const unsigned int i) {
     const unsigned int cellIndex = i / threads_per_cell;
-    simplemd::LinkedCell cell = (*this)[cellIndex];
-
     for (unsigned int j = i % threads_per_cell; j < _linkedCellNumMolecules_d(cellIndex); j+=threads_per_cell) {
         Molecule& m = getMoleculeAt(cellIndex, j);
-        a.handleMolecule(m,cell);
-        handleCellNeighbors(a, m, cell);
+        a.handleMoleculeVeryFast(m,cellIndex);
+        handleCellNeighbors(a, m, cellIndex);
     }
   });
 

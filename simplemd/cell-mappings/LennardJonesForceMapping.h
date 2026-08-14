@@ -42,15 +42,13 @@ public:
   static const bool IsParallel = true;
   static const bool IsReadonly = false;
 
-private:
+protected:
   /** epsilon */
   const double _epsilon;
   /** sigma^6 */
   const double _sigma6;
   /** cutOffRadius*cutOffRadius */
   const double _cutOffRadiusSquared;
-
-protected:
   /** external forces*/
   tarch::la::Vector<MD_DIM, double> _externalForce;
 };
