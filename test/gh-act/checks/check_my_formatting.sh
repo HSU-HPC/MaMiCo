@@ -34,7 +34,10 @@ unset 'find_args[-1]'
 files=$(find "$CWD" "${find_args[@]}")
 for file in $files; do
     relative="${file#"$CWD"/}"
-    if ! diff -q "$CWD/$relative" "$COPY/$relative" > /dev/null; then
+    if [[ "$relative" == build/* ]]; then
+        continue # Ignore generated files
+    fi
+    if ! diff -q "$CWD/$relative" "$COPY/$relative" 1>&2; then
         echo ':eyes: Please format your code with `make '$CLANG_FORMAT_TARGET'`!'
         exit 1
     fi
