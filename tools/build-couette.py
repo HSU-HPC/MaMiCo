@@ -41,6 +41,10 @@ def get_git_repo_root(cwd="."):
 MAMICO_REPO_DIR = get_git_repo_root(Path(__file__))
 MAMICO_DEPENDENCIES_DIR = MAMICO_REPO_DIR / "dependencies"
 MAMICO_DEPENDENCIES_DIR.mkdir(parents=True, exist_ok=True)
+
+MAMICO_INSTALL_DIR = Path.home() / ".local" / "bin"
+MAMICO_INSTALL_DIR.mkdir(parents=True, exist_ok=True)
+
 MAMICO_BUILD_TYPE = "DebugOptimized"
 
 # LAMMPS
@@ -162,6 +166,23 @@ def build_mamico_couette_md(
     run_info = f"Started {time.strftime('%Y-%m-%d %H:%M:%S %Z')}"
     print(run_info)
     had_error = False
+
+    commit = subprocess.getoutput(
+        f"git -C {MAMICO_REPO_DIR} rev-parse --short HEAD"
+    )
+
+    couette_name = f"couette-{commit}-{md_solver}"
+
+    if with_openfoam:
+        couette_name += "-foam"
+
+    if with_mpi:
+        couette_name += "-mpi"
+
+    couette_name += f"-{MAMICO_BUILD_TYPE.lower()}"
+
+    print(f"Couette name: {couette_name}")
+
     build_id = time.strftime("%Y-%m-%d_%H-%M-%S")
     build_dir = MAMICO_REPO_DIR / "builds" / build_id
 
@@ -227,6 +248,17 @@ def build_mamico_couette_md(
     if not had_error:
         with ChangeDir(build_dir):
             had_error = 0 != shell(f"make -j {jobs} couette")
+
+    if not had_error:
+        installed_couette_path = MAMICO_INSTALL_DIR / couette_name
+        shutil.copy2(couette_bin_path, installed_couette_path)
+
+    couette_link = MAMICO_INSTALL_DIR / "couette"
+
+    if couette_link.exists() or couette_link.is_symlink():
+        couette_link.unlink()
+
+    couette_link.symlink_to(installed_couette_path)
 
     print(f"::: Completed (Successful: {not had_error}) :::")
     return None if had_error else couette_bin_path
