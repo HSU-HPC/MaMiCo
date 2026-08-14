@@ -462,7 +462,7 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellSer
 
 template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellParallel(A& a) {
   a.beginMoleculeIteration();
-  const unsigned int threads_per_cell = 5;
+  const unsigned int threads_per_cell = _cellCapacity;
   const unsigned int length = _linkedCellNumMolecules_d.size() * threads_per_cell;
   Kokkos::parallel_for(
       "simplemd::MoleculeContainer::iterateMoleculesWithCellParallel", Kokkos::RangePolicy<MainExecSpace>(0, length),
