@@ -236,6 +236,7 @@ public:
    * @brief applies molecule-with-cell mapping to all neighbors of cell
    */
   template <class A> KOKKOS_FUNCTION void handleCellNeighbors(A& a, Molecule& m, int index) const;
+  template <class A> KOKKOS_FUNCTION void handleCellNeighborsES1(A& a, Molecule& m, int index) const;
 
   /**
    * @brief applies molecule-with-cell mapping without any node-level parallelisation
@@ -445,6 +446,12 @@ template <class A> void simplemd::MoleculeContainer::handleCellNeighbors(A& a, M
   }
 }
 
+template <class A> void simplemd::MoleculeContainer::handleCellNeighborsES1(A& a, Molecule& m, int index) const {
+  for (int i = 0; i < 26; i++) {
+    a.handleMoleculeVeryFastES1(m, index + _neighborOffsets(i));
+  }
+}
+
 template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellSerial(A& a) {
   a.beginMoleculeIteration();
   for (unsigned int i = 0; i < _linkedCellNumMolecules_h.size(); i++) {
@@ -480,16 +487,29 @@ template <class A> void simplemd::MoleculeContainer::iterateMoleculesWithCellPar
   
   const int threads_per_cell = _cellCapacity;
   const int length = _linkedCellNumMolecules_d.size() * threads_per_cell;
-  Kokkos::parallel_for(
-      "simplemd::MoleculeContainer::iterateMoleculesWithCellParallel", Kokkos::RangePolicy<MainExecSpace>(0, length),
-      KOKKOS_CLASS_LAMBDA(const  int i) {
-    const int cellIndex = i / threads_per_cell;
-    for (int j = i % threads_per_cell; j < linkedCellNumMolecules(cellIndex); j+=threads_per_cell) {
-        Molecule& m = getMoleculeAt(cellIndex, j);
-        a.handleMoleculeVeryFast(m,cellIndex);
-        handleCellNeighbors(a, m, cellIndex);
-    }
-  });
+  if(a.epsilon_sigma_is_one()){
+    Kokkos::parallel_for(
+        "simplemd::MoleculeContainer::iterateMoleculesWithCellParallel", Kokkos::RangePolicy<MainExecSpace>(0, length),
+        KOKKOS_CLASS_LAMBDA(const  int i) {
+      const int cellIndex = i / threads_per_cell;
+      for (int j = i % threads_per_cell; j < linkedCellNumMolecules(cellIndex); j+=threads_per_cell) {
+          Molecule& m = getMoleculeAt(cellIndex, j);
+          a.handleMoleculeVeryFastES1(m,cellIndex);
+          handleCellNeighborsES1(a, m, cellIndex);
+      }
+    });
+  } else {
+    Kokkos::parallel_for(
+        "simplemd::MoleculeContainer::iterateMoleculesWithCellParallel", Kokkos::RangePolicy<MainExecSpace>(0, length),
+        KOKKOS_CLASS_LAMBDA(const  int i) {
+      const int cellIndex = i / threads_per_cell;
+      for (int j = i % threads_per_cell; j < linkedCellNumMolecules(cellIndex); j+=threads_per_cell) {
+          Molecule& m = getMoleculeAt(cellIndex, j);
+          a.handleMoleculeVeryFast(m,cellIndex);
+          handleCellNeighbors(a, m, cellIndex);
+      }
+    });
+  }
   a.endMoleculeIteration();
 }
 

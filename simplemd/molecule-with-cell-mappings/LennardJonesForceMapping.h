@@ -22,6 +22,7 @@ public:
 
   KOKKOS_FUNCTION void handleMolecule(Molecule& molecule, const LinkedCell& cell) const;
   KOKKOS_FUNCTION void handleMoleculeVeryFast(Molecule& molecule, int cellIndex) const;
+  KOKKOS_FUNCTION void handleMoleculeVeryFastES1(Molecule& molecule, int cellIndex) const;
 
   static const bool IsParallel = true;
   static const bool IsReadonly = false;

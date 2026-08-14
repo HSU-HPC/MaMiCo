@@ -42,6 +42,8 @@ public:
   static const bool IsParallel = true;
   static const bool IsReadonly = false;
 
+  bool epsilon_sigma_is_one() const {return _epsilon == 1.0 && _sigma6 == 1.0;};
+
 protected:
   /** epsilon */
   const double _epsilon;
