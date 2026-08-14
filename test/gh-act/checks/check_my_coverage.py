@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     if not Path(".git").is_dir():
         print(f"{os.getcwd()} is not a git repository!", file=sys.stderr)
-        exit(1)
+        sys.exit(1)
 
     # Look up target branch for pull request in CI/CD pipeline or default to master when running locally
     target_branch = ""
@@ -163,7 +163,7 @@ if __name__ == "__main__":
 
     if not coverage_root.is_dir():
         print("Coverage has not been generated yet.", file=sys.stderr)
-        exit(1)
+        sys.exit(1)
     
     coverage_index_files = iterate_coverage_indices(coverage_root)
     df_coverage = get_test_coverage(coverage_index_files)
@@ -176,9 +176,9 @@ if __name__ == "__main__":
     df_coverage = df_coverage[mask_touched]
 
     if len(df_coverage) == 0:
-        print("Sufficient test coverage for changed files.")
+        print(":rocket: Sufficient test coverage for changed files.")
     else:
-        print("**You should write tests for:**")
+        print(":eyes: You should write tests for:")
         headers = df_coverage.columns
         print("| " + " | ".join(headers) + " |")
         print("| :-- | --: | --: |")
@@ -190,3 +190,4 @@ if __name__ == "__main__":
                 for value in row.iloc[1:]
             ]
             print("| " + " | ".join(map(str, values)) + " |")
+        sys.exit(1)

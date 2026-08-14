@@ -35,9 +35,9 @@ files=$(find "$CWD" "${find_args[@]}")
 for file in $files; do
     relative="${file#"$CWD"/}"
     if ! diff -q "$CWD/$relative" "$COPY/$relative" > /dev/null; then
-        echo '**Please format your code with `make '$CLANG_FORMAT_TARGET'`!**' >&2
+        echo ':eyes: Please format your code with `make '$CLANG_FORMAT_TARGET'`!'
         exit 1
     fi
 done
 
-echo "Code already formatted!"
+echo ":rocket: Code already formatted!"
