@@ -115,7 +115,7 @@ message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
 
 # Optimize compile times for release builds
 if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT BUILD_TESTING)  
-  set(CMAKE_UNITY_BUILD ON)
+  set(CMAKE_UNITY_BUILD OFF)
 endif()
 
 #
@@ -595,6 +595,21 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
   target_compile_options(couette PRIVATE -std=c++${MAMICO_CXX_STANDARD})
 endif()
 target_link_libraries(couette PRIVATE mamico)
+
+#
+# CFDPush target
+#
+set(CFDPUSH_SOURCES
+  ${MAMICO_SOURCES}
+  "coupling/scenario/main_cfdpush.cpp"
+)
+add_executable(cfdpush ${CFDPUSH_SOURCES})
+target_link_libraries(cfdpush INTERFACE shared_defines)
+set_target_properties(cfdpush PROPERTIES CXX_STANDARD ${MAMICO_CXX_STANDARD})
+if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
+  target_compile_options(cfdpush PRIVATE -std=c++${MAMICO_CXX_STANDARD})
+endif()
+target_link_libraries(cfdpush PRIVATE mamico)
 
 #
 # test_lammps target
