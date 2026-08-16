@@ -35,3 +35,4 @@ docs/
 /lammps
 # mamico-cfg cache
 .mamico-cfg.cache
+allib/
