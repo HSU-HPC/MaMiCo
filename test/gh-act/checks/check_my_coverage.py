@@ -123,7 +123,8 @@ if __name__ == "__main__":
         l.split(" ")[-1]
         for l in subprocess.check_output(
             ["git", "status", "--porcelain"],
-            stderr=subprocess.DEVNULL,
+            #TODO just for testing
+            #stderr=subprocess.DEVNULL,
         )
         .decode()
         .strip()
