@@ -26,7 +26,7 @@ class coupling::interface::LS1MDSolverInterface : public coupling::interface::MD
 public:
   LS1MDSolverInterface(tarch::la::Vector<3, double> couplingCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell)
       : _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation),
-      _locSimulation(global_simulation) {
+        _locSimulation(global_simulation) {
     _fullDomainWrapper.setupIDcounterForParticleAddition();
     for (int i = 0; i < 3; i++)
       _linkedCellSize[i] = couplingCellSize[i] / linkedCellsPerCouplingCell[i];

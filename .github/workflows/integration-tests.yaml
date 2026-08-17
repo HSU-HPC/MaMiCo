@@ -24,7 +24,7 @@ jobs:
       - id: get-matrix
         name: Extract all test configurations from a text file
         run: |
-          test/integration/gh-act/get-test-cases-matrix.py >> $GITHUB_OUTPUT
+          test/gh-act/integration/get-test-cases-matrix.py >> $GITHUB_OUTPUT
 
   build-executable:
     runs-on: minicluster

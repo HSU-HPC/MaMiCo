@@ -12,7 +12,11 @@ for build in $2; do
 	for compiler in $1; do
 		for kokkos_target in $4; do
 			# cmake must be called twice if the compiler changes (the other variables are deleted, so we need to set them again later)
-			cmake . -D CMAKE_CXX_COMPILER=${compiler} -D KOKKOS_TARGET=${kokkos_target} || { #try/catch
+			cmake \
+				-D CMAKE_UNITY_BUILD=ON \
+				-D CMAKE_CXX_COMPILER=${compiler} \
+				-D KOKKOS_TARGET=${kokkos_target} \
+				. || { #try/catch
 			>&2 echo "CompileTest: Makefile generation of CouetteTest failed for compiler/kokkos target: ${compiler}/${kokkos_target} with MPI ${mpi}"
 			exit 1 
 			}
@@ -25,6 +29,7 @@ for build in $2; do
 				start=$SECONDS
 
 				cmake \
+					-D CMAKE_UNITY_BUILD=ON \
 					-D CMAKE_CXX_COMPILER=${compiler} \
 					-D BUILD_WITH_MPI=${mpi} \
 					-D BUILD_WITH_PYBIND11=${mpi} \
