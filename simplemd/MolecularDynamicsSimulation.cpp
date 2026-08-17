@@ -173,7 +173,7 @@ void simplemd::MolecularDynamicsSimulation::initServices() {
 #endif
 
     // cell mappings
-    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
+    _lennardJonesForce = new simplemd::moleculewithcellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
     if (_lennardJonesForce == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_lennardJonesForce==NULL!"
@@ -383,7 +383,7 @@ void simplemd::MolecularDynamicsSimulation::initServices(const tarch::utils::Mul
 #endif
 
     // cell mappings
-    _lennardJonesForce = new simplemd::cellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
+    _lennardJonesForce = new simplemd::moleculewithcellmappings::LennardJonesForceMapping(_externalForceService, *_molecularPropertiesService);
     if (_lennardJonesForce == NULL) {
       std::cout << "ERROR simplemd::MolecularDynamicsSimulation::initServices(): "
                    "_lennardJonesForce==NULL!"
@@ -533,7 +533,11 @@ void simplemd::MolecularDynamicsSimulation::simulateOneTimestep(const unsigned i
   if (!_configuration.getSimulationConfiguration().useOverlappingCommunicationWithForceComputation()) {
     _boundaryTreatment->putBoundaryParticlesToInnerCellsAndFillBoundaryCells(_localBoundary, *_parallelTopologyService);
     // compute forces between molecules.
+#if defined(KOKKOS_TARGET_CUDA)
+    _moleculeService->getContainer().iterateMoleculesWithCell(*_lennardJonesForce);
+#else
     _moleculeService->getContainer().iterateCellPairs(*_lennardJonesForce);
+#endif
 #if (TARCH_DEBUG == TARCH_YES)
     _moleculeService->getContainer().iterateMolecules(_convertForcesFixedToFloatMapping);
 #endif

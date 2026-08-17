@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+env:
+  OPEN_FOAM_VERSION: "2206"
+  LAMMPS_REPO_REF: "release"
+
 # Abort running jobs if a new one is triggered
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -37,12 +41,12 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: build/LAMMPS
-          key: LAMMPS
+          key: LAMMPS-${{ env.LAMMPS_REPO_REF }}
       - name: Use cached OpenFOAM
         uses: actions/cache/restore@v4
         with:
           path: build/openfoam
-          key: OpenFOAM
+          key: OpenFOAM-${{ env.OPEN_FOAM_VERSION }}
       - name: Build couette executable
         run: |
           source scl_source enable gcc-toolset-9 || :
@@ -58,12 +62,12 @@ jobs:
         if: matrix.md-solver == 'lammps'
         with:
           path: build/LAMMPS
-          key: LAMMPS
+          key: LAMMPS-${{ env.LAMMPS_REPO_REF }}
       - name: Cache OpenFOAM
         uses: actions/cache/save@v4
         with:
           path: build/openfoam
-          key: OpenFOAM
+          key: OpenFOAM-${{ env.OPEN_FOAM_VERSION }}
       - name: Delete OpenFOAM files (too large)
         run: rm -rf build/openfoam
       - uses: actions/upload-artifact@v4
@@ -84,7 +88,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: build/openfoam
-          key: OpenFOAM
+          key: OpenFOAM-${{ env.OPEN_FOAM_VERSION }}
           fail-on-cache-miss: true
         env:
           SEGMENT_DOWNLOAD_TIMEOUT_MINS: 5 # Average cache transfer speed should be over 3 MB/s
