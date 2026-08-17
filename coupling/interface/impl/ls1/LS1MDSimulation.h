@@ -104,6 +104,7 @@ public:
       ls1MamicoPlugin->switchOffCoupling();
   }
   virtual void init() override {
+    tarch::utils::RandomNumberService::getInstance().init(_configuration.getSimulationConfiguration().fixSeed());
     global_simulation = simulation;
     // parse file
     const std::string filename = coupling::interface::LS1StaticCommData::getInstance().getConfigFilename();
