@@ -67,6 +67,8 @@ jobs:
 
     - name: CMake
       run: |
+        rm -rf build # Re-build from scratch after compiletest
+        mkdir build
         cd build
         cmake -DCMAKE_UNITY_BUILD=OFF -DBUILD_TESTING=ON -DBUILD_WITH_MPI=ON ..
 
@@ -74,4 +76,4 @@ jobs:
       run: cd build; make -j4 testmamico
 
     - name: Test
-      run: cd build; ctest --output-on-failure
+      run: cd build; ctest --output-on-failure --no-tests=error
