@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     if not args.skip_make_coverage:
         os.chdir(build_dir)
-        os.system("make coverage") # Calls this script again
+        os.system("make coverage")  # Calls this script again
 
     print("\n=== Analysing coverage of locally changed files ===\n", file=sys.stderr)
     os.chdir(base_dir)
@@ -123,8 +123,7 @@ if __name__ == "__main__":
         l.split(" ")[-1]
         for l in subprocess.check_output(
             ["git", "status", "--porcelain"],
-            #TODO just for testing
-            #stderr=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
         .decode()
         .strip()
@@ -173,7 +172,7 @@ if __name__ == "__main__":
     if not coverage_root.is_dir():
         print("Coverage has not been generated yet.", file=sys.stderr)
         sys.exit(1)
-    
+
     coverage_index_files = iterate_coverage_indices(coverage_root)
     df_coverage = get_test_coverage(coverage_index_files)
 
@@ -192,11 +191,8 @@ if __name__ == "__main__":
         print("| " + " | ".join(headers) + " |")
         print("| :-- | --: | --: |")
         for _, row in df_coverage.iterrows():
-            values = [
-                row.iloc[0]
-            ] + [
-                f"{value:.2%}" if pd.notna(value) else "NaN"
-                for value in row.iloc[1:]
+            values = [row.iloc[0]] + [
+                f"{value:.2%}" if pd.notna(value) else "NaN" for value in row.iloc[1:]
             ]
             print("| " + " | ".join(map(str, values)) + " |")
         sys.exit(1)

@@ -62,6 +62,8 @@ jobs:
 
       
       # ==========vvv Comment test coverage on corresponding PR vvv==========
+      - name: Mark checkout as safe for Git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check Formatting and Test Coverage
         if: github.event_name == 'pull_request'
         run: |

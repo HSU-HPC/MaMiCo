@@ -507,7 +507,7 @@ class LBSolver():
 
     def advance(self, timesteps):
         vtk_every_ts = 10000
-       	ts_goal = self.timesteps_finished + timesteps
+        ts_goal = self.timesteps_finished + timesteps
         while self.timesteps_finished < ts_goal:
             if ts_goal - self.timesteps_finished < vtk_every_ts:
                 steps = ts_goal - self.timesteps_finished
