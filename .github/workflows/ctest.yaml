@@ -70,7 +70,7 @@ jobs:
         rm -rf build # Re-build from scratch after compiletest
         mkdir build
         cd build
-        cmake -DCMAKE_UNITY_BUILD=OFF -DBUILD_TESTING=ON -DBUILD_WITH_MPI=ON ..
+        cmake -DBUILD_TESTING=ON -DBUILD_WITH_MPI=ON ..
 
     - name: Build
       run: cd build; make -j4 testmamico
