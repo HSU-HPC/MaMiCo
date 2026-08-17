@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2026-08-17 09:44:20</td>
+            <td class="headerValue">2026-08-17 12:51:03</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryLo">36.4&nbsp;%</td>
@@ -127,7 +127,7 @@
 <span id="L65"><span class="lineNum">      65</span>              : </span>
 <span id="L66"><span class="lineNum">      66</span>              : template &lt;class IndexType, std::size_t... Extents, class... Indices,</span>
 <span id="L67"><span class="lineNum">      67</span>              :           std::size_t... Enumerate&gt;</span>
-<span id="L68"><span class="lineNum">      68</span> <span class="tlaGNC">    79213500 : KOKKOS_FUNCTION bool within_range(</span></span>
+<span id="L68"><span class="lineNum">      68</span> <span class="tlaGNC">    79191511 : KOKKOS_FUNCTION bool within_range(</span></span>
 <span id="L69"><span class="lineNum">      69</span>              :     Kokkos::extents&lt;IndexType, Extents...&gt; const &amp;exts,</span>
 <span id="L70"><span class="lineNum">      70</span>              :     std::index_sequence&lt;Enumerate...&gt;, Indices... indices) {</span>
 <span id="L71"><span class="lineNum">      71</span>              :   // FIXME[CUDA11]: This is written so weirdly to avoid warnings with CUDA 11</span>
@@ -144,10 +144,10 @@
 <span id="L82"><span class="lineNum">      82</span>              :     return true;</span>
 <span id="L83"><span class="lineNum">      83</span>              :   };</span>
 <span id="L84"><span class="lineNum">      84</span>              : </span>
-<span id="L85"><span class="lineNum">      85</span> <span class="tlaGNC">    79213500 :   return ((static_cast&lt;size_t&gt;(indices) &lt;</span></span>
-<span id="L86"><span class="lineNum">      86</span> <span class="tlaGNC">    79213500 :            static_cast&lt;size_t&gt;(exts.extent(Enumerate))) &amp;&amp;</span></span>
-<span id="L87"><span class="lineNum">      87</span> <span class="tlaGNC">    79213500 :           ...) &amp;&amp;</span></span>
-<span id="L88"><span class="lineNum">      88</span> <span class="tlaGNC">    79213500 :          (check_index_min(indices) &amp;&amp; ...);</span></span>
+<span id="L85"><span class="lineNum">      85</span> <span class="tlaGNC">    79191511 :   return ((static_cast&lt;size_t&gt;(indices) &lt;</span></span>
+<span id="L86"><span class="lineNum">      86</span> <span class="tlaGNC">    79191511 :            static_cast&lt;size_t&gt;(exts.extent(Enumerate))) &amp;&amp;</span></span>
+<span id="L87"><span class="lineNum">      87</span> <span class="tlaGNC">    79191511 :           ...) &amp;&amp;</span></span>
+<span id="L88"><span class="lineNum">      88</span> <span class="tlaGNC">    79191511 :          (check_index_min(indices) &amp;&amp; ...);</span></span>
 <span id="L89"><span class="lineNum">      89</span>              : }</span>
 <span id="L90"><span class="lineNum">      90</span>              : </span>
 <span id="L91"><span class="lineNum">      91</span>              : template &lt;class... Indices&gt;</span>
@@ -176,11 +176,11 @@
 <span id="L114"><span class="lineNum">     114</span> <span class="tlaUNC">           0 : }</span></span>
 <span id="L115"><span class="lineNum">     115</span>              : </span>
 <span id="L116"><span class="lineNum">     116</span>              : template &lt;class ExtentsType, class... IndexTypes&gt;</span>
-<span id="L117"><span class="lineNum">     117</span> <span class="tlaGNC">    79213500 : KOKKOS_INLINE_FUNCTION void view_verify_operator_bounds(</span></span>
+<span id="L117"><span class="lineNum">     117</span> <span class="tlaGNC">    79191511 : KOKKOS_INLINE_FUNCTION void view_verify_operator_bounds(</span></span>
 <span id="L118"><span class="lineNum">     118</span>              :     SharedAllocationTracker const &amp;tracker, const ExtentsType &amp;exts,</span>
 <span id="L119"><span class="lineNum">     119</span>              :     [[maybe_unused]] const void *data, IndexTypes... idx) {</span>
 <span id="L120"><span class="lineNum">     120</span>              :   using idx_t = typename ExtentsType::index_type;</span>
-<span id="L121"><span class="lineNum">     121</span> <span class="tlaGNC">    79213500 :   if (!within_range(exts, std::make_index_sequence&lt;sizeof...(IndexTypes)&gt;(),</span></span>
+<span id="L121"><span class="lineNum">     121</span> <span class="tlaGNC">    79191511 :   if (!within_range(exts, std::make_index_sequence&lt;sizeof...(IndexTypes)&gt;(),</span></span>
 <span id="L122"><span class="lineNum">     122</span>              :                     idx...)) {</span>
 <span id="L123"><span class="lineNum">     123</span> <span class="tlaUNC">           0 :     char err[256] = &quot;&quot;;</span></span>
 <span id="L124"><span class="lineNum">     124</span> <span class="tlaUNC">           0 :     strcat(err, &quot;Kokkos::View ERROR: out of bounds access&quot;);</span></span>
@@ -205,7 +205,7 @@
 <span id="L143"><span class="lineNum">     143</span> <span class="tlaUNC">           0 :     print_extents(err, exts, std::make_index_sequence&lt;sizeof...(IndexTypes)&gt;());</span></span>
 <span id="L144"><span class="lineNum">     144</span>              :     Kokkos::abort(err);</span>
 <span id="L145"><span class="lineNum">     145</span>              :   }</span>
-<span id="L146"><span class="lineNum">     146</span> <span class="tlaGNC">    79213500 : }</span></span>
+<span id="L146"><span class="lineNum">     146</span> <span class="tlaGNC">    79191511 : }</span></span>
 <span id="L147"><span class="lineNum">     147</span>              : }  // namespace Kokkos::Impl</span>
 <span id="L148"><span class="lineNum">     148</span>              : </span>
 <span id="L149"><span class="lineNum">     149</span>              : #endif  // KOKKOS_VIEW_CHECKING_HPP</span>

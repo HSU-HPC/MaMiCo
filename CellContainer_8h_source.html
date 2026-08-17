@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keyword">public</span>:</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  CellContainer() { <a class="code hl_variable" href="classcoupling_1_1datastructures_1_1CellContainer.html#aebb09e05d6728e74a9821951df372f18">_couplingCells</a>.reserve(CellIndexT::linearNumberCellsInDomain); }</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  CellContainer(std::vector&lt;<a class="code hl_class" href="classcoupling_1_1datastructures_1_1CouplingCell.html">coupling::datastructures::CouplingCell&lt;dim&gt;</a>*&gt; couplingCells) {</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  CellContainer(std::vector&lt;<a class="code hl_class" href="classcoupling_1_1datastructures_1_1CouplingCell.html">coupling::datastructures::CouplingCell&lt;dim&gt;</a>*&gt;&amp; couplingCells) {</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <a class="code hl_variable" href="classcoupling_1_1datastructures_1_1CellContainer.html#aebb09e05d6728e74a9821951df372f18">_couplingCells</a>.reserve(CellIndexT::linearNumberCellsInDomain);</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> cell : couplingCells) {</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>      *<span class="keyword">this</span> &lt;&lt; cell;</div>

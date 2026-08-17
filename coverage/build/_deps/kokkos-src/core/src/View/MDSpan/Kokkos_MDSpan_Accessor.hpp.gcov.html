@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2026-08-17 09:44:20</td>
+            <td class="headerValue">2026-08-17 12:51:03</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryHi">-</td>
@@ -118,7 +118,7 @@
 <span id="L56"><span class="lineNum">      56</span>              :   explicit operator NestedAccessor() const { return nested_acc; }</span>
 <span id="L57"><span class="lineNum">      57</span>              : </span>
 <span id="L58"><span class="lineNum">      58</span>              :   KOKKOS_FUNCTION</span>
-<span id="L59"><span class="lineNum">      59</span> <span class="tlaGNC">    73223988 :   constexpr reference access(</span></span>
+<span id="L59"><span class="lineNum">      59</span> <span class="tlaGNC">    73223983 :   constexpr reference access(</span></span>
 <span id="L60"><span class="lineNum">      60</span>              : #ifndef KOKKOS_ENABLE_OPENACC</span>
 <span id="L61"><span class="lineNum">      61</span>              :       const data_handle_type&amp; p,</span>
 <span id="L62"><span class="lineNum">      62</span>              : #else</span>
@@ -129,7 +129,7 @@
 <span id="L67"><span class="lineNum">      67</span>              :     Kokkos::Impl::runtime_check_memory_access_violation&lt;memory_space&gt;(</span>
 <span id="L68"><span class="lineNum">      68</span>              :         &quot;Kokkos::SpaceAwareAccessor ERROR: attempt to access inaccessible &quot;</span>
 <span id="L69"><span class="lineNum">      69</span>              :         &quot;memory space&quot;);</span>
-<span id="L70"><span class="lineNum">      70</span> <span class="tlaGNC">    73223988 :     return nested_acc.access(p, i);</span></span>
+<span id="L70"><span class="lineNum">      70</span> <span class="tlaGNC">    73223983 :     return nested_acc.access(p, i);</span></span>
 <span id="L71"><span class="lineNum">      71</span>              :   }</span>
 <span id="L72"><span class="lineNum">      72</span>              : </span>
 <span id="L73"><span class="lineNum">      73</span>              :   KOKKOS_FUNCTION</span>
@@ -361,7 +361,7 @@
 <span id="L299"><span class="lineNum">     299</span>              :       : m_tracker(other.m_tracker), m_handle(other.m_handle) {}</span>
 <span id="L300"><span class="lineNum">     300</span>              : </span>
 <span id="L301"><span class="lineNum">     301</span>              :   KOKKOS_FUNCTION</span>
-<span id="L302"><span class="lineNum">     302</span> <span class="tlaGNC">   146447976 :   pointer get() const noexcept { return m_handle; }</span></span>
+<span id="L302"><span class="lineNum">     302</span> <span class="tlaGNC">   146447966 :   pointer get() const noexcept { return m_handle; }</span></span>
 <span id="L303"><span class="lineNum">     303</span>              :   KOKKOS_FUNCTION</span>
 <span id="L304"><span class="lineNum">     304</span>              :   explicit operator pointer() const noexcept { return m_handle; }</span>
 <span id="L305"><span class="lineNum">     305</span>              : </span>
@@ -371,7 +371,7 @@
 <span id="L309"><span class="lineNum">     309</span>              : </span>
 <span id="L310"><span class="lineNum">     310</span>              :   std::string get_label() const { return m_tracker.get_label&lt;memory_space&gt;(); }</span>
 <span id="L311"><span class="lineNum">     311</span>              :   KOKKOS_FUNCTION</span>
-<span id="L312"><span class="lineNum">     312</span> <span class="tlaGNC">    73223988 :   const SharedAllocationTracker&amp; tracker() const noexcept { return m_tracker; }</span></span>
+<span id="L312"><span class="lineNum">     312</span> <span class="tlaGNC">    73223983 :   const SharedAllocationTracker&amp; tracker() const noexcept { return m_tracker; }</span></span>
 <span id="L313"><span class="lineNum">     313</span>              : </span>
 <span id="L314"><span class="lineNum">     314</span>              :   KOKKOS_FUNCTION</span>
 <span id="L315"><span class="lineNum">     315</span> <span class="tlaGNC">     1378872 :   friend bool operator==(const ReferenceCountedDataHandle&amp; lhs,</span></span>
@@ -478,7 +478,7 @@
 <span id="L416"><span class="lineNum">     416</span>              :   }</span>
 <span id="L417"><span class="lineNum">     417</span>              : </span>
 <span id="L418"><span class="lineNum">     418</span>              :   KOKKOS_FUNCTION</span>
-<span id="L419"><span class="lineNum">     419</span> <span class="tlaGNC">    73223988 :   constexpr reference access(</span></span>
+<span id="L419"><span class="lineNum">     419</span> <span class="tlaGNC">    73223983 :   constexpr reference access(</span></span>
 <span id="L420"><span class="lineNum">     420</span>              : #ifndef KOKKOS_ENABLE_OPENACC</span>
 <span id="L421"><span class="lineNum">     421</span>              :       const data_handle_type&amp; p,</span>
 <span id="L422"><span class="lineNum">     422</span>              : #else</span>
@@ -486,7 +486,7 @@
 <span id="L424"><span class="lineNum">     424</span>              :       data_handle_type p,</span>
 <span id="L425"><span class="lineNum">     425</span>              : #endif</span>
 <span id="L426"><span class="lineNum">     426</span>              :       size_t i) const {</span>
-<span id="L427"><span class="lineNum">     427</span> <span class="tlaGNC">    73223988 :     return m_nested_acc.access(p.get(), i);</span></span>
+<span id="L427"><span class="lineNum">     427</span> <span class="tlaGNC">    73223983 :     return m_nested_acc.access(p.get(), i);</span></span>
 <span id="L428"><span class="lineNum">     428</span>              :   }</span>
 <span id="L429"><span class="lineNum">     429</span>              : </span>
 <span id="L430"><span class="lineNum">     430</span>              :   KOKKOS_FUNCTION</span>
