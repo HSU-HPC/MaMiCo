@@ -1,4 +1,11 @@
-#! /usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# dependencies = [
+#   "numpy",
+#   "pandas",
+#   "beautifulsoup4",
+# ]
+# ///
 
 """
 This script parses the current remote and local state of git and the HTML output of the test coverage
@@ -80,7 +87,7 @@ def get_test_coverage(index_files):
 
 
 if __name__ == "__main__":
-    base_dir = Path(__file__).parent.parent
+    base_dir = Path(__file__).resolve().parents[3]
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument(
         "-d", "--build-directory", type=Path, default=base_dir / Path("build")
@@ -88,17 +95,18 @@ if __name__ == "__main__":
     arg_parser.add_argument("-M", "--skip-make-coverage", action="store_true")
     args = arg_parser.parse_args()
     build_dir = args.build_directory.absolute()
+    build_dir.mkdir(exist_ok=True, parents=True)
 
     if not args.skip_make_coverage:
         os.chdir(build_dir)
-        os.system("make coverage") # Calls this script again
+        os.system("make coverage")  # Calls this script again
 
     print("\n=== Analysing coverage of locally changed files ===\n", file=sys.stderr)
     os.chdir(base_dir)
 
     if not Path(".git").is_dir():
         print(f"{os.getcwd()} is not a git repository!", file=sys.stderr)
-        exit(1)
+        sys.exit(1)
 
     # Look up target branch for pull request in CI/CD pipeline or default to master when running locally
     target_branch = ""
@@ -129,7 +137,7 @@ if __name__ == "__main__":
         current_branch = os.environ["GITHUB_HEAD_REF"]
     if len(current_branch) == 0:
         print("Could not determine current branch!", file=sys.stderr)
-        exit(1)
+        sys.exit(1)
     changed_files = []
     remote = "origin"
     for branch_prefix in ["", f"{remote}/"]:
@@ -148,8 +156,8 @@ if __name__ == "__main__":
                 .strip()
                 .splitlines()
             )
-        except:
-            pass  # No such branch
+        except Exception as e:
+            print(e, file=sys.stderr)
     touched_files = set(uncommited_files + changed_files)
 
     coverage_root = build_dir / "coverage"
@@ -163,8 +171,8 @@ if __name__ == "__main__":
 
     if not coverage_root.is_dir():
         print("Coverage has not been generated yet.", file=sys.stderr)
-        exit(1)
-    
+        sys.exit(1)
+
     coverage_index_files = iterate_coverage_indices(coverage_root)
     df_coverage = get_test_coverage(coverage_index_files)
 
@@ -176,17 +184,15 @@ if __name__ == "__main__":
     df_coverage = df_coverage[mask_touched]
 
     if len(df_coverage) == 0:
-        print("Sufficient test coverage for changed files.")
+        print(":rocket: Sufficient test coverage for changed files.")
     else:
-        print("**You should write tests for:**")
+        print(":eyes: You should write tests for:")
         headers = df_coverage.columns
         print("| " + " | ".join(headers) + " |")
         print("| :-- | --: | --: |")
         for _, row in df_coverage.iterrows():
-            values = [
-                row.iloc[0]
-            ] + [
-                f"{value:.2%}" if pd.notna(value) else "NaN"
-                for value in row.iloc[1:]
+            values = [row.iloc[0]] + [
+                f"{value:.2%}" if pd.notna(value) else "NaN" for value in row.iloc[1:]
             ]
             print("| " + " | ".join(map(str, values)) + " |")
+        sys.exit(1)
