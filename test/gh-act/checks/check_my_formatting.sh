@@ -12,6 +12,14 @@ cd "$(dirname "$0")"
 cd ../../..
 CWD=$(pwd)
 
+# Format Python scripts
+diff="$(black . --diff 2>/dev/null)"
+if [ -n "$diff" ]; then
+    echo ':eyes: Please format your Python scripts with `black .`!'
+else
+    echo ":rocket: Python ccripts already formatted!"
+fi
+
 # Make an ephemeral copy of the working copy
 COPY=$(mktemp --directory)
 trap 'rm -rf "$COPY"' EXIT
