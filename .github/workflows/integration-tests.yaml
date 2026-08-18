@@ -49,8 +49,6 @@ jobs:
           key: OpenFOAM-${{ env.OPEN_FOAM_VERSION }}
       - name: Build couette executable
         run: |
-          source scl_source enable gcc-toolset-9 || :
-          ml mpi || :
           ./tools/build-couette.py \
             --force-gcc \
             --jobs $(($(nproc --all) / 2)) \
