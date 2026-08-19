@@ -646,6 +646,14 @@ protected:
 
   void loadBalance(int cycle, double prevCoupTime) {
     std::cout << _rank << " last coupling time " << prevCoupTime << std::endl;
+    //if cycle % rebalanceFrequency == 0
+    std::array<double, 3> newBoxMin, newBoxMax;
+    // pass timer to ALL
+    // get box bounds
+    // send to instance handler
+    _instanceHandling->rebalance(newBoxMin, newBoxMax);
+    // migrate coupling cells
+    // reinit indexing system
   }
 
   /** @brief finalize the time measurement, and cleans up at the end of the
