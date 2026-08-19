@@ -23,18 +23,27 @@ void runScenario(Scenario* scenario) {
 }
 
 int main(int argc, char* argv[]) {
-
+  int rank = 0;
+  int size = 1;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
 #endif
 
   Kokkos::ScopeGuard kokkos(argc, argv);
   MainExecSpace mainExecSpace;
+if (rank == 0) {
+  std::cout << std::endl;
+#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+  std::cout << "(Printing Kokkos configuration on rank " << rank << " out of " << size << ")" << std::endl;
+#endif
   std::cout << "Kokkos using execution space \"" << mainExecSpace.name() << "\" with memory space \"" << MainExecSpace::memory_space::name() << "\""
             << std::endl;
   mainExecSpace.print_configuration(std::cout);
 
-  std::cout << "Available concurrency: " << mainExecSpace.concurrency() << std::endl;
+  std::cout << "Available concurrency: " << mainExecSpace.concurrency() << std::endl << std::endl;
+}
 
   // run scenarios
   runScenario(new CouetteScenario());
