@@ -105,11 +105,16 @@ public:
    *  @brief combines the functioniality necessary for a cycle of the coupled
    * simulation  */
   void runOneCouplingCycle(int cycle) override {
+    gettimeofday(&_tv.coup_start, NULL);
     advanceMacro(cycle);
-    varyMD(cycle);
     advanceMicro(cycle);
     computeSNR(cycle);
     twoWayCoupling(cycle);
+    gettimeofday(&_tv.coup_end, NULL);
+    double coupTime = (_tv.coup_end.tv_sec - _tv.coup_start.tv_sec) * 1000000 + (_tv.coup_end.tv_usec - _tv.coup_start.tv_usec);
+    // cycle starts at 0
+    _avgCouplingTime = ((_avgCouplingTime * cycle) + coupTime) / (cycle + 1);
+    loadBalance(cycle, _avgCouplingTime);
     if (_cfg.totalNumberMDSimulations < 0) // dynamic MD
       _multiMDCellService->finishCycle(cycle, *_instanceHandling);
     if (_isRootRank) {
@@ -537,67 +542,6 @@ protected:
     }
   }
 
-  void varyMD(int cycle) {
-    // Non-dynamic case: Nothing to do.
-    if (_cfg.totalNumberMDSimulations > 0)
-      return;
-
-    // modify number of instances only once every 10 cycles
-    if (cycle % 10 != 0)
-      return;
-
-    int addMDInstances = 0;
-
-    if (_rank == 0) {
-      tarch::la::Vector<3, double> vel(0, 0, 0);
-      double mass = 0;
-      for (auto pair : _couplingBuffer.md2macroBuffer) {
-        I01 idx;
-        coupling::datastructures::CouplingCell<3>* couplingCell;
-        std::tie(couplingCell, idx) = pair;
-        vel += couplingCell->getMacroscopicMomentum();
-        mass += couplingCell->getMacroscopicMass();
-      }
-      vel = vel / (double)_couplingBuffer.md2macroBuffer.size();
-      mass /= _couplingBuffer.md2macroBuffer.size();
-
-      double soundSpeed =
-          (1 / std::sqrt(3)) * (_mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[0] /
-                                (_simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()));
-      double cellVolume = _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[0] *
-                          _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[1] *
-                          _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[2];
-
-      coupling::error::ErrorEstimation errorControl(vel[0], _cfg.temp, mass, _simpleMDConfig.getMoleculeConfiguration().getMass(), soundSpeed,
-                                                    _multiMDService->getTotalNumberOfMDSimulations(), cellVolume);
-
-      double simtime = (double)cycle / _cfg.couplingCycles;
-      double targetError = _cfg.absVelErrEnd * simtime + _cfg.absVelErrStart * (1 - simtime);
-      errorControl.setAbsVelocityError(targetError);
-      double NoMD = errorControl.getCorrectorNumberOfSamples(coupling::error::ErrorEstimation::Velocity, coupling::error::ErrorEstimation::Absolute);
-
-      addMDInstances = NoMD - _multiMDService->getTotalNumberOfMDSimulations();
-    }
-
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Bcast(&addMDInstances, 1, MPI_INT, 0, _timeIntegrationService->getPintComm());
-#endif
-    if (addMDInstances < 0) {
-      if ((int)_multiMDMediator->getNumberOfActiveMDSimulations() + addMDInstances < _cfg.lowerBoundNumberMDSimulations) {
-        addMDInstances = (_cfg.lowerBoundNumberMDSimulations - (int)_multiMDMediator->getNumberOfActiveMDSimulations());
-      }
-    }
-    if (addMDInstances < 0) {
-      if (_rank == 0)
-        std::cout << "Removing " << -addMDInstances << " of " << _multiMDService->getTotalNumberOfMDSimulations() << " MD simulations" << std::endl;
-      _multiMDMediator->rmNMDSimulations(-addMDInstances);
-    } else if (addMDInstances > 0) {
-      if (_rank == 0)
-        std::cout << "Adding " << addMDInstances << " to " << _multiMDService->getTotalNumberOfMDSimulations() << " MD simulations" << std::endl;
-      _multiMDMediator->addNMDSimulations(addMDInstances);
-    }
-  }
-
   /** @brief advances the md solver for one coupling time step and collect the
    * data for the coupling
    *  @param cycle the number of the current coupling time step  */
@@ -698,6 +642,10 @@ protected:
     }
     // write data to csv-compatible file for evaluation
     write2CSV(_couplingBuffer.md2macroBuffer, cycle + 1);
+  }
+
+  void loadBalance(int cycle, double prevCoupTime) {
+    std::cout << _rank << " last coupling time " << prevCoupTime << std::endl;
   }
 
   /** @brief finalize the time measurement, and cleans up at the end of the
@@ -988,6 +936,8 @@ protected:
     /** @brief */
     timeval end;
     timeval output;
+    timeval coup_start;
+    timeval coup_end;
     /** @brief */
     double micro;
     /** @brief */
@@ -1029,6 +979,7 @@ protected:
   TimingValues _tv;
   coupling::MultiMDMediator<MY_LINKEDCELL, 3>* _multiMDMediator;
   bool _MDBoundarySetupDone;
+  double _avgCouplingTime = 0;
 };
 
 #endif // _COUPLING_SCENARIO_COUETTESCENARIO_H_
