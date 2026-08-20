@@ -7,6 +7,8 @@
 const std::string simplemd::configurations::DomainDecompConfiguration::DECOMP_TYPE("decomposition-type");
 const std::string simplemd::configurations::DomainDecompConfiguration::DEFAULT_DECOMP("default");
 const std::string simplemd::configurations::DomainDecompConfiguration::STATIC_IRREG_RECT_GRID("static-irreg-rect-grid");
+const std::string simplemd::configurations::DomainDecompConfiguration::DYNAMIC_LB("dynamic-lb");
+const std::string simplemd::configurations::DomainDecompConfiguration::FREQUENCY("frequency");
 const std::string simplemd::configurations::DomainDecompConfiguration::AXES[MD_DIM]
 #if MD_DIM == 1
     = {"x"};
@@ -20,6 +22,7 @@ simplemd::configurations::DomainDecompConfiguration::DomainDecompConfiguration()
   _decompType = DecompositionType::DEFAULT;
   _isDefined = false;
   _isValid = true;
+  _frequency = 0;
   for (int i = 0; i < MD_DIM; i++) {
     _subdomainWeights[i] = {};
   }
@@ -34,6 +37,8 @@ void simplemd::configurations::DomainDecompConfiguration::parseSubtag(tinyxml2::
     _decompType = DecompositionType::DEFAULT;
   else if (stringBuf == STATIC_IRREG_RECT_GRID)
     _decompType = DecompositionType::STATIC_IRREG_RECT_GRID;
+  else if (stringBuf == DYNAMIC_LB)
+    _decompType = DecompositionType::DYNAMIC_LB;
   else {
     std::cout << "ERROR: given decomposition-type not supported!" << std::endl;
     _isValid = false;
@@ -58,6 +63,10 @@ void simplemd::configurations::DomainDecompConfiguration::parseSubtag(tinyxml2::
       // pass string to helper function
       _subdomainWeights[d] = getWeightsFromString(weightsBuf);
     }
+  } break;
+
+  case DecompositionType::DYNAMIC_LB: {
+    tarch::configuration::ParseConfiguration::readIntMandatory(_frequency, node, FREQUENCY);
   } break;
 
   default:

@@ -646,14 +646,16 @@ protected:
 
   void loadBalance(int cycle, double prevCoupTime) {
     std::cout << _rank << " last coupling time " << prevCoupTime << std::endl;
-    //if cycle % rebalanceFrequency == 0
-    std::array<double, 3> newBoxMin, newBoxMax;
-    // pass timer to ALL
-    // get box bounds
-    // send to instance handler
-    _instanceHandling->rebalance(newBoxMin, newBoxMax);
-    // migrate coupling cells
-    // reinit indexing system
+    if (_simpleMDConfig.getDomainDecompConfiguration().getRebalanceFrequency() != 0 &&
+        cycle % _simpleMDConfig.getDomainDecompConfiguration().getRebalanceFrequency() == 0) {
+      std::array<double, 3> newBoxMin, newBoxMax;
+      // pass timer to ALL
+      // get box bounds
+      // send to instance handler
+      _instanceHandling->rebalance(newBoxMin, newBoxMax);
+      // migrate coupling cells
+      // reinit indexing system
+    }
   }
 
   /** @brief finalize the time measurement, and cleans up at the end of the
@@ -795,8 +797,7 @@ protected:
    *  @param macro2MDBuffer the bufffer to send data from macro to micro
    *  @param globalCellIndices4SendBuffer the global linearized indices of the
    * coupling cells in the buffer  */
-  void fillSendBuffer(const double density,
-                      coupling::datastructures::FlexibleCellContainer<3>& macro2MDBuffer) const {
+  void fillSendBuffer(const double density, coupling::datastructures::FlexibleCellContainer<3>& macro2MDBuffer) const {
     using coupling::configurations::CouetteConfig;
     using namespace coupling::indexing;
     const tarch::la::Vector<3, double> dx(IndexingService<3>::getInstance().getCouplingCellSize());

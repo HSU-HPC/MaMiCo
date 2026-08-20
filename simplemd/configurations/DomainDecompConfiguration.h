@@ -31,7 +31,7 @@ public:
    * STATIC_IRREG_RECT_GRID : rectilinear grid with weights given to specify subdomain sizes
    * E.g. x values 1,2,1 define an x axis with subdomain lengths in the 1:2:1 ratio
    */
-  enum class DecompositionType { DEFAULT, STATIC_IRREG_RECT_GRID };
+  enum class DecompositionType { DEFAULT, STATIC_IRREG_RECT_GRID, DYNAMIC_LB };
 
   void parseSubtag(tinyxml2::XMLElement* node);
 
@@ -56,11 +56,14 @@ public:
   /** getters for all parsed and computed quantities */
   const tarch::la::Vector<MD_DIM, std::vector<unsigned int>>& getSubdomainWeights() const { return _subdomainWeights; }
   DecompositionType getDecompType() const { return _decompType; }
+  const int getRebalanceFrequency() const { return _frequency; }
 
 private:
   static const std::string DECOMP_TYPE;
   static const std::string DEFAULT_DECOMP;
   static const std::string STATIC_IRREG_RECT_GRID;
+  static const std::string DYNAMIC_LB;
+  static const std::string FREQUENCY;
   static const std::string AXES[MD_DIM];
 
   /** helper method to parse input string */
@@ -77,6 +80,9 @@ private:
 
   /** validity of the config */
   bool _isValid;
+
+  /** load balancing frequency */
+  int _frequency;
 };
 
 #endif // _MOLECULARDYNAMICS_CONFIGURATIONS_DOMAINDECOMPCONFIGURATION_H_

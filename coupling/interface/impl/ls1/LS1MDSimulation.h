@@ -80,10 +80,9 @@ public:
   virtual void rebalance(std::array<double, 3> newBoxMin, std::array<double, 3> newBoxMax) override {
     global_simulation = simulation;
     try {
-      GuidedDomainDecomposition &dd = dynamic_cast<GuidedDomainDecomposition&>(simulation->domainDecomposition());
-      //dd.rebalance(simulation->getMoleculeContainer(), simulation->getDomain(), newBoxMin, newBoxMax);
-    }
-    catch(std::bad_cast const&) {
+      GuidedDomainDecomposition& dd = dynamic_cast<GuidedDomainDecomposition&>(simulation->domainDecomposition());
+      // dd.rebalance(simulation->getMoleculeContainer(), simulation->getDomain(), newBoxMin, newBoxMax);
+    } catch (std::bad_cast const&) {
       std::cout << "ERROR: Make sure ls1 is using GuidedDomainDecomposition!" << std::endl;
       exit(EXIT_FAILURE);
     }
