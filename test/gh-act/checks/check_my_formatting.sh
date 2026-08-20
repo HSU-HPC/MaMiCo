@@ -1,7 +1,8 @@
 #! /usr/bin/env bash
 
-# Check if source code needs to be formatted using clang-format
-# and if CMakeList.txt needs to be formatted with cmake_format
+# Check if the Python scripts need to be formatted with black,
+# if the CMakeList.txt needs to be formatted with cmake-format,
+# and if the source code needs to be formatted using clang-format
 
 SOURCE_CODE_EXTS=(c h hpp cpp cxx cpph)
 CLANG_FORMAT_TARGET=mamico-clangformat
