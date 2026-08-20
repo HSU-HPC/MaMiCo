@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2026-08-17 12:51:03</td>
+            <td class="headerValue">2026-08-20 07:09:22</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryLo">61.5&nbsp;%</td>
@@ -174,9 +174,9 @@
 <span id="L112"><span class="lineNum">     112</span>              : #pragma push</span>
 <span id="L113"><span class="lineNum">     113</span>              : #pragma diag_suppress implicit_return_from_non_void_function</span>
 <span id="L114"><span class="lineNum">     114</span>              : #endif</span>
-<span id="L115"><span class="lineNum">     115</span> <span class="tlaGNC">       11374 :   static KOKKOS_FUNCTION int tracking_enabled() {</span></span>
-<span id="L116"><span class="lineNum">     116</span> <span class="tlaGNC">       11374 :     KOKKOS_IF_ON_HOST(return t_tracking_enabled;)</span></span>
-<span id="L117"><span class="lineNum">     117</span> <span class="tlaGNC">       11374 :     KOKKOS_IF_ON_DEVICE(return 0;)</span></span>
+<span id="L115"><span class="lineNum">     115</span> <span class="tlaGNC">       11390 :   static KOKKOS_FUNCTION int tracking_enabled() {</span></span>
+<span id="L116"><span class="lineNum">     116</span> <span class="tlaGNC">       11390 :     KOKKOS_IF_ON_HOST(return t_tracking_enabled;)</span></span>
+<span id="L117"><span class="lineNum">     117</span> <span class="tlaGNC">       11390 :     KOKKOS_IF_ON_DEVICE(return 0;)</span></span>
 <span id="L118"><span class="lineNum">     118</span>              :   }</span>
 <span id="L119"><span class="lineNum">     119</span>              : #if defined(__EDG__)</span>
 <span id="L120"><span class="lineNum">     120</span>              : #pragma pop</span>
@@ -185,12 +185,12 @@
 <span id="L123"><span class="lineNum">     123</span>              :   /**\brief A host process thread claims and disables the</span>
 <span id="L124"><span class="lineNum">     124</span>              :    *        shared allocation tracking flag.</span>
 <span id="L125"><span class="lineNum">     125</span>              :    */</span>
-<span id="L126"><span class="lineNum">     126</span> <span class="tlaGNC">        5687 :   static void tracking_disable() { t_tracking_enabled = 0; }</span></span>
+<span id="L126"><span class="lineNum">     126</span> <span class="tlaGNC">        5695 :   static void tracking_disable() { t_tracking_enabled = 0; }</span></span>
 <span id="L127"><span class="lineNum">     127</span>              : </span>
 <span id="L128"><span class="lineNum">     128</span>              :   /**\brief A host process thread releases and enables the</span>
 <span id="L129"><span class="lineNum">     129</span>              :    *        shared allocation tracking flag.</span>
 <span id="L130"><span class="lineNum">     130</span>              :    */</span>
-<span id="L131"><span class="lineNum">     131</span> <span class="tlaGNC">        5687 :   static void tracking_enable() { t_tracking_enabled = 1; }</span></span>
+<span id="L131"><span class="lineNum">     131</span> <span class="tlaGNC">        5695 :   static void tracking_enable() { t_tracking_enabled = 1; }</span></span>
 <span id="L132"><span class="lineNum">     132</span>              : </span>
 <span id="L133"><span class="lineNum">     133</span> <span class="tlaGNC">        1024 :   virtual ~SharedAllocationRecord() = default;</span></span>
 <span id="L134"><span class="lineNum">     134</span>              : </span>
@@ -759,22 +759,22 @@
 <span id="L697"><span class="lineNum">     697</span>              : };</span>
 <span id="L698"><span class="lineNum">     698</span>              : </span>
 <span id="L699"><span class="lineNum">     699</span>              : struct SharedAllocationDisableTrackingGuard {</span>
-<span id="L700"><span class="lineNum">     700</span> <span class="tlaGNC">        5687 :   SharedAllocationDisableTrackingGuard() {</span></span>
-<span id="L701"><span class="lineNum">     701</span> <span class="tlaGNC">        5687 :     KOKKOS_ASSERT(</span></span>
-<span id="L702"><span class="lineNum">     702</span> <span class="tlaGNC">        5687 :         (Kokkos::Impl::SharedAllocationRecord&lt;void, void&gt;::tracking_enabled()));</span></span>
-<span id="L703"><span class="lineNum">     703</span> <span class="tlaGNC">        5687 :     Kokkos::Impl::SharedAllocationRecord&lt;void, void&gt;::tracking_disable();</span></span>
-<span id="L704"><span class="lineNum">     704</span> <span class="tlaGNC">        5687 :   }</span></span>
+<span id="L700"><span class="lineNum">     700</span> <span class="tlaGNC">        5695 :   SharedAllocationDisableTrackingGuard() {</span></span>
+<span id="L701"><span class="lineNum">     701</span> <span class="tlaGNC">        5695 :     KOKKOS_ASSERT(</span></span>
+<span id="L702"><span class="lineNum">     702</span> <span class="tlaGNC">        5695 :         (Kokkos::Impl::SharedAllocationRecord&lt;void, void&gt;::tracking_enabled()));</span></span>
+<span id="L703"><span class="lineNum">     703</span> <span class="tlaGNC">        5695 :     Kokkos::Impl::SharedAllocationRecord&lt;void, void&gt;::tracking_disable();</span></span>
+<span id="L704"><span class="lineNum">     704</span> <span class="tlaGNC">        5695 :   }</span></span>
 <span id="L705"><span class="lineNum">     705</span>              : </span>
 <span id="L706"><span class="lineNum">     706</span>              :   SharedAllocationDisableTrackingGuard(</span>
 <span id="L707"><span class="lineNum">     707</span>              :       const SharedAllocationDisableTrackingGuard&amp;) = delete;</span>
 <span id="L708"><span class="lineNum">     708</span>              :   SharedAllocationDisableTrackingGuard(SharedAllocationDisableTrackingGuard&amp;&amp;) =</span>
 <span id="L709"><span class="lineNum">     709</span>              :       delete;</span>
 <span id="L710"><span class="lineNum">     710</span>              : </span>
-<span id="L711"><span class="lineNum">     711</span> <span class="tlaGNC">        5687 :   ~SharedAllocationDisableTrackingGuard() {</span></span>
-<span id="L712"><span class="lineNum">     712</span> <span class="tlaGNC">        5687 :     KOKKOS_ASSERT((</span></span>
-<span id="L713"><span class="lineNum">     713</span> <span class="tlaGNC">        5687 :         !Kokkos::Impl::SharedAllocationRecord&lt;void, void&gt;::tracking_enabled()));</span></span>
-<span id="L714"><span class="lineNum">     714</span> <span class="tlaGNC">        5687 :     Kokkos::Impl::SharedAllocationRecord&lt;void, void&gt;::tracking_enable();</span></span>
-<span id="L715"><span class="lineNum">     715</span> <span class="tlaGNC">        5687 :   }</span></span>
+<span id="L711"><span class="lineNum">     711</span> <span class="tlaGNC">        5695 :   ~SharedAllocationDisableTrackingGuard() {</span></span>
+<span id="L712"><span class="lineNum">     712</span> <span class="tlaGNC">        5695 :     KOKKOS_ASSERT((</span></span>
+<span id="L713"><span class="lineNum">     713</span> <span class="tlaGNC">        5695 :         !Kokkos::Impl::SharedAllocationRecord&lt;void, void&gt;::tracking_enabled()));</span></span>
+<span id="L714"><span class="lineNum">     714</span> <span class="tlaGNC">        5695 :     Kokkos::Impl::SharedAllocationRecord&lt;void, void&gt;::tracking_enable();</span></span>
+<span id="L715"><span class="lineNum">     715</span> <span class="tlaGNC">        5695 :   }</span></span>
 <span id="L716"><span class="lineNum">     716</span>              :   // clang-format off</span>
 <span id="L717"><span class="lineNum">     717</span>              :   // The old version of clang format we use is particularly egregious here</span>
 <span id="L718"><span class="lineNum">     718</span>              :   SharedAllocationDisableTrackingGuard&amp; operator=(</span>

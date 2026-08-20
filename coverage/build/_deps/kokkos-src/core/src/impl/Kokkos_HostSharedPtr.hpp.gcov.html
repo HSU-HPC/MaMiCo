@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2026-08-17 12:51:03</td>
+            <td class="headerValue">2026-08-20 07:09:22</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
@@ -107,12 +107,12 @@
 <span id="L45"><span class="lineNum">      45</span> <span class="tlaGNC">        1236 :     other.m_control     = nullptr;</span></span>
 <span id="L46"><span class="lineNum">      46</span>              :   }</span>
 <span id="L47"><span class="lineNum">      47</span>              : </span>
-<span id="L48"><span class="lineNum">      48</span> <span class="tlaGNC">       18621 :   KOKKOS_FUNCTION HostSharedPtr(const HostSharedPtr&amp; other) noexcept</span></span>
-<span id="L49"><span class="lineNum">      49</span> <span class="tlaGNC">       18621 :       : m_element_ptr(other.m_element_ptr), m_control(other.m_control) {</span></span>
-<span id="L50"><span class="lineNum">      50</span> <span class="tlaGNC">       18621 :     KOKKOS_IF_ON_HOST(</span></span>
+<span id="L48"><span class="lineNum">      48</span> <span class="tlaGNC">       18645 :   KOKKOS_FUNCTION HostSharedPtr(const HostSharedPtr&amp; other) noexcept</span></span>
+<span id="L49"><span class="lineNum">      49</span> <span class="tlaGNC">       18645 :       : m_element_ptr(other.m_element_ptr), m_control(other.m_control) {</span></span>
+<span id="L50"><span class="lineNum">      50</span> <span class="tlaGNC">       18645 :     KOKKOS_IF_ON_HOST(</span></span>
 <span id="L51"><span class="lineNum">      51</span>              :         (if (m_control) Kokkos::atomic_add(&amp;(m_control-&gt;m_counter), 1);))</span>
 <span id="L52"><span class="lineNum">      52</span>              :     KOKKOS_IF_ON_DEVICE(m_control = nullptr;)</span>
-<span id="L53"><span class="lineNum">      53</span> <span class="tlaGNC">       18621 :   }</span></span>
+<span id="L53"><span class="lineNum">      53</span> <span class="tlaGNC">       18645 :   }</span></span>
 <span id="L54"><span class="lineNum">      54</span>              : </span>
 <span id="L55"><span class="lineNum">      55</span>              :   KOKKOS_FUNCTION HostSharedPtr&amp; operator=(HostSharedPtr&amp;&amp; other) noexcept {</span>
 <span id="L56"><span class="lineNum">      56</span>              :     if (&amp;other != this) {</span>
@@ -141,7 +141,7 @@
 <span id="L79"><span class="lineNum">      79</span> <span class="tlaGNC">        9327 :   KOKKOS_FUNCTION ~HostSharedPtr() { cleanup(); }</span></span>
 <span id="L80"><span class="lineNum">      80</span>              : </span>
 <span id="L81"><span class="lineNum">      81</span>              :   // returns the stored pointer</span>
-<span id="L82"><span class="lineNum">      82</span> <span class="tlaGNC">        5999 :   KOKKOS_FUNCTION T* get() const noexcept { return m_element_ptr; }</span></span>
+<span id="L82"><span class="lineNum">      82</span> <span class="tlaGNC">        6007 :   KOKKOS_FUNCTION T* get() const noexcept { return m_element_ptr; }</span></span>
 <span id="L83"><span class="lineNum">      83</span>              :   // dereferences the stored pointer</span>
 <span id="L84"><span class="lineNum">      84</span>              :   KOKKOS_FUNCTION T&amp; operator*() const noexcept {</span>
 <span id="L85"><span class="lineNum">      85</span>              :     KOKKOS_EXPECTS(bool(*this));</span>
@@ -166,8 +166,8 @@
 <span id="L104"><span class="lineNum">     104</span>              : </span>
 <span id="L105"><span class="lineNum">     105</span>              :  private:</span>
 <span id="L106"><span class="lineNum">     106</span>              :   // NOLINTNEXTLINE(bugprone-exception-escape)</span>
-<span id="L107"><span class="lineNum">     107</span> <span class="tlaGNC">       33983 :   KOKKOS_FUNCTION void cleanup() noexcept {</span></span>
-<span id="L108"><span class="lineNum">     108</span> <span class="tlaGNC">       42098 :     KOKKOS_IF_ON_HOST((</span></span>
+<span id="L107"><span class="lineNum">     107</span> <span class="tlaGNC">       34015 :   KOKKOS_FUNCTION void cleanup() noexcept {</span></span>
+<span id="L108"><span class="lineNum">     108</span> <span class="tlaGNC">       42130 :     KOKKOS_IF_ON_HOST((</span></span>
 <span id="L109"><span class="lineNum">     109</span>              :         // If m_counter is set, then this instance is responsible for managing</span>
 <span id="L110"><span class="lineNum">     110</span>              :         // the object pointed to by m_counter and m_element_ptr.</span>
 <span id="L111"><span class="lineNum">     111</span>              :         if (m_control) {</span>
@@ -183,7 +183,7 @@
 <span id="L121"><span class="lineNum">     121</span>              :             m_control = nullptr;</span>
 <span id="L122"><span class="lineNum">     122</span>              :           }</span>
 <span id="L123"><span class="lineNum">     123</span>              :         }))</span>
-<span id="L124"><span class="lineNum">     124</span> <span class="tlaGNC">       33983 :   }</span></span>
+<span id="L124"><span class="lineNum">     124</span> <span class="tlaGNC">       34015 :   }</span></span>
 <span id="L125"><span class="lineNum">     125</span>              : </span>
 <span id="L126"><span class="lineNum">     126</span> <span class="tlaGNC">        8115 :   struct Control {</span></span>
 <span id="L127"><span class="lineNum">     127</span>              :     std::function&lt;void(T*)&gt; m_deleter;</span>
