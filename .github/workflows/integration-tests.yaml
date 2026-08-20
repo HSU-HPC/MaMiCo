@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  OPEN_FOAM_VERSION: "2206"
+  OPEN_FOAM_VERSION: "2606"
   LAMMPS_REPO_REF: "release"
 
 # Abort running jobs if a new one is triggered
@@ -49,8 +49,6 @@ jobs:
           key: OpenFOAM-${{ env.OPEN_FOAM_VERSION }}
       - name: Build couette executable
         run: |
-          source scl_source enable gcc-toolset-9 || :
-          ml mpi || :
           ./tools/build-couette.py \
             --force-gcc \
             --jobs $(($(nproc --all) / 2)) \
