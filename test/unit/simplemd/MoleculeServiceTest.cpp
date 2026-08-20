@@ -70,8 +70,8 @@ public:
 
 private:
   // use for persistent tests
-  const tarch::la::Vector<3, size_t> _numCellsIf3D = {15, 15, 15};
-  const tarch::la::Vector<3, unsigned int> _numMoleculesIf3D = {14, 14, 14};
+  const tarch::la::Vector<3, size_t> _numCellsIf3D = {30, 30, 30};
+  const tarch::la::Vector<3, unsigned int> _numMoleculesIf3D = {28, 28, 28};
   simplemd::services::MoleculeService* _moleculeService;
 };
 
