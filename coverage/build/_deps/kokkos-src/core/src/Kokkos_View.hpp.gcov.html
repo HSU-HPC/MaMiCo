@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2026-08-20 07:09:22</td>
+            <td class="headerValue">2026-08-20 07:57:39</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
@@ -599,12 +599,12 @@
 <span id="L537"><span class="lineNum">     537</span>              :          Kokkos::Impl::IsLayoutRightPadded&lt;</span>
 <span id="L538"><span class="lineNum">     538</span>              :              typename base_t::layout_type&gt;::value ||</span>
 <span id="L539"><span class="lineNum">     539</span>              :          std::is_same_v&lt;typename base_t::layout_type, Kokkos::layout_stride&gt;))</span>
-<span id="L540"><span class="lineNum">     540</span> <span class="tlaGNC">    73223878 :   KOKKOS_FUNCTION constexpr reference_type operator()(</span></span>
+<span id="L540"><span class="lineNum">     540</span> <span class="tlaGNC">    73224008 :   KOKKOS_FUNCTION constexpr reference_type operator()(</span></span>
 <span id="L541"><span class="lineNum">     541</span>              :       OtherIndexTypes... idx) const {</span>
-<span id="L542"><span class="lineNum">     542</span> <span class="tlaGNC">    73223878 :     KOKKOS_IMPL_BASICVIEW_OPERATOR_VERIFY(idx...);</span></span>
-<span id="L543"><span class="lineNum">     543</span> <span class="tlaGNC">    73223878 :     return m_acc.access(</span></span>
-<span id="L544"><span class="lineNum">     544</span> <span class="tlaGNC">    73223878 :         m_ptr, static_cast&lt;size_t&gt;(compute_offset(</span></span>
-<span id="L545"><span class="lineNum">     545</span> <span class="tlaGNC">    73223878 :                    std::index_sequence_for&lt;OtherIndexTypes...&gt;{}, idx...)));</span></span>
+<span id="L542"><span class="lineNum">     542</span> <span class="tlaGNC">    73224008 :     KOKKOS_IMPL_BASICVIEW_OPERATOR_VERIFY(idx...);</span></span>
+<span id="L543"><span class="lineNum">     543</span> <span class="tlaGNC">    73224008 :     return m_acc.access(</span></span>
+<span id="L544"><span class="lineNum">     544</span> <span class="tlaGNC">    73224008 :         m_ptr, static_cast&lt;size_t&gt;(compute_offset(</span></span>
+<span id="L545"><span class="lineNum">     545</span> <span class="tlaGNC">    73224008 :                    std::index_sequence_for&lt;OtherIndexTypes...&gt;{}, idx...)));</span></span>
 <span id="L546"><span class="lineNum">     546</span>              :   }</span>
 <span id="L547"><span class="lineNum">     547</span>              : </span>
 <span id="L548"><span class="lineNum">     548</span>              :   template &lt;class... OtherIndexTypes&gt;</span>
