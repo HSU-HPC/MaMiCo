@@ -64,7 +64,6 @@ public:
     for (size_t i = 0; i < 1000; i++) {
       const auto expected = i + offset;
       const auto actual = _moleculeService->getNextMoleculeID();
-      std::cout << "Expected: " << expected << ", actual: " << actual << std::endl;
       CPPUNIT_ASSERT(actual == expected);
     }
   }
