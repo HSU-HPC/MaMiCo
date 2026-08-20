@@ -34,7 +34,9 @@
 #include <chrono>
 #include <math.h>
 #include <random>
+#include <string>
 #include <sys/time.h>
+#include <utility>
 
 #if defined(LS1_MARDYN)
 #include "coupling/interface/impl/ls1/LS1MDSolverInterface.h"
@@ -69,7 +71,9 @@ using Log::global_log;
 class CouetteScenario : public Scenario {
 public:
   /** @brief simple constructor */
-  CouetteScenario() : Scenario("CouetteScenario"), _generator(std::chrono::system_clock::now().time_since_epoch().count()) {}
+  explicit CouetteScenario(std::string configurationFile = "couette.xml")
+      : Scenario("CouetteScenario"), _configurationFile(std::move(configurationFile)),
+        _generator(std::chrono::system_clock::now().time_since_epoch().count()) {}
   /** @brief a dummy destructor */
   virtual ~CouetteScenario() {}
 
@@ -162,7 +166,7 @@ protected:
   /** @brief reads the configuration from the xml file and calls
    * parseCouetteScenarioConfiguration() */
   void parseConfigurations() {
-    std::string filename("couette.xml");
+    const std::string& filename = _configurationFile;
 
     tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",
                                                                                                                            _simpleMDConfig);
@@ -291,12 +295,12 @@ protected:
       // initialise coupling cell service for multi-MD case and set single
       // cell services in each MD simulation
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>(_mdSolverInterface, couetteSolverInterface, _simpleMDConfig,
-                                                                                         _mamicoConfig, "couette.xml", *_multiMDService, _tws);
+                                                                                         _mamicoConfig, _configurationFile.c_str(), *_multiMDService, _tws);
     } else {
       // initialise coupling cell service for multi-MD case and set single
       // cell services in each MD simulation
       _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>(_mdSolverInterface, couetteSolverInterface, _simpleMDConfig,
-                                                                                         _mamicoConfig, "couette.xml", *_multiMDService);
+                                                                                         _mamicoConfig, _configurationFile.c_str(), *_multiMDService);
     }
 
     // init filtering for all md instances
@@ -1002,6 +1006,8 @@ protected:
   int _rank;
   /** @todo Piet */
   int _tws;
+  /** @brief XML configuration file used for this scenario */
+  std::string _configurationFile;
   /** @brief the config data and information for SimpleMD */
   simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
   /** @brief the config data and information for MaMiCo*/

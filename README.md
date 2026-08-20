@@ -77,6 +77,7 @@ cmake -DMD_SIM=LS1_MARDYN -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_MPI=ON -DBUILD
 * The available options and features are explained [here](https://github.com/HSU-HPC/MaMiCo/wiki/couette.xml).  
 (*Deprecated:* Some are also listed directly in the template file via XML comments, so that you can modify the configuration to suit your needs.)
 * Start the simulation by executing (sequential case) `./couette` or e.g. (MPI-parallel) `mpirun -n 8 ./couette`.
+  To use a configuration from another location, pass `--config <path>`, for example `./couette --config ../examples/couette.xml`.
 * If you get the error message 'ERROR MoleculeService::MoleculeService: Could not open file CheckpointSimpleMD_10000_reflecting_0.checkpoint!', copy the file of the same name from the 'examples' folder into your build folder.
 * Depending on the configuration, you will obtain various output files in CSV, VTK or other formats. 
 
