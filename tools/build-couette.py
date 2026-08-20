@@ -49,11 +49,11 @@ LAMMPS_REPO_REF = os.getenv("LAMMPS_REPO_REF", "release")
 
 # OpenFOAM
 OPEN_FOAM_BASE_DIR = MAMICO_BUILD_DIR / "openfoam"
-OPEN_FOAM_VERSION = os.getenv("OPEN_FOAM_VERSION", "2206")
+OPEN_FOAM_VERSION = os.getenv("OPEN_FOAM_VERSION", "2606")
 OPEN_FOAM_SRC_DIR = OPEN_FOAM_BASE_DIR / f"OpenFOAM-v{OPEN_FOAM_VERSION}"
 OPEN_FOAM_URL = f"https://dl.openfoam.com/source/v{OPEN_FOAM_VERSION}/OpenFOAM-v{OPEN_FOAM_VERSION}.tgz"
 OPEN_FOAM_THIRD_PARTY_REPO_DIR = OPEN_FOAM_SRC_DIR / "ThirdParty"
-OPEN_FOAM_THIRD_PARTY_URL = "https://dl.openfoam.com/source/v2206/ThirdParty-v2206.tgz"
+OPEN_FOAM_THIRD_PARTY_URL = f"https://dl.openfoam.com/source/v{OPEN_FOAM_VERSION}/ThirdParty-v{OPEN_FOAM_VERSION}.tar.gz"
 
 
 def shell(cmd):
@@ -123,33 +123,46 @@ def download_open_foam():
     OPEN_FOAM_BASE_DIR.mkdir(exist_ok=True)
 
     def download_and_extract(url, archive_filename):
-        return 0 != shell(
-            f"wget -q -nc -O {archive_filename} {url} && tar -xzf {archive_filename} && rm {archive_filename}"
-        )
+        had_error = False
+        had_error |= 0 != shell(f"wget -q -nc -O {archive_filename} {url}")
+        if not had_error:
+            had_error |= 0 != shell(f"tar -xzf {archive_filename}")
+            if not had_error:
+                Path(archive_filename).unlink()
+        if had_error:
+            print(f"Error downloading {archive_filename} from {url}")
+        return had_error
 
     with ChangeDir(OPEN_FOAM_BASE_DIR):
         had_error |= download_and_extract(
             OPEN_FOAM_URL, f"OpenFOAM-v{OPEN_FOAM_VERSION}.tgz"
         )
     if not had_error:
-        with ChangeDir(OPEN_FOAM_SRC_DIR):
-            print(f"Downloading OpenFOAM-v{OPEN_FOAM_VERSION} third party files...")
-            had_error |= download_and_extract(
-                OPEN_FOAM_THIRD_PARTY_URL, f"ThirdParty-v{OPEN_FOAM_VERSION}.tgz"
-            )
-            if not had_error:
-                had_error = 0 != shell(f"mv ThirdParty-v{OPEN_FOAM_VERSION} ThirdParty")
+        if OPEN_FOAM_SRC_DIR.is_dir():
+            with ChangeDir(OPEN_FOAM_SRC_DIR):
+                print(f"Downloading OpenFOAM-v{OPEN_FOAM_VERSION} third party files...")
+                had_error |= download_and_extract(
+                    OPEN_FOAM_THIRD_PARTY_URL, f"ThirdParty-v{OPEN_FOAM_VERSION}.tgz"
+                )
+                if not had_error:
+                    had_error = 0 != shell(f"mv ThirdParty-v{OPEN_FOAM_VERSION} ThirdParty")
+        else:
+            had_error = True
+    if had_error:
+        shutil.rmtree(OPEN_FOAM_SRC_DIR, ignore_errors=True)
     return had_error
 
 
 def build_open_foam(jobs=8):
     print("Building OpenFOAM from source...")
     had_error = False
-    if not OPEN_FOAM_BASE_DIR.exists():
+    if not OPEN_FOAM_SRC_DIR.exists():
         had_error |= download_open_foam()
         if had_error:
-            shutil.rmtree(OPEN_FOAM_BASE_DIR)
+            shutil.rmtree(OPEN_FOAM_SRC_DIR, ignore_errors=True)
             return had_error
+    else:
+        print(f"Found {OPEN_FOAM_SRC_DIR} (Skipping download.)")
     with ChangeDir(OPEN_FOAM_SRC_DIR):
         cmd_build = ""
         cmd_build += f"source {OPEN_FOAM_SRC_DIR / 'etc' / 'bashrc'};"
@@ -263,6 +276,10 @@ if __name__ == "__main__":
     arg_parser.add_argument("-g", "--force-gcc", action="store_true")
     arg_parser.add_argument("-c", "--clean", action="store_true")
     args = arg_parser.parse_args()
+
+    assert shell("cmake --version >/dev/null") == 0, "CMake not installed or loaded!"
+    if args.with_mpi:
+        assert shell("mpicxx --version >/dev/null") == 0, "MPI not installed or loaded!"
 
     exec_path = build_mamico_couette_md(
         md_solver=args.md_solver,

@@ -767,8 +767,8 @@ if(BUILD_TESTING)
 
   message(STATUS ">> Running cmake with GET_TEST_NAMES ON ...")
   message(STATUS "(((((((((((((((((((((((((((((((((( SUBPROCESSES_START ")
-  execute_process(COMMAND cmake -DGET_TEST_NAMES=ON -DBUILD_TESTING=ON -DENABLE_COVERAGE=OFF
-                          -DBUILD_WITH_MPI=${BUILD_WITH_MPI} .)
+  execute_process(COMMAND cmake -S ${CMAKE_SOURCE_DIR} -B ${CMAKE_BINARY_DIR} -DGET_TEST_NAMES=ON -DBUILD_TESTING=ON
+                          -DENABLE_COVERAGE=OFF -DBUILD_WITH_MPI=${BUILD_WITH_MPI})
   message(STATUS ">> Building getTestNames executable ...")
   execute_process(COMMAND make -j4 getTestNames)
   message(STATUS "SUBPROCESSES_END ))))))))))))))))))))))))))))))))))")

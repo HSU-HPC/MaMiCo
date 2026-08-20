@@ -66,10 +66,14 @@ jobs:
         make compiletest
 
     - name: CMake
-      run: cd build; cmake -DBUILD_TESTING=ON -DBUILD_WITH_MPI=ON .
+      run: |
+        rm -rf build # Re-build from scratch after compiletest
+        mkdir build
+        cd build
+        cmake -DBUILD_TESTING=ON -DBUILD_WITH_MPI=ON ..
 
     - name: Build
       run: cd build; make -j4 testmamico
 
     - name: Test
-      run: cd build; ctest --output-on-failure
+      run: cd build; ctest --output-on-failure --no-tests=error

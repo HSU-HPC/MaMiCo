@@ -8,7 +8,7 @@ KOKKOS_FUNCTION constexpr double pow10(unsigned exponent) { return exponent == 0
 
 #define DEFINE_DECIMAL_FP_LIMITS(digits)                                                                                                                       \
   constexpr double maxFP##digits = pow10(digits);                                                                                                              \
-  constexpr double stepFP##digits = static_cast<double>(LLONG_MAX) / maxFP##digits;                                                           \
+  constexpr double stepFP##digits = static_cast<double>(LLONG_MAX) / maxFP##digits;                                                                            \
   constexpr double minFP##digits = 1.0 / stepFP##digits;                                                                                                       \
   (void)minFP##digits; // Avoid unused variable warning/error if minFPx is not needed.
 
