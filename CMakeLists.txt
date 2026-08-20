@@ -709,7 +709,7 @@ if(ENABLE_COVERAGE)
     coverage
     # gather data
     COMMAND
-      ${LCOV} --directory . --capture --exclude */test/* --exclude '/usr/*' --exclude '*/simplemd/*' --output-file coverage.info
+      ${LCOV} --directory . --capture --exclude '*/build/*' --exclude */test/* --exclude '/usr/*'  --output-file coverage.info
     # generate report
     COMMAND ${GENHTML} --rc check_data_consistency=0 --demangle-cpp -o coverage coverage.info
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -717,7 +717,7 @@ if(ENABLE_COVERAGE)
     # add my-coverage target
     add_custom_target(
       my-coverage
-      COMMAND ${PYTHON3} ../test/check_my_coverage.py --build-directory . --skip-make-coverage
+      COMMAND ${PYTHON3} ../test/gh-act/checks/check_my_coverage.py --build-directory . --skip-make-coverage
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
     add_dependencies(my-coverage coverage)

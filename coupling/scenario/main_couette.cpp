@@ -24,8 +24,8 @@ void runScenario(Scenario* scenario) {
 
 int main(int argc, char* argv[]) {
   int rank = 0;
-  int size = 1;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
+  int size = 1;
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
