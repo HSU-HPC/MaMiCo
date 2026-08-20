@@ -45,7 +45,7 @@ public:
     );
 
     _moleculeService = new simplemd::services::MoleculeService(parallelTopologyService.getGlobalDomainSize(), parallelTopologyService.getGlobalDomainOffset(),
-                                                               numMolecules, 0 /* meanVelocity */, 1 /* kB */, 1 /* temperature */, 10 /* capacityFactor" */,
+                                                               numMolecules, 0.0 /* meanVelocity */, 1.0 /* kB */, 1.1 /* temperature */, 3 /* capacityFactor" */,
                                                                molecularPropertiesService, parallelTopologyService);
   }
 
@@ -70,8 +70,8 @@ public:
 
 private:
   // use for persistent tests
-  const tarch::la::Vector<3, size_t> _numCellsIf3D = {30, 30, 30};
-  const tarch::la::Vector<3, unsigned int> _numMoleculesIf3D = {28, 28, 28};
+  const tarch::la::Vector<3, size_t> _numCellsIf3D = {100, 60, 50};
+  const tarch::la::Vector<3, unsigned int> _numMoleculesIf3D = { 99, 50, 49 };
   simplemd::services::MoleculeService* _moleculeService;
 };
 
