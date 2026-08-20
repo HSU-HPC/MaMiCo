@@ -8,7 +8,7 @@ on:
 env:
   OPEN_FOAM_VERSION: "2606"
   LAMMPS_REPO_REF: "release"
-  TEST_TIMEOUT_MINUTES: 360 # 6 hours
+  TEST_TIMEOUT_MINUTES: 330 # Must be less than 6 hours
 
 # Abort running jobs if a new one is triggered
 concurrency:
@@ -81,7 +81,7 @@ jobs:
     needs: [extract-tests, build-executable]
     if: "success() || failure()" # Only SOME couette binaries might have failed to build (unless canceled)
     runs-on: minicluster
-    timeout-minutes: ${{ fromJSON(env.TEST_TIMEOUT_MINUTES) }}
+    timeout-minutes: 360 # Also the default value (https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idtimeout-minutes)
     defaults:
       run:
         shell: bash -leo pipefail {0}
@@ -124,10 +124,9 @@ jobs:
           source build/openfoam/OpenFOAM-v*/etc/bashrc || :
           cd build/test_cases/${{ matrix.case }}
           chmod +x ../../couette
-          SLURM_TIMEOUT=$((TEST_TIMEOUT_MINUTES - 10))
           srun \
             --job-name="couette-${{ matrix.case }}" \
-            --time="${SLURM_TIMEOUT}" \
+            --time="${TEST_TIMEOUT_MINUTES}" \
             mpirun -n $(( ${{ matrix.mpi_ranks_per_md }} * ${{ matrix.parallel_MD_instances }} )) \
             ../../couette
       - name: Assess couette profile
