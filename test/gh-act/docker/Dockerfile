@@ -43,8 +43,8 @@ ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
 # Python dependencies for reporting coverage and formatting
 RUN pip install \
-        pandas \
-        beautifulsoup4 \
-        black \
-        cmakelang \
+        pandas==3.0.5 \
+        beautifulsoup4==4.15.0 \
+        black==26.5.1 \
+        cmakelang==0.6.13 \
         --break-system-packages `# Install at system-level`
