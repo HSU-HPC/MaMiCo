@@ -1,7 +1,8 @@
 #! /usr/bin/env bash
 
-# Check if source code needs to be formatted using clang-format
-# and if CMakeList.txt needs to be formatted with cmake_format
+# Check if the Python scripts need to be formatted with black,
+# if the CMakeList.txt needs to be formatted with cmake-format,
+# and if the source code needs to be formatted using clang-format
 
 SOURCE_CODE_EXTS=(c h hpp cpp cxx cpph)
 CLANG_FORMAT_TARGET=mamico-clangformat
@@ -13,11 +14,21 @@ cd ../../..
 CWD=$(pwd)
 
 # Format Python scripts
-diff="$(black . --diff 2>/dev/null)"
-if [ -n "$diff" ]; then
+if ! command -v black >/dev/null 2>&1; then
+    echo ":warning: Black is not installed!"
+elif diff="$(black . --diff 2>/dev/null)" && [ -n "$diff" ]; then
     echo ':eyes: Please format your Python scripts with `black .`!'
 else
-    echo ":rocket: Python ccripts already formatted!"
+    echo ":rocket: Python scripts already formatted!"
+fi
+
+# Format CMakeList.txt
+if ! command -v cmake-format >/dev/null 2>&1; then
+    echo ":warning: cmake-format is not installed!"
+elif ! cmake-format --check --config-file .cmake-format.py CMakeLists.txt; then
+    echo ':eyes: Please format your CMakeList.txt scripts with `cmake-format --config-file .cmake-format.py -i CMakeLists.txt`!'
+else
+    echo ":rocket: CMakeList.txt already formatted!"
 fi
 
 # Make an ephemeral copy of the working copy

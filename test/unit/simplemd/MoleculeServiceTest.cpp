@@ -46,6 +46,10 @@ public:
     // Hardcoded for test: unit tests run with 4 MPI ranks
     tarch::la::Vector<MD_DIM, double> localDomainSize{15, 15, 30};
     tarch::la::Vector<MD_DIM, double> localDomainOffset(0);
+    auto globalIndexOfFirstCell = parallelTopologyService.getGlobalIndexOfFirstCell();
+    for (size_t i = 0; i < MD_DIM; i++) {
+      localDomainOffset[i] = globalIndexOfFirstCell[i] * meshWidth[i];
+    }
     _moleculeService =
         new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, numMolecules, 0.0 /* meanVelocity */, 1.0 /* kB */, 1.1 /* temperature */,
                                                 3 /* capacityFactor" */, molecularPropertiesService, parallelTopologyService);
