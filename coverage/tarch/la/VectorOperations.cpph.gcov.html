@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2026-08-21 08:19:34</td>
+            <td class="headerValue">2026-08-21 15:14:06</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryMed">80.8&nbsp;%</td>
@@ -80,12 +80,12 @@
 <span id="L18"><span class="lineNum">      18</span>              :  *      @author Philipp Neumann</span>
 <span id="L19"><span class="lineNum">      19</span>              :  *      @return result resulting vector</span>
 <span id="L20"><span class="lineNum">      20</span>              :  */</span>
-<span id="L21"><span class="lineNum">      21</span> <span class="tlaGNC">     5658612 : template &lt;int size, class T&gt; KOKKOS_FUNCTION tarch::la::Vector&lt;size, T&gt; operator+(const tarch::la::Vector&lt;size, T&gt;&amp; l, const tarch::la::Vector&lt;size, T&gt;&amp; r) {</span></span>
-<span id="L22"><span class="lineNum">      22</span> <span class="tlaGNC">     5658612 :   tarch::la::Vector&lt;size, T&gt; result;</span></span>
-<span id="L23"><span class="lineNum">      23</span> <span class="tlaGNC">    22634448 :   for (int i = 0; i &lt; size; i++) {</span></span>
-<span id="L24"><span class="lineNum">      24</span> <span class="tlaGNC">    16975836 :     result[i] = l[i] + r[i];</span></span>
+<span id="L21"><span class="lineNum">      21</span> <span class="tlaGNC">     5746428 : template &lt;int size, class T&gt; KOKKOS_FUNCTION tarch::la::Vector&lt;size, T&gt; operator+(const tarch::la::Vector&lt;size, T&gt;&amp; l, const tarch::la::Vector&lt;size, T&gt;&amp; r) {</span></span>
+<span id="L22"><span class="lineNum">      22</span> <span class="tlaGNC">     5746428 :   tarch::la::Vector&lt;size, T&gt; result;</span></span>
+<span id="L23"><span class="lineNum">      23</span> <span class="tlaGNC">    22985712 :   for (int i = 0; i &lt; size; i++) {</span></span>
+<span id="L24"><span class="lineNum">      24</span> <span class="tlaGNC">    17239284 :     result[i] = l[i] + r[i];</span></span>
 <span id="L25"><span class="lineNum">      25</span>              :   }</span>
-<span id="L26"><span class="lineNum">      26</span> <span class="tlaGNC">     5658612 :   return result;</span></span>
+<span id="L26"><span class="lineNum">      26</span> <span class="tlaGNC">     5746428 :   return result;</span></span>
 <span id="L27"><span class="lineNum">      27</span>              : }</span>
 <span id="L28"><span class="lineNum">      28</span>              : </span>
 <span id="L29"><span class="lineNum">      29</span>              : /** this file contains some methods for vector types.</span>
@@ -95,12 +95,12 @@
 <span id="L33"><span class="lineNum">      33</span>              :  *      @author Philipp Neumann</span>
 <span id="L34"><span class="lineNum">      34</span>              :  *      @return result resulting vector</span>
 <span id="L35"><span class="lineNum">      35</span>              :  */</span>
-<span id="L36"><span class="lineNum">      36</span> <span class="tlaGNC">     4790484 : template &lt;int size, class T&gt; KOKKOS_FUNCTION tarch::la::Vector&lt;size, T&gt; operator-(const tarch::la::Vector&lt;size, T&gt;&amp; l, const tarch::la::Vector&lt;size, T&gt;&amp; r) {</span></span>
-<span id="L37"><span class="lineNum">      37</span> <span class="tlaGNC">     4790484 :   tarch::la::Vector&lt;size, T&gt; result;</span></span>
-<span id="L38"><span class="lineNum">      38</span> <span class="tlaGNC">    19161936 :   for (int i = 0; i &lt; size; i++) {</span></span>
-<span id="L39"><span class="lineNum">      39</span> <span class="tlaGNC">    14371452 :     result[i] = l[i] - r[i];</span></span>
+<span id="L36"><span class="lineNum">      36</span> <span class="tlaGNC">     4878296 : template &lt;int size, class T&gt; KOKKOS_FUNCTION tarch::la::Vector&lt;size, T&gt; operator-(const tarch::la::Vector&lt;size, T&gt;&amp; l, const tarch::la::Vector&lt;size, T&gt;&amp; r) {</span></span>
+<span id="L37"><span class="lineNum">      37</span> <span class="tlaGNC">     4878296 :   tarch::la::Vector&lt;size, T&gt; result;</span></span>
+<span id="L38"><span class="lineNum">      38</span> <span class="tlaGNC">    19513184 :   for (int i = 0; i &lt; size; i++) {</span></span>
+<span id="L39"><span class="lineNum">      39</span> <span class="tlaGNC">    14634888 :     result[i] = l[i] - r[i];</span></span>
 <span id="L40"><span class="lineNum">      40</span>              :   }</span>
-<span id="L41"><span class="lineNum">      41</span> <span class="tlaGNC">     4790484 :   return result;</span></span>
+<span id="L41"><span class="lineNum">      41</span> <span class="tlaGNC">     4878296 :   return result;</span></span>
 <span id="L42"><span class="lineNum">      42</span>              : }</span>
 <span id="L43"><span class="lineNum">      43</span>              : </span>
 <span id="L44"><span class="lineNum">      44</span>              : /** this file contains some methods for vector types.</span>
@@ -125,12 +125,12 @@
 <span id="L63"><span class="lineNum">      63</span>              :  *      @author Philipp Neumann</span>
 <span id="L64"><span class="lineNum">      64</span>              :  *      @return result resulting vector</span>
 <span id="L65"><span class="lineNum">      65</span>              :  */</span>
-<span id="L66"><span class="lineNum">      66</span> <span class="tlaGNC">      244396 : template &lt;int size, class T&gt; KOKKOS_FUNCTION tarch::la::Vector&lt;size, T&gt; operator*(const T&amp; s, const tarch::la::Vector&lt;size, T&gt;&amp; v) {</span></span>
-<span id="L67"><span class="lineNum">      67</span> <span class="tlaGNC">      244396 :   tarch::la::Vector&lt;size, T&gt; result;</span></span>
-<span id="L68"><span class="lineNum">      68</span> <span class="tlaGNC">      977584 :   for (int i = 0; i &lt; size; i++) {</span></span>
-<span id="L69"><span class="lineNum">      69</span> <span class="tlaGNC">      733188 :     result[i] = v[i] * s;</span></span>
+<span id="L66"><span class="lineNum">      66</span> <span class="tlaGNC">      420016 : template &lt;int size, class T&gt; KOKKOS_FUNCTION tarch::la::Vector&lt;size, T&gt; operator*(const T&amp; s, const tarch::la::Vector&lt;size, T&gt;&amp; v) {</span></span>
+<span id="L67"><span class="lineNum">      67</span> <span class="tlaGNC">      420016 :   tarch::la::Vector&lt;size, T&gt; result;</span></span>
+<span id="L68"><span class="lineNum">      68</span> <span class="tlaGNC">     1680064 :   for (int i = 0; i &lt; size; i++) {</span></span>
+<span id="L69"><span class="lineNum">      69</span> <span class="tlaGNC">     1260048 :     result[i] = v[i] * s;</span></span>
 <span id="L70"><span class="lineNum">      70</span>              :   }</span>
-<span id="L71"><span class="lineNum">      71</span> <span class="tlaGNC">      244396 :   return result;</span></span>
+<span id="L71"><span class="lineNum">      71</span> <span class="tlaGNC">      420016 :   return result;</span></span>
 <span id="L72"><span class="lineNum">      72</span>              : }</span>
 <span id="L73"><span class="lineNum">      73</span>              : </span>
 <span id="L74"><span class="lineNum">      74</span>              : /** this file contains some methods for vector types.</span>
@@ -171,12 +171,12 @@
 <span id="L109"><span class="lineNum">     109</span>              :  *      @author Philipp Neumann</span>
 <span id="L110"><span class="lineNum">     110</span>              :  *      @return equal result; true: if they are equal, false otherwise.</span>
 <span id="L111"><span class="lineNum">     111</span>              :  */</span>
-<span id="L112"><span class="lineNum">     112</span> <span class="tlaGNC">      980980 : template &lt;int size, class T&gt; KOKKOS_FUNCTION bool operator==(const Vector&lt;size, T&gt;&amp; l, const Vector&lt;size, T&gt;&amp; r) {</span></span>
-<span id="L113"><span class="lineNum">     113</span> <span class="tlaGNC">      980980 :   bool equal = true;</span></span>
-<span id="L114"><span class="lineNum">     114</span> <span class="tlaGNC">     3923772 :   for (int i = 0; i &lt; size; i++) {</span></span>
-<span id="L115"><span class="lineNum">     115</span> <span class="tlaGNC">     5885580 :     equal = equal &amp;&amp; (l[i] == r[i]);</span></span>
+<span id="L112"><span class="lineNum">     112</span> <span class="tlaGNC">      980988 : template &lt;int size, class T&gt; KOKKOS_FUNCTION bool operator==(const Vector&lt;size, T&gt;&amp; l, const Vector&lt;size, T&gt;&amp; r) {</span></span>
+<span id="L113"><span class="lineNum">     113</span> <span class="tlaGNC">      980988 :   bool equal = true;</span></span>
+<span id="L114"><span class="lineNum">     114</span> <span class="tlaGNC">     3923804 :   for (int i = 0; i &lt; size; i++) {</span></span>
+<span id="L115"><span class="lineNum">     115</span> <span class="tlaGNC">     5885628 :     equal = equal &amp;&amp; (l[i] == r[i]);</span></span>
 <span id="L116"><span class="lineNum">     116</span>              :   }</span>
-<span id="L117"><span class="lineNum">     117</span> <span class="tlaGNC">      980980 :   return equal;</span></span>
+<span id="L117"><span class="lineNum">     117</span> <span class="tlaGNC">      980988 :   return equal;</span></span>
 <span id="L118"><span class="lineNum">     118</span>              : }</span>
 <span id="L119"><span class="lineNum">     119</span>              : </span>
 <span id="L120"><span class="lineNum">     120</span>              : /** This operator overloading compares two vectors and determins if they are NOT equal.</span>
