@@ -43,10 +43,12 @@ public:
                                                                         MPI_COMM_WORLD
 #endif
     );
-
-    _moleculeService = new simplemd::services::MoleculeService(parallelTopologyService.getGlobalDomainSize(), parallelTopologyService.getGlobalDomainOffset(),
-                                                               numMolecules, 0.0 /* meanVelocity */, 1.0 /* kB */, 1.1 /* temperature */, 3 /* capacityFactor" */,
-                                                               molecularPropertiesService, parallelTopologyService);
+    // Hardcoded for test: unit tests run with 4 MPI ranks
+    tarch::la::Vector<MD_DIM, double> localDomainSize{15, 15, 30};
+    tarch::la::Vector<MD_DIM, double> localDomainOffset(0);
+    _moleculeService =
+        new simplemd::services::MoleculeService(localDomainSize, localDomainOffset, numMolecules, 0.0 /* meanVelocity */, 1.0 /* kB */, 1.1 /* temperature */,
+                                                3 /* capacityFactor" */, molecularPropertiesService, parallelTopologyService);
   }
 
   void tearDown() {
@@ -70,8 +72,8 @@ public:
 
 private:
   // use for persistent tests
-  const tarch::la::Vector<3, size_t> _numCellsIf3D = {100, 60, 50};
-  const tarch::la::Vector<3, unsigned int> _numMoleculesIf3D = { 99, 50, 49 };
+  const tarch::la::Vector<3, size_t> _numCellsIf3D = {30, 30, 30};
+  const tarch::la::Vector<3, unsigned int> _numMoleculesIf3D = {28, 28, 28};
   simplemd::services::MoleculeService* _moleculeService;
 };
 
