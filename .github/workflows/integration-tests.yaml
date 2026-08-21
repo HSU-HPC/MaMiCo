@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  OPEN_FOAM_VERSION: "2206"
+  OPEN_FOAM_VERSION: "2606"
   LAMMPS_REPO_REF: "release"
 
 # Abort running jobs if a new one is triggered
@@ -28,6 +28,9 @@ jobs:
 
   build-executable:
     runs-on: minicluster
+    defaults:
+      run:
+        shell: bash -leo pipefail {0}
     strategy:
       fail-fast: false # If some versions fail to build, still build all the others
       matrix:
@@ -49,8 +52,6 @@ jobs:
           key: OpenFOAM-${{ env.OPEN_FOAM_VERSION }}
       - name: Build couette executable
         run: |
-          source scl_source enable gcc-toolset-9 || :
-          ml mpi || :
           ./tools/build-couette.py \
             --force-gcc \
             --jobs $(($(nproc --all) / 2)) \
@@ -79,6 +80,9 @@ jobs:
     needs: [extract-tests, build-executable]
     if: "success() || failure()" # Only SOME couette binaries might have failed to build (unless canceled)
     runs-on: minicluster
+    defaults:
+      run:
+        shell: bash -leo pipefail {0}
     strategy:
       fail-fast: false # If some test cases fail, still run all the others
       matrix: ${{ fromJson(needs.extract-tests.outputs.matrix) }}
