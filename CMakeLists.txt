@@ -713,8 +713,8 @@ if(ENABLE_COVERAGE)
   add_custom_target(
     coverage
     # gather data
-    COMMAND ${LCOV} --directory . --capture --exclude '*/build/*' --exclude '*/ls1/*' --exclude */test/* --exclude
-            '/usr/*' --output-file coverage.info
+    COMMAND ${LCOV} --directory . --capture --ignore-errors unused --exclude '*/build/*' --exclude '*/ls1/*' --exclude
+            */test/* --exclude '/usr/*' --output-file coverage.info
     # generate report
     COMMAND ${GENHTML} --rc check_data_consistency=0 --demangle-cpp -o coverage coverage.info
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
