@@ -50,7 +50,7 @@ void simplemd::MoleculeContainer::remove(unsigned int cellIdx, unsigned int mole
                    _linkedCellNumMolecules(cellIdx));
     Kokkos::abort("ERROR simplemd::MoleculeContainer::remove\n");
   }
-  if (cellIdx >= _linkedCellNumMolecules(cellIdx)) {
+  if (cellIdx >= _linkedCellNumMolecules.size()) {
     Kokkos::printf("Deleting particle from cell that does not exist! moleculeIdx: %d, cellIdx: %d, num molecules: %d\n", moleculeIdx, cellIdx,
                    _linkedCellNumMolecules(cellIdx));
     Kokkos::abort("ERROR simplemd::MoleculeContainer::remove\n");
@@ -239,17 +239,18 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
     index += _localIndexOfFirstCell[d];
     index -= _globalIndexOfFirstCell[d];
 #if (MD_ERROR == MD_YES)
-    if (index < 0) {
-      Kokkos::printf("index < 0: index=%ld; "
+    if (index < 0 || index > _numCells[d]) {
+      Kokkos::printf("index %s: index=%ld; "
                      "Dimension : dim=%u, GIFC=%u, LIFC=%u, cell=%ld; "
                      "cellVectorIndex: %u %u %u; "
                      "Position: %lf %lf %lf; "
                      "offset: %lf %lf %lf; "
                      "meshwidth: %lf %lf %lf"
                      "\n",
-                     index, d, _globalIndexOfFirstCell[d], _localIndexOfFirstCell[d], (long int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])),
-                     cellVectorIndex[0], cellVectorIndex[1], MD_DIM3_OR0(cellVectorIndex[2]), position[0], position[1], MD_DIM3_OR0(position[2]),
-                     _domainOffset[0], _domainOffset[1], MD_DIM3_OR0(_domainOffset[2]), _meshWidth[0], _meshWidth[1], MD_DIM3_OR0(_meshWidth[2]));
+                     index < 0 ? "< 0" : "> _numCells[dim]", index, d, _globalIndexOfFirstCell[d], _localIndexOfFirstCell[d],
+                     (long int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])), cellVectorIndex[0], cellVectorIndex[1],
+                     MD_DIM3_OR0(cellVectorIndex[2]), position[0], position[1], MD_DIM3_OR0(position[2]), _domainOffset[0], _domainOffset[1],
+                     MD_DIM3_OR0(_domainOffset[2]), _meshWidth[0], _meshWidth[1], MD_DIM3_OR0(_meshWidth[2]));
       Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex\n");
     }
 #endif
