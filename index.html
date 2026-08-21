@@ -103,16 +103,20 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_README"></a></p>
 <p>The macro-micro-coupling tool for multiscale coupled molecular-continuum flow simulation.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md0"></a>
-Documentation</h2>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
+Documentation</h1>
 <p>* The source code documentation can be found <a href="https://hsu-hpc.github.io/MaMiCo/">here</a> * The unit test code coverage is <a href="https://hsu-hpc.github.io/MaMiCo/coverage/index.html">here</a></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1"></a>
-Requirements and optional dependencies</h2>
-<p>To compile and execute MaMiCo on a linux system, you need at least: * a C++17[^1] compiler installed (e.g. GCC 7 or newer) * CMake version &gt;= 3.13</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md5"></a>
+Requirements and optional dependencies</h1>
+<p>To compile and execute MaMiCo on a linux system, you need at least:</p>
+<p>* a C++17[^1] compiler installed (e.g. GCC 7 or newer) * CMake version &gt;= 3.13</p>
 <p>[^1]: MaMiCo supports C++17 onwards, but the default Kokkos version 5.0.2 requires C++20 (GCC 10+). If using this version, a C++20 compatible compiler is required. However, Kokkos version 4.x can be used to reduce this to C++17 (e.g. GCC 7 or newer).</p>
-<p>Optional dependencies are: * <a href="https://www.open-mpi.org/">MPI</a>, highly recommended for parallel runs, e.g. on clusters. * <a href="http://eigen.tuxfamily.org/">Eigen 3</a>, a linear algebra library used for the POD noise filter. * <a href="https://pybind11.readthedocs.io/en/stable/">pybind11</a>, for the MaMiCo Python bindings. * <a href="https://develop.openfoam.com/Development/openfoam/blob/develop/doc/Build.md">OpenFOAM</a>, for coupling to CFD simulations with OpenFOAM. * <a href="https://precice.org/">preCICE</a>, for coupling with other solvers using the preCICE coupling library. * <a href="https://www.ls1-mardyn.de/home.html">ls1-MarDyn</a>, for coupling to MD simulations with ls1. * <a href="https://lammps.org/">LAMMPS</a>, for coupling to MD simulations with LAMMPS. * <a href="https://github.com/linux-test-project/lcov">LCOV</a> and <a href="https://gcc.gnu.org/">gcc</a>, for test code coverage analysis.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md2"></a>
-Build instructions</h2>
+<p>Optional dependencies are:</p>
+<p>* <a href="https://www.open-mpi.org/">MPI</a>, highly recommended for parallel runs, e.g. on clusters. * <a href="http://eigen.tuxfamily.org/">Eigen 3</a>, a linear algebra library used for the POD noise filter. * <a href="https://pybind11.readthedocs.io/en/stable/">pybind11</a>, for the MaMiCo Python bindings. * <a href="https://develop.openfoam.com/Development/openfoam/blob/develop/doc/Build.md">OpenFOAM</a>, for coupling to CFD simulations with OpenFOAM. * <a href="https://precice.org/">preCICE</a>, for coupling with other solvers using the preCICE coupling library. * <a href="https://www.ls1-mardyn.de/home.html">ls1-MarDyn</a>, for coupling to MD simulations with ls1. * <a href="https://lammps.org/">LAMMPS</a>, for coupling to MD simulations with LAMMPS. * <a href="https://github.com/linux-test-project/lcov">LCOV</a> and <a href="https://gcc.gnu.org/">gcc</a>, for test code coverage analysis.</p>
+<p>Additional development dependencies are:</p>
+<p>* <a href="https://releases.llvm.org/18.1.8/tools/clang/docs/ClangFormat.html">clang-format</a> for source code formatting * <a href="https://github.com/cheshirekow/cmake_format">cmakelang</a> providing <span class="tt">cmake-format</span> for formatting CMakeList.txt * <a href="https://github.com/psf/black">black</a> for Python formatting</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md6"></a>
+Build instructions</h1>
 <p>* First clone this repository and create a new build directory: </p><pre class="fragment">  git clone git@github.com:HSU-HPC/MaMiCo.git
   cd MaMiCo
   mkdir build
@@ -121,29 +125,29 @@ Build instructions</h2>
 <p>* Then initialise CMake in your build directory, pointing it to the root directory of the repository. (Note that on some older systems, the command may be named <span class="tt">cmake3</span> instead of <span class="tt">cmake</span>.) </p><pre class="fragment">  cmake ..
 </pre><p>* This will configure the build system with default settings and generate makefiles in the build directory. Optionally, you might want to change the build configuration now: </p><pre class="fragment">  ccmake .
 </pre><p>* Here you can enable optional dependencies, e.g. activate BUILD_WITH_MPI (default OFF), or modifiy which compiler and flags you want to use. When you are done, press the configure [c] and generate [g] keys. Now you can start the compilation: </p><pre class="fragment">  make
-</pre><h3 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
-Building with GPU support</h3>
+</pre><h2 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
+Building with GPU support</h2>
 <p>To compile for Nvidia GPUs, use <span class="tt">-DKOKKOS_TARGET=CUDA</span>. <br  />
  For compilation on a host without a GPU (such as the login node of a cluster), it is also necessary to specify the <a href="https://kokkos.org/kokkos-core-wiki/get-started/configuration-guide.html#gpu-architectures">target GPU architecture</a>:</p>
 <div class="fragment"><div class="line">ml gcc cuda cmake # Load build tools</div>
 <div class="line">cmake -DKOKKOS_TARGET=CUDA -DKokkos_ARCH_AMPERE80=ON .. # Nvidia A100</div>
 <div class="line">make</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
-Additional instructions to build with ls1</h3>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
+Additional instructions to build with ls1</h2>
 <p>* After cloning the repository, initialize the ls1 submodule with </p><pre class="fragment">  git submodule init
   git submodule update
 </pre><p>* Make MaMiCo as normal, choosing LS1_MARDYN as your MD library. Options from ls1 will be available in the CMake cache. Options such as BUILD_WITH_MPI, BUILD_WITH_ADIOS2 will be propagated down to ls1. Having the Kokkos target as OpenMP enables OpenMP in ls1. Example build string:</p>
 <div class="fragment"><div class="line">cmake -DMD_SIM=LS1_MARDYN -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_MPI=ON -DBUILD_WITH_ADIOS2=ON -DENABLE_AUTOPAS=ON -DKOKKOS_TARGET=OPENMP ..</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md5"></a>
-Additional instructions to build with LAMMPS</h3>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md9"></a>
+Additional instructions to build with LAMMPS</h2>
 <p>1. <a href="https://docs.lammps.org/Install_git.html">Download the LAMMPS source code</a>, <a href="https://docs.lammps.org/Build_cmake.html">build it using CMake</a> with the option <span class="tt">-DBUILD_SHARED_LIBS=ON</span>, and install it using <span class="tt">make install</span>. <br  />
  2. Make LAMMPS available through pgk-config with <span class="tt">export PKG_CONFIG_PATH=/home/$(whoami)/.local/lib/pkgconfig</span>. 3. Create a symbolic link to the LAMMPS header files in the MaMiCo root folder using <span class="tt">ln -s &lt;path to LAMMPS&gt;/src &lt;path to MaMiCo&gt;/lammps</span></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md6"></a>
-Input file construction and first runs</h2>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md10"></a>
+Input file construction and first runs</h1>
 <p>* The build instructions have created an executable of the standard Couette flow test case, the file is called 'couette'. It expects an XML configuration file named 'couette.xml' in the current working directory. * An example simulation configuration can be generated in the current working directory using <a href="./tools/"><span class="tt">tools</span></a><span class="tt">/mamico-cfg</span>. * The available options and features are explained <a href="https://github.com/HSU-HPC/MaMiCo/wiki/couette.xml">here</a>. <br  />
  (<em>Deprecated:</em> Some are also listed directly in the template file via XML comments, so that you can modify the configuration to suit your needs.) * Start the simulation by executing (sequential case) <span class="tt">./couette</span> or e.g. (MPI-parallel) <span class="tt">mpirun -n 8 ./couette</span>. * If you get the error message 'ERROR MoleculeService::MoleculeService: Could not open file CheckpointSimpleMD_10000_reflecting_0.checkpoint!', copy the file of the same name from the 'examples' folder into your build folder. * Depending on the configuration, you will obtain various output files in CSV, VTK or other formats.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
-Papers to cite</h2>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md11"></a>
+Papers to cite</h1>
 <p>* P. Jarmatz, P. Neumann: <a href="https://link.springer.com/chapter/10.1007/978-3-030-22747-0_34">MaMiCo: Parallel Noise Reduction for Multi-instance Molecular-Continuum Flow Simulation</a>, International Conference on Computational Science. Springer, Cham, 2019 * P. Neumann, X. Bian: <a href="https://doi.org/10.1016/j.cpc.2017.06.026">MaMiCo: Transient multi-instance molecular-continuum flow simulation on supercomputers</a>, Computer Physics Communications 220 (2017): 390-402 * P. Neumann, H. Flohr, R. Arora, P. Jarmatz: <a href="https://doi.org/10.1016/j.cpc.2015.10.029">MaMiCo: Software design for parallel molecular-continuum flow simulations</a> Computer Physics Communications 200 (2016): 324-335 </p>
 </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>

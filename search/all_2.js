@@ -20,11 +20,12 @@ var searchData=
   ['boundaryforceconfiguration_17',['BoundaryForceConfiguration',['../classcoupling_1_1configurations_1_1BoundaryForceConfiguration.html',1,'coupling::configurations::BoundaryForceConfiguration&lt; dim &gt;'],['../classcoupling_1_1configurations_1_1BoundaryForceConfiguration.html#adbe59b414f39d6a78c87b307e4cc445c',1,'coupling::configurations::BoundaryForceConfiguration::BoundaryForceConfiguration()']]],
   ['boundaryforcecontroller_18',['BoundaryForceController',['../classcoupling_1_1BoundaryForceController.html',1,'coupling::BoundaryForceController&lt; LinkedCell, dim &gt;'],['../classcoupling_1_1BoundaryForceController.html#a2b1891868681bf76e49c813eaf6075e3',1,'coupling::BoundaryForceController::BoundaryForceController()']]],
   ['boundaryforcetype_19',['BoundaryForceType',['../classcoupling_1_1configurations_1_1BoundaryForceConfiguration.html#a86965f71f03c562a1912e0509e8038be',1,'coupling::configurations::BoundaryForceConfiguration']]],
-  ['buffercollective_20',['BufferCollective',['../structcoupling_1_1sendrecv_1_1SendReceiveBuffer_1_1BufferCollective.html',1,'coupling::sendrecv::SendReceiveBuffer']]],
-  ['bufferwithid_21',['BufferWithID',['../structcoupling_1_1sendrecv_1_1SendReceiveBuffer_1_1BufferWithID.html',1,'coupling::sendrecv::SendReceiveBuffer']]],
-  ['build_20couette_20scenario_22',['Build Couette Scenario',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md15',1,'']]],
-  ['build_20instructions_23',['Build instructions',['../index.html#autotoc_md2',1,'']]],
-  ['build_20with_20lammps_24',['Additional instructions to build with LAMMPS',['../index.html#autotoc_md5',1,'']]],
-  ['build_20with_20ls1_25',['Additional instructions to build with ls1',['../index.html#autotoc_md4',1,'']]],
-  ['building_20with_20gpu_20support_26',['Building with GPU support',['../index.html#autotoc_md3',1,'']]]
+  ['branch_20naming_20',['Branch Naming',['../md_CONTRIBUTING.html#autotoc_md1',1,'']]],
+  ['buffercollective_21',['BufferCollective',['../structcoupling_1_1sendrecv_1_1SendReceiveBuffer_1_1BufferCollective.html',1,'coupling::sendrecv::SendReceiveBuffer']]],
+  ['bufferwithid_22',['BufferWithID',['../structcoupling_1_1sendrecv_1_1SendReceiveBuffer_1_1BufferWithID.html',1,'coupling::sendrecv::SendReceiveBuffer']]],
+  ['build_20couette_20scenario_23',['Build Couette Scenario',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md19',1,'']]],
+  ['build_20instructions_24',['Build instructions',['../index.html#autotoc_md6',1,'']]],
+  ['build_20with_20lammps_25',['Additional instructions to build with LAMMPS',['../index.html#autotoc_md9',1,'']]],
+  ['build_20with_20ls1_26',['Additional instructions to build with ls1',['../index.html#autotoc_md8',1,'']]],
+  ['building_20with_20gpu_20support_27',['Building with GPU support',['../index.html#autotoc_md7',1,'']]]
 ];

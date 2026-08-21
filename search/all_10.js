@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['papers_20to_20cite_0',['Papers to cite',['../index.html#autotoc_md7',1,'']]],
+  ['papers_20to_20cite_0',['Papers to cite',['../index.html#autotoc_md11',1,'']]],
   ['parallel_5fboundary_1',['PARALLEL_BOUNDARY',['../classcoupling_1_1solvers_1_1NumericalSolver.html#a9be98c40ee9eca5a8522dc7b30396b8ba246a0677268dcb601fd238075d7b2d8d',1,'coupling::solvers::NumericalSolver']]],
   ['paralleltimeintegrationservice_2',['ParallelTimeIntegrationService',['../classcoupling_1_1services_1_1ParallelTimeIntegrationService.html',1,'coupling::services']]],
   ['paralleltopology_3',['ParallelTopology',['../classcoupling_1_1paralleltopology_1_1ParallelTopology.html',1,'coupling::paralleltopology']]],
@@ -26,7 +26,7 @@ var searchData=
   ['pintablemacrosolver_23',['PintableMacroSolver',['../classcoupling_1_1interface_1_1PintableMacroSolver.html',1,'coupling::interface']]],
   ['pintablemacrosolverstate_24',['PintableMacroSolverState',['../classcoupling_1_1interface_1_1PintableMacroSolverState.html',1,'coupling::interface']]],
   ['pintdomain_25',['PintDomain',['../structcoupling_1_1services_1_1ParallelTimeIntegrationService_1_1PintDomain.html',1,'coupling::services::ParallelTimeIntegrationService']]],
-  ['pipeline_26',['CI pipeline',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md14',1,'']]],
+  ['pipeline_26',['CI pipeline',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md18',1,'']]],
   ['plot_27',['plot',['../classcoupling_1_1solvers_1_1IcoFoamInterface.html#a2a8a94e4a7f93118180bc1d2eec5aff6',1,'coupling::solvers::IcoFoamInterface::plot()'],['../classcoupling_1_1solvers_1_1NumericalSolver.html#a2a0fb0cf8523a5adaf54cd6611f7708b',1,'coupling::solvers::NumericalSolver::plot()']]],
   ['plotaveragevelocity_28',['plotAverageVelocity',['../structcoupling_1_1configurations_1_1CouetteConfig.html#ab208d38ee532b34c1e4907888d58d92d',1,'coupling::configurations::CouetteConfig']]],
   ['plotcouplingcellfile_29',['plotCouplingCellFile',['../classcoupling_1_1CouplingCellPlotter.html#a859d58ba798d91d225498d4ef0c9d814',1,'coupling::CouplingCellPlotter']]],
@@ -34,7 +34,7 @@ var searchData=
   ['ploteverymicroscopictimestep_31',['plotEveryMicroscopicTimestep',['../classcoupling_1_1services_1_1CouplingCellServiceImpl.html#a1cff3d06390c5e7dd730bb0f1f077b6d',1,'coupling::services::CouplingCellServiceImpl']]],
   ['ploteverytimestep_32',['plotEveryTimestep',['../structcoupling_1_1configurations_1_1CouetteConfig.html#af03077aebac8f701e728a1bd1f1a374f',1,'coupling::configurations::CouetteConfig']]],
   ['plotmoleculefile_33',['plotMoleculeFile',['../classcoupling_1_1CouplingCellPlotter.html#ab43486a0201be5abd4d9683606d92bb6',1,'coupling::CouplingCellPlotter']]],
-  ['plotting_34',['Plotting',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md13',1,'']]],
+  ['plotting_34',['Plotting',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md17',1,'']]],
   ['plottxt_35',['plottxt',['../classcoupling_1_1solvers_1_1IcoFoamInterface.html#ab32c79df13d06006d9c5f6fb9f289fab',1,'coupling::solvers::IcoFoamInterface']]],
   ['pod_36',['POD',['../classcoupling_1_1filtering_1_1POD.html',1,'coupling::filtering']]],
   ['preparefornewnode_37',['PrepareForNewNode',['../classtinyxml2_1_1XMLPrinter.html#a83f100894c0ed069ffbd2c5a2c9ed190',1,'tinyxml2::XMLPrinter']]],

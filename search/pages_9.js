@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['optional_20dependencies_0',['Requirements and optional dependencies',['../index.html#autotoc_md1',1,'']]]
+  ['naming_0',['Branch Naming',['../md_CONTRIBUTING.html#autotoc_md1',1,'']]]
 ];

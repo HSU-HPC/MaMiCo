@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2026-08-20 07:57:39</td>
+            <td class="headerValue">2026-08-21 08:19:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryHi">-</td>
@@ -419,13 +419,13 @@
 <span id="L357"><span class="lineNum">     357</span>              :   constexpr static TStatic static_value(size_t r) { return static_vals_t::get(r); }</span>
 <span id="L358"><span class="lineNum">     358</span>              : </span>
 <span id="L359"><span class="lineNum">     359</span>              :   MDSPAN_INLINE_FUNCTION</span>
-<span id="L360"><span class="lineNum">     360</span> <span class="tlaGNC">   148030064 :   constexpr TDynamic value(size_t r) const {</span></span>
-<span id="L361"><span class="lineNum">     361</span> <span class="tlaGNC">   148030064 :     TStatic static_val = static_vals_t::get(r);</span></span>
+<span id="L360"><span class="lineNum">     360</span> <span class="tlaGNC">   147980692 :   constexpr TDynamic value(size_t r) const {</span></span>
+<span id="L361"><span class="lineNum">     361</span> <span class="tlaGNC">   147980692 :     TStatic static_val = static_vals_t::get(r);</span></span>
 <span id="L362"><span class="lineNum">     362</span>              : </span>
 <span id="L363"><span class="lineNum">     363</span>              :     // FIXME: workaround for nvhpc OpenACC compiler bug</span>
-<span id="L364"><span class="lineNum">     364</span> <span class="tlaGNC">   148030064 :     TStatic dyn_tag_copy = dyn_tag;</span></span>
+<span id="L364"><span class="lineNum">     364</span> <span class="tlaGNC">   147980692 :     TStatic dyn_tag_copy = dyn_tag;</span></span>
 <span id="L365"><span class="lineNum">     365</span> <span class="tlaGNC">    67281612 :     return static_val == dyn_tag_copy ? m_dyn_vals[dyn_map_t::get(r)]</span></span>
-<span id="L366"><span class="lineNum">     366</span> <span class="tlaGNC">   148030064 :                                      : static_cast&lt;TDynamic&gt;(static_val);</span></span>
+<span id="L366"><span class="lineNum">     366</span> <span class="tlaGNC">   147980692 :                                      : static_cast&lt;TDynamic&gt;(static_val);</span></span>
 <span id="L367"><span class="lineNum">     367</span>              :   }</span>
 <span id="L368"><span class="lineNum">     368</span>              :   MDSPAN_INLINE_FUNCTION</span>
 <span id="L369"><span class="lineNum">     369</span>              :   constexpr TDynamic operator[](size_t r) const { return value(r); }</span>
@@ -478,7 +478,7 @@
 <span id="L416"><span class="lineNum">     416</span>              :   constexpr static rank_type rank_dynamic() noexcept { return m_rank_dynamic; }</span>
 <span id="L417"><span class="lineNum">     417</span>              : </span>
 <span id="L418"><span class="lineNum">     418</span>              :   MDSPAN_INLINE_FUNCTION</span>
-<span id="L419"><span class="lineNum">     419</span> <span class="tlaGNC">    80748452 :   constexpr index_type extent(rank_type r) const noexcept { return m_vals.value(r); }</span></span>
+<span id="L419"><span class="lineNum">     419</span> <span class="tlaGNC">    80699080 :   constexpr index_type extent(rank_type r) const noexcept { return m_vals.value(r); }</span></span>
 <span id="L420"><span class="lineNum">     420</span>              :   MDSPAN_INLINE_FUNCTION</span>
 <span id="L421"><span class="lineNum">     421</span>              :   constexpr static size_t static_extent(rank_type r) noexcept {</span>
 <span id="L422"><span class="lineNum">     422</span>              :     return vals_t::static_value(r);</span>

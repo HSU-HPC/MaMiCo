@@ -115,7 +115,7 @@ Directory dependency graph for mamico-cfg-src:</div>
 </map>
 </div>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><h1 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
+<div class="textblock"><h1 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
 MaMiCo Config Generator</h1>
 <p>This simple utility can be used to generate basic <span class="tt">couette.xml</span> files for the Couette flow test scenario using MaMiCo.</p>
 <p>Using <a href="./assets/couette.xml.template"><span class="tt">assets/couette.xml.template</span></a>, this Python script substitutes all occurances of <span class="tt">{&lt;variable-name&gt;}</span> with concrete values. <br  />
@@ -147,13 +147,13 @@ MaMiCo Config Generator</h1>
 <div class="line">    ]</div>
 <div class="line">  }</div>
 <div class="line">]</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md9"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md13"></a>
 Requirements</h2>
 <ul>
 <li>Python 3.9+</li>
 <li>Bash</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md10"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
 Usage</h2>
 <p>1. Navigate to the target directory for the <span class="tt">couette.xml</span> file. (Most likely the MaMiCo build folder) 2. Execute <span class="tt">$MAMICO_DIR/tool/mamico-cfg</span>. (Add <span class="tt">-r</span> to overwrite existing files.) <br  />
  Specific values can be fixed by providing them as a command line argument, e.g. <span class="tt">--override=domain_size=large,equilibrate=False,multi_md=2</span>. <br  />
