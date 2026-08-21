@@ -554,7 +554,7 @@ if(BUILD_WITH_ALLIB)
   target_include_directories(mamico INTERFACE ${ALL_INCLUDE_DIR})
   target_compile_definitions(mamico INTERFACE BUILD_WITH_ALLIB)
 endif()
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang" )
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
   target_compile_options(mamico INTERFACE -Wno-undefined-var-template)
 endif()
 # we always link against libsimplemd, even if ${MD_SIM} not SIMPLE_MD, so that we can use the simpleMD configuration
@@ -635,14 +635,13 @@ target_link_libraries(couette PRIVATE mamico)
 #
 # CFDPush target
 #
-set(CFDPUSH_SOURCES
-  ${MAMICO_SOURCES}
-  "coupling/scenario/main_cfdpush.cpp"
-)
-add_executable(cfdpush ${CFDPUSH_SOURCES})
+set(CFDPUSH_SOURCES ${MAMICO_SOURCES} "coupling/scenario/main_cfdpush.cpp")
+add_executable(
+  cfdpush
+  ${CFDPUSH_SOURCES})
 target_link_libraries(cfdpush INTERFACE shared_defines)
 set_target_properties(cfdpush PROPERTIES CXX_STANDARD ${MAMICO_CXX_STANDARD})
-if (CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "FujitsuClang")
   target_compile_options(cfdpush PRIVATE -std=c++${MAMICO_CXX_STANDARD})
 endif()
 target_link_libraries(cfdpush PRIVATE mamico)
