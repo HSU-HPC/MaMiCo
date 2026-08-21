@@ -1,6 +1,6 @@
 # MaMiCo
 
-The **Ma**cro-**Mi**cro-**Co**upling tool for multiscale coupled molecular-continuum flow simulation.
+The macro-micro-coupling tool for multiscale coupled molecular-continuum flow simulation.
 
 ## Documentation
 
