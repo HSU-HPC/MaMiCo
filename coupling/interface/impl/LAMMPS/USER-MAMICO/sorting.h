@@ -221,40 +221,34 @@ private:
     }
   }
 
-  tarch::la::Vector<dim, unsigned int> getThisProcess() const {
-    return {0}; // FIXME: Not yet implemented
-  }
-  tarch::la::Vector<dim, unsigned int> getAverageLocalNumberCouplingCells() const {
-    return {0}; // FIXME: Not yet implemented
+  // --------------------------------------------------------------------------------------------
+  // Fix: getLocalOffset()/getLocalSize() used to be unimplemented stubs.
+  //Unused stubs Sorting::getThisProcess() and getAverageLocalNumberCouplingCells().--------------------------------------------------------------------------------------------
+
+  /** returns the local domain size of this process, including a ghost layer of
+   * mamico cells */
+  tarch::la::Vector<dim, double> getLocalSize() const {
+    const tarch::la::Vector<dim, unsigned int> localNumberCouplingCells =
+        coupling::indexing::IndexingService<dim>::getInstance().getLocalNumberCouplingCells();
+    const tarch::la::Vector<dim, double> meshsize = IDXS.getCouplingCellSize();
+    tarch::la::Vector<dim, double> localSize(0.0);
+    for (unsigned int d = 0; d < dim; d++) {
+      localSize[d] = meshsize[d] * (localNumberCouplingCells[d] + 2);
+    }
+    return localSize;
   }
 
   /** returns the offset of the local MD domain, incl. a ghost layer of mamico
    * cells */
   tarch::la::Vector<dim, double> getLocalOffset() const {
-    // init local offset to global MD offset (very lower left of ghost layer)
+    const tarch::la::Vector<dim, unsigned int> localCellOffset = coupling::indexing::IndexingService<dim>::getInstance().getLocalCellOffset();
     const tarch::la::Vector<dim, double> meshsize = IDXS.getCouplingCellSize();
+    // start at the global ghost-layer corner, then shift by this rank's owned-cell offset
     tarch::la::Vector<dim, double> localOffset = IDXS.getGlobalMDDomainOffset() - meshsize;
-
-    // shift lower offset to the correct process
-    const tarch::la::Vector<dim, unsigned int> thisProcess = getThisProcess();
-    const tarch::la::Vector<dim, unsigned int> avgNumberCells = getAverageLocalNumberCouplingCells();
     for (unsigned int d = 0; d < dim; d++) {
-      localOffset[d] += meshsize[d] * thisProcess[d] * avgNumberCells[d];
+      localOffset[d] += meshsize[d] * localCellOffset[d];
     }
-
     return localOffset;
-  }
-
-  /** returns the local domain size of this process, including a ghost layer of
-   * mamico cells */
-  tarch::la::Vector<dim, double> getLocalSize() const {
-    const tarch::la::Vector<dim, double> meshsize = IDXS.getCouplingCellSize();
-    const tarch::la::Vector<dim, unsigned int> localNumberCells = I11::numberCellsInDomain;
-    tarch::la::Vector<dim, double> localSize(0.0);
-    for (unsigned int d = 0; d < dim; d++) {
-      localSize[d] = meshsize[d] * (localNumberCells[d] + 2);
-    }
-    return localSize;
   }
 
   /** returns true if the position vector lies inside the local domain,

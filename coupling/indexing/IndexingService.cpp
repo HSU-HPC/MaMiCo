@@ -461,6 +461,10 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
       // find the last occurence, add one to convert reverse iterator to forward
       boxMax[i] =
           std::distance(_subdomainOwnership[i].begin(), (std::find(_subdomainOwnership[i].rbegin(), _subdomainOwnership[i].rend(), coords[i]) + 1).base());
+
+      // Cache this rank's owned-cell range (noGhost, 0-indexed) for callers outside this class.
+      _localCellOffset[i] = boxMin[i];
+      _localNumberCouplingCells[i] = boxMax[i] - boxMin[i];
     }
     // _subdomainOwnership does not include ghost, so when we take the first occurence value, it is noGhost
     // however directly casting it into baseIndex shifts everything left by 1, since baseIndex expects ghost
@@ -646,6 +650,23 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingC
 
   return getUniqueRankForCouplingCell((tarch::la::Vector<dim, unsigned int>)(globalCellIndex.get()), I09::numberCellsInDomain, topologyOffset);
 }
+
+template <unsigned int dim>
+tarch::la::Vector<dim, unsigned int> coupling::indexing::IndexingService<dim>::getProcessCoordinates(unsigned int rank) const {
+  const unsigned int topologyOffset = (rank / _scalarNumberProcesses) * _scalarNumberProcesses;
+  return _parallelTopology->getProcessCoordinates(rank, topologyOffset);
+}
+
+template <unsigned int dim>
+tarch::la::Vector<dim, unsigned int> coupling::indexing::IndexingService<dim>::getThisProcess() const {
+  return getProcessCoordinates(_rank);
+}
+
+template <unsigned int dim>
+tarch::la::Vector<dim, unsigned int> coupling::indexing::IndexingService<dim>::getLocalNumberCouplingCells() const { return _localNumberCouplingCells; }
+
+template <unsigned int dim>
+tarch::la::Vector<dim, unsigned int> coupling::indexing::IndexingService<dim>::getLocalCellOffset() const { return _localCellOffset; }
 
 // declare specialisation of IndexingService
 #ifdef INDEXING_ENABLE_DIM2

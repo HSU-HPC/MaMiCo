@@ -158,6 +158,17 @@ public:
 
   unsigned int getUniqueRankForCouplingCell(const BaseIndex<dim>& globalCellIndex, unsigned int topologyOffset) const;
 
+  /** @returns the coordinates of the calling rank in the process grid. */
+  tarch::la::Vector<dim, unsigned int> getThisProcess() const;
+
+  /** @returns the number of coupling cells (excl. ghost layer) owned by the calling rank,
+   * per dimension. Used e.g. by the LAMMPS coupling to size its rank-local domain. */
+  tarch::la::Vector<dim, unsigned int> getLocalNumberCouplingCells() const;
+
+  /** @returns the 0-indexed offset (excl. ghost layer) of the calling rank's first owned
+   * coupling cell within the global domain, per dimension. */
+  tarch::la::Vector<dim, unsigned int> getLocalCellOffset() const;
+
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   MPI_Comm getComm() const {
 #if (COUPLING_MD_ERROR == COUPLING_MD_YES)
@@ -265,6 +276,11 @@ public:
 private:
   unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
                                             const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells, unsigned int topologyOffset) const;
+
+  tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const;
+  // Owned-cell range of the calling rank (excl. ghost layer), cached in initWithCells();
+  tarch::la::Vector<dim, unsigned int> _localNumberCouplingCells;
+  tarch::la::Vector<dim, unsigned int> _localCellOffset;
 
   /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const
   unsigned int _scalarNumberProcesses;
