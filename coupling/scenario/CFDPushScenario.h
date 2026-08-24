@@ -44,6 +44,13 @@
 using Log::global_log;
 #endif
 
+// #if (BUILD_WITH_ALLIB)
+#include <ALL.hpp>
+// #endif
+
+// TODO: remove when ALL stuff is wrapped into its own service
+#define dim 3
+
 // This is ignored if you dont use synthetic MD. For further instructions cf.
 // SYNTHETIC part of initSolvers().
 #define SYNTHETICMD_SEQUENCE "SYNTHETIC-MD"
@@ -70,7 +77,7 @@ using Log::global_log;
 class CFDPushScenario : public Scenario {
 public:
   /** @brief simple constructor */
-  CFDPushScenario() : Scenario("CouetteScenario"), _generator(std::chrono::system_clock::now().time_since_epoch().count()) {}
+  CFDPushScenario() : Scenario("CouetteScenario"), _generator(std::chrono::system_clock::now().time_since_epoch().count()), _all(ALL::LB_t::TENSOR, 3, 0.0) {}
   /** @brief a dummy destructor */
   virtual ~CFDPushScenario() {}
 
@@ -496,6 +503,30 @@ protected:
     if (_isRootRank) {
       gettimeofday(&_tv.start_total, NULL);
     }
+
+    std::vector<double> minSize = {_mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[0],
+                                   _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[1],
+                                   _mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[2]};
+    _lowerBound[0] = (I11::lowerBoundary.get()[0] - 1) * minSize[0];
+    _lowerBound[1] = (I11::lowerBoundary.get()[1] - 1) * minSize[1];
+    _lowerBound[2] = (I11::lowerBoundary.get()[2] - 1) * minSize[2];
+    _upperBound[0] = I11::upperBoundary.get()[0] * minSize[0];
+    _upperBound[1] = I11::upperBoundary.get()[1] * minSize[1];
+    _upperBound[2] = I11::upperBoundary.get()[2] * minSize[2];
+
+    std::vector<int> _location, _size;
+    _location = {static_cast<int>(IDXS.getProcessCoords()[0]), static_cast<int>(IDXS.getProcessCoords()[1]), static_cast<int>(IDXS.getProcessCoords()[2])};
+    _size = {static_cast<int>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses()[0]),
+             static_cast<int>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses()[1]),
+             static_cast<int>(_simpleMDConfig.getMPIConfiguration().getNumberOfProcesses()[2])};
+
+    std::vector<ALL::Point<double>> points;
+    points.emplace_back(3, _lowerBound.data());
+    points.emplace_back(3, _upperBound.data());
+    _all.setVertices(points);
+    _all.setProcGridParams(_location, _size);
+    _all.setCommunicator(_multiMDService->getLocalCommunicator());
+    _all.setMinDomainSize(minSize);
     if (_isRootRank) {
       std::cout << "Finish CouetteScenario::initSolvers() " << std::endl;
     }
@@ -646,6 +677,15 @@ protected:
 
   void loadBalance(int cycle, double prevCoupTime) {
     std::cout << _rank << " last coupling time " << prevCoupTime << std::endl;
+    _all.setWork(prevCoupTime);
+    _all.setup();
+    _all.balance();
+    auto resultVertices = _all.getVertices();
+    std::array<double, 3> boxMin{resultVertices[0][0], resultVertices[0][1], resultVertices[0][2]};
+    std::array<double, 3> boxMax{resultVertices[1][0], resultVertices[1][1], resultVertices[1][2]};
+    std::cout << "rank " << _rank << " boxmin " << boxMin[0] << " " << boxMin[1] << " " << boxMin[2] << std::endl;
+    std::cout << "rank " << _rank << " boxmax " << boxMax[0] << " " << boxMax[1] << " " << boxMax[2] << std::endl;
+
     if (_simpleMDConfig.getDomainDecompConfiguration().getRebalanceFrequency() != 0 &&
         cycle % _simpleMDConfig.getDomainDecompConfiguration().getRebalanceFrequency() == 0) {
       std::array<double, 3> newBoxMin, newBoxMax;
@@ -989,6 +1029,8 @@ protected:
   coupling::MultiMDMediator<MY_LINKEDCELL, 3>* _multiMDMediator;
   bool _MDBoundarySetupDone;
   double _avgCouplingTime = 0;
+  ALL::ALL<double, double> _all;
+  std::array<double, 3> _lowerBound, _upperBound;
 };
 
 #endif // _COUPLING_SCENARIO_COUETTESCENARIO_H_

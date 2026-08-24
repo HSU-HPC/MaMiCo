@@ -262,6 +262,15 @@ public:
     return res;
   }
 
+  const tarch::la::Vector<dim, unsigned int> getProcessCoords() const {
+#if (COUPLING_MD_ERROR == COUPLING_MD_YES)
+    if (!_isInitialized) {
+      throw std::runtime_error(std::string("IndexingService: Called getCellIndex() before initalization! "));
+    }
+#endif
+    return _coords;
+  }
+
 private:
   unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
                                             const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells, unsigned int topologyOffset) const;
@@ -282,5 +291,6 @@ private:
   tarch::la::Vector<dim, double> _globalMDDomainOffset;
   tarch::la::Vector<dim, double> _couplingCellSize;
   coupling::paralleltopology::ParallelTopologyType _parallelTopologyType;
+  tarch::la::Vector<dim, unsigned int> _coords;
   friend IndexingServiceTest;
 };

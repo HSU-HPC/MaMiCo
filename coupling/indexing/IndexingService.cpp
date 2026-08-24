@@ -450,17 +450,17 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
   _parallelTopology = coupling::paralleltopology::ParallelTopologyFactory::getParallelTopology<dim>(parallelTopologyType, _numberProcesses);
 
   const unsigned int topologyOffset = (_rank / _scalarNumberProcesses) * _scalarNumberProcesses;
-  auto coords = _parallelTopology->getProcessCoordinates(_rank, topologyOffset);
+  _coords = _parallelTopology->getProcessCoordinates(_rank, topologyOffset);
   // init boundaries of all local, non-m2m, GL including indexing types
   {
     tarch::la::Vector<3, int> boxMin, boxMax;
     for (unsigned int i = 0; i < dim; i++) {
       // calculate box bounds from cell ownership
       // find the first occurence of owned rank
-      boxMin[i] = std::distance(_subdomainOwnership[i].begin(), std::find(_subdomainOwnership[i].begin(), _subdomainOwnership[i].end(), coords[i]));
+      boxMin[i] = std::distance(_subdomainOwnership[i].begin(), std::find(_subdomainOwnership[i].begin(), _subdomainOwnership[i].end(), _coords[i]));
       // find the last occurence, add one to convert reverse iterator to forward
       boxMax[i] =
-          std::distance(_subdomainOwnership[i].begin(), (std::find(_subdomainOwnership[i].rbegin(), _subdomainOwnership[i].rend(), coords[i]) + 1).base());
+          std::distance(_subdomainOwnership[i].begin(), (std::find(_subdomainOwnership[i].rbegin(), _subdomainOwnership[i].rend(), _coords[i]) + 1).base());
     }
     // _subdomainOwnership does not include ghost, so when we take the first occurence value, it is noGhost
     // however directly casting it into baseIndex shifts everything left by 1, since baseIndex expects ghost
