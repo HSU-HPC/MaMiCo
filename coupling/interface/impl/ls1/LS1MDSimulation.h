@@ -17,6 +17,7 @@ private:
   Simulation* simulation;          // cannot name this _simulation, a global preprocessor marco with the name _simulation expands to *global_simulation
   MamicoCoupling* ls1MamicoPlugin; // the plugin is only initialized after the simulation object reads xml, so cannot use it before that point
   bool internalCouplingState;
+  double _curForceTime, _prevForceTime;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm comm;
 #endif
@@ -44,6 +45,7 @@ public:
     simulation->disableFinalCheckpoint();
     internalCouplingState = false;
     ls1MamicoPlugin = nullptr;
+    _curForceTime = _prevForceTime = 0;
   }
   virtual ~LS1MDSimulation() {
     if (simulation != nullptr) {
@@ -76,6 +78,8 @@ public:
     for (unsigned int i = 0; i < numberTimesteps; i++) {
       simulation->simulateOneTimestep();
     }
+    _curForceTime += simulation->timers()->getTimer("SIMULATION_FORCE_CALCULATION")->get_etime();
+    _curForceTime += simulation->timers()->getTimer("MamicoCoupling")->get_etime();
   }
   virtual void rebalance(std::array<double, 3> newBoxMin, std::array<double, 3> newBoxMax) override {
     global_simulation = simulation;
@@ -87,6 +91,8 @@ public:
       exit(EXIT_FAILURE);
     }
   }
+  virtual double getForceComputationTime() { return _curForceTime - _prevForceTime; }
+  virtual void clearForceComputationTime() { _curForceTime = _prevForceTime; }
   /** simulates a single time step*/
   // virtual void simulateTimestep(const unsigned int &thisTimestep ){const
   // unsigned int steps=1; simulateTimesteps(thisTimestep,steps);} TODO BUG

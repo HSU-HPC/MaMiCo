@@ -181,6 +181,15 @@ public:
    */
   void simulateTimesteps(const unsigned int& t, unsigned int& T, const unsigned int& i) { _mdSimulations[i]->simulateTimesteps(t, T); }
 
+  double getCumulativeForceTime() {
+    double toRet = 0;
+    for (auto& mdSimulation : _mdSimulations) {
+      toRet += mdSimulation->getForceComputationTime();
+      mdSimulation->clearForceComputationTime();
+    }
+    return toRet;
+  }
+
   void rebalance(std::array<double, 3> newBoxMin, std::array<double, 3> newBoxMax) {
     for (auto& mdSimulation : _mdSimulations) {
       mdSimulation->rebalance(newBoxMin, newBoxMax);

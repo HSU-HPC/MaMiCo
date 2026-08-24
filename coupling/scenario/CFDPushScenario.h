@@ -677,7 +677,9 @@ protected:
 
   void loadBalance(int cycle, double prevCoupTime) {
     std::cout << _rank << " last coupling time " << prevCoupTime << std::endl;
-    _all.setWork(prevCoupTime);
+    double work = _instanceHandling->getCumulativeForceTime();
+    std::cout << _rank << " last force time " << work << std::endl;
+    _all.setWork(work);
     _all.setup();
     _all.balance();
     auto resultVertices = _all.getVertices();

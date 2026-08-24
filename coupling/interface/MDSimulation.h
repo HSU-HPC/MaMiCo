@@ -27,6 +27,9 @@ public:
   virtual void simulateTimesteps(const unsigned int& numberTimesteps, const unsigned int& firstTimestep) = 0;
 
   virtual void rebalance(std::array<double, 3> newMoxMin, std::array<double, 3> newBoxMax) = 0;
+
+  virtual double getForceComputationTime() = 0;
+  virtual void clearForceComputationTime() = 0;
   // simulates a single time step
   // virtual void simulateTimestep(const unsigned int &thisTimestep ){const
   // unsigned int steps=1; simulateTimesteps(thisTimestep,steps);} TODO BUG
