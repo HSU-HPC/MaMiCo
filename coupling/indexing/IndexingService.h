@@ -258,10 +258,31 @@ public:
     }
 #endif
 
+    // Fix: This function serves two different callers with opposite needs, so the
+    // clamp below must be narrow:
+
     tarch::la::Vector<dim, int> res_raw;
+    tarch::la::Vector<dim, double> frac;
     for (unsigned int d = 0; d < dim; d++) {
       const double buf = position[d] - (_globalMDDomainOffset[d] - _couplingCellSize[d]);
-      res_raw[d] = buf / _couplingCellSize[d];
+      frac[d] = buf / _couplingCellSize[d];
+      res_raw[d] = (int)floor(frac[d]);
+    }
+    constexpr double residueTolerance = 1e-6; // cell-fraction units: far
+                                               // above fp noise (~1e-13), far
+                                               // below one full cell (1.0)
+    const auto realLower = CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary.get();
+    const auto realUpper = CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary.get();
+    for (unsigned int d = 0; d < dim; d++) {
+      if (res_raw[d] < realLower[d]) {
+        const double undershoot = (double)realLower[d] - frac[d];
+        if (undershoot < residueTolerance)
+          res_raw[d] = realLower[d];
+      } else if (res_raw[d] > realUpper[d]) {
+        const double overshoot = frac[d] - ((double)realUpper[d] + 1.0);
+        if (overshoot < residueTolerance)
+          res_raw[d] = realUpper[d];
+      }
     }
 
     BaseIndex<dim> res{res_raw};

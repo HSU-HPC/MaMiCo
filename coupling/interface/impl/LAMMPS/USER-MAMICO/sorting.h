@@ -125,7 +125,8 @@ public:
 
     if (clearCellLists) {
       for (auto idx : I10()) {
-        _mamicoCells[idx.get()].clear();
+        // Fix: Now converting to I02 first        
+        _mamicoCells[I02{idx}.get()].clear();
       }
     }
 
