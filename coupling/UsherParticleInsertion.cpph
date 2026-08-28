@@ -279,7 +279,9 @@ typename coupling::ParticleInsertion<LinkedCell, dim>::Action coupling::UsherPar
 
       absForce = std::sqrt(tarch::la::dot(force, force));
       xiOld = xiloc;
-      xiloc = fabs(energy - U_0) / fabs(U_0);
+      // Floor the denominator so xiloc stays a large-but-finite number
+      // ------------------------------------------------------------------
+      xiloc = fabs(energy - U_0) / fmax(fabs(U_0), _mdSolverInterface->getMoleculeEpsilon());
 
       if (xiloc < xiMax) {
         success++;
