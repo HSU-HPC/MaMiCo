@@ -289,6 +289,12 @@ protected:
     std::cout << "Parse config " << mamicoLammpsTestConfiguration << std::endl;
     tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<dim>>(mamicoLammpsTestConfiguration, "mamico",
                                                                                                                      config);
+    // IndexingService must be initialised before the coupling cell service is built
+    const tarch::la::Vector<3, double> globalMDDomainOffset(1.0);
+    const tarch::la::Vector<3, double> globalMDDomainSize(10.0);
+    coupling::indexing::IndexingService<dim>::getInstance().initWithMDSize(
+        globalMDDomainSize, globalMDDomainOffset, numberProcesses, config.getCouplingCellConfiguration().getCouplingCellSize(),
+        config.getParallelTopologyConfiguration().getParallelTopologyType(), config.getMomentumInsertionConfiguration().getInnerOverlap(), (unsigned int)rank);
     std::cout << "Init coupling cell service..." << std::endl;
     if (_couplingCellService != NULL) {
       delete _couplingCellService;
