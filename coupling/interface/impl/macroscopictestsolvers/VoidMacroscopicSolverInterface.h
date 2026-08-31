@@ -21,20 +21,15 @@ public:
   VoidMacroscopicSolverInterface() : TestMacroscopicSolverInterface<dim>() {}
   virtual ~VoidMacroscopicSolverInterface() {}
 
-  /** returns true if the cell at position globalCellIndex shall be received from the MD solver.
-   *  This function does not send the cell, but only steers the process.
+  /** no cells are excluded from the md2macro region; this is a no-op dummy solver.
+   *  Replaces the legacy receive-/sendMacroscopicQuantity*MDSolver() pair, cf. MacroscopicSolverInterface.
    */
-  virtual bool receiveMacroscopicQuantityFromMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return false; }
-
-  /** returns true if the cell at position globalCellIndex shall be sent to the MD solver.
-   *  This function does not send the cell, but only steers the process.
-   */
-  virtual bool sendMacroscopicQuantityToMDSolver(tarch::la::Vector<dim, unsigned int> globalCellIndex) { return false; }
+  unsigned int getOuterRegion() override { return 0; }
 
   /** returns the ranks on which the macroscopic solver holds/requires data of the coupling cell
-   *  at index globalCellIndex.
+   *  at index idx. All cells are located on rank 0.
    */
-  virtual std::vector<unsigned int> getRanks(tarch::la::Vector<dim, unsigned int> globalCellIndex) {
+  std::vector<unsigned int> getRanks(I01 idx) override {
     std::vector<unsigned int> result;
     result.push_back(0);
     return result;

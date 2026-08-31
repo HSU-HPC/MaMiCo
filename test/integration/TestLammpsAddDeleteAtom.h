@@ -43,8 +43,10 @@ public:
     const tarch::la::Vector<dim, double> dummyVec(0.0);
     const double dummyEnergy = 0.0;
     const coupling::datastructures::Molecule<dim> deleteMolecule(posDeleteAtom, dummyVec, dummyVec, dummyEnergy);
-    tarch::la::Vector<dim, unsigned int> deleteCellIndex(1);
-    deleteCellIndex[0] = 2; // global cell index for deletion
+    // global cell index for deletion; must be an I01 (like addCellIndex below)
+    tarch::la::Vector<dim, int> deleteCellIndexVector(1);
+    deleteCellIndexVector[0] = 2;
+    const I01 deleteCellIndex{deleteCellIndexVector};
     // true, if this is the respective rank that should contain this molecule
     const bool performDeletion =
         (size == 1) || ((size == 4) && (rank == 0)) || ((size == 16) && (rank == 1)) || ((size == 8) && (rank == 0)) || ((size == 64) && (rank == 1));
