@@ -303,7 +303,9 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   if(KOKKOS_TARGET STREQUAL "CUDA")
     target_compile_options(simplemd_interface INTERFACE -O3)
   else()
-    target_compile_options(simplemd_interface INTERFACE -Ofast)
+    # -Ofast is just -O3 -ffast-math, spelled out (clang 19+ deprecates -Ofast); suppress
+    # the Kokkos NaN/Inf sentinel warning that fast-math triggers, same as the mamico target
+    target_compile_options(simplemd_interface INTERFACE -O3 -ffast-math -Wno-nan-infinity-disabled)
   endif()
 else()
   message(FATAL_ERROR "Unsupported build type")
@@ -519,7 +521,11 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   if(KOKKOS_TARGET STREQUAL "CUDA")
     target_compile_options(mamico INTERFACE -O3)
   else()
-    target_compile_options(mamico INTERFACE -Ofast)
+    # -Ofast itself is just -O3 -ffast-math; spelled out explicitly (clang 19+ deprecates
+    # -Ofast) and paired with -Wno-nan-infinity-disabled since Kokkos's numeric_limits-style
+    # NaN/Inf sentinels (not runtime arithmetic) trip that diagnostic under fast-math, and
+    # -Werror below would otherwise turn it fatal
+    target_compile_options(mamico INTERFACE -O3 -ffast-math -Wno-nan-infinity-disabled)
   endif()
 else()
   message(FATAL_ERROR "Unsupported build type")
