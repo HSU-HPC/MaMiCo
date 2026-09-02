@@ -41,7 +41,7 @@ Additional development dependencies are:
         cd MaMiCo
         mkdir build
         cd build
-* If you don't have a github account or don't want to use it, you can alternatively use `git clone https://github.com/HSU-HPC/MaMiCo.git` (read-only).
+* If you don't have a github account or don't want to use it, you can alternatively use `git clone https://github.com/HSU-HPC/MaMiCo` (read-only).
 
 * Then initialise CMake in your build directory, pointing it to the root directory of the repository. (Note that on some older systems, the command may be named `cmake3` instead of `cmake`.)
 
