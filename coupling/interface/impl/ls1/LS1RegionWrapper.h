@@ -77,19 +77,9 @@ public:
 
   bool isInRegion(const double startBox[3], const double endBox[3]) { return isInRegion(startBox) && isInRegion(endBox); }
 
-  void setupIDcounterForParticleAddition() {
-    if (!_IDinited) {
-      _curParticleID = _locSimulation->getTotalNumberOfMolecules() + 1;
-      _IDIncrementor = 1;
-
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-      int curRank = _locSimulation->domainDecomposition().getRank();
-      _curParticleID += curRank + 1;
-      _IDIncrementor = _locSimulation->domainDecomposition().getNumProcs();
-#endif
-
-      _IDinited = true;
-    }
+  void setupIDcounterForParticleAddition(const unsigned long particleID) {
+    _curParticleID = particleID + 1;
+    _IDinited = true;
   }
 
   void addMolecule(::Molecule& molecule) {

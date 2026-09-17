@@ -147,8 +147,16 @@ public:
 #elif defined(LAMMPS_DPD)
     mdSolverInterface = coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();
 #elif defined(LS1_MARDYN)
+    coupling::interface::LS1MDSimulation* ls1Sim = dynamic_cast<coupling::interface::LS1MDSimulation*>(mdSimulation);
+    if (ls1Sim == nullptr) {
+      std::cout << "ERROR MDSimulationFactory::getMDSolverInterface(): Could "
+                   "not cast to LS1MDSimulation!"
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
     mdSolverInterface = new coupling::interface::LS1MDSolverInterface(mamicoConfiguration.getCouplingCellConfiguration().getCouplingCellSize(),
-                                                                      mamicoConfiguration.getCouplingCellConfiguration().getNumberLinkedCellsPerCouplingCell());
+                                                                      mamicoConfiguration.getCouplingCellConfiguration().getNumberLinkedCellsPerCouplingCell(),
+                                                                      ls1Sim->getPostInitParticleID());
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMDSolverInterface(mdSolverInterface);
 #endif
 

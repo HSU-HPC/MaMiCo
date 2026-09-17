@@ -16,6 +16,7 @@ private:
   Simulation* simulation;          // cannot name this _simulation, a global preprocessor marco with the name _simulation expands to *global_simulation
   MamicoCoupling* ls1MamicoPlugin; // the plugin is only initialized after the simulation object reads xml, so cannot use it before that point
   bool internalCouplingState;
+  unsigned long postInitParticleID = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   MPI_Comm comm;
 #endif
@@ -114,6 +115,12 @@ public:
     // after this point the mamico plugin exists and is accessible
     simulation->prepare_start();
     simulation->preSimLoopSteps();
+    // phasespace is ready, find the largest ID among particles
+    for (auto pit = simulation->getMoleculeContainer()->iterator(ParticleIterator::ONLY_INNER_AND_BOUNDARY); pit.isValid(); ++pit) {
+      unsigned long pid = pit->getID();
+      if (pid > postInitParticleID)
+        postInitParticleID = pid;
+    }
   }
   virtual void init(const tarch::utils::MultiMDService<MDSIMULATIONFACTORY_DIMENSION>& multiMDService, unsigned int localMDSimulation) override { init(); }
   virtual void shutdown() override {
@@ -125,6 +132,7 @@ public:
   virtual void writeCheckpoint(const std::string& filestem, const unsigned int& t) override {
     // configure through ls1 config file, using plugins
   }
+  const unsigned long getPostInitParticleID() const { return postInitParticleID; }
 };
 } // namespace interface
 } // namespace coupling
