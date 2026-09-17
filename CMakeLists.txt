@@ -112,7 +112,7 @@ option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
 message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
 
 # Optimize compile times for release builds
-if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT BUILD_TESTING AND "${MD_SIM}" NOT STREQUAL "LS1_MARDYN")
+if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT BUILD_TESTING AND NOT "${MD_SIM}" STREQUAL "LS1_MARDYN")
   set(CMAKE_UNITY_BUILD ON)
 endif()
 
