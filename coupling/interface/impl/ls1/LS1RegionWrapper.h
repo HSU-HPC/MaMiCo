@@ -43,8 +43,9 @@ public:
       : LS1RegionWrapper(tarch::la::Vector<3, double>(startRegion[0], startRegion[1], startRegion[2]),
                          tarch::la::Vector<3, double>(endRegion[0], endRegion[1], endRegion[2]), simulation) {}
 
-  LS1RegionWrapper(): LS1RegionWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) {}
-  
+  LS1RegionWrapper()
+      : LS1RegionWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) {}
+
   void setRegion(double startRegion[3], double endRegion[3]) {
     for (int i = 0; i < 3; i++) {
       _startRegion[i] = startRegion[i];
@@ -192,7 +193,8 @@ public:
     return potentialEnergy;
   }
 
-  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position, bool adjustCutoff, bool ignoreSelf, bool ignoreOffset) {
+  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position, bool adjustCutoff,
+                                                                                     bool ignoreSelf, bool ignoreOffset) {
     tarch::la::Vector<3, double> force(0.0);
     double potentialEnergy = 0.0;
 
