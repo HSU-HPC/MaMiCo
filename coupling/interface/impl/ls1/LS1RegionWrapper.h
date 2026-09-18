@@ -173,12 +173,12 @@ public:
     double startRegion[] = {moleculePosition[0] - _cutoff, moleculePosition[1] - _cutoff, moleculePosition[2] - _cutoff};
     double endRegion[] = {moleculePosition[0] + _cutoff, moleculePosition[1] + _cutoff, moleculePosition[2] + _cutoff};
 
-    ls1::LS1RegionWrapper region(startRegion, endRegion, _locSimulation);
+    auto iterator = _particleContainer->regionIterator(startRegion, endRegion, ParticleIterator::ALL_CELLS);
 
     // calculate lennard jones energy
-    while (region.iteratorValid()) {
-      ::Molecule* temp = region.getParticleAtIterator();
-      tempMoleculePosition = {temp->r(0), temp->r(1), temp->r(2)};
+    while (iterator.isValid()) {
+      ::Molecule temp = *iterator;
+      tempMoleculePosition = {temp.r(0), temp.r(1), temp.r(2)};
       const auto r = tempMoleculePosition - moleculePosition;
       const double r2 = tarch::la::dot(r, r);
       if (r2 <= _cutoff2) {
@@ -189,7 +189,7 @@ public:
         force += forceContrib;
       }
 
-      region.iteratorNext();
+      ++iterator;
     }
     return std::make_tuple(force, potentialEnergy);
   }
