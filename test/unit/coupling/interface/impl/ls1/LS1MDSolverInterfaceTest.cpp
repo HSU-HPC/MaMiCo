@@ -58,6 +58,11 @@ public:
     // after this point the mamico plugin exists and is accessible
     _testSimulation->prepare_start();
     _testSimulation->preSimLoopSteps();
+    for (auto pit = _testSimulation->getMoleculeContainer()->iterator(ParticleIterator::ONLY_INNER_AND_BOUNDARY); pit.isValid(); ++pit) {
+      unsigned long pid = pit->getID();
+      if (pid > _maxParticleID)
+        _maxParticleID = pid;
+    }
   }
   void tearDown() {
     if (_testSimulation != nullptr) {
@@ -67,7 +72,7 @@ public:
   }
   void testConstants() {
     // create interface
-    coupling::interface::LS1MDSolverInterface interface({5, 5, 5}, {1, 1, 1});
+    coupling::interface::LS1MDSolverInterface interface({5, 5, 5}, {1, 1, 1}, _maxParticleID);
     // load config file to read consts
     tinyxml2::XMLDocument conffile;
     tinyxml2::XMLElement* siteInfo = nullptr;
@@ -113,7 +118,7 @@ public:
     global_simulation->domainDecomposition().getBoundingBoxMinMax(global_simulation->getDomain(), bBoxMin, bBoxMax);
     ls1::LS1RegionWrapper wrapper(bBoxMin, bBoxMax, _testSimulation);
     // create interface
-    coupling::interface::LS1MDSolverInterface interface({5, 5, 5}, {1, 1, 1});
+    coupling::interface::LS1MDSolverInterface interface({5, 5, 5}, {1, 1, 1}, _maxParticleID);
 
     // verify that position is empty
     bool found = false;
@@ -179,7 +184,7 @@ public:
       numberProcesses[i] = _domainGridDecomposition[i];
 #endif
 
-    coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell);
+    coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell, _maxParticleID);
     IDXS.initWithMDSize(interface.getGlobalMDDomainSize(), interface.getGlobalMDDomainOffset(), numberProcesses, couplingCellSize,
                         coupling::paralleltopology::ZYX, 3, (unsigned int)rank);
 
@@ -238,7 +243,7 @@ public:
     for (int i = 0; i < 3; i++)
       numberProcesses[i] = _domainGridDecomposition[i];
 #endif
-    coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell);
+    coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell, _maxParticleID);
     IDXS.initWithMDSize(interface.getGlobalMDDomainSize(), interface.getGlobalMDDomainOffset(), numberProcesses, couplingCellSize,
                         coupling::paralleltopology::ZYX, 3, (unsigned int)rank);
 
@@ -297,7 +302,7 @@ public:
     // create interface with coupling cell size 10 and 2 linked cells per mac.cell per dimension, hence linked cells are size 5,5,5
     tarch::la::Vector<3, double> couplingCellSize(10.0);
     tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell(2);
-    coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell);
+    coupling::interface::LS1MDSolverInterface interface(couplingCellSize, linkedCellsPerCouplingCell, _maxParticleID);
     int rank = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -390,6 +395,7 @@ public:
 private:
   Simulation* _testSimulation;
   std::string _ls1ConfigFileName;
+  unsigned int _maxParticleID;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
   std::array<int, 3> _domainGridDecomposition;
 #endif

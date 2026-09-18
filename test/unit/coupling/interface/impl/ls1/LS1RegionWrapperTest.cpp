@@ -93,7 +93,7 @@ public:
     CPPUNIT_ASSERT_NO_THROW(wrapper.deleteMolecule(tempParticle));
 
     // insert particle
-    wrapper.setupIDcounterForParticleAddition();
+    wrapper.setupIDcounterForParticleAddition(0);
     wrapper.addMolecule(tempParticle);
 
     // verify that position is filled
@@ -269,7 +269,7 @@ public:
                                                   _testSimulation);
           tarch::la::Vector<3, double> force(0.0);
           double pseudoPotential = 0.0;
-          std::tie(force, pseudoPotential) = fullDomainWrapper.calculateForceAndPotentialAtPoint(position, true);
+          std::tie(force, pseudoPotential) = fullDomainWrapper.calculateForceAndPotentialAtPoint(position, true, false, false);
 
           ::Molecule ls1Molecule;
           coupling::interface::LS1Molecule mamicoMolecule(&ls1Molecule);
