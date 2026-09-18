@@ -43,6 +43,8 @@ public:
       : LS1RegionWrapper(tarch::la::Vector<3, double>(startRegion[0], startRegion[1], startRegion[2]),
                          tarch::la::Vector<3, double>(endRegion[0], endRegion[1], endRegion[2]), simulation) {}
 
+  LS1RegionWrapper(): LS1RegionWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) {}
+  
   void setRegion(double startRegion[3], double endRegion[3]) {
     for (int i = 0; i < 3; i++) {
       _startRegion[i] = startRegion[i];
@@ -154,15 +156,14 @@ public:
     //_particleContainer->deleteMolecule(temp, false);
   }
 
-  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position, double adjustCutoff) {
-    tarch::la::Vector<3, double> force(0.0);
+  double calculatePotentialAtPoint(const tarch::la::Vector<3, double> position, double adjustCutoff, bool ignoreSelf, bool ignoreOffset) {
     double potentialEnergy = 0.0;
-
-    // molecule position
     tarch::la::Vector<3, double> moleculePosition = position;
-    for (int i = 0; i < 3; i++) {
-      moleculePosition[i] =
-          moleculePosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i); // temporary till ls1 offset is natively supported
+    if (!ignoreOffset) {
+      for (int i = 0; i < 3; i++) {
+        moleculePosition[i] =
+            moleculePosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i); // temporary till ls1 offset is natively supported
+      }
     }
 
     tarch::la::Vector<3, double> tempMoleculePosition;
@@ -181,14 +182,52 @@ public:
       tempMoleculePosition = {temp.r(0), temp.r(1), temp.r(2)};
       const auto r = tempMoleculePosition - moleculePosition;
       const double r2 = tarch::la::dot(r, r);
-      if (r2 <= _cutoff2) {
+      if (r2 <= _cutoff2 && (r2 != 0 || ignoreSelf)) {
+        const double r6 = r2 * r2 * r2;
+        const double uContrib = 4.0 * _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - (adjustCutoff ? _cutoffEnergy : 0);
+        potentialEnergy += 0.5 * uContrib;
+      }
+      ++iterator;
+    }
+    return potentialEnergy;
+  }
+
+  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position, bool adjustCutoff, bool ignoreSelf, bool ignoreOffset) {
+    tarch::la::Vector<3, double> force(0.0);
+    double potentialEnergy = 0.0;
+
+    // molecule position
+    tarch::la::Vector<3, double> moleculePosition = position;
+    if (!ignoreOffset) {
+      for (int i = 0; i < 3; i++) {
+        moleculePosition[i] =
+            moleculePosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i); // temporary till ls1 offset is natively supported
+      }
+    }
+
+    tarch::la::Vector<3, double> tempMoleculePosition;
+
+    // calculate force
+    // find all molecules within cutoff
+
+    double startRegion[] = {moleculePosition[0] - _cutoff, moleculePosition[1] - _cutoff, moleculePosition[2] - _cutoff};
+    double endRegion[] = {moleculePosition[0] + _cutoff, moleculePosition[1] + _cutoff, moleculePosition[2] + _cutoff};
+
+    auto iterator = _particleContainer->regionIterator(startRegion, endRegion, ParticleIterator::ALL_CELLS);
+
+    // calculate lennard jones energy
+    while (iterator.isValid()) {
+      ::Molecule temp = *iterator;
+      tempMoleculePosition = {temp.r(0), temp.r(1), temp.r(2)};
+      const auto r = tempMoleculePosition - moleculePosition;
+      const double r2 = tarch::la::dot(r, r);
+      if (r2 <= _cutoff2 && (r2 != 0 || ignoreSelf)) {
         const double r6 = r2 * r2 * r2;
         const auto forceContrib = (24.0 * _epsilon / r2 * (_sigma6 / r6)) * (1.0 - 2.0 * (_sigma6 / r6)) * r;
         const double uContrib = 4.0 * _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - (adjustCutoff ? _cutoffEnergy : 0);
         potentialEnergy += 0.5 * uContrib;
         force += forceContrib;
       }
-
       ++iterator;
     }
     return std::make_tuple(force, potentialEnergy);
