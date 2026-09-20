@@ -213,8 +213,8 @@ public:
   virtual void synchronizeMoleculesAfterMassModification() {
     // delete halo particles in ls1 linked cells
     // this should technically delete leaving particles too, since this is occuring after position update
-    // however at this point positions are only updates within molecules, and as long as moleculecontainer->update()
-    // is not called, the particles are not actually marked to be outside the bounding box, hence this is safe
+    // however before this, in the MamicoCoupling plugin, updateParticleContainer... has already been called
+    // so leaving particles are already communicated
 #ifndef MARDYN_AUTOPAS
     _locSimulation->getMoleculeContainer()->deleteOuterParticles();
 #endif
