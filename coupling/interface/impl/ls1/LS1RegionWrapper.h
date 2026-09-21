@@ -157,7 +157,7 @@ public:
     //_particleContainer->deleteMolecule(temp, false);
   }
 
-  double calculatePotentialAtPoint(const tarch::la::Vector<3, double> position, double adjustCutoff, bool ignoreSelf, bool ignoreOffset) {
+  double calculatePotentialAtMolecule(const tarch::la::Vector<3, double> position, bool ignoreOffset) {
     double potentialEnergy = 0.0;
     tarch::la::Vector<3, double> moleculePosition = position;
     if (!ignoreOffset) {
@@ -183,9 +183,9 @@ public:
       tempMoleculePosition = {temp.r(0), temp.r(1), temp.r(2)};
       const auto r = tempMoleculePosition - moleculePosition;
       const double r2 = tarch::la::dot(r, r);
-      if (r2 <= _cutoff2 && (r2 != 0 || ignoreSelf)) {
+      if (r2 <= _cutoff2 && r2 != 0) {
         const double r6 = r2 * r2 * r2;
-        const double uContrib = 4.0 * _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - (adjustCutoff ? _cutoffEnergy : 0);
+        const double uContrib = 4.0 * _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - _cutoffEnergy;
         potentialEnergy += 0.5 * uContrib;
       }
       ++iterator;
@@ -193,8 +193,7 @@ public:
     return potentialEnergy;
   }
 
-  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position, bool adjustCutoff,
-                                                                                     bool ignoreSelf, bool ignoreOffset) {
+  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position, bool ignoreOffset) {
     tarch::la::Vector<3, double> force(0.0);
     double potentialEnergy = 0.0;
 
@@ -223,10 +222,10 @@ public:
       tempMoleculePosition = {temp.r(0), temp.r(1), temp.r(2)};
       const auto r = tempMoleculePosition - moleculePosition;
       const double r2 = tarch::la::dot(r, r);
-      if (r2 <= _cutoff2 && (r2 != 0 || ignoreSelf)) {
+      if (r2 <= _cutoff2) {
         const double r6 = r2 * r2 * r2;
         const auto forceContrib = (24.0 * _epsilon / r2 * (_sigma6 / r6)) * (1.0 - 2.0 * (_sigma6 / r6)) * r;
-        const double uContrib = 4.0 * _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - (adjustCutoff ? _cutoffEnergy : 0);
+        const double uContrib = 4.0 * _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - _cutoffEnergy;
         potentialEnergy += 0.5 * uContrib;
         force += forceContrib;
       }

@@ -118,13 +118,13 @@ public:
     ::Molecule ls1Molecule;
     coupling::interface::LS1Molecule mamicoMolecule(&ls1Molecule);
     ls1::LS1RegionWrapper region;
-    for(int i = 0; i < 40; i++) {
-      for(int j = 0; j < 40; j++) {
-        for(int k = 0; k < 40; k++) {
+    for (int i = 0; i < 40; i++) {
+      for (int j = 0; j < 40; j++) {
+        for (int k = 0; k < 40; k++) {
           tarch::la::Vector<3, double> position{i + 0.5, j + 0.5, k + 0.5};
           mamicoMolecule.setPosition(position);
           const double potFromMolecule = mamicoMolecule.getPotentialEnergy();
-          const auto [force, potFromIterator] = region.calculateForceAndPotentialAtPoint(position, true, true, false);
+          const auto [force, potFromIterator] = region.calculateForceAndPotentialAtPoint(position, false);
           CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Potential assersion", potFromIterator, potFromMolecule, 1e-6);
         }
       }

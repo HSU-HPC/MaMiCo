@@ -197,7 +197,7 @@ public:
     tarch::la::Vector<3, double> force(0.0);
     double potentialEnergy = 0.0;
     // calculate energy (copied from coupling::interface, assuming that the molecule used here is a coupling::datastructures)
-    std::tie(force, potentialEnergy) = _fullDomainWrapper.calculateForceAndPotentialAtPoint(molecule.getPosition(), true, false, false);
+    std::tie(force, potentialEnergy) = _fullDomainWrapper.calculateForceAndPotentialAtPoint(molecule.getPosition(), false);
     molecule.setForce(force);
     molecule.setPotentialEnergy(potentialEnergy);
   }

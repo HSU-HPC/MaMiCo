@@ -269,7 +269,7 @@ public:
                                                   _testSimulation);
           tarch::la::Vector<3, double> force(0.0);
           double pseudoPotential = 0.0;
-          std::tie(force, pseudoPotential) = fullDomainWrapper.calculateForceAndPotentialAtPoint(position, true, false, false);
+          std::tie(force, pseudoPotential) = fullDomainWrapper.calculateForceAndPotentialAtPoint(position, false);
 
           ::Molecule ls1Molecule;
           coupling::interface::LS1Molecule mamicoMolecule(&ls1Molecule);

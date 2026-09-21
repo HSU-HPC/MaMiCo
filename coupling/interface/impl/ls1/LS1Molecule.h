@@ -81,7 +81,7 @@ public:
     // if(_myMolecule == NULL) return 0.0;
     location = {_myMolecule->r(0), _myMolecule->r(1), _myMolecule->r(2)};
     ls1::LS1RegionWrapper region;
-    return region.calculatePotentialAtPoint(location, true, true, true);
+    return region.calculatePotentialAtMolecule(location, true);
   }
   virtual void setPotentialEnergy(const double& potentialEnergy) { throw std::runtime_error("LS1Molecule:setPotentialEnergy should never be called!"); }
 
