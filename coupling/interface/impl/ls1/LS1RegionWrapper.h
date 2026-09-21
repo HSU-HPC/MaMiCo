@@ -157,7 +157,7 @@ public:
     //_particleContainer->deleteMolecule(temp, false);
   }
 
-  double calculatePotentialAtMolecule(const tarch::la::Vector<3, double> position, bool ignoreOffset) {
+  double calculatePotentialAtMolecule(const tarch::la::Vector<3, double> position, const bool ignoreOffset) {
     double potentialEnergy = 0.0;
     tarch::la::Vector<3, double> moleculePosition = position;
     if (!ignoreOffset) {
@@ -193,7 +193,7 @@ public:
     return potentialEnergy;
   }
 
-  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position, bool ignoreOffset) {
+  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position, const bool ignoreOffset) {
     tarch::la::Vector<3, double> force(0.0);
     double potentialEnergy = 0.0;
 
