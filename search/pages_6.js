@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['input_20file_20construction_20and_20first_20runs_0',['Input file construction and first runs',['../index.html#autotoc_md10',1,'']]],
-  ['instructions_1',['Build instructions',['../index.html#autotoc_md6',1,'']]],
-  ['instructions_20to_20build_20with_20lammps_2',['Additional instructions to build with LAMMPS',['../index.html#autotoc_md9',1,'']]],
-  ['instructions_20to_20build_20with_20ls1_3',['Additional instructions to build with ls1',['../index.html#autotoc_md8',1,'']]]
+  ['generator_0',['Generator',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md22',1,'Config Generator'],['../dir_b94d3ad9af2a4d1552e52cc0114f17f5.html#autotoc_md14',1,'MaMiCo Config Generator']]],
+  ['gpu_20support_1',['Building with GPU support',['../index.html#autotoc_md9',1,'']]],
+  ['guidelines_2',['Contributing Guidelines',['../md_CONTRIBUTING.html',1,'']]]
 ];

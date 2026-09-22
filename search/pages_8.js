@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['mamico_0',['MaMiCo',['../index.html',1,'']]],
-  ['mamico_20config_20generator_1',['MaMiCo Config Generator',['../dir_b94d3ad9af2a4d1552e52cc0114f17f5.html#autotoc_md12',1,'']]],
-  ['mamico_20tools_2',['MaMiCo Tools',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md15',1,'']]]
+  ['lammps_0',['Additional instructions to build with LAMMPS',['../index.html#autotoc_md11',1,'']]],
+  ['list_1',['Todo List',['../todo.html',1,'']]],
+  ['ls1_2',['Additional instructions to build with ls1',['../index.html#autotoc_md10',1,'']]]
 ];

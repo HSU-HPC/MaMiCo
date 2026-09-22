@@ -20,5 +20,6 @@ var searchData=
   ['errorid_17',['ErrorID',['../classtinyxml2_1_1XMLDocument.html#afa3ed33b3107f920ec2b301f805ac17d',1,'tinyxml2::XMLDocument']]],
   ['errorlinenum_18',['ErrorLineNum',['../classtinyxml2_1_1XMLDocument.html#a57400f816dbe7799ece33615ead9ab76',1,'tinyxml2::XMLDocument']]],
   ['errorstr_19',['ErrorStr',['../classtinyxml2_1_1XMLDocument.html#ae97fff2402a0d01e0509c430b37996b3',1,'tinyxml2::XMLDocument']]],
-  ['errortype_20',['errorType',['../classcoupling_1_1error_1_1ErrorEstimation.html#a3ed1fc36c80690f4d115cecba42316ff',1,'coupling::error::ErrorEstimation']]]
+  ['errortype_20',['errorType',['../classcoupling_1_1error_1_1ErrorEstimation.html#a3ed1fc36c80690f4d115cecba42316ff',1,'coupling::error::ErrorEstimation']]],
+  ['external_20contribution_20policy_21',['External Contribution Policy',['../md_CONTRIBUTING.html#autotoc_md3',1,'']]]
 ];

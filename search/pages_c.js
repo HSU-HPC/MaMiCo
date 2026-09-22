@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['requirements_0',['Requirements',['../dir_b94d3ad9af2a4d1552e52cc0114f17f5.html#autotoc_md13',1,'']]],
-  ['requirements_20and_20optional_20dependencies_1',['Requirements and optional dependencies',['../index.html#autotoc_md5',1,'']]],
-  ['runs_2',['Input file construction and first runs',['../index.html#autotoc_md10',1,'']]]
+  ['papers_20to_20cite_0',['Papers to cite',['../index.html#autotoc_md13',1,'']]],
+  ['pipeline_1',['CI pipeline',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md20',1,'']]],
+  ['plotting_2',['Plotting',['../dir_4eeb864c4eec08c7d6b9d3b0352cfdde.html#autotoc_md19',1,'']]],
+  ['policy_3',['Policy',['../md_CONTRIBUTING.html#autotoc_md4',1,'AI Usage Policy'],['../md_CONTRIBUTING.html#autotoc_md3',1,'External Contribution Policy']]]
 ];

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['with_20gpu_20support_0',['Building with GPU support',['../index.html#autotoc_md7',1,'']]],
-  ['with_20lammps_1',['Additional instructions to build with LAMMPS',['../index.html#autotoc_md9',1,'']]],
-  ['with_20ls1_2',['Additional instructions to build with ls1',['../index.html#autotoc_md8',1,'']]]
+  ['usage_0',['Usage',['../dir_b94d3ad9af2a4d1552e52cc0114f17f5.html#autotoc_md16',1,'']]],
+  ['usage_20policy_1',['AI Usage Policy',['../md_CONTRIBUTING.html#autotoc_md4',1,'']]]
 ];
