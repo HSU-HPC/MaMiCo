@@ -89,6 +89,31 @@ public:
     if (!_IDinited) {
       throw std::runtime_error("addMolecule used with a wrapper that did not have particle ID initalized");
     }
+#ifdef USHER_DEBUG
+    std::stringstream ss;
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    ss << "RANK " << rank << " adding ID " << molecule.getID() << " location " << molecule.r(0) << ", " << molecule.r(1)
+    << ", " << molecule.r(2)<< " Nearby: ";
+    int i = 0;
+    tarch::la::Vector<3, double> moleculePosition = {molecule.r(0),molecule.r(1),molecule.r(2)};
+    double startRegion[] = {molecule.r(0) - _cutoff, molecule.r(1) - _cutoff, molecule.r(2) - _cutoff};
+    double endRegion[] = {molecule.r(0) + _cutoff, molecule.r(1) + _cutoff, molecule.r(2) + _cutoff};
+    auto iterator = _particleContainer->regionIterator(startRegion, endRegion, ParticleIterator::ALL_CELLS);
+    tarch::la::Vector<3, double> tempMoleculePosition;
+    // calculate lennard jones energy
+    while (iterator.isValid()) {
+      ::Molecule temp = *iterator;
+      tempMoleculePosition = {temp.r(0), temp.r(1), temp.r(2)};
+      const auto r = tempMoleculePosition - moleculePosition;
+      const double r2 = tarch::la::dot(r, r);
+      ss << "[" << temp.getID()<< ", " << r2 << "] ";
+      ++iterator;
+      i++;
+    }
+    ss << " Total " << i << std::endl;
+    std::cout << ss.str();
+#endif
     _particleContainer->addParticle(molecule);
   }
 
@@ -118,7 +143,7 @@ public:
     temp.setF(2, force[2]);
 
     temp.setid(_curParticleID);
-    _curParticleID += _IDIncrementor;
+    _curParticleID++;
 
     temp.setComponent(_locSimulation->getEnsemble()->getComponent(0));
 
@@ -142,8 +167,8 @@ public:
     RegionParticleIterator _curIterator = _particleContainer->regionIterator(startBox, endBox, ParticleIterator::ALL_CELLS);
     bool found = false;
     while (_curIterator.isValid()) {
-      ::Molecule* temp = &(*_curIterator);
-      if (std::abs(temp->r(0) - molPosition[0]) < 1e-6 && std::abs(temp->r(1) - molPosition[1]) < 1e-6 && std::abs(temp->r(2) - molPosition[2]) < 1e-6) {
+      ::Molecule temp = *_curIterator;
+      if (std::abs(temp.r(0) - molPosition[0]) < 1e-6 && std::abs(temp.r(1) - molPosition[1]) < 1e-6 && std::abs(temp.r(2) - molPosition[2]) < 1e-6) {
         found = true;
         break;
       }
@@ -154,7 +179,6 @@ public:
       return;
 
     deleteMolecule(_curIterator);
-    //_particleContainer->deleteMolecule(temp, false);
   }
 
   double calculatePotentialAtMolecule(const tarch::la::Vector<3, double> position, const bool ignoreOffset) {
@@ -243,7 +267,6 @@ private:
   const double _cutoffEnergy;
   double _startRegion[3], _endRegion[3];
   unsigned long int _curParticleID;
-  int _IDIncrementor;
   bool _IDinited;
   RegionParticleIterator _iterator;
 };
