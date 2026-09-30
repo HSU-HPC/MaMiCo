@@ -121,7 +121,7 @@ Build instructions</h1>
   cd MaMiCo
   mkdir build
   cd build
-</pre><p> * If you don't have a github account or don't want to use it, you can alternatively use <span class="tt">git clone <a href="https://github.com/HSU-HPC/MaMiCo.git">https://github.com/HSU-HPC/MaMiCo.git</a></span> (read-only).</p>
+</pre><p> * If you don't have a github account or don't want to use it, you can alternatively use <span class="tt">git clone <a href="https://github.com/HSU-HPC/MaMiCo">https://github.com/HSU-HPC/MaMiCo</a></span> (read-only).</p>
 <p>* Then initialise CMake in your build directory, pointing it to the root directory of the repository. (Note that on some older systems, the command may be named <span class="tt">cmake3</span> instead of <span class="tt">cmake</span>.) </p><pre class="fragment">  cmake ..
 </pre><p>* This will configure the build system with default settings and generate makefiles in the build directory. Optionally, you might want to change the build configuration now: </p><pre class="fragment">  ccmake .
 </pre><p>* Here you can enable optional dependencies, e.g. activate BUILD_WITH_MPI (default OFF), or modifiy which compiler and flags you want to use. When you are done, press the configure [c] and generate [g] keys. Now you can start the compilation: </p><pre class="fragment">  make
