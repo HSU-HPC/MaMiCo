@@ -157,7 +157,7 @@ if __name__ == "__main__":
                 .splitlines()
             )
         except subprocess.CalledProcessError:
-            pass # Branch may not exist on remote or locally yet (ignore)
+            pass  # Branch may not exist on remote or locally yet (ignore)
     touched_files = set(uncommited_files + changed_files)
 
     coverage_root = build_dir / "coverage"

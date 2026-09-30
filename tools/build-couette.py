@@ -58,8 +58,7 @@ OPEN_FOAM_THIRD_PARTY_URL = f"https://dl.openfoam.com/source/v{OPEN_FOAM_VERSION
 
 def shell(cmd):
     print(
-        f"{getpass.getuser()}@{socket.gethostname()}:{os.getcwd()}$ {cmd}",
-        flush=True
+        f"{getpass.getuser()}@{socket.gethostname()}:{os.getcwd()}$ {cmd}", flush=True
     )
     cmd = f"{cmd} 2>&1"
     return subprocess.call(["/bin/bash", "-c", "set -o pipefail; " + cmd])
@@ -76,14 +75,10 @@ def git_clone_shallow(repository_url, repository_dir, ref):
         print(f"{repository_dir} exists but is not a git repository")
         return True
 
-    if shell(
-        f"git -C {repository_dir} fetch --depth 1 origin {ref}"
-    ) != 0:
+    if shell(f"git -C {repository_dir} fetch --depth 1 origin {ref}") != 0:
         return True
 
-    return shell(
-        f"git -C {repository_dir} checkout --detach FETCH_HEAD"
-    ) != 0
+    return shell(f"git -C {repository_dir} checkout --detach FETCH_HEAD") != 0
 
 
 def build_ls1(mamico_repo_dir, with_mpi=False, jobs=8, force_gcc=False):
@@ -145,7 +140,9 @@ def download_open_foam():
                     OPEN_FOAM_THIRD_PARTY_URL, f"ThirdParty-v{OPEN_FOAM_VERSION}.tgz"
                 )
                 if not had_error:
-                    had_error = 0 != shell(f"mv ThirdParty-v{OPEN_FOAM_VERSION} ThirdParty")
+                    had_error = 0 != shell(
+                        f"mv ThirdParty-v{OPEN_FOAM_VERSION} ThirdParty"
+                    )
         else:
             had_error = True
     if had_error:
@@ -172,7 +169,9 @@ def build_open_foam(jobs=8):
         )  # Building OpenFOAM has some irrelevant errors (non-zero exit code)
     if not had_error:
         # Rename unused logging macro to avoid issue when compiling MaMiCo with both OpenFOAM and ls1
-        had_error = 0 != shell(f"sed -i 's/^#define Log/#define FoamLog/g' {OPEN_FOAM_SRC_DIR}/src/OpenFOAM/lnInclude/messageStream.H")
+        had_error = 0 != shell(
+            f"sed -i 's/^#define Log/#define FoamLog/g' {OPEN_FOAM_SRC_DIR}/src/OpenFOAM/lnInclude/messageStream.H"
+        )
     return had_error
 
 
@@ -180,9 +179,7 @@ def build_lammps():
     print("Building LAMMPS from source...")
     had_error = False
     if not LAMMPS_REPO_DIR.exists():
-        had_error = git_clone_shallow(
-            LAMMPS_REPO_URL, LAMMPS_REPO_DIR, LAMMPS_REPO_REF
-        )
+        had_error = git_clone_shallow(LAMMPS_REPO_URL, LAMMPS_REPO_DIR, LAMMPS_REPO_REF)
     build_dir = LAMMPS_REPO_DIR / "build"
     build_dir.mkdir(exist_ok=True)
     with ChangeDir(build_dir):
@@ -204,7 +201,12 @@ md_solvers = dict(
 
 
 def build_mamico_couette_md(
-    md_solver="md", with_openfoam=False, with_mpi=False, jobs=8, clean=False, force_gcc=False
+    md_solver="md",
+    with_openfoam=False,
+    with_mpi=False,
+    jobs=8,
+    clean=False,
+    force_gcc=False,
 ):
     run_info = f"Started {time.strftime('%Y-%m-%d %H:%M:%S %Z')}"
     print(run_info)
@@ -287,7 +289,7 @@ if __name__ == "__main__":
         with_mpi=args.with_mpi,
         jobs=args.jobs,
         clean=args.clean,
-        force_gcc=args.force_gcc
+        force_gcc=args.force_gcc,
     )
     if exec_path is not None:
         print(exec_path)
