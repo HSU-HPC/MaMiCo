@@ -13,10 +13,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-OUTPUT_FILE_EXTENSIONS = [
-    ".csv",
-    ".vtk"
-]
+OUTPUT_FILE_EXTENSIONS = [".csv", ".vtk"]
 
 
 if any(s in sys.argv for s in ["-h", "--help"]):
@@ -32,6 +29,5 @@ for file_extension in OUTPUT_FILE_EXTENSIONS:
 
 for output_path in output_files:
     output_filename = str(output_path)
-    hash = subprocess.check_output(
-        ["md5sum", output_path], text=True).split(" ")[0]
-    print(hash, "\t...", output_filename[output_filename.rindex("_"):], sep="")
+    hash = subprocess.check_output(["md5sum", output_path], text=True).split(" ")[0]
+    print(hash, "\t...", output_filename[output_filename.rindex("_") :], sep="")

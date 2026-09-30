@@ -48,8 +48,10 @@ def apply(partial_xml, get_config_value) -> None:
     should_write_to_file = filtering != False and not get_config_value("coupling_2way")
     partial_xml.substitute(
         "write-to-file",
-        xml_write_to_file
-        if should_write_to_file
-        else "<!-- No output of filtering result -->",
+        (
+            xml_write_to_file
+            if should_write_to_file
+            else "<!-- No output of filtering result -->"
+        ),
     )
     print("Substituted filtering pipeline")
