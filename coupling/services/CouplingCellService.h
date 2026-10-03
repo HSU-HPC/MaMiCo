@@ -66,6 +66,7 @@ public:
   virtual void processInnerCouplingCellAfterMDTimestep() = 0;
   virtual void computeAndStoreTemperature(double temperature) = 0;
   virtual void applyTemperatureToMolecules(unsigned int t) = 0;
+  virtual bool checkIfDistributeMass(unsigned int t) const = 0;
   virtual void distributeMass(unsigned int t) = 0;
   virtual void distributeMomentum(unsigned int t) = 0;
   virtual void applyBoundaryForce(unsigned int t) = 0;
@@ -220,6 +221,11 @@ public:
   /** applies a boundary force to molecules which are close to an open boundary.
    */
   void applyBoundaryForce(unsigned int t) override;
+
+  /** returns true if distributeMass would occur in this timestep
+   * public because this is useful for MD simulations to call and check if particle container needs to be updated
+   */
+  bool checkIfDistributeMass(unsigned int t) const override;
 
   /** distributes mass in the system. */
   void distributeMass(unsigned int t) override;
