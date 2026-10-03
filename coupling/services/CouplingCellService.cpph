@@ -249,16 +249,18 @@ tarch::la::Vector<dim, double> coupling::services::CouplingCellServiceImpl<Linke
   return position;
 }
 
-template <class LinkedCell, unsigned int dim> void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::distributeMass(unsigned int t) {
-  // nop if there is no particle insertion
+template <class LinkedCell, unsigned int dim> bool coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::checkIfDistributeMass(unsigned int t) const {
   if (_particleInsertionType == coupling::configurations::ParticleInsertionConfiguration::NO_INSERTION) {
-    return;
+    return false;
   }
   // only insert mass every X time steps
-  if (!_particleInsertion->insertDeleteMassAtTimestep(t)) {
-    return;
-  }
+  return _particleInsertion->insertDeleteMassAtTimestep(t);
+}
 
+template <class LinkedCell, unsigned int dim> void coupling::services::CouplingCellServiceImpl<LinkedCell, dim>::distributeMass(unsigned int t) {
+  // nop if there is no particle insertion
+  if (!checkIfDistributeMass(t))
+    return;
   // compute mean potential energy over all coupling cells and set the value
   // in the coupling cell
   coupling::cellmappings::ComputeMeanPotentialEnergyMapping<LinkedCell, dim> computeMeanPotentialEnergyMapping(_mdSolverInterface, *_boundaryForceController);
