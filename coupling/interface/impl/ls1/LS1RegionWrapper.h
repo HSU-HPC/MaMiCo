@@ -46,7 +46,7 @@ public:
   LS1RegionWrapper()
       : LS1RegionWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) {}
 
-  void setRegion(double startRegion[3], double endRegion[3]) {
+  void setRegion(const double startRegion[3], const double endRegion[3]) {
     for (int i = 0; i < 3; i++) {
       _startRegion[i] = startRegion[i];
       _endRegion[i] = endRegion[i];
@@ -54,31 +54,31 @@ public:
     _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS);
   }
 
-  double getStartRegionAtDim(int dim) { return _startRegion[dim]; }
+  double getStartRegionAtDim(const int dim) const { return _startRegion[dim]; }
 
-  double getEndRegionAtDim(int dim) { return _endRegion[dim]; }
+  double getEndRegionAtDim(const int dim) const { return _endRegion[dim]; }
 
   void iteratorReset() { _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS); }
 
   void iteratorNext() { ++_iterator; }
 
-  bool iteratorValid() { return _iterator.isValid(); }
+  bool iteratorValid() const { return _iterator.isValid(); }
 
   ::Molecule* getParticleAtIterator() {
     ::Molecule* temp = &(*_iterator);
     return temp;
   }
 
-  bool isInRegion(const double point[3]) {
+  bool isInRegion(const double point[3]) const {
     bool isInRegion = true;
     for (int i = 0; i < 3; i++) {
       isInRegion &= ((point[i] >= _startRegion[i]) & (point[i] < _endRegion[i]));
     }
     return isInRegion;
   }
-  bool isInRegion(const tarch::la::Vector<3, double> point) { return isInRegion(new double[3]{point[0], point[1], point[2]}); }
+  bool isInRegion(const tarch::la::Vector<3, double> point) const { return isInRegion(new double[3]{point[0], point[1], point[2]}); }
 
-  bool isInRegion(const double startBox[3], const double endBox[3]) { return isInRegion(startBox) && isInRegion(endBox); }
+  bool isInRegion(const double startBox[3], const double endBox[3]) const { return isInRegion(startBox) && isInRegion(endBox); }
 
   void setupIDcounterForParticleAddition(const unsigned long particleID) {
     _curParticleID = particleID + 1;
@@ -93,10 +93,10 @@ public:
     std::stringstream ss;
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    ss << "RANK " << rank << " adding ID " << molecule.getID() << " location " << molecule.r(0) << ", " << molecule.r(1)
-    << ", " << molecule.r(2)<< " Nearby: ";
+    ss << "RANK " << rank << " adding ID " << molecule.getID() << " location " << molecule.r(0) << ", " << molecule.r(1) << ", " << molecule.r(2)
+       << " Nearby: ";
     int i = 0;
-    tarch::la::Vector<3, double> moleculePosition = {molecule.r(0),molecule.r(1),molecule.r(2)};
+    tarch::la::Vector<3, double> moleculePosition = {molecule.r(0), molecule.r(1), molecule.r(2)};
     double startRegion[] = {molecule.r(0) - _cutoff, molecule.r(1) - _cutoff, molecule.r(2) - _cutoff};
     double endRegion[] = {molecule.r(0) + _cutoff, molecule.r(1) + _cutoff, molecule.r(2) + _cutoff};
     auto iterator = _particleContainer->regionIterator(startRegion, endRegion, ParticleIterator::ALL_CELLS);
@@ -107,7 +107,7 @@ public:
       tempMoleculePosition = {temp.r(0), temp.r(1), temp.r(2)};
       const auto r = tempMoleculePosition - moleculePosition;
       const double r2 = tarch::la::dot(r, r);
-      ss << "[" << temp.getID()<< ", " << r2 << "] ";
+      ss << "[" << temp.getID() << ", " << r2 << "] ";
       ++iterator;
       i++;
     }
@@ -181,7 +181,7 @@ public:
     deleteMolecule(_curIterator);
   }
 
-  double calculatePotentialAtMolecule(const tarch::la::Vector<3, double> position, const bool ignoreOffset) {
+  double calculatePotentialAtMolecule(const tarch::la::Vector<3, double> position, const bool ignoreOffset) const {
     double potentialEnergy = 0.0;
     tarch::la::Vector<3, double> moleculePosition = position;
     if (!ignoreOffset) {
@@ -217,7 +217,8 @@ public:
     return potentialEnergy;
   }
 
-  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position, const bool ignoreOffset) {
+  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position,
+                                                                                     const bool ignoreOffset) const {
     tarch::la::Vector<3, double> force(0.0);
     double potentialEnergy = 0.0;
 
