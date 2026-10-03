@@ -69,6 +69,7 @@ public:
   void processInnerCouplingCellAfterMDTimestep() override {}
   void computeAndStoreTemperature(double temperature) override {}
   void applyTemperatureToMolecules(unsigned int t) override {}
+  bool checkIfDistributeMass(unsigned int t) override {}
   void distributeMass(unsigned int t) override {}
   void distributeMomentum(unsigned int t) override {}
   void perturbateVelocity() override {}
