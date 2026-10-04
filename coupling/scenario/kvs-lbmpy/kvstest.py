@@ -19,8 +19,8 @@ import pandas as pd
 from lbmpy.parameterization import Scaling
 from lbmpy.session import *
 
-sys.path.append('../../../build')
-sys.path.append('../../filtering/filters')
+sys.path.append("../../../build")
+sys.path.append("../../filtering/filters")
 
 import mamico.coupling
 import mamico.tarch.configuration
@@ -29,8 +29,8 @@ from mamico.coupling.services import MultiMDCellService
 from mamico.coupling.solvers import CouetteSolverInterface
 from configparser import ConfigParser
 
-log = logging.getLogger('KVSTest')
-logging.getLogger('matplotlib.font_manager').disabled = True
+log = logging.getLogger("KVSTest")
+logging.getLogger("matplotlib.font_manager").disabled = True
 
 
 BENCH_BEFORE_RUN = True
@@ -44,11 +44,11 @@ RANK = mamico.tarch.utils.initMPI()
 # -> using filtering subsystem with configurable coupling data analysis or noise filter sequences (TODO)
 
 
-class KVSTest():
+class KVSTest:
     def __init__(self, cfg):
         self.cfg = cfg
         self.rank = RANK
-        if self.rank==0:
+        if self.rank == 0:
             log.info("Created KVSTest ...")
 
     def run(self):
@@ -56,8 +56,8 @@ class KVSTest():
         self.initSolvers()
         for cycle in range(self.cfg.getint("coupling", "couplingCycles")):
             self.runOneCouplingCycle(cycle)
-        if self.rank==0:
-            pd.DataFrame(self.velLB).to_csv("lbm.csv", sep = ";", header = False)
+        if self.rank == 0:
+            pd.DataFrame(self.velLB).to_csv("lbm.csv", sep=";", header=False)
 
     def runOneCouplingCycle(self, cycle):
         self.advanceMacro(cycle)
@@ -67,13 +67,17 @@ class KVSTest():
             log.info("Finish coupling cycle " + str(cycle))
 
     def parseXMLConfigurations(self):
-        self.simpleMDConfig = mamico.tarch.configuration.parseMolecularDynamicsConfiguration(
-            "kvs.xml", "molecular-dynamics")
+        self.simpleMDConfig = (
+            mamico.tarch.configuration.parseMolecularDynamicsConfiguration(
+                "kvs.xml", "molecular-dynamics"
+            )
+        )
         if not self.simpleMDConfig.isValid():
             log.error("Invalid SimpleMD config!")
             sys.exit(1)
         self.mamicoConfig = mamico.tarch.configuration.parseMaMiCoConfiguration(
-            "kvs.xml", "mamico")
+            "kvs.xml", "mamico"
+        )
         if not self.mamicoConfig.isValid():
             log.error("Invalid MaMiCo config!")
             sys.exit(1)
@@ -89,31 +93,46 @@ class KVSTest():
             self.t = 0
             # kinematic viscosity of fluid, in Mamico Units
             kinVisc = self.cfg.getfloat(
-                "macroscopic-solver", "viscosity") / self.cfg.getfloat("microscopic-solver", "density")
+                "macroscopic-solver", "viscosity"
+            ) / self.cfg.getfloat("microscopic-solver", "density")
             # dx LB in Mamico Units
-            self.dx = self.mamicoConfig.getCouplingCellConfiguration(
-            ).getCouplingCellSize()[0]
+            self.dx = (
+                self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[
+                    0
+                ]
+            )
             # time intervall of one coupling cycle, in Mamico Units
-            self.dt = self.simpleMDConfig.getSimulationConfiguration().getDt() * \
-                self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
+            self.dt = (
+                self.simpleMDConfig.getSimulationConfiguration().getDt()
+                * self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
+            )
             # duration of one LB timestep, in Mamico Units
-            self.dt_LB = self.dx*self.dx * \
-                (1/self.macroscopicSolver.omega-0.5)/(3*kinVisc)
+            self.dt_LB = (
+                self.dx
+                * self.dx
+                * (1 / self.macroscopicSolver.omega - 0.5)
+                / (3 * kinVisc)
+            )
 
-            log.info("MD timesteps per coupling cycle = " +
-                     str(self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()))
-            log.info("LB timesteps per coupling cycle = " +
-                     str(self.dt / self.dt_LB))
+            log.info(
+                "MD timesteps per coupling cycle = "
+                + str(
+                    self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
+                )
+            )
+            log.info("LB timesteps per coupling cycle = " + str(self.dt / self.dt_LB))
 
             isteps = self.cfg.getint("macroscopic-solver", "init-timesteps")
-            log.info("Running " + str(isteps) +
-                     " LB initialisation timesteps ...")
+            log.info("Running " + str(isteps) + " LB initialisation timesteps ...")
 
             if BENCH_BEFORE_RUN == True:
-                timeguess = isteps * self.macroscopicSolver.domain_size[0] * \
-                    self.macroscopicSolver.domain_size[1] * \
-                    self.macroscopicSolver.domain_size[2] / \
-                    (self.macroscopicSolver.mlups * 1e6)
+                timeguess = (
+                    isteps
+                    * self.macroscopicSolver.domain_size[0]
+                    * self.macroscopicSolver.domain_size[1]
+                    * self.macroscopicSolver.domain_size[2]
+                    / (self.macroscopicSolver.mlups * 1e6)
+                )
                 log.info("(Estimated runtime = " + str(timeguess) + " seconds)")
 
             self.macroscopicSolver.advance(isteps)
@@ -121,22 +140,31 @@ class KVSTest():
 
         numMD = self.cfg.getint("microscopic-solver", "number-md-simulations")
 
-        self.multiMDService = mamico.tarch.utils.MultiMDService(numberProcesses=self.simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
-                                                                totalNumberMDSimulations=numMD)
+        self.multiMDService = mamico.tarch.utils.MultiMDService(
+            numberProcesses=self.simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
+            totalNumberMDSimulations=numMD,
+        )
 
         self.localMDInstances = self.multiMDService.getLocalNumberOfMDSimulations()
 
         if self.rank == 0:
             log.info("totalNumberMDSimulations = " + str(numMD))
-            log.info("localMDInstances on rank 0 = " +
-                     str(self.localMDInstances))
+            log.info("localMDInstances on rank 0 = " + str(self.localMDInstances))
 
-        self.simpleMD = [mamico.coupling.getMDSimulation(self.simpleMDConfig, self.mamicoConfig,
-                                                         self.multiMDService.getLocalCommunicator()) for i in range(self.localMDInstances)]
+        self.simpleMD = [
+            mamico.coupling.getMDSimulation(
+                self.simpleMDConfig,
+                self.mamicoConfig,
+                self.multiMDService.getLocalCommunicator(),
+            )
+            for i in range(self.localMDInstances)
+        ]
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].init(
-                self.multiMDService, self.multiMDService.getGlobalNumberOfLocalMDSimulation(i))
+                self.multiMDService,
+                self.multiMDService.getGlobalNumberOfLocalMDSimulation(i),
+            )
 
         equSteps = self.cfg.getint("microscopic-solver", "equilibration-steps")
         for i in range(self.localMDInstances):
@@ -146,33 +174,50 @@ class KVSTest():
         self.mdStepCounter = equSteps
 
         # Warning: If instances < ranks, this is empty for rank 0. In that case, the MultiMDCellService intialisation below segfaults. FIXME
-        self.mdSolverInterface = [mamico.coupling.getMDSolverInterface(self.simpleMDConfig, self.mamicoConfig,
-                                                                       self.simpleMD[i]) for i in range(self.localMDInstances)]
+        self.mdSolverInterface = [
+            mamico.coupling.getMDSolverInterface(
+                self.simpleMDConfig, self.mamicoConfig, self.simpleMD[i]
+            )
+            for i in range(self.localMDInstances)
+        ]
 
-        self.macroscopicSolverInterface = CouetteSolverInterface(self.getGlobalNumberCouplingCells(),
-                                                                 self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
-        mamico.coupling.setMacroscopicSolverInterface(
-            self.macroscopicSolverInterface)
+        self.macroscopicSolverInterface = CouetteSolverInterface(
+            self.getGlobalNumberCouplingCells(),
+            self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+        )
+        mamico.coupling.setMacroscopicSolverInterface(self.macroscopicSolverInterface)
 
         mamico.tarch.utils.initIndexing(
-            self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(), 
+            self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
             self.simpleMDConfig.getMPIConfiguration().getNumberOfProcesses(),
-            self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(), 
+            self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize(),
             self.mamicoConfig.getParallelTopologyConfiguration().getParallelTopologyType(),
-            self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap() , self.rank)
+            self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+            self.rank,
+        )
 
-        self.multiMDCellService = MultiMDCellService(self.mdSolverInterface, self.macroscopicSolverInterface,
-                                                     self.simpleMDConfig, self.rank, self.cfg.getint(
-                                                         "microscopic-solver", "number-md-simulations"),
-                                                     self.mamicoConfig, "kvs.xml", self.multiMDService)
+        self.multiMDCellService = MultiMDCellService(
+            self.mdSolverInterface,
+            self.macroscopicSolverInterface,
+            self.simpleMDConfig,
+            self.rank,
+            self.cfg.getint("microscopic-solver", "number-md-simulations"),
+            self.mamicoConfig,
+            "kvs.xml",
+            self.multiMDService,
+        )
 
         self.multiMDCellService.constructFilterPipelines()
 
         for i in range(self.localMDInstances):
             self.simpleMD[i].setCouplingCellService(
-                self.multiMDCellService.getCouplingCellService(i))
-            self.multiMDCellService.getCouplingCellService(i).computeAndStoreTemperature(
-                self.cfg.getfloat("microscopic-solver", "temperature"))
+                self.multiMDCellService.getCouplingCellService(i)
+            )
+            self.multiMDCellService.getCouplingCellService(
+                i
+            ).computeAndStoreTemperature(
+                self.cfg.getfloat("microscopic-solver", "temperature")
+            )
 
         from scipy.ndimage import gaussian_filter, median_filter
 
@@ -192,7 +237,9 @@ class KVSTest():
 
         def gauss_vec1(data):
             print("Applying gaussian filter to a 3d property. sigma = 1.")
-            return gaussian_filter(data, truncate=1.0, sigma=(1, 1, 1, 0), mode="mirror")
+            return gaussian_filter(
+                data, truncate=1.0, sigma=(1, 1, 1, 0), mode="mirror"
+            )
 
         def gauss_sca15(data):
             print("Applying gaussian filter to a scalar property. sigma = 1.5.")
@@ -260,13 +307,17 @@ class KVSTest():
 
         def gauss_x_sca1(data):
             print(
-                "Applying gaussian filter to a scalar property. Filtering on X-axis only. sigma = 1.")
+                "Applying gaussian filter to a scalar property. Filtering on X-axis only. sigma = 1."
+            )
             return gaussian_filter(data, truncate=1.0, sigma=(1, 0, 0), mode="mirror")
 
         def gauss_x_vec1(data):
             print(
-                "Applying gaussian filter to a 3d property. Filtering on X-axis only. sigma = 1.")
-            return gaussian_filter(data, truncate=1.0, sigma=(1, 0, 0, 0), mode="mirror")
+                "Applying gaussian filter to a 3d property. Filtering on X-axis only. sigma = 1."
+            )
+            return gaussian_filter(
+                data, truncate=1.0, sigma=(1, 0, 0, 0), mode="mirror"
+            )
 
         mcs = self.multiMDCellService.getCouplingCellService(0)
 
@@ -290,27 +341,42 @@ class KVSTest():
         # mcs.addFilterToSequence(filter_sequence="gauss-45", filter_index=0, scalar_filter_func = gauss_sca45, vector_filter_func=gauss_vec45)
         # mcs.addFilterToSequence(filter_sequence="gauss-5", filter_index=0, scalar_filter_func = gauss_sca5, vector_filter_func=gauss_vec5)
 
-        self.buf = mamico.coupling.Buffer(self.macroscopicSolverInterface, self.rank, self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap())
+        self.buf = mamico.coupling.Buffer(
+            self.macroscopicSolverInterface,
+            self.rank,
+            self.mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap(),
+        )
 
         self.csv = self.cfg.getint("coupling", "csv-every-timestep")
         self.png = self.cfg.getint("coupling", "png-every-timestep")
         self.adios2 = self.cfg.getint("coupling", "adios2-every-timestep")
 
         # buffer for evaluation plot
-        if self.rank==0:
+        if self.rank == 0:
             self.velLB = np.zeros((self.cfg.getint("coupling", "couplingCycles"), 2))
             if self.adios2 > 0:
                 from adios2 import Stream
+
                 self.adiosfile = Stream("kvstest_volume.bp", "w")
-                if self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep()==0:
-                    self.adiosfile.write_attribute('timefactor', "inf")
+                if (
+                    self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep()
+                    == 0
+                ):
+                    self.adiosfile.write_attribute("timefactor", "inf")
                 else:
-                    timefactor = self.adios2 * self.dt/(self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep() * self.simpleMDConfig.getSimulationConfiguration().getDt())
+                    timefactor = (
+                        self.adios2
+                        * self.dt
+                        / (
+                            self.simpleMDConfig.getADIOS2Configuration().getWriteEveryTimestep()
+                            * self.simpleMDConfig.getSimulationConfiguration().getDt()
+                        )
+                    )
                     log.info("timefactor:", timefactor)
-                    self.adiosfile.write_attribute('timefactor', str(timefactor))
-    
-        if self.rank==0:
-            log.info("Finished initSolvers") # after ? ms
+                    self.adiosfile.write_attribute("timefactor", str(timefactor))
+
+        if self.rank == 0:
+            log.info("Finished initSolvers")  # after ? ms
 
     def shutdown(self):
         if self.rank == 0:
@@ -328,53 +394,124 @@ class KVSTest():
 
     def advanceMacro(self, cycle):
         if self.rank == 0:
-            to_advance = (cycle+1)*self.dt - self.t
+            to_advance = (cycle + 1) * self.dt - self.t
             steps = int(round(to_advance / self.dt_LB))
             log.debug("Advancing " + str(steps) + " LB timesteps")
             self.macroscopicSolver.advance(steps)
             self.t = self.t + steps * self.dt_LB
 
-            cellmass = (self.cfg.getfloat("microscopic-solver", "density")
-                        * np.prod(self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()))
+            cellmass = self.cfg.getfloat("microscopic-solver", "density") * np.prod(
+                self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()
+            )
             numcells = self.getGlobalNumberCouplingCells()
             mdpos = json.loads(self.cfg.get("domain", "md-pos"))
             # Convert center of MD domain in SI units to offset of MD domain as cell index
-            mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2)
-                     for d in range(3)]
+            mdpos = [
+                int(mdpos[d] * self.macroscopicSolver.cpm - numcells[d] / 2)
+                for d in range(3)
+            ]
 
-            self.buf.store2send(cellmass,
-                                self.macroscopicSolver.scen.velocity[
-                                    mdpos[0]:mdpos[0]+numcells[0],
-                                    mdpos[1]:mdpos[1]+numcells[1],
-                                    mdpos[2]:mdpos[2]+numcells[2],
-                                    :].data * (self.dx / self.dt_LB),
-                                self.macroscopicSolver.scen.density[
-                                    mdpos[0]:mdpos[0]+numcells[0],
-                                    mdpos[1]:mdpos[1]+numcells[1],
-                                    mdpos[2]:mdpos[2]+numcells[2]].data
-                                )
+            self.buf.store2send(
+                cellmass,
+                self.macroscopicSolver.scen.velocity[
+                    mdpos[0] : mdpos[0] + numcells[0],
+                    mdpos[1] : mdpos[1] + numcells[1],
+                    mdpos[2] : mdpos[2] + numcells[2],
+                    :,
+                ].data
+                * (self.dx / self.dt_LB),
+                self.macroscopicSolver.scen.density[
+                    mdpos[0] : mdpos[0] + numcells[0],
+                    mdpos[1] : mdpos[1] + numcells[1],
+                    mdpos[2] : mdpos[2] + numcells[2],
+                ].data,
+            )
 
-            if self.png > 0 and (cycle+1) % self.png == 0:
-                filename = "kvstest_" + str(cycle+1) + ".png"
+            if self.png > 0 and (cycle + 1) % self.png == 0:
+                filename = "kvstest_" + str(cycle + 1) + ".png"
                 self.macroscopicSolver.plot(filename)
 
-            if self.adios2 > 0 and (cycle+1)%self.adios2 == 0:
-               to_write = np.ascontiguousarray(self.macroscopicSolver.scen.velocity[:,:,:,:].data, dtype=np.float32)
-               log.info("writing to adios2 " + str(type(to_write)) + " with shape " + str(to_write.shape) + " and dtype " + str(to_write.dtype))
-               shape = np.array(self.macroscopicSolver.scen.velocity[:,:,:,0].data.shape)*self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()
-               offset = [0.,0.,0.]
-               log.debug(str(shape))
-               log.debug(str(mdpos))
-               log.debug(str(self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()))
-               offset[0] = -((mdpos[0]/to_write.shape[0]* shape[0])-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[0]))
-               offset[1] = -((mdpos[1]/to_write.shape[1]* shape[1])-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[1]))
-               offset[2] = -((mdpos[2]/to_write.shape[2]* shape[2])-( 0.5 * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[2]))
-               log.debug(str((offset)))
-               gb_to_write = np.array([offset[0], offset[1], offset[2], offset[0] + shape[0], offset[1] + shape[1], offset[2] + shape[2]])
-               log.debug(str((gb_to_write)))
-               self.adiosfile.write("global_box", gb_to_write, gb_to_write.shape, np.zeros_like(gb_to_write.shape).tolist(), gb_to_write.shape)
-               self.adiosfile.write("velocity", to_write, to_write.shape, np.zeros_like(to_write.shape).tolist(), to_write.shape)
-               self.adiosfile.end_step()
+            if self.adios2 > 0 and (cycle + 1) % self.adios2 == 0:
+                to_write = np.ascontiguousarray(
+                    self.macroscopicSolver.scen.velocity[:, :, :, :].data,
+                    dtype=np.float32,
+                )
+                log.info(
+                    "writing to adios2 "
+                    + str(type(to_write))
+                    + " with shape "
+                    + str(to_write.shape)
+                    + " and dtype "
+                    + str(to_write.dtype)
+                )
+                shape = (
+                    np.array(
+                        self.macroscopicSolver.scen.velocity[:, :, :, 0].data.shape
+                    )
+                    * self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()
+                )
+                offset = [0.0, 0.0, 0.0]
+                log.debug(str(shape))
+                log.debug(str(mdpos))
+                log.debug(
+                    str(
+                        self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()
+                    )
+                )
+                offset[0] = -(
+                    (mdpos[0] / to_write.shape[0] * shape[0])
+                    - (
+                        0.5
+                        * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[
+                            0
+                        ]
+                    )
+                )
+                offset[1] = -(
+                    (mdpos[1] / to_write.shape[1] * shape[1])
+                    - (
+                        0.5
+                        * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[
+                            1
+                        ]
+                    )
+                )
+                offset[2] = -(
+                    (mdpos[2] / to_write.shape[2] * shape[2])
+                    - (
+                        0.5
+                        * self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()[
+                            2
+                        ]
+                    )
+                )
+                log.debug(str((offset)))
+                gb_to_write = np.array(
+                    [
+                        offset[0],
+                        offset[1],
+                        offset[2],
+                        offset[0] + shape[0],
+                        offset[1] + shape[1],
+                        offset[2] + shape[2],
+                    ]
+                )
+                log.debug(str((gb_to_write)))
+                self.adiosfile.write(
+                    "global_box",
+                    gb_to_write,
+                    gb_to_write.shape,
+                    np.zeros_like(gb_to_write.shape).tolist(),
+                    gb_to_write.shape,
+                )
+                self.adiosfile.write(
+                    "velocity",
+                    to_write,
+                    to_write.shape,
+                    np.zeros_like(to_write.shape).tolist(),
+                    to_write.shape,
+                )
+                self.adiosfile.end_step()
 
         if self.cfg.getboolean("coupling", "send-from-macro-to-md"):
             self.multiMDCellService.sendFromMacro2MD(self.buf)
@@ -383,11 +520,13 @@ class KVSTest():
         numT = self.simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps()
         for i in range(self.localMDInstances):
             mamico.coupling.setCouplingCellService(
-                self.multiMDCellService.getCouplingCellService(i))
+                self.multiMDCellService.getCouplingCellService(i)
+            )
             mamico.coupling.setMDSolverInterface(self.mdSolverInterface[i])
             self.simpleMD[i].simulateTimesteps(numT, self.mdStepCounter)
             self.multiMDCellService.getCouplingCellService(
-                i).plotEveryMacroscopicTimestep(cycle)
+                i
+            ).plotEveryMacroscopicTimestep(cycle)
         self.mdStepCounter = self.mdStepCounter + numT
 
         if self.cfg.getboolean("coupling", "send-from-md-to-macro"):
@@ -397,8 +536,8 @@ class KVSTest():
         if self.cfg.getboolean("coupling", "two-way-coupling") and self.rank == 0:
             self.macroscopicSolver.setMDBoundaryValues(self.buf)  # TODO
 
-        if self.csv > 0 and (cycle+1) % self.csv == 0 and self.rank == 0:
-            filename = "KVSMD2Macro_" + str(cycle+1) + ".csv"
+        if self.csv > 0 and (cycle + 1) % self.csv == 0 and self.rank == 0:
+            filename = "KVSMD2Macro_" + str(cycle + 1) + ".csv"
             self.buf.recv2CSV(filename)
 
         if self.rank == 0:
@@ -406,15 +545,18 @@ class KVSTest():
             numcells = self.getGlobalNumberCouplingCells()
             mdpos = json.loads(self.cfg.get("domain", "md-pos"))
             # Convert center of MD domain in SI units to offset of MD domain as cell index
-            mdpos = [int(mdpos[d]*self.macroscopicSolver.cpm - numcells[d]/2)
-                     for d in range(3)]
+            mdpos = [
+                int(mdpos[d] * self.macroscopicSolver.cpm - numcells[d] / 2)
+                for d in range(3)
+            ]
             for dir in range(2):
                 self.velLB[cycle, dir] = self.macroscopicSolver.scen.velocity[
                     # TODO: exact cell index in md2macro
-                    mdpos[0]+6,
-                    mdpos[1]+6,
-                    mdpos[2]+6,
-                    dir].data * (self.dx / self.dt_LB)
+                    mdpos[0] + 6,
+                    mdpos[1] + 6,
+                    mdpos[2] + 6,
+                    dir,
+                ].data * (self.dx / self.dt_LB)
 
     def __del__(self):
         self.shutdown()
@@ -425,23 +567,28 @@ class KVSTest():
     def getGlobalNumberCouplingCells(self):
         domainSize = self.simpleMDConfig.getDomainConfiguration().getGlobalDomainSize()
         dx = self.mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()
-        return [math.floor(domainSize[d]/dx[d]+0.5) for d in range(3)]
+        return [math.floor(domainSize[d] / dx[d] + 0.5) for d in range(3)]
 
-if RANK == 0:    # This fixes last_config.json-Error
+
+if RANK == 0:  # This fixes last_config.json-Error
     from lbmpy.session import *
     from lbmpy.parameterization import Scaling
 
-lb_log = logging.getLogger('LBSolver')
+lb_log = logging.getLogger("LBSolver")
 
 
-class LBSolver():
+class LBSolver:
     def __init__(self, cfg):
         self.cfg = cfg
         self.cpm = cpm = cfg.getint("macroscopic-solver", "cells-per-meter")
-        self.domain_size = (int(2.5*cpm), int(0.41*cpm), int(0.41*cpm))
+        self.domain_size = (int(2.5 * cpm), int(0.41 * cpm), int(0.41 * cpm))
         self.vis = 1e-3
-        self.scaling = Scaling(physical_length=0.1, physical_velocity=2.25, kinematic_viscosity=self.vis,
-             cells_per_length=0.1*cpm)
+        self.scaling = Scaling(
+            physical_length=0.1,
+            physical_velocity=2.25,
+            kinematic_viscosity=self.vis,
+            cells_per_length=0.1 * cpm,
+        )
         self.omega = cfg.getfloat("macroscopic-solver", "omega")
         if self.omega > 1.92:
             lb_log.warning("High omega, LB may be unstable!")
@@ -458,8 +605,10 @@ class LBSolver():
         self.setup_scenario()
         lb_log.info("Successfully created scenario")
         lb_log.info("Domain size = " + str(self.domain_size))
-        lb_log.info("Total number of cells = " +
-                    str(self.domain_size[0]*self.domain_size[1]*self.domain_size[2]))
+        lb_log.info(
+            "Total number of cells = "
+            + str(self.domain_size[0] * self.domain_size[1] * self.domain_size[2])
+        )
 
         if BENCH_BEFORE_RUN == True:
             lb_log.info("Running benchmark ...")
@@ -472,33 +621,51 @@ class LBSolver():
     def setup_scenario(self):
         try:  # for lbmpy version >= 0.4.0
             from pystencils import Target
+
             if self.cfg.get("macroscopic-solver", "optimization-target") == "cpu":
                 optTarget = Target.CPU
             elif self.cfg.get("macroscopic-solver", "optimization-target") == "gpu":
                 optTarget = Target.GPU
             method = Method.TRT
-        except ImportError:   # for lbmpy version <= 0.3.4
+        except ImportError:  # for lbmpy version <= 0.3.4
             optTarget = self.cfg.get("macroscopic-solver", "optimization-target")
-            method ='trt'
-        self.scen = LatticeBoltzmannStep(domain_size=self.domain_size, method=method,stencil='D3Q19',
-            relaxation_rate=self.omega, periodicity=(True, False, False),
-            optimization={'target':optTarget, 
-            'gpu_indexing':'line', 
-            'double_precision':self.cfg.get("macroscopic-solver", "double-precision")})
+            method = "trt"
+        self.scen = LatticeBoltzmannStep(
+            domain_size=self.domain_size,
+            method=method,
+            stencil="D3Q19",
+            relaxation_rate=self.omega,
+            periodicity=(True, False, False),
+            optimization={
+                "target": optTarget,
+                "gpu_indexing": "line",
+                "double_precision": self.cfg.get(
+                    "macroscopic-solver", "double-precision"
+                ),
+            },
+        )
+
         def obstacle(x, y, z):
-            return (x > 0.45*self.cpm) & (x < 0.55*self.cpm) & (y > 0.15*self.cpm) & (y < 0.25*self.cpm)
+            return (
+                (x > 0.45 * self.cpm)
+                & (x < 0.55 * self.cpm)
+                & (y > 0.15 * self.cpm)
+                & (y < 0.25 * self.cpm)
+            )
+
         wall = NoSlip()
         self.scen.boundary_handling.set_boundary(wall, mask_callback=obstacle)
 
         def velocity_info_callback(boundary_data, **_):
-            boundary_data['vel_1'] = 0
-            boundary_data['vel_2'] = 0
+            boundary_data["vel_1"] = 0
+            boundary_data["vel_2"] = 0
             u_max = self.scaling_result.lattice_velocity
-            y, z = boundary_data.link_positions(
-                1), boundary_data.link_positions(2)
+            y, z = boundary_data.link_positions(1), boundary_data.link_positions(2)
             H = self.domain_size[1]
-            boundary_data['vel_0'] = 16 * u_max * \
-                y * z * (H-y) * (H-z) / (H*H*H*H)
+            boundary_data["vel_0"] = (
+                16 * u_max * y * z * (H - y) * (H - z) / (H * H * H * H)
+            )
+
         inflow = UBB(velocity_info_callback, dim=self.scen.method.dim)
         self.scen.boundary_handling.set_boundary(inflow, make_slice[0, :, :])
 
@@ -524,36 +691,38 @@ class LBSolver():
         dx = self.scaling.dx
         dt = self.scaling_result.dt
 
-        S = 0.1 * 0.41     # surface of one cylinder face in m^2
+        S = 0.1 * 0.41  # surface of one cylinder face in m^2
 
         # compute cell indices around cylinder obstacle
         # TODO only tested for cpm = 312 cells per meter
-        left = int(0.45*self.cpm) - 1  # X: left = fluid,   left+1 = obstacle
-        right = int(0.55*self.cpm) + 1  # X: right = fluid,  right-1 = obstacle
-        bottom = int(0.15*self.cpm)    # Y: bottom = fluid, bottom+1 = obstacle
-        top = int(0.25*self.cpm)       # Y: top = fluid,    top-1 = obstacle
+        left = int(0.45 * self.cpm) - 1  # X: left = fluid,   left+1 = obstacle
+        right = int(0.55 * self.cpm) + 1  # X: right = fluid,  right-1 = obstacle
+        bottom = int(0.15 * self.cpm)  # Y: bottom = fluid, bottom+1 = obstacle
+        top = int(0.25 * self.cpm)  # Y: top = fluid,    top-1 = obstacle
 
         # compute drag
         kvs = self.scen
         # compute advective drag force
         # pressure = density * c_s^2 = density / 3
-        p_left = np.mean(kvs.density[left, bottom+1:top-1, :]) / 3
-        p_right = np.mean(kvs.density[right, bottom+1:top-1, :]) / 3
+        p_left = np.mean(kvs.density[left, bottom + 1 : top - 1, :]) / 3
+        p_right = np.mean(kvs.density[right, bottom + 1 : top - 1, :]) / 3
         # convert from lattice to SI units
-        p_left = p_left * dx*dx/(dt*dt)
-        p_right = p_right * dx*dx/(dt*dt)
+        p_left = p_left * dx * dx / (dt * dt)
+        p_right = p_right * dx * dx / (dt * dt)
         FD = (p_left - p_right) * S
         # compute viscous drag force
         # ignore 3 cell layers, because simple wall boundary condition resets all PDFs to equilibrium => wrong results very close to boundary
         # use second order forward finite difference to get first derivative in normal direction of tangential velocity
-        vel_grad_bottom = \
-            -3/2 * np.mean(kvs.velocity[left+1:right-1, bottom-3, :, 0]) + \
-            2 * np.mean(kvs.velocity[left+1:right-1, bottom-4, :, 0]) + \
-            -1/2 * np.mean(kvs.velocity[left+1:right-1, bottom-5, :, 0])
-        vel_grad_top = \
-            -3/2 * np.mean(kvs.velocity[left+1:right-1, top+3, :, 0]) + \
-            2 * np.mean(kvs.velocity[left+1:right-1, top+4, :, 0]) + \
-            -1/2 * np.mean(kvs.velocity[left+1:right-1, top+5, :, 0])
+        vel_grad_bottom = (
+            -3 / 2 * np.mean(kvs.velocity[left + 1 : right - 1, bottom - 3, :, 0])
+            + 2 * np.mean(kvs.velocity[left + 1 : right - 1, bottom - 4, :, 0])
+            + -1 / 2 * np.mean(kvs.velocity[left + 1 : right - 1, bottom - 5, :, 0])
+        )
+        vel_grad_top = (
+            -3 / 2 * np.mean(kvs.velocity[left + 1 : right - 1, top + 3, :, 0])
+            + 2 * np.mean(kvs.velocity[left + 1 : right - 1, top + 4, :, 0])
+            + -1 / 2 * np.mean(kvs.velocity[left + 1 : right - 1, top + 5, :, 0])
+        )
         lb_log.debug("vel_grad_bottom = " + str(vel_grad_bottom))
         lb_log.debug("vel_grad_top = " + str(vel_grad_top))
         # convert to SI, integrate over surface, add to force
@@ -561,45 +730,47 @@ class LBSolver():
 
         # compute lift
         # compute advective lift force
-        p_bottom = np.mean(kvs.density[left+1:right-1, bottom, :]) / 3
-        p_top = np.mean(kvs.density[left+1:right-1, top, :]) / 3
-        p_bottom = p_bottom * dx*dx/(dt*dt)
-        p_top = p_top * dx*dx/(dt*dt)
+        p_bottom = np.mean(kvs.density[left + 1 : right - 1, bottom, :]) / 3
+        p_top = np.mean(kvs.density[left + 1 : right - 1, top, :]) / 3
+        p_bottom = p_bottom * dx * dx / (dt * dt)
+        p_top = p_top * dx * dx / (dt * dt)
         FL = (p_bottom - p_top) * S
         # compute viscous lift force
-        vel_grad_left = \
-            -3/2 * np.mean(kvs.velocity[left-3, bottom+1:top-1, :, 1]) + \
-            2 * np.mean(kvs.velocity[left-4, bottom+1:top-1, :, 1]) + \
-            -1/2 * np.mean(kvs.velocity[left-5, bottom+1:top-1, :, 1])
-        vel_grad_right = \
-            -3/2 * np.mean(kvs.velocity[right+3, bottom+1:top-1, :, 1]) + \
-            2 * np.mean(kvs.velocity[right+4, bottom+1:top-1, :, 1]) + \
-            -1/2 * np.mean(kvs.velocity[right+5, bottom+1:top-1, :, 1])
+        vel_grad_left = (
+            -3 / 2 * np.mean(kvs.velocity[left - 3, bottom + 1 : top - 1, :, 1])
+            + 2 * np.mean(kvs.velocity[left - 4, bottom + 1 : top - 1, :, 1])
+            + -1 / 2 * np.mean(kvs.velocity[left - 5, bottom + 1 : top - 1, :, 1])
+        )
+        vel_grad_right = (
+            -3 / 2 * np.mean(kvs.velocity[right + 3, bottom + 1 : top - 1, :, 1])
+            + 2 * np.mean(kvs.velocity[right + 4, bottom + 1 : top - 1, :, 1])
+            + -1 / 2 * np.mean(kvs.velocity[right + 5, bottom + 1 : top - 1, :, 1])
+        )
         FL = FL + self.vis * (vel_grad_left + vel_grad_right) / dt * S
 
         # Convert forces in Newton to (dimensionless) coefficients
-        cD = 2 * FD / (1*1*1*S)
-        if (abs(cD) > abs(self.cD_max)):
+        cD = 2 * FD / (1 * 1 * 1 * S)
+        if abs(cD) > abs(self.cD_max):
             self.cD_max = cD
 
-        cL = 2 * FL / (1*1*1*S)
-        if (abs(cL) > abs(self.cL_max)):
+        cL = 2 * FL / (1 * 1 * 1 * S)
+        if abs(cL) > abs(self.cL_max):
             self.cL_max = cL
 
     def __del__(self):
-        lb_log.info("Finished " + str(self.timesteps_finished) +
-                    " LB timesteps")
+        lb_log.info("Finished " + str(self.timesteps_finished) + " LB timesteps")
         lb_log.info("cD_max = " + str(self.cD_max))
         lb_log.info("cL_max = " + str(self.cL_max))
 
     # write velocity slice to png file
     def plot(self, filename):
         plt.vector_field_magnitude(
-            self.scen.velocity[:, :, int(self.domain_size[2]//2), 0:2])
-        plt.subplots_adjust(left=0, bottom=0, right=1,
-                            top=1, wspace=None, hspace=None)
-        plt.axis('off')
+            self.scen.velocity[:, :, int(self.domain_size[2] // 2), 0:2]
+        )
+        plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=None, hspace=None)
+        plt.axis("off")
         plt.savefig(filename)
+
 
 # Read config file, create a KVSTest instance and run it
 
@@ -611,7 +782,9 @@ def main():
     # console mode, colored log to stdout
     if len(sys.argv) == 1:
         coloredlogs.install(
-            fmt='%(asctime)s.%(msecs)03d %(name)s %(levelname)s %(message)s', level='DEBUG')
+            fmt="%(asctime)s.%(msecs)03d %(name)s %(levelname)s %(message)s",
+            level="DEBUG",
+        )
         log.setLevel(level=logging.INFO)
         lb_log.setLevel(level=logging.INFO)
     # job mode, log to file
@@ -629,5 +802,5 @@ def main():
 
 # only if this file is executed directly ie. not imported as a module,
 # then actually run the simulation
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
