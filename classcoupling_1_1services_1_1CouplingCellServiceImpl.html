@@ -229,6 +229,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4b0d4ef319285e171342b8ac4aeb4a7e" id="r_a4b0d4ef319285e171342b8ac4aeb4a7e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a4b0d4ef319285e171342b8ac4aeb4a7e">computeAndStoreTemperature</a> (double temperature) override</td></tr>
 <tr class="memitem:a2ba7915ea76d88b118a4c810e5ea460d" id="r_a2ba7915ea76d88b118a4c810e5ea460d"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2ba7915ea76d88b118a4c810e5ea460d">applyTemperatureToMolecules</a> (unsigned int t) override</td></tr>
 <tr class="memitem:ac475441b6b87fc5ba32731eafc767670" id="r_ac475441b6b87fc5ba32731eafc767670"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac475441b6b87fc5ba32731eafc767670">applyBoundaryForce</a> (unsigned int t) override</td></tr>
+<tr class="memitem:abc687bf2b6b5613bade1838cde722fff" id="r_abc687bf2b6b5613bade1838cde722fff"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#abc687bf2b6b5613bade1838cde722fff">checkIfDistributeMass</a> (unsigned int t) const override</td></tr>
 <tr class="memitem:a6b7b1c5d8a6f75e71565f1e1818d2eff" id="r_a6b7b1c5d8a6f75e71565f1e1818d2eff"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6b7b1c5d8a6f75e71565f1e1818d2eff">distributeMass</a> (unsigned int t) override</td></tr>
 <tr class="memitem:a842b3105de92b44bcef692dc61f668b0" id="r_a842b3105de92b44bcef692dc61f668b0"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a842b3105de92b44bcef692dc61f668b0">distributeMomentum</a> (unsigned int t) override</td></tr>
 <tr class="memitem:a4f02aacb72e63b7092bd09a79ea99ac3" id="r_a4f02aacb72e63b7092bd09a79ea99ac3"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a4f02aacb72e63b7092bd09a79ea99ac3">perturbateVelocity</a> () override</td></tr>
@@ -527,6 +528,36 @@ template&lt;class LinkedCell, unsigned int dim&gt; </div>
 </table>
 </div><div class="memdoc">
 <p>applies a thermostat in all non-ghost coupling cells. </p>
+
+<p>Implements <a class="el" href="classcoupling_1_1services_1_1CouplingCellService.html">coupling::services::CouplingCellService&lt; dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="abc687bf2b6b5613bade1838cde722fff" name="abc687bf2b6b5613bade1838cde722fff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc687bf2b6b5613bade1838cde722fff">&#9670;&#160;</a></span>checkIfDistributeMass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class LinkedCell, unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classcoupling_1_1services_1_1CouplingCellServiceImpl.html">coupling::services::CouplingCellServiceImpl</a>&lt; LinkedCell, dim &gt;::checkIfDistributeMass </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>t</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>returns true if distributeMass would occur in this timestep public because this is useful for MD simulations to call and check if particle container needs to be updated </p>
 
 <p>Implements <a class="el" href="classcoupling_1_1services_1_1CouplingCellService.html">coupling::services::CouplingCellService&lt; dim &gt;</a>.</p>
 

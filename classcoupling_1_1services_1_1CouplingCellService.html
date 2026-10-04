@@ -142,6 +142,7 @@ virtual void&#160;</td><td class="memItemRight"><b>sendFromMD2MacroPostProcess</
 <tr class="memitem:a349fed6f211f3796d91ccaeb60a4c94a" id="r_a349fed6f211f3796d91ccaeb60a4c94a"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a349fed6f211f3796d91ccaeb60a4c94a">processInnerCouplingCellAfterMDTimestep</a> ()=0</td></tr>
 <tr class="memitem:a2429f80bf8e70b75f7c02c9b8805186b" id="r_a2429f80bf8e70b75f7c02c9b8805186b"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a2429f80bf8e70b75f7c02c9b8805186b">computeAndStoreTemperature</a> (double temperature)=0</td></tr>
 <tr class="memitem:a26538f8883cad856d2387c298f0f64a2" id="r_a26538f8883cad856d2387c298f0f64a2"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a26538f8883cad856d2387c298f0f64a2">applyTemperatureToMolecules</a> (unsigned int t)=0</td></tr>
+<tr class="memitem:a9f90003f922fcad2d7091aff94cc0dd7" id="r_a9f90003f922fcad2d7091aff94cc0dd7"><td class="memItemLeft">virtual bool&#160;</td><td class="memItemRight"><a class="el" href="#a9f90003f922fcad2d7091aff94cc0dd7">checkIfDistributeMass</a> (unsigned int t) const =0</td></tr>
 <tr class="memitem:adbf892166cf9080bef03045dc6f4d1e9" id="r_adbf892166cf9080bef03045dc6f4d1e9"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#adbf892166cf9080bef03045dc6f4d1e9">distributeMass</a> (unsigned int t)=0</td></tr>
 <tr class="memitem:a1165a7960f0fdf06852d14398f8f9730" id="r_a1165a7960f0fdf06852d14398f8f9730"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a1165a7960f0fdf06852d14398f8f9730">distributeMomentum</a> (unsigned int t)=0</td></tr>
 <tr class="memitem:a3426f3fa57035e89a9fd46e4e9d51f32" id="r_a3426f3fa57035e89a9fd46e4e9d51f32"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a3426f3fa57035e89a9fd46e4e9d51f32">applyBoundaryForce</a> (unsigned int t)=0</td></tr>
@@ -251,6 +252,35 @@ template&lt;unsigned int dim&gt; </div>
 </div><div class="memdoc">
 
 <p>Implemented in <a class="el" href="classcoupling_1_1services_1_1CouplingCellServiceImpl.html#a2ba7915ea76d88b118a4c810e5ea460d">coupling::services::CouplingCellServiceImpl&lt; LinkedCell, dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a9f90003f922fcad2d7091aff94cc0dd7" name="a9f90003f922fcad2d7091aff94cc0dd7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f90003f922fcad2d7091aff94cc0dd7">&#9670;&#160;</a></span>checkIfDistributeMass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool <a class="el" href="classcoupling_1_1services_1_1CouplingCellService.html">coupling::services::CouplingCellService</a>&lt; dim &gt;::checkIfDistributeMass </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>t</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classcoupling_1_1services_1_1CouplingCellServiceImpl.html#abc687bf2b6b5613bade1838cde722fff">coupling::services::CouplingCellServiceImpl&lt; LinkedCell, dim &gt;</a>.</p>
 
 </div>
 </div>

@@ -153,6 +153,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acd9412e382a5958262715da8496b864a" id="r_acd9412e382a5958262715da8496b864a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#acd9412e382a5958262715da8496b864a">processInnerCouplingCellAfterMDTimestep</a> () override</td></tr>
 <tr class="memitem:ac2380e4e835f87b600b3a34740c0fb03" id="r_ac2380e4e835f87b600b3a34740c0fb03"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac2380e4e835f87b600b3a34740c0fb03">computeAndStoreTemperature</a> (double temperature) override</td></tr>
 <tr class="memitem:a1b72e4504d9307dd52b60bc467e1a802" id="r_a1b72e4504d9307dd52b60bc467e1a802"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1b72e4504d9307dd52b60bc467e1a802">applyTemperatureToMolecules</a> (unsigned int t) override</td></tr>
+<tr class="memitem:a6491470d4e9758a853a1617b77202d62" id="r_a6491470d4e9758a853a1617b77202d62"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a6491470d4e9758a853a1617b77202d62">checkIfDistributeMass</a> (unsigned int t) const override</td></tr>
 <tr class="memitem:ac7f3f1f025eee2a10566695966b22591" id="r_ac7f3f1f025eee2a10566695966b22591"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac7f3f1f025eee2a10566695966b22591">distributeMass</a> (unsigned int t) override</td></tr>
 <tr class="memitem:a878d34b17e510053db4244551c2d698f" id="r_a878d34b17e510053db4244551c2d698f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a878d34b17e510053db4244551c2d698f">distributeMomentum</a> (unsigned int t) override</td></tr>
 <tr class="memitem:aa7b70862990a0ffb4f1000e2c998e0c8" id="r_aa7b70862990a0ffb4f1000e2c998e0c8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa7b70862990a0ffb4f1000e2c998e0c8">perturbateVelocity</a> () override</td></tr>
@@ -265,6 +266,35 @@ template&lt;unsigned int dim&gt; </div>
           <td>(</td>
           <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>t</em></span></td><td>)</td>
           <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classcoupling_1_1services_1_1CouplingCellService.html">coupling::services::CouplingCellService&lt; dim &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a6491470d4e9758a853a1617b77202d62" name="a6491470d4e9758a853a1617b77202d62"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6491470d4e9758a853a1617b77202d62">&#9670;&#160;</a></span>checkIfDistributeMass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int dim&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classcoupling_1_1services_1_1CouplingCellServiceDummy.html">coupling::services::CouplingCellServiceDummy</a>&lt; dim &gt;::checkIfDistributeMass </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>t</em></span></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
   </td>
