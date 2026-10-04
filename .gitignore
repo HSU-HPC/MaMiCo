@@ -1,4 +1,4 @@
-build/
+build*/
 .sconsign.dblite
 *.csv
 *.vtk
@@ -35,3 +35,5 @@ docs/
 /lammps
 # mamico-cfg cache
 .mamico-cfg.cache
+allib/
+ls1-originrepo/
