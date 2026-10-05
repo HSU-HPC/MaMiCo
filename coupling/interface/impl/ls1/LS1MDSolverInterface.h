@@ -28,8 +28,8 @@ public:
       : _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation),
         _locSimulation(global_simulation) {
     _fullDomainWrapper.setupIDcounterForParticleAddition(particleID);
-    const auto totalNumPossibleCells = I10::numberCellsInDomain[0] * I10::numberCellsInDomain[1] * I10::numberCellsInDomain[2] * linkedCellsPerCouplingCell[0] *
-                                       linkedCellsPerCouplingCell[1] * linkedCellsPerCouplingCell[2];
+    const auto totalNumPossibleCells =
+        I10::linearNumberCellsInDomain * linkedCellsPerCouplingCell[0] * linkedCellsPerCouplingCell[1] * linkedCellsPerCouplingCell[2];
     _linkedCellPointers.reserve(totalNumPossibleCells);
     for (int i = 0; i < 3; i++)
       _linkedCellSize[i] = couplingCellSize[i] / linkedCellsPerCouplingCell[i];
