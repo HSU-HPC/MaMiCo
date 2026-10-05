@@ -14,7 +14,7 @@
 #include "ls1/src/parallel/DomainDecompBase.h"
 
 #include <cmath>
-#include <map>
+#include <vector>
 
 namespace coupling {
 namespace interface {
@@ -28,11 +28,14 @@ public:
       : _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation),
         _locSimulation(global_simulation) {
     _fullDomainWrapper.setupIDcounterForParticleAddition(particleID);
+    const auto totalNumPossibleCells = I10::numberCellsInDomain[0] * I10::numberCellsInDomain[1] * I10::numberCellsInDomain[2] * linkedCellsPerCouplingCell[0] *
+                                       linkedCellsPerCouplingCell[1] * linkedCellsPerCouplingCell[2];
+    _linkedCellPointers.reserve(totalNumPossibleCells);
     for (int i = 0; i < 3; i++)
       _linkedCellSize[i] = couplingCellSize[i] / linkedCellsPerCouplingCell[i];
   }
   ~LS1MDSolverInterface() {
-    for (auto [key, cell] : _linkedCellPointers) {
+    for (auto cell : _linkedCellPointers) {
       if (cell != nullptr) {
         delete cell;
         cell = nullptr;
@@ -55,22 +58,6 @@ public:
     if (!CellIndex_T::contains(couplingCellIndex))
       throw std::runtime_error("ERROR in LS1MDSolverInterface::getLinkedCell(): ghost coupling cells may not have linked cells!");
 
-    // get unique key for this linked cell
-    I08 indexKey(couplingCellIndex);
-    const unsigned int linkedCellKey = linkedCellInCouplingCell[2] * linkedCellsPerCouplingCell[1] * linkedCellsPerCouplingCell[0] +
-                                       linkedCellInCouplingCell[1] * linkedCellsPerCouplingCell[0] + linkedCellInCouplingCell[0];
-    const unsigned int totalLinkedCells = linkedCellsPerCouplingCell[0] * linkedCellsPerCouplingCell[1] * linkedCellsPerCouplingCell[2];
-    const unsigned int finalKey = indexKey.get() * totalLinkedCells + linkedCellKey;
-
-    // return correct cell if it was already created and exists
-    // technically, cells should never preexist, as this function is only called once in CouplingCellWithLinkedCells::initLinkedCellContainer
-    // and thereafter the pointer there is used
-    // but still, if in the future this function is called repeatedly, this is useful
-    if (_linkedCellPointers.count(finalKey) != 0) {
-      _linkedCellPointers[finalKey]->iteratorReset();
-      return *_linkedCellPointers[finalKey];
-    }
-
     // size of the coupling cell
     const unsigned int dim = 3; // Used by expansion of IDXS macro
     tarch::la::Vector<3, double> macroCellSize(IDXS.getCouplingCellSize());
@@ -91,7 +78,7 @@ public:
     ls1::LS1RegionWrapper* cell = new ls1::LS1RegionWrapper(regionOffset, regionEndpoint, _locSimulation); // temporary till ls1 offset is natively supported
     // when offset is supported, the offset min will need to be added to both regions
     // store pointer to delete later
-    _linkedCellPointers[finalKey] = cell;
+    _linkedCellPointers.push_back(cell);
     return *cell;
   }
 
@@ -243,6 +230,6 @@ private:
   Simulation* _locSimulation;
   tarch::la::Vector<3, double> _linkedCellSize;
   // take ownership of created cell pointers to delete later
-  std::map<unsigned int, ls1::LS1RegionWrapper*> _linkedCellPointers;
+  std::vector<ls1::LS1RegionWrapper*> _linkedCellPointers;
 };
 #endif
