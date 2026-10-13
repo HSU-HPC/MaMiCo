@@ -10,3 +10,4 @@ Why? Allows for easy comparison of the simulation output between different imple
 + __plotting/plot-pint-LBCouette.py__ Used to create Couette flow profile plots (average X-vel over simulation time) for a time-parallel simulation.
 Plots several PinT iterations in a single plot, can be used to show convergence.
 + __mamico-cfg__ Utility script to generate basic couette.xml configurations (and additional files) for MaMiCo.
++ __cluster-build/__ Two-stage couette build for clusters whose compute nodes have no outbound network: `build-couette-login.py` fetches LAMMPS and Kokkos on a login node, `build-couette-compute.py` builds offline on a compute node. Alternative to `build-couette.py`; see `cluster-build/README.md`.
