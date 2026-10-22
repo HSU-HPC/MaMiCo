@@ -93,7 +93,7 @@ public:
     CPPUNIT_ASSERT_NO_THROW(wrapper.deleteMolecule(tempParticle));
 
     // insert particle
-    wrapper.setupIDcounterForParticleAddition(0);
+    wrapper.setupIDcounterForParticleAddition();
     wrapper.addMolecule(tempParticle);
 
     // verify that position is filled

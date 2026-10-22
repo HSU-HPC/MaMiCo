@@ -123,9 +123,25 @@ public:
         for (int k = 0; k < 40; k++) {
           tarch::la::Vector<3, double> position{i + 0.5, j + 0.5, k + 0.5};
           mamicoMolecule.setPosition(position);
+          // ensure there isn't a molecule already at that position
+          double startRegion[] = {position[0] - 0.01, position[1] - 0.01, position[2] - 0.01};
+          double endRegion[] = {position[0] + 0.01, position[1] + 0.01, position[2] + 0.01};
+          RegionParticleIterator _curIterator = _testSimulation->getMoleculeContainer()->regionIterator(startRegion, endRegion, ParticleIterator::ALL_CELLS);
+          bool found = false;
+          while (_curIterator.isValid()) {
+            ::Molecule temp = *_curIterator;
+            if (std::abs(temp.r(0) - position[0]) < 1e-6 && std::abs(temp.r(1) - position[1]) < 1e-6 && std::abs(temp.r(2) - position[2]) < 1e-6) {
+              found = true;
+              break;
+            }
+            ++_curIterator;
+          }
           const double potFromMolecule = mamicoMolecule.getPotentialEnergy();
           const auto [force, potFromIterator] = region.calculateForceAndPotentialAtPoint(position, false);
-          CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Potential assersion", potFromIterator, potFromMolecule, 1e-6);
+          if (found)
+            CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Potential assersion", std::numeric_limits<double>::infinity(), potFromIterator, 1e-6);
+          else
+            CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Potential assersion", potFromIterator, potFromMolecule, 1e-6);
         }
       }
     }
