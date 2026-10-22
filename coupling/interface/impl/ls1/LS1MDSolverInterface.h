@@ -24,10 +24,10 @@ class LS1MDSolverInterface;
 
 class coupling::interface::LS1MDSolverInterface : public coupling::interface::MDSolverInterface<ls1::LS1RegionWrapper, 3> {
 public:
-  LS1MDSolverInterface(tarch::la::Vector<3, double> couplingCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell, unsigned long particleID)
+  LS1MDSolverInterface(tarch::la::Vector<3, double> couplingCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell)
       : _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation),
         _locSimulation(global_simulation) {
-    _fullDomainWrapper.setupIDcounterForParticleAddition(particleID);
+    _fullDomainWrapper.setupIDcounterForParticleAddition();
     const auto totalNumPossibleCells =
         I10::linearNumberCellsInDomain * linkedCellsPerCouplingCell[0] * linkedCellsPerCouplingCell[1] * linkedCellsPerCouplingCell[2];
     _linkedCellPointers.reserve(totalNumPossibleCells);
@@ -184,7 +184,7 @@ public:
     tarch::la::Vector<3, double> force(0.0);
     double potentialEnergy = 0.0;
     // calculate energy (copied from coupling::interface, assuming that the molecule used here is a coupling::datastructures)
-    std::tie(force, potentialEnergy) = _fullDomainWrapper.calculateForceAndPotentialAtPoint(molecule.getPosition(), false);
+    std::tie(force, potentialEnergy) = _fullDomainWrapper.calculateForceAndPotentialAtPoint(molecule.getPosition(), false /*ignoreOffset*/);
     molecule.setForce(force);
     molecule.setPotentialEnergy(potentialEnergy);
   }

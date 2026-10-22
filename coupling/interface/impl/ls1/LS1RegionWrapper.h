@@ -6,10 +6,12 @@
 #include <tuple>
 
 #include "ls1/src/Simulation.h"
+#include "ls1/src/Domain.h"
 #include "ls1/src/ensemble/EnsembleBase.h"
 #include "ls1/src/molecules/Molecule.h"
 #include "ls1/src/particleContainer/ParticleContainer.h"
 #include "ls1/src/particleContainer/RegionParticleIterator.h"
+#include "ls1/src/utils/CommVar.h"
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/interface/Molecule.h"
@@ -79,9 +81,20 @@ public:
   bool isInRegion(const tarch::la::Vector<3, double> point) const { return isInRegion(new double[3]{point[0], point[1], point[2]}); }
 
   bool isInRegion(const double startBox[3], const double endBox[3]) const { return isInRegion(startBox) && isInRegion(endBox); }
-
-  void setupIDcounterForParticleAddition(const unsigned long particleID) {
-    _curParticleID = particleID + 1;
+  /**
+   * @brief Initialises a region iterator so that it can insert particles with correct IDs into ls1.
+   *
+   * If IDs are not unique, crashes occur with AutoPas, since it uses IDs to update halo moleules, and if they are skipped, explosions can occur.
+   * ls1 inits its molecules in two ways: either it gives every molecule in the whole simulation consecutive IDs (old system, check CubicGridGeneratorInternal),
+   * or it divides the whole unsigned int space into ID pools per rank (check MoleculeIDPool.h). Regardless of which method it chooses, the system below (taking
+   * the biggest ID, and interweaving molecules by incrementing by rank number) should make sure that no clashes occur, while maintaining unique IDs.
+   *
+   */
+  void setupIDcounterForParticleAddition() {
+    _locSimulation->getDomain()->updateMaxMoleculeID(_locSimulation->getMoleculeContainer(), &(_locSimulation->domainDecomposition()));
+    auto maxIDs = _locSimulation->getDomain()->getMaxMoleculeID();
+    _curParticleID = maxIDs.global + 1 + _locSimulation->domainDecomposition().getRank(); // returns 0 in serial case
+    _IDIncrementor = _locSimulation->domainDecomposition().getNumProcs();                 // returns 1 in serial case
     _IDinited = true;
   }
 
@@ -143,7 +156,7 @@ public:
     temp.setF(2, force[2]);
 
     temp.setid(_curParticleID);
-    _curParticleID++;
+    _curParticleID += _IDIncrementor;
 
     temp.setComponent(_locSimulation->getEnsemble()->getComponent(0));
 
@@ -268,6 +281,7 @@ private:
   const double _cutoffEnergy;
   double _startRegion[3], _endRegion[3];
   unsigned long int _curParticleID;
+  unsigned int _IDIncrementor;
   bool _IDinited;
   RegionParticleIterator _iterator;
 };
