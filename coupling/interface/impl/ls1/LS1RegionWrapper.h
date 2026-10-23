@@ -173,7 +173,7 @@ public:
     if (!isInRegion(molPosition))
       return;
     // check if molecule at location specified
-    double margin = _cutoff / 10;
+    double margin = _locSimulation->getEnsemble()->getComponent(0)->getSigma(0) / 10;
     double startBox[] = {molPosition[0] - margin, molPosition[1] - margin, molPosition[2] - margin};
     double endBox[] = {molPosition[0] + margin, molPosition[1] + margin, molPosition[2] + margin};
 
