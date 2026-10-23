@@ -24,10 +24,12 @@ class LS1MDSolverInterface;
 
 class coupling::interface::LS1MDSolverInterface : public coupling::interface::MDSolverInterface<ls1::LS1RegionWrapper, 3> {
 public:
-  LS1MDSolverInterface(tarch::la::Vector<3, double> couplingCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell)
+  LS1MDSolverInterface(tarch::la::Vector<3, double> couplingCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell,
+                       bool enableInsertion = true)
       : _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation),
         _locSimulation(global_simulation) {
-    _fullDomainWrapper.setupIDcounterForParticleAddition();
+    if (enableInsertion)
+      _fullDomainWrapper.setupIDcounterForParticleAddition();
     const auto totalNumPossibleCells =
         I10::linearNumberCellsInDomain * linkedCellsPerCouplingCell[0] * linkedCellsPerCouplingCell[1] * linkedCellsPerCouplingCell[2];
     _linkedCellPointers.reserve(totalNumPossibleCells);
