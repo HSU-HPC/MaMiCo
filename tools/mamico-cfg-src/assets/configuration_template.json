@@ -6,15 +6,15 @@
       {
         "selected": true,
         "value": "small",
-        "description": "MD/CFD domain size = 30\u00B3/50\u00B3"
+        "description": "MD/CFD domain size = 30\u00b3/50\u00b3"
       },
       {
         "value": "medium",
-        "description": "MD/CFD domain size = 60\u00B3/100\u00B3"
+        "description": "MD/CFD domain size = 60\u00b3/100\u00b3"
       },
       {
         "value": "large",
-        "description": "MD/CFD domain size = 120\u00B3/200\u00B3"
+        "description": "MD/CFD domain size = 120\u00b3/200\u00b3"
       }
     ]
   },
@@ -65,6 +65,11 @@
       {
         "value": "foam",
         "label": "OpenFOAM"
+      },
+      {
+        "value": "precice",
+        "label": "preCICE",
+        "description": "external solver via preCICE (generates an OpenFOAM participant)"
       }
     ]
   },
@@ -103,6 +108,12 @@
       },
       {
         "value": 5
+      },
+      {
+        "value": 7.5
+      },
+      {
+        "value": 10
       }
     ]
   },
@@ -161,11 +172,11 @@
       },
       {
         "value": "short",
-        "description": "250 \u00D7 domain size\u00B2 coupling cycles"
+        "description": "250 \u00d7 domain size\u00b2 coupling cycles"
       },
       {
         "value": "normal",
-        "description": "500 \u00D7 domain size\u00B2 coupling cycles"
+        "description": "500 \u00d7 domain size\u00b2 coupling cycles"
       }
     ]
   },
@@ -184,7 +195,49 @@
         "value": 20
       },
       {
+        "value": 60
+      },
+      {
         "value": 200
+      }
+    ]
+  },
+  {
+    "key": "thermostat",
+    "label": "Thermostat region",
+    "options": [
+      {
+        "selected": true,
+        "value": "outerLayers"
+      },
+      {
+        "value": "all"
+      }
+    ]
+  },
+  {
+    "key": "hole_inset",
+    "label": "CFD hole inset (cells inside md2macro)",
+    "options": [
+      {
+        "selected": true,
+        "value": 1
+      },
+      {
+        "value": 0
+      }
+    ]
+  },
+  {
+    "key": "coupling_dt",
+    "label": "Coupling time step (MD time units)",
+    "options": [
+      {
+        "selected": true,
+        "value": 0.25
+      },
+      {
+        "value": 0.5
       }
     ]
   }

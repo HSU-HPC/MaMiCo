@@ -4,6 +4,12 @@ from pathlib import Path
 
 import term
 
+# Fluid properties of the reference Couette setup, shared by the MD and CFD sides.
+MD_DENSITY = 0.813037037
+DYNAMIC_VISCOSITY = 2.14
+# MD timestep, must match <simulation-configuration dt> in couette.xml.template
+MD_TIMESTEP = 0.005
+
 
 def get_domain_size(get_config_value) -> int:
     """Return the domain size as an ordinal integer where 1=small, 2=medium, and 3=large.

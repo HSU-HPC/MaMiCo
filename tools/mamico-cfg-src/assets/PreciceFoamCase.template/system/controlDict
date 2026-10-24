@@ -1,0 +1,53 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           |
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     icoFoam;
+
+startFrom       startTime;
+startTime       0.0;
+stopAt          endTime;
+endTime         {end-time};
+
+// One OpenFOAM step per MaMiCo coupling cycle
+deltaT          {delta-t};
+
+writeControl    runTime;
+writeInterval   {delta-t};
+
+purgeWrite      0;
+writeFormat     ascii;
+writePrecision  6;
+writeCompression off;
+timeFormat      general;
+timePrecision   6;
+runTimeModifiable true;
+adjustTimeStep  no;
+
+// Outside functions{} so the adapter's custom boundary conditions are available
+libs            ("libpreciceAdapterFunctionObject.so");
+
+functions
+{
+    // Must stay last: it ends the run and triggers every other function object's end()
+    preCICE_Adapter
+    {
+        type preciceAdapterFunctionObject;
+        errors strict;
+    }
+}
+
+// ************************************************************************* //

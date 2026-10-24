@@ -161,8 +161,40 @@ def generate(configs: list, output_dir: str, replace_existing: bool) -> None:
         configs, "multi_md"
     )
     print("\nRe-generate using:", get_cmdline(configs), sep="\n")
-    print(f'\nRun simulation using "mpirun -n {ranks} $MAMICO_DIR/build/couette"')
+    if get_config_value(configs, "solver_cfd") == "precice":
+        # Two participants, started from different directories, sharing precice-run/
+        print(
+            f"\nRun simulation using (both from {output_dir}, two terminals):"
+            f"\n  mpirun -n {ranks} $MAMICO_DIR/build/couette preCICE_Couette"
+            f"\n  ./FoamCase/Allrun"
+        )
+    else:
+        print(f'\nRun simulation using "mpirun -n {ranks} $MAMICO_DIR/build/couette"')
     exit(0)
+
+
+def _collect(configs: list, hook: str) -> str:
+    """Run an optional generator hook ("validate"/"warn") over all configs and join its messages.
+
+    Keyword arguments:
+    configs -- The list of configurations whose generators are consulted
+    hook -- The name of the generator function to invoke
+    """
+    messages = ""
+    for config in configs:
+        generator = load_generator(config["key"])
+        try:
+            message = getattr(generator, hook)(lambda k: get_config_value(configs, k))
+        except AttributeError:
+            # Debugging only
+            # print(
+            #     f"Could not invoke {hook} for generator \"{config['key']}\"",
+            #     file=sys.stderr,
+            # )
+            continue
+        if message is not None:
+            messages += message + "\n"
+    return messages.strip()
 
 
 def validate(configs: list) -> str:
@@ -171,23 +203,16 @@ def validate(configs: list) -> str:
     Keyword arguments:
     configs -- The list of configurations which to validate using the generators corresponding to the keys
     """
-    validation_errors = ""
-    for config in configs:
-        generator = load_generator(config["key"])
-        try:
-            validation_error = generator.validate(
-                lambda k: get_config_value(configs, k)
-            )
-        except AttributeError:
-            # Debugging only
-            # print(
-            #     f"Could not invoke validation for generator \"{config['key']}\"",
-            #     file=sys.stderr,
-            # )
-            continue
-        if validation_error is not None:
-            validation_errors += validation_error + "\n"
-    return validation_errors.strip()
+    return _collect(configs, "validate")
+
+
+def warn(configs: list) -> str:
+    """Return a string of non-blocking warnings from the generators (empty if there are none).
+
+    Keyword arguments:
+    configs -- The list of configurations which to check using the generators corresponding to the keys
+    """
+    return _collect(configs, "warn")
 
 
 def parse_args(argv: dict = sys.argv[1:], configs: list = []) -> object:
@@ -316,16 +341,25 @@ def main() -> None:
         # 3. Validate
         validation_errors = validate(configs)
         is_valid = len(validation_errors.strip()) == 0
+        warnings = warn(configs)
         is_interactive = not args.default and (
             len(main_menu) > 0
         )  # Skip interactive mode if there are no options
         if not is_interactive:
             if is_valid:
+                if warnings:
+                    print("Warning:", warnings, file=sys.stderr)
                 generate(configs, args.output, args.replace_existing)
             else:
                 print("Error:", validation_errors, file=sys.stderr)
                 exit(1)
         else:
+            if warnings:
+                title += (
+                    term.fmt_yellow(term.fmt_bold("\nWarnings:\n"))
+                    + "\n".join([term.fmt_yellow(s) for s in warnings.splitlines()])
+                    + "\n"
+                )
             if is_valid:
                 main_menu[-1] += "\n"
                 main_menu.append("Generate config file(s)")

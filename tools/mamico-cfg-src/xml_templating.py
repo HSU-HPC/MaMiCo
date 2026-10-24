@@ -58,12 +58,21 @@ class PartialXml:
         """
         self._string = self._string.replace("{" + placeholder + "}", str(value))
 
-    def get(self) -> str:
-        """Returns the current value of the template.
-        A RuntimeError occurs if not all placeholders have been substituted."""
+    def _check_substituted(self) -> None:
         if "{" in self._string:
             not_substituted = list(set(re.findall("{.*}", self._string)))
             raise RuntimeError(
                 f"Not all values have been substituted: [{', '.join(not_substituted)}]"
             )
+
+    def get(self) -> str:
+        """Returns the current value of the template.
+        A RuntimeError occurs if not all placeholders have been substituted."""
+        self._check_substituted()
         return format_xml(self._string)
+
+    def get_raw(self) -> str:
+        """Like get(), but keeps the template's own layout.
+        Used for documents minidom cannot re-serialize, e.g. preCICE configs with prefixed tags."""
+        self._check_substituted()
+        return remove_empty_files(self._string) + "\n"

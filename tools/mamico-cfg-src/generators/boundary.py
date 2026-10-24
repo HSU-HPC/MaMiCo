@@ -21,6 +21,12 @@ def apply(partial_xml, get_config_value) -> None:
 """.strip()
     else:
         raise ValueError(f'Invalid boundary condition "boundary_condition"')
+    # Nie mass flux models an open boundary; on a periodic axis molecules already
+    # wrap around, so applying it there would exchange mass twice.
+    periodic_xy = "periodic" in boundary_condition
+    partial_xml.substitute("mass-flux-x", "no" if periodic_xy else "yes")
+    partial_xml.substitute("mass-flux-y", "no")
+    partial_xml.substitute("mass-flux-z", "no")
     partial_xml.substitute("boundary-condition", boundary_condition_value)
     partial_xml.substitute("boundary-condition-XY", boundary_condition_XY_value)
     partial_xml.substitute("boundary-condition-xml", boundary_condition_xml)

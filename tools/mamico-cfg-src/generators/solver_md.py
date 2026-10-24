@@ -2,8 +2,12 @@ from pathlib import Path
 
 from generators.cell_size import get_molecules_per_direction
 from generators.domain_size import get_domain_sizes
-from utils import check_if_replacing, get_asset_text
+from utils import MD_DENSITY, check_if_replacing, get_asset_text
 from xml_templating import PartialXml
+
+
+def get_wall_velocity(get_config_value) -> float:
+    return 1.5 if get_config_value("solver_md") == "ls1" else 0.5
 
 
 def _create_ls1_config(get_config_value) -> Path:
@@ -26,10 +30,8 @@ def apply(partial_xml, get_config_value) -> None:
     key = __name__.split(".")[-1]
     solver = get_config_value(key)
     partial_xml.substitute("md-solver", solver)
-    wall_velocity = 1.5 if solver == "ls1" else 0.5
-    partial_xml.substitute("wall-velocity", wall_velocity)
-    thermostat_type = "all" if solver == "ls1" else "outerLayers"
-    partial_xml.substitute("thermostat-type", thermostat_type)
+    partial_xml.substitute("wall-velocity", get_wall_velocity(get_config_value))
+    partial_xml.substitute("density", MD_DENSITY)
     parallel_topology_type = "zyx" if solver == "ls1" else "xyz"
     partial_xml.substitute("parallel-topology-type", parallel_topology_type)
     print("Substituted MD solver and wall velocity")

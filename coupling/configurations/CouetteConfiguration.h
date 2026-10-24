@@ -36,7 +36,9 @@ public:
                             ///< (coupling::solvers::LBCouetteSolver)
     COUETTE_FD = 2,         ///< the 1d finite-difference solver is used
                             ///< (coupling::solvers::FiniteDifferenceSolver)
-    COUETTE_FOAM = 3        ///< the IcoFoam solver is used (coupling::solvers::IcoFoam)
+    COUETTE_FOAM = 3,       ///< the IcoFoam solver is used (coupling::solvers::IcoFoam)
+    COUETTE_PRECICE = 4     ///< the continuum solver is an external preCICE participant
+                            ///< (coupling::scenario::precice::CouetteScenario)
   };
   /** Defines the type of md solver for the coupled simulation  */
   enum MicroSolverType {
@@ -204,6 +206,14 @@ public:
       }
     }
 #endif
+#if (BUILD_WITH_PRECICE)
+    // The continuum solver lives in another process; preCICE owns the exchange and the time loop.
+    else if (type == "precice") {
+      cfg.maSolverType = COUETTE_PRECICE;
+      cfg.preciceConfigFile = "precice-config.xml";
+      tarch::configuration::ParseConfiguration::readStringOptional(cfg.preciceConfigFile, subtag, "precice-config-file");
+    }
+#endif
     else if (type == "analytical") {
       cfg.maSolverType = COUETTE_ANALYTICAL;
       if (!(cfg.wallVelocity[1] == 0.0 && cfg.wallVelocity[2] == 0.0)) {
@@ -318,6 +328,8 @@ public:
   /** @brief number of cycles the continuum solver is advanced before the
    * coupling is enabled */
   int initAdvanceCycles;
+  /** @brief only for COUETTE_PRECICE: path to the preCICE XML config, relative to the working directory */
+  std::string preciceConfigFile;
   /** @brief the start temperature for the fluid under consideration */
   double temp;
   /** @brief number of equilibartion time steps = number of time steps that

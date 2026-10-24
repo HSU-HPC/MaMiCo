@@ -1,0 +1,12 @@
+#!/bin/sh
+# Run from the case parent: preCICE resolves precice-run/ against the working
+# directory, so both participants must be started from the same one.
+cd "${0%/*}/.." || exit 1
+set -e
+
+# Mesh the channel and tag the cells overlapping the MD region as the coupling cellSet
+blockMesh -case {foam-case-name}
+topoSet -case {foam-case-name}
+
+# icoFoam blocks in the preCICE handshake until the MaMiCo participant starts
+icoFoam -case {foam-case-name}

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<precice-configuration>
+  <log>
+    <sink filter="%Severity% > debug" enabled="true" />
+  </log>
+
+  <data:vector name="{macro2md-data}" />
+  <data:vector name="{md2macro-data}" />
+
+  <!-- MaMiCo provides one mesh per coupling direction, at coupling cell midpoints -->
+  <mesh name="{macro2md-mesh}" dimensions="3">
+    <use-data name="{macro2md-data}" />
+  </mesh>
+  <mesh name="{md2macro-mesh}" dimensions="3">
+    <use-data name="{md2macro-data}" />
+  </mesh>
+
+  <!-- OpenFOAM provides one mesh per direction too, on disjoint cell sets -->
+  <mesh name="{foam-mesh-outer}" dimensions="3">
+    <use-data name="{macro2md-data}" />
+  </mesh>
+  <mesh name="{foam-mesh-inner}" dimensions="3">
+    <use-data name="{md2macro-data}" />
+  </mesh>
+
+  <participant name="{mamico-participant}">
+    <provide-mesh name="{macro2md-mesh}" />
+    <provide-mesh name="{md2macro-mesh}" />
+    <read-data name="{macro2md-data}" mesh="{macro2md-mesh}" />
+    <write-data name="{md2macro-data}" mesh="{md2macro-mesh}" />
+  </participant>
+
+  <participant name="{foam-participant}">
+    <provide-mesh name="{foam-mesh-outer}" />
+    <provide-mesh name="{foam-mesh-inner}" />
+    <receive-mesh name="{macro2md-mesh}" from="{mamico-participant}" />
+    <receive-mesh name="{md2macro-mesh}" from="{mamico-participant}" />
+    <write-data name="{macro2md-data}" mesh="{foam-mesh-outer}" />
+    <read-data name="{md2macro-data}" mesh="{foam-mesh-inner}" />
+    <mapping:nearest-neighbor direction="write" from="{foam-mesh-outer}" to="{macro2md-mesh}" constraint="consistent" />
+    <!--          The MD->CFD boundary value must be an average over a volume centred on
+         the boundary point (Nie 2004 section 2), not one cell half a cell away.
+         This needs the hole face to lie strictly inside md2macro, which
+         _precice_hole_inset in solver_cfd.py arranges; it also makes preCICE
+         report requiresMeshConnectivityFor(md2macro), which is what triggers
+         PreciceAdapter::setMeshTetrahedra to supply the connectivity. -->
+    <mapping:linear-cell-interpolation direction="read" from="{md2macro-mesh}" to="{foam-mesh-inner}" constraint="consistent" />
+  </participant>
+
+  <m2n:sockets acceptor="{mamico-participant}" connector="{foam-participant}" />
+
+  <coupling-scheme:serial-explicit>
+    <participants first="{foam-participant}" second="{mamico-participant}" />
+    <max-time-windows value="{max-time-windows}" />
+    <time-window-size value="{time-window-size}" />
+    <exchange data="{macro2md-data}" mesh="{macro2md-mesh}" from="{foam-participant}" to="{mamico-participant}" />
+    <exchange data="{md2macro-data}" mesh="{md2macro-mesh}" from="{mamico-participant}" to="{foam-participant}" />
+  </coupling-scheme:serial-explicit>
+</precice-configuration>

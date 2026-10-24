@@ -1,6 +1,7 @@
 #pragma once
 
 #include "coupling/CouplingMDDefinitions.h"
+#include "coupling/configurations/CouetteConfiguration.h"
 #include "coupling/configurations/MaMiCoConfiguration.h"
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSimulationFactory.h"
@@ -19,6 +20,7 @@
 #include <mpi.h>
 #endif
 #include <random>
+#include <string>
 #include <sys/time.h>
 
 #if defined(LS1_MARDYN)
@@ -39,30 +41,28 @@ namespace precice {
 
 class coupling::scenario::precice::CouetteScenario : public Scenario {
 public:
-  CouetteScenario() : Scenario("couette_precice") {}
+  /** @param configFilename couette.xml in the standard <couette-test> schema */
+  CouetteScenario(const std::string& configFilename = "couette.xml") : Scenario("couette_precice"), _configFilename(configFilename) {}
   ~CouetteScenario() {
     if (_instanceHandling != nullptr) {
       delete _instanceHandling;
+      _instanceHandling = nullptr;
     }
-    if (_multiMDService != NULL) {
+    if (_multiMDService != nullptr) {
       delete _multiMDService;
-      _multiMDService = NULL;
+      _multiMDService = nullptr;
     }
-    if (_preciceInterface != NULL) {
-      delete _preciceInterface;
-      _preciceInterface = NULL;
-    }
-    if (_preciceAdapter != NULL) {
+    if (_preciceAdapter != nullptr) {
       delete _preciceAdapter;
-      _preciceAdapter = NULL;
+      _preciceAdapter = nullptr;
     }
-    if (_preciceInterface != NULL) {
+    if (_preciceInterface != nullptr) {
       delete _preciceInterface;
-      _preciceInterface = NULL;
+      _preciceInterface = nullptr;
     }
-    if (_multiMDCellService != NULL) {
+    if (_multiMDCellService != nullptr) {
       delete _multiMDCellService;
-      _multiMDCellService = NULL;
+      _multiMDCellService = nullptr;
     }
   }
 
@@ -72,7 +72,7 @@ public:
    */
   void run () override {
     const unsigned int dim = 3;
-    int rank;
+    int rank = 0;
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 #endif
@@ -83,19 +83,26 @@ public:
 #endif
 #endif
 
-    // Read the configurations
-    std::string xmlConfigurationFilename("config.xml");
-    // Read the MD config
+    // Same three-section couette.xml the in-process scenarios read; <macroscopic-solver type="precice">
     simplemd::configurations::MolecularDynamicsConfiguration mdConfig;
-    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(xmlConfigurationFilename,
+    tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(_configFilename,
                                                                                                                            "molecular-dynamics", mdConfig);
-    // Read the MaMiCo config
+    if (!mdConfig.isValid()) {
+      std::cout << "ERROR precice::CouetteScenario: Invalid SimpleMD config!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
     coupling::configurations::MaMiCoConfiguration<3> mamicoConfig;
-    tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<dim>>(xmlConfigurationFilename, "mamico",
+    tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<dim>>(_configFilename, "mamico",
                                                                                                                      mamicoConfig);
-    // Read specific Couette config
-    ScenarioConfig scenarioConfig;
-    tarch::configuration::ParseConfiguration::parseConfiguration<ScenarioConfig>(xmlConfigurationFilename, "scenario", scenarioConfig);
+    if (!mamicoConfig.isValid()) {
+      std::cout << "ERROR precice::CouetteScenario: Invalid MaMiCo config!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    const coupling::configurations::CouetteConfig cfg = coupling::configurations::CouetteConfig::parseCouetteConfiguration(_configFilename);
+    if (cfg.maSolverType != coupling::configurations::CouetteConfig::COUETTE_PRECICE) {
+      std::cout << "ERROR precice::CouetteScenario: <macroscopic-solver type> must be \"precice\"" << std::endl;
+      exit(EXIT_FAILURE);
+    }
 
 #if defined(LS1_MARDYN)
     auto offset = mdConfig.getDomainConfiguration().getGlobalDomainOffset();
@@ -105,16 +112,16 @@ public:
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
 #endif
 
-    _multiMDService = new tarch::utils::MultiMDService<dim>(mdConfig.getMPIConfiguration().getNumberOfProcesses(), scenarioConfig.totalNumberMDSimulations);
+    _multiMDService = new tarch::utils::MultiMDService<dim>(mdConfig.getMPIConfiguration().getNumberOfProcesses(), cfg.totalNumberMDSimulations);
 
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(mdConfig, mamicoConfig, *_multiMDService);
 
     // MD equilibration steps
     unsigned int mdStepCounter = 0;
     _instanceHandling->switchOffCoupling();
-    _instanceHandling->equilibrate(scenarioConfig.equSteps, mdStepCounter);
+    _instanceHandling->equilibrate(cfg.equSteps, mdStepCounter);
     _instanceHandling->switchOnCoupling();
-    mdStepCounter += scenarioConfig.equSteps;
+    mdStepCounter += cfg.equSteps;
 
     _instanceHandling->setMDSolverInterface();
 
@@ -122,17 +129,10 @@ public:
     const tarch::la::Vector<3, double> domainOffset{mdConfig.getDomainConfiguration().getGlobalDomainOffset()};
     const tarch::la::Vector<3, double> cellSize{mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()};
     const tarch::la::Vector<dim, double> domainSize{mdConfig.getDomainConfiguration().getGlobalDomainSize()};
-    tarch::la::Vector<3, int> numberCells;
-    for (unsigned int d = 0; d < 3; d++) {
-      numberCells[d] = floor(domainSize[d] / cellSize[d] + 0.5);
-    }
-    const double densityCell = mdConfig.getDomainConfiguration().getMoleculesPerDirection()[0] *
-                               mdConfig.getDomainConfiguration().getMoleculesPerDirection()[1] *
-                               mdConfig.getDomainConfiguration().getMoleculesPerDirection()[2] / (domainSize[0] * domainSize[1] * domainSize[2]);
-    const double massCell = densityCell * cellSize[0] * cellSize[1] * cellSize[2];
+    const double massCell = cfg.density * cellSize[0] * cellSize[1] * cellSize[2];
 
     // Create the preCICE interface to enable communication between MaMiCo and preCICE
-    _preciceInterface = new CouettePreciceInterface(massCell, scenarioConfig.twoWayCoupling); 
+    _preciceInterface = new CouettePreciceInterface(massCell, cfg.twoWayCoupling);
 
     // init indexing
     coupling::indexing::IndexingService<3>::getInstance().initWithMDSize(
@@ -142,20 +142,20 @@ public:
         (unsigned int)rank);
 
     _multiMDCellService = new coupling::services::MultiMDCellService<MY_LINKEDCELL, dim>(
-        _instanceHandling->getMDSolverInterface(), _preciceInterface, mdConfig, mamicoConfig, xmlConfigurationFilename.c_str(), *_multiMDService);
+        _instanceHandling->getMDSolverInterface(), _preciceInterface, mdConfig, mamicoConfig, _configFilename.c_str(), *_multiMDService);
     // init filtering for all md instances
     _multiMDCellService->constructFilterPipelines();
-    
+
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, dim>::getInstance().setMacroscopicSolverInterface(_preciceInterface);
 
     _instanceHandling->setCouplingCellServices(*_multiMDCellService);
 
-    _multiMDCellService->computeAndStoreTemperature(scenarioConfig.temp);
+    _multiMDCellService->computeAndStoreTemperature(cfg.temp);
 
     // Create the MaMiCo/preCICE adapter and initialie it, i.e.:
     //  - create and communicate the preCICE vertices corresponding to the MaMiCo cartesian grid
     //  - create the CouplingCellContainers used as buffer for communication between MaMiCo and preCICE
-    _preciceAdapter = new coupling::preciceadapter::PreciceAdapter<MY_LINKEDCELL, dim>(_preciceInterface);
+    _preciceAdapter = new coupling::preciceadapter::PreciceAdapter<MY_LINKEDCELL, dim>(_preciceInterface, cfg.preciceConfigFile);
     _preciceAdapter->initialize();
 
     // Start the preCICE solving until the coupling is on going, i.e. until the final time is reached
@@ -165,7 +165,7 @@ public:
       // In case of implicit coupling scheme, it might be required to save the current state
       if (_preciceAdapter->requiresWritingCheckpoint()) {
         std::cout << "Writing checkpoint" << std::endl;
-        _instanceHandling->writeCheckpoint("checkpoint_restart_" + rank, 0);
+        _instanceHandling->writeCheckpoint("checkpoint_restart_" + std::to_string(rank), 0);
       }
 
       _preciceAdapter->readData();
@@ -188,9 +188,9 @@ public:
         std::cout << "Reading checkpoint" << std::endl;
       } else {
         cycle++;
-        if (scenarioConfig.csvEveryTimestep >= 1 && cycle % scenarioConfig.csvEveryTimestep == 0)
+        if (cfg.csvEveryTimestep >= 1 && cycle % cfg.csvEveryTimestep == 0)
           _preciceAdapter->write2csv(cycle);
-      } 
+      }
     }
   }
 
@@ -199,30 +199,6 @@ public:
   coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { throw std::runtime_error("not supported yet"); }
 
 private:
-  struct ScenarioConfig : public tarch::configuration::Configuration {
-    ~ScenarioConfig() {}
-
-    void parseSubtag(tinyxml2::XMLElement* node) override {
-      tinyxml2::XMLElement* subtag = node->FirstChildElement("coupling");
-      tarch::configuration::ParseConfiguration::readIntMandatory(csvEveryTimestep, subtag, "write-csv-every-timestep");
-      tarch::configuration::ParseConfiguration::readBoolMandatory(twoWayCoupling, subtag, "two-way-coupling");
-      subtag = node->FirstChildElement("microscopic-solver");
-      tarch::configuration::ParseConfiguration::readDoubleMandatory(temp, subtag, "temperature");
-      tarch::configuration::ParseConfiguration::readIntMandatory(equSteps, subtag, "equilibration-steps");
-      tarch::configuration::ParseConfiguration::readIntMandatory(totalNumberMDSimulations, subtag, "number-md-simulations");
-    };
-
-    std::string getTag() const override { return "scenario"; };
-
-    bool isValid() const override { return true; };
-
-    int csvEveryTimestep;
-    int equSteps;
-    double temp;
-    int totalNumberMDSimulations;
-    bool twoWayCoupling;
-  };
-
   class CouettePreciceInterface : public coupling::preciceadapter::PreciceInterface<3> {
   private:
     const std::string _macro2MDMeshName;
@@ -235,12 +211,27 @@ private:
       coupling::preciceadapter::PreciceInterface<3>::addDataDescription(
         _macro2MDMeshName, coupling::preciceadapter::DataDescription{"VelocityMacro", coupling::preciceadapter::DataType::vector});
       coupling::preciceadapter::PreciceInterface<3>::addDataDescription(
-        _MD2macroMeshName, coupling::preciceadapter::DataDescription{"VelocityMicro", coupling::preciceadapter::DataType::vector});      
+        _MD2macroMeshName, coupling::preciceadapter::DataDescription{"VelocityMicro", coupling::preciceadapter::DataType::vector});
     }
 
     unsigned int getOuterRegion() override {
       return 3;
     }
+#ifdef MAMICO_MD2MACRO_LAYER3
+    // At hole inset 0 the CFD face lies between the innermost macro2MD layer and
+    // the first md2macro cell. Putting that layer on the MD2macro mesh, carrying
+    // the continuum velocity it was itself given, turns linear-cell-interpolation
+    // on the face into (CFD_own + MD)/2: the IcoFoamInterface operator.
+    bool isMD2Macro(I01 idx) const override { return I12::contains(idx) || isInnermostMacro2MDLayer(idx); }
+    static bool isInnermostMacro2MDLayer(I01 idx) {
+      if (!I08::contains(idx) || I12::contains(idx)) return false;
+      const auto lo = I12::lowerBoundary.get(), hi = I12::upperBoundary.get(), v = idx.get();
+      for (unsigned int d = 0; d < 3; d++)
+        if (v[d] < lo[d] - 1 || v[d] > hi[d] + 1) return false;
+      return true;
+    }
+    mutable std::map<unsigned int, tarch::la::Vector<3, double>> _continuumVelocity;
+#endif
 
     std::vector<unsigned int> getRanks(I01 idx) override { return {0}; }
 
@@ -261,17 +252,27 @@ private:
       return false;
     }
 
-    void readVectorData(const std::string& meshName, const std::string& dataName, coupling::datastructures::CouplingCell<3>* const cell, 
+    void readVectorData(const std::string& meshName, const std::string& dataName, coupling::datastructures::CouplingCell<3>* const cell,
     const I01& idx, const double& vx, const double& vy, const double& vz) const override {
+#ifdef MAMICO_MD2MACRO_LAYER3
+      _continuumVelocity[I00{idx}.get()] = tarch::la::Vector<3, double>{vx, vy, vz};
+#endif
       tarch::la::Vector<3, double> momentum{vx, vy, vz};
       momentum=momentum*_massCell;
       cell->setMicroscopicMass(_massCell);
       cell->setMicroscopicMomentum(momentum);
     }
 
-    void writeVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<3>* const cell, 
+    void writeVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<3>* const cell,
     const I01& idx, double& vx, double& vy, double& vz) const override {
-      tarch::la::Vector<3, double> velocity;
+#ifdef MAMICO_MD2MACRO_LAYER3
+      if (!I12::contains(idx)) {
+        const auto& u = _continuumVelocity.at(I00{idx}.get());
+        vx = u[0]; vy = u[1]; vz = u[2];
+        return;
+      }
+#endif
+      tarch::la::Vector<3, double> velocity(0.0);
       if (cell->getMacroscopicMass() != 0.0) {
         velocity = (1.0 / cell->getMacroscopicMass()) * cell->getMacroscopicMomentum();
       }
@@ -281,9 +282,10 @@ private:
     }
   };
 
-  coupling::preciceadapter::PreciceAdapter<MY_LINKEDCELL, 3>* _preciceAdapter;
-  coupling::preciceadapter::PreciceInterface<3>* _preciceInterface;
-  coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling;
-  tarch::utils::MultiMDService<3>* _multiMDService;
-  coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService;
+  const std::string _configFilename;
+  coupling::preciceadapter::PreciceAdapter<MY_LINKEDCELL, 3>* _preciceAdapter = nullptr;
+  coupling::preciceadapter::PreciceInterface<3>* _preciceInterface = nullptr;
+  coupling::InstanceHandling<MY_LINKEDCELL, 3>* _instanceHandling = nullptr;
+  tarch::utils::MultiMDService<3>* _multiMDService = nullptr;
+  coupling::services::MultiMDCellService<MY_LINKEDCELL, 3>* _multiMDCellService = nullptr;
 };

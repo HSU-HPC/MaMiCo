@@ -36,7 +36,8 @@ public:
   /**
    * Create a new preCICE participant in the coupling scheme and read the preCICE config file
    */
-  PreciceAdapter(coupling::preciceadapter::PreciceInterface<dim>* _preciceInterface): _preciceInterface(_preciceInterface), _rank(0) {
+  PreciceAdapter(coupling::preciceadapter::PreciceInterface<dim>* _preciceInterface, const std::string& preciceConfigFile = "precice-config.xml")
+      : _preciceInterface(_preciceInterface), _rank(0) {
     if (_preciceInterface == nullptr)
       throw new std::runtime_error("PreciceAdapter: preCICE interface == nullptr");
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
@@ -46,7 +47,7 @@ public:
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 #endif
-    _participant = new precice::Participant("mamico", "../precice-config.xml", _rank, size);
+    _participant = new precice::Participant("mamico", preciceConfigFile, _rank, size);
   }
 
   /**
@@ -160,7 +161,17 @@ public:
   }
 
   void sendFromMD2Macro(coupling::services::MultiMDCellService<LinkedCell, dim>* multiMDCellService) {
+#ifdef MAMICO_MD2MACRO_LAYER3
+    // The sendrecv layer keys on I12 and pairs cells by position, so only sampled
+    // md2macro cells may be handed to it; the extra mesh cells are written below
+    // from the continuum velocity instead.
+    coupling::datastructures::FlexibleCellContainer<3> sampled;
+    for (auto pair : _MD2MacroCouplingCells)
+      if (I12::contains(pair.second)) sampled << pair;
+    multiMDCellService->sendFromMD2Macro(sampled);
+#else
     multiMDCellService->sendFromMD2Macro(_MD2MacroCouplingCells);
+#endif
     for (auto pair : _MD2MacroCouplingCells) { // loop over all the macro to micro coupling cells
       I01 idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;

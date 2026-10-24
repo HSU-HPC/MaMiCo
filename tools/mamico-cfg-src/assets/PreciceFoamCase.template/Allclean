@@ -1,0 +1,10 @@
+#!/bin/sh
+cd "${0%/*}" || exit 1
+
+rm -rf constant/polyMesh
+rm -rf processor* postProcessing
+rm -f ./*.log
+# precice-run/ lives next to couette.xml, shared with the MaMiCo participant
+rm -rf ../precice-run ../precice-profiling
+# Every written time directory except the initial condition
+find . -maxdepth 1 -regex './[0-9]+\(\.[0-9]+\)?' ! -name 0 -exec rm -rf {} +

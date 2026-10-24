@@ -76,3 +76,15 @@ def fmt_red(text: str) -> None:
     if os.name == "nt":
         return text
     return f"\033[0;31m{text}\033[0m"
+
+
+def fmt_yellow(text: str) -> None:
+    """Returns text formatted to be printed to the terminal in yellow font.
+    On windows this has no effect.
+
+    Keyword arguments:
+    text -- The text to be formatted
+    """
+    if os.name == "nt":
+        return text
+    return f"\033[0;33m{text}\033[0m"
