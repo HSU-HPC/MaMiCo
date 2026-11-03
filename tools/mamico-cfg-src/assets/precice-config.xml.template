@@ -38,13 +38,8 @@
     <write-data name="{macro2md-data}" mesh="{foam-mesh-outer}" />
     <read-data name="{md2macro-data}" mesh="{foam-mesh-inner}" />
     <mapping:nearest-neighbor direction="write" from="{foam-mesh-outer}" to="{macro2md-mesh}" constraint="consistent" />
-    <!--          The MD->CFD boundary value must be an average over a volume centred on
-         the boundary point (Nie 2004 section 2), not one cell half a cell away.
-         This needs the hole face to lie strictly inside md2macro, which
-         _precice_hole_inset in solver_cfd.py arranges; it also makes preCICE
-         report requiresMeshConnectivityFor(md2macro), which is what triggers
-         PreciceAdapter::setMeshTetrahedra to supply the connectivity. -->
-    <mapping:linear-cell-interpolation direction="read" from="{md2macro-mesh}" to="{foam-mesh-inner}" constraint="consistent" />
+    <!-- MD -> CFD read mapping onto the hole faces, chosen by the hole_operator option in solver_cfd.py -->
+    <mapping:nearest-neighbor direction="read" from="{md2macro-mesh}" to="{foam-mesh-inner}" constraint="consistent" />
   </participant>
 
   <m2n:sockets acceptor="{mamico-participant}" connector="{foam-participant}" />

@@ -15,8 +15,9 @@ preciceConfig "{precice-config}";
 
 participant {foam-participant};
 
-// FF claims data names by case-insensitive prefix, so Velocity* reaches its U coupler.
-modules (FF);
+// The generic module names the OpenFOAM field per data entry (solver_name); the FF
+// module would claim every data name starting with "Velocity" and bind both to U.
+modules (generic);
 
 // Schwarz-style split, mirroring the direct IcoFoam coupling in MaMiCo:
 //   MD  -> CFD  as Dirichlet values on the hole surface (faceCenters)
@@ -33,7 +34,7 @@ interfaces
 
     readData
     (
-      {md2macro-data}
+      {md2macro-read-entry}
     );
   };
 
@@ -46,7 +47,7 @@ interfaces
 
     writeData
     (
-      {macro2md-data}
+      {macro2md-write-entry}
     );
   };
 };

@@ -168,7 +168,7 @@ public:
         _instanceHandling->writeCheckpoint("checkpoint_restart_" + std::to_string(rank), 0);
       }
 
-      _preciceAdapter->readData();
+      _preciceAdapter->readData(mamico_dt);
       _preciceAdapter->sendFromMacro2MD(_multiMDCellService);
 
       // Subcycle MD solving by a number of timesteps given in the config file
@@ -217,22 +217,6 @@ private:
     unsigned int getOuterRegion() override {
       return 3;
     }
-#ifdef MAMICO_MD2MACRO_LAYER3
-    // At hole inset 0 the CFD face lies between the innermost macro2MD layer and
-    // the first md2macro cell. Putting that layer on the MD2macro mesh, carrying
-    // the continuum velocity it was itself given, turns linear-cell-interpolation
-    // on the face into (CFD_own + MD)/2: the IcoFoamInterface operator.
-    bool isMD2Macro(I01 idx) const override { return I12::contains(idx) || isInnermostMacro2MDLayer(idx); }
-    static bool isInnermostMacro2MDLayer(I01 idx) {
-      if (!I08::contains(idx) || I12::contains(idx)) return false;
-      const auto lo = I12::lowerBoundary.get(), hi = I12::upperBoundary.get(), v = idx.get();
-      for (unsigned int d = 0; d < 3; d++)
-        if (v[d] < lo[d] - 1 || v[d] > hi[d] + 1) return false;
-      return true;
-    }
-    mutable std::map<unsigned int, tarch::la::Vector<3, double>> _continuumVelocity;
-#endif
-
     std::vector<unsigned int> getRanks(I01 idx) override { return {0}; }
 
     std::string getMacro2MDSolverMeshName(I01 idx) const override {
@@ -254,9 +238,6 @@ private:
 
     void readVectorData(const std::string& meshName, const std::string& dataName, coupling::datastructures::CouplingCell<3>* const cell,
     const I01& idx, const double& vx, const double& vy, const double& vz) const override {
-#ifdef MAMICO_MD2MACRO_LAYER3
-      _continuumVelocity[I00{idx}.get()] = tarch::la::Vector<3, double>{vx, vy, vz};
-#endif
       tarch::la::Vector<3, double> momentum{vx, vy, vz};
       momentum=momentum*_massCell;
       cell->setMicroscopicMass(_massCell);
@@ -265,13 +246,6 @@ private:
 
     void writeVectorData(const std::string& meshName, const std::string& dataName, const coupling::datastructures::CouplingCell<3>* const cell,
     const I01& idx, double& vx, double& vy, double& vz) const override {
-#ifdef MAMICO_MD2MACRO_LAYER3
-      if (!I12::contains(idx)) {
-        const auto& u = _continuumVelocity.at(I00{idx}.get());
-        vx = u[0]; vy = u[1]; vz = u[2];
-        return;
-      }
-#endif
       tarch::la::Vector<3, double> velocity(0.0);
       if (cell->getMacroscopicMass() != 0.0) {
         velocity = (1.0 / cell->getMacroscopicMass()) * cell->getMacroscopicMomentum();

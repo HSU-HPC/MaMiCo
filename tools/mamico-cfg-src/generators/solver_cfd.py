@@ -31,15 +31,15 @@ _foam_inner_patches = ("lefti", "righti", "fronti", "backi", "buttomi", "topi")
 # Overlap layers MaMiCo keeps outside its md2macro region
 # (CouettePreciceInterface::getOuterRegion in coupling/scenario/precice/CouetteScenario.h)
 _precice_outer_region = 3
-# Extra cell layers by which the OpenFOAM hole is pulled INSIDE the md2macro
-# region. With 0 the hole face coincides with the md2macro boundary, so a
-# nearest-neighbor read mapping hands the CFD one cell half a cell away. With 1
-# the face lies strictly between two genuinely sampled MaMiCo cells, which is
-# what makes linear-cell-interpolation a real (inner+outer)/2 average over a
-# volume centred on the boundary -- the operator Nie 2004 section 2 specifies
-# and the one the direct IcoFoamInterface coupling used. getOuterRegion() stays
-# at 3, so the Nie momentum layers are untouched.
-_precice_hole_inset = 1  # default; overridden by the hole_inset option
+# The OpenFOAM hole coincides with the md2macro boundary. A nearest-neighbor read
+# mapping hands each hole face the MD cell half a cell inside it, and the face value
+# is formed inside the participant as (own cell + MD)/2, the operator of
+# IcoFoamInterface. getOuterRegion() stays at 3, so the Nie momentum layers are untouched.
+# OpenFOAM field that carries the received MD velocity.
+_foam_md_carrier = "UMD"
+# Copy of U frozen at the start of each coupling window: the own-cell half of the face
+# value in IcoFoamInterface is set once per cycle from the field of that moment.
+_foam_cfd_frozen = "UCFD"
 _precice_config_name = "precice-config.xml"
 _precice_foam_case_name = "FoamCase"
 
@@ -68,9 +68,8 @@ def _get_geometry(get_config_value) -> dict:
     md_max = (offset_xy + md_size, offset_xy + md_size, offset_z + md_size)
 
     overlap = _precice_outer_region * cell_size
-    hole_overlap = (_precice_outer_region + int(get_config_value("hole_inset"))) * cell_size
-    hole_min = tuple(v + hole_overlap for v in md_min)
-    hole_max = tuple(v - hole_overlap for v in md_max)
+    hole_min = tuple(v + overlap for v in md_min)
+    hole_max = tuple(v - overlap for v in md_max)
 
     def counts(lo, hi):
         # cells below / inside / above the hole along one axis
@@ -96,8 +95,8 @@ def _get_geometry(get_config_value) -> dict:
         # Cells between the hole surface and the md2macro boundary exist in the
         # CFD mesh but must not join mdShell, which has to stay exactly the
         # _precice_outer_region macro2MD layers getOuterRegion() defines.
-        # With _precice_hole_inset = 0 this box holds no cells and the
-        # corresponding topoSet delete action is a no-op.
+        # The hole sits at the md2macro boundary, so this box holds no cells
+        # and the corresponding topoSet delete action is a no-op.
         shell_cut_min=tuple(v + overlap for v in md_min),
         shell_cut_max=tuple(v - overlap for v in md_max),
     )
@@ -139,16 +138,35 @@ def _get_side_conditions(get_config_value) -> dict:
 def _get_hole_condition(get_config_value) -> dict:
     """Whether MD velocities actually reach the CFD solution.
 
-    Two-way: Dirichlet on the hole faces; the adapter overwrites them each window.
+    Two-way: each hole face takes (own cell + MD)/2, with the MD value read into the
+    carrier field by the adapter and the own cell taken from the copy frozen at the
+    window start.
     One-way: zeroGradient, so the BC re-derives itself from the interior and the values
     the adapter writes are discarded. MaMiCo and preCICE still exchange both directions
     -- the published arrangement is "technically bidirectional, physically
     unidirectional" (Neumann & Bian section 4), and PreciceAdapter only registers
     MD2macro vertices under twoWayCoupling(), which preCICE needs non-empty.
     """
-    if get_config_value("coupling_2way"):
-        return {"hole-u-bc": "type            fixedValue;\n        value           uniform (0 0 0);"}
-    return {"hole-u-bc": "type            zeroGradient;"}
+    if not get_config_value("coupling_2way"):
+        return {"hole-u-bc": "type            zeroGradient;"}
+    return {"hole-u-bc": ("type            uniformFixedValue;\n        uniformValue\n        {\n            type        expression;\n"
+                          "            expression  \"0.5*(internalField(%s) + %s)\";\n        }\n        value           uniform (0 0 0);") % (_foam_cfd_frozen, _foam_md_carrier)}
+
+
+def _get_adapter_setup(get_config_value) -> dict:
+    """preciceDict data entries and the controlDict function objects behind the carrier fields."""
+    window = get_timesteps_per_coupling_cycle(get_config_value) * MD_TIMESTEP
+    # readFields loads on construction, i.e. before the adapter configures.
+    functions = "    readCarrier\n    {\n        type readFields;\n        libs (fieldFunctionObjects);\n        fields (%s %s);\n    }\n" % (_foam_md_carrier, _foam_cfd_frozen)
+    # Runs at every window end, before the adapter advances preCICE (list order).
+    functions += ("    freezeOwnCell\n    {\n        type exprField;\n        libs (fieldFunctionObjects);\n"
+                  "        field %s;\n        action modify;\n        expression \"U\";\n"
+                  "        executeControl runTime;\n        executeInterval %g;\n        writeControl none;\n    }\n") % (_foam_cfd_frozen, window)
+    return {
+        "md2macro-read-entry": "%s { name %s; solver_name %s; operation value; }" % (_precice_md2macro_data, _precice_md2macro_data, _foam_md_carrier),
+        "macro2md-write-entry": "%s { name %s; solver_name U; operation value; }" % (_precice_macro2md_data, _precice_macro2md_data),
+        "carrier-function": functions,
+    }
 
 
 def _create_precice_config(get_config_value) -> Path:
@@ -209,6 +227,7 @@ def _create_precice_foam_case(get_config_value) -> Path:
     }
     substitutions.update(_get_side_conditions(get_config_value))
     substitutions.update(_get_hole_condition(get_config_value))
+    substitutions.update(_get_adapter_setup(get_config_value))
     for axis, ns in (("nx", geometry["nx"]), ("ny", geometry["ny"]), ("nz", geometry["nz"])):
         for idx, n in enumerate(ns):
             substitutions["%s%d" % (axis, idx)] = n

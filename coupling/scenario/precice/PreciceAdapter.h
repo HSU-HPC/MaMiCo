@@ -106,12 +106,14 @@ public:
   void advance(const double dt) { _participant->advance(dt); }
 
   /**
-   * Call the participant readData, send the values stored in the data buffer to the participant
+   * Call the participant readData, send the values stored in the data buffer to the participant.
+   * dt is the coupling window this participant is about to advance by: the data is read at the
+   * end of the window, i.e. the values the other participant has just written.
    */
-  void readData() {
+  void readData(const double dt) {
     for (auto& meshData : _macro2MDData) {
       for (auto& dataValues : meshData.second) {
-        _participant->readData(meshData.first, dataValues.first, _macro2MDIndices[meshData.first], 0, dataValues.second);
+        _participant->readData(meshData.first, dataValues.first, _macro2MDIndices[meshData.first], dt, dataValues.second);
       }
     }
   }
@@ -161,17 +163,7 @@ public:
   }
 
   void sendFromMD2Macro(coupling::services::MultiMDCellService<LinkedCell, dim>* multiMDCellService) {
-#ifdef MAMICO_MD2MACRO_LAYER3
-    // The sendrecv layer keys on I12 and pairs cells by position, so only sampled
-    // md2macro cells may be handed to it; the extra mesh cells are written below
-    // from the continuum velocity instead.
-    coupling::datastructures::FlexibleCellContainer<3> sampled;
-    for (auto pair : _MD2MacroCouplingCells)
-      if (I12::contains(pair.second)) sampled << pair;
-    multiMDCellService->sendFromMD2Macro(sampled);
-#else
     multiMDCellService->sendFromMD2Macro(_MD2MacroCouplingCells);
-#endif
     for (auto pair : _MD2MacroCouplingCells) { // loop over all the macro to micro coupling cells
       I01 idx;
       coupling::datastructures::CouplingCell<3>* couplingCell;

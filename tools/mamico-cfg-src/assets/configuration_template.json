@@ -1,244 +1,231 @@
 [
-  {
-    "key": "domain_size",
-    "label": "domain size",
-    "options": [
-      {
-        "selected": true,
-        "value": "small",
-        "description": "MD/CFD domain size = 30\u00b3/50\u00b3"
-      },
-      {
-        "value": "medium",
-        "description": "MD/CFD domain size = 60\u00b3/100\u00b3"
-      },
-      {
-        "value": "large",
-        "description": "MD/CFD domain size = 120\u00b3/200\u00b3"
-      }
-    ]
-  },
-  {
-    "key": "use_checkpoint",
-    "label": "use checkpoint",
-    "options": [
-      {
-        "selected": true,
-        "value": true
-      },
-      {
-        "value": false
-      }
-    ]
-  },
-  {
-    "key": "solver_md",
-    "label": "MD solver",
-    "options": [
-      {
-        "selected": true,
-        "value": "md",
-        "label": "Simple MD"
-      },
-      {
-        "value": "ls1",
-        "label": "ls1 mardyn"
-      }
-    ]
-  },
-  {
-    "key": "solver_cfd",
-    "label": "CFD solver",
-    "options": [
-      {
-        "value": "analytical"
-      },
-      {
-        "selected": true,
-        "value": "lb",
-        "label": "lattice Boltzmann"
-      },
-      {
-        "value": "fd",
-        "label": "finite difference"
-      },
-      {
-        "value": "foam",
-        "label": "OpenFOAM"
-      },
-      {
-        "value": "precice",
-        "label": "preCICE",
-        "description": "external solver via preCICE (generates an OpenFOAM participant)"
-      }
-    ]
-  },
-  {
-    "key": "mpi_ranks",
-    "label": "ranks/MD inst.",
-    "options": [
-      {
-        "selected": true,
-        "value": 1
-      },
-      {
-        "value": 2
-      },
-      {
-        "value": 4
-      },
-      {
-        "value": 8
-      },
-      {
-        "value": 64
-      },
-      {
-        "value": 512
-      }
-    ]
-  },
-  {
-    "key": "cell_size",
-    "label": "cell size",
-    "options": [
-      {
-        "selected": true,
-        "value": 2.5
-      },
-      {
-        "value": 5
-      },
-      {
-        "value": 7.5
-      },
-      {
-        "value": 10
-      }
-    ]
-  },
-  {
-    "key": "boundary",
-    "options": [
-      {
-        "selected": true,
-        "value": "reflecting"
-      },
-      {
-        "value": "XY-periodic"
-      },
-      {
-        "value": "periodic"
-      }
-    ]
-  },
-  {
-    "key": "coupling_2way",
-    "label": "2-way coupling",
-    "options": [
-      {
-        "selected": true,
-        "value": false
-      },
-      {
-        "value": true
-      }
-    ]
-  },
-  {
-    "key": "filtering",
-    "options": [
-      {
-        "selected": true,
-        "value": false
-      },
-      {
-        "value": "gauss",
-        "label": "2D gaussian"
-      },
-      {
-        "value": "nlm",
-        "label": "non-local means"
-      }
-    ]
-  },
-  {
-    "key": "simulation",
-    "options": [
-      {
-        "selected": true,
-        "value": "test",
-        "description": "50 coupling cycles"
-      },
-      {
-        "value": "short",
-        "description": "250 \u00d7 domain size\u00b2 coupling cycles"
-      },
-      {
-        "value": "normal",
-        "description": "500 \u00d7 domain size\u00b2 coupling cycles"
-      }
-    ]
-  },
-  {
-    "key": "multi_md",
-    "label": "MD instances",
-    "options": [
-      {
-        "selected": true,
-        "value": 1
-      },
-      {
-        "value": 2
-      },
-      {
-        "value": 20
-      },
-      {
-        "value": 60
-      },
-      {
-        "value": 200
-      }
-    ]
-  },
-  {
-    "key": "thermostat",
-    "label": "Thermostat region",
-    "options": [
-      {
-        "selected": true,
-        "value": "outerLayers"
-      },
-      {
-        "value": "all"
-      }
-    ]
-  },
-  {
-    "key": "hole_inset",
-    "label": "CFD hole inset (cells inside md2macro)",
-    "options": [
-      {
-        "selected": true,
-        "value": 1
-      },
-      {
-        "value": 0
-      }
-    ]
-  },
-  {
-    "key": "coupling_dt",
-    "label": "Coupling time step (MD time units)",
-    "options": [
-      {
-        "selected": true,
-        "value": 0.25
-      },
-      {
-        "value": 0.5
-      }
-    ]
-  }
+   {
+      "key": "domain_size",
+      "label": "domain size",
+      "options": [
+         {
+            "selected": true,
+            "value": "small",
+            "description": "MD/CFD domain size = 30³/50³"
+         },
+         {
+            "value": "medium",
+            "description": "MD/CFD domain size = 60³/100³"
+         },
+         {
+            "value": "large",
+            "description": "MD/CFD domain size = 120³/200³"
+         }
+      ]
+   },
+   {
+      "key": "use_checkpoint",
+      "label": "use checkpoint",
+      "options": [
+         {
+            "selected": true,
+            "value": true
+         },
+         {
+            "value": false
+         }
+      ]
+   },
+   {
+      "key": "solver_md",
+      "label": "MD solver",
+      "options": [
+         {
+            "selected": true,
+            "value": "md",
+            "label": "Simple MD"
+         },
+         {
+            "value": "ls1",
+            "label": "ls1 mardyn"
+         }
+      ]
+   },
+   {
+      "key": "solver_cfd",
+      "label": "CFD solver",
+      "options": [
+         {
+            "value": "analytical"
+         },
+         {
+            "selected": true,
+            "value": "lb",
+            "label": "lattice Boltzmann"
+         },
+         {
+            "value": "fd",
+            "label": "finite difference"
+         },
+         {
+            "value": "foam",
+            "label": "OpenFOAM"
+         },
+         {
+            "value": "precice",
+            "label": "preCICE",
+            "description": "external solver via preCICE (generates an OpenFOAM participant)"
+         }
+      ]
+   },
+   {
+      "key": "mpi_ranks",
+      "label": "ranks/MD inst.",
+      "options": [
+         {
+            "selected": true,
+            "value": 1
+         },
+         {
+            "value": 2
+         },
+         {
+            "value": 4
+         },
+         {
+            "value": 8
+         },
+         {
+            "value": 64
+         },
+         {
+            "value": 512
+         }
+      ]
+   },
+   {
+      "key": "cell_size",
+      "label": "cell size",
+      "options": [
+         {
+            "selected": true,
+            "value": 2.5
+         },
+         {
+            "value": 5
+         },
+         {
+            "value": 7.5
+         },
+         {
+            "value": 10
+         }
+      ]
+   },
+   {
+      "key": "boundary",
+      "options": [
+         {
+            "selected": true,
+            "value": "reflecting"
+         },
+         {
+            "value": "XY-periodic"
+         },
+         {
+            "value": "periodic"
+         }
+      ]
+   },
+   {
+      "key": "coupling_2way",
+      "label": "2-way coupling",
+      "options": [
+         {
+            "selected": true,
+            "value": false
+         },
+         {
+            "value": true
+         }
+      ]
+   },
+   {
+      "key": "filtering",
+      "options": [
+         {
+            "selected": true,
+            "value": false
+         },
+         {
+            "value": "gauss",
+            "label": "2D gaussian"
+         },
+         {
+            "value": "nlm",
+            "label": "non-local means"
+         }
+      ]
+   },
+   {
+      "key": "simulation",
+      "options": [
+         {
+            "selected": true,
+            "value": "test",
+            "description": "50 coupling cycles"
+         },
+         {
+            "value": "short",
+            "description": "250 × domain size² coupling cycles"
+         },
+         {
+            "value": "normal",
+            "description": "500 × domain size² coupling cycles"
+         }
+      ]
+   },
+   {
+      "key": "multi_md",
+      "label": "MD instances",
+      "options": [
+         {
+            "selected": true,
+            "value": 1
+         },
+         {
+            "value": 2
+         },
+         {
+            "value": 20
+         },
+         {
+            "value": 60
+         },
+         {
+            "value": 200
+         }
+      ]
+   },
+   {
+      "key": "thermostat",
+      "label": "Thermostat region",
+      "options": [
+         {
+            "selected": true,
+            "value": "outerLayers"
+         },
+         {
+            "value": "all"
+         }
+      ]
+   },
+   {
+      "key": "coupling_dt",
+      "label": "Coupling time step (MD time units)",
+      "options": [
+         {
+            "selected": true,
+            "value": 0.25
+         },
+         {
+            "value": 0.5
+         }
+      ]
+   }
 ]

@@ -42,6 +42,7 @@ libs            ("libpreciceAdapterFunctionObject.so");
 
 functions
 {
+{carrier-function}
     // Must stay last: it ends the run and triggers every other function object's end()
     preCICE_Adapter
     {

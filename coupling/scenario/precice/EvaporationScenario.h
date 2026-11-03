@@ -150,7 +150,7 @@ public:
    
     while (_preciceAdapter->isCouplingOngoing()) {
 
-      _preciceAdapter->readData();
+      _preciceAdapter->readData(mamico_dt);
       _preciceAdapter->sendFromMacro2MD(_multiMDCellService);
 
       _instanceHandling->simulateTimesteps(mdConfig.getSimulationConfiguration().getNumberOfTimesteps(), mdStepCounter, *_multiMDCellService);
