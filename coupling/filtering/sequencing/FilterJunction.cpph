@@ -104,8 +104,9 @@ int coupling::filtering::FilterJunction<dim, inputc>::loadFiltersFromXML(
       }
 
       // Instantiation
-      newjunctor = new coupling::filtering::NLM<dim>(inputCellVector[inputp_unfiltered], inputCellVector[inputp_prefiltered], outputCellVector[outputp],
-                                                     coupling::filtering::FilterSequence<dim>::_filteredValues, tws, sigsq, sigsq_rel, hsq, hsq_rel);
+      newjunctor = new coupling::filtering::NLM<dim, coupling::indexing::IndexTrait::local>(
+          inputCellVector[inputp_unfiltered], inputCellVector[inputp_prefiltered], outputCellVector[outputp],
+          coupling::filtering::FilterSequence<dim>::_filteredValues, tws, sigsq, sigsq_rel, hsq, hsq_rel);
 
       // TODO: generalize this for arbitrary junctors?
       // Swapping for output partition

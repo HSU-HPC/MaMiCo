@@ -46,29 +46,40 @@ MAMICO_BUILD_TYPE_DEBUG = "DebugMD"
 # LAMMPS
 LAMMPS_REPO_DIR = MAMICO_BUILD_DIR / "LAMMPS"
 LAMMPS_REPO_URL = "https://github.com/lammps/lammps.git"
-LAMMPS_REPO_BRANCH = "release"
+LAMMPS_REPO_REF = os.getenv("LAMMPS_REPO_REF", "release")
 
 # OpenFOAM
 OPEN_FOAM_BASE_DIR = MAMICO_BUILD_DIR / "openfoam"
-OPEN_FOAM_VERSION = "2206"
+OPEN_FOAM_VERSION = os.getenv("OPEN_FOAM_VERSION", "2606")
 OPEN_FOAM_SRC_DIR = OPEN_FOAM_BASE_DIR / f"OpenFOAM-v{OPEN_FOAM_VERSION}"
 OPEN_FOAM_URL = f"https://dl.openfoam.com/source/v{OPEN_FOAM_VERSION}/OpenFOAM-v{OPEN_FOAM_VERSION}.tgz"
 OPEN_FOAM_THIRD_PARTY_REPO_DIR = OPEN_FOAM_SRC_DIR / "ThirdParty"
-OPEN_FOAM_THIRD_PARTY_URL = "https://dl.openfoam.com/source/v2206/ThirdParty-v2206.tgz"
+OPEN_FOAM_THIRD_PARTY_URL = f"https://dl.openfoam.com/source/v{OPEN_FOAM_VERSION}/ThirdParty-v{OPEN_FOAM_VERSION}.tar.gz"
 
 
 def shell(cmd):
     print(
-        f"{getpass.getuser()}@{socket.gethostname()}:{os.getcwd()}$ {cmd}",
-        flush=True
+        f"{getpass.getuser()}@{socket.gethostname()}:{os.getcwd()}$ {cmd}", flush=True
     )
     cmd = f"{cmd} 2>&1"
     return subprocess.call(["/bin/bash", "-c", "set -o pipefail; " + cmd])
 
 
-def git_clone_shallow(repository_url, repository_dir, branch):
-    cmd = f"git clone -b {branch} --depth 1 --single-branch {repository_url} {repository_dir}"
-    return 0 != shell(cmd)
+def git_clone_shallow(repository_url, repository_dir, ref):
+    if not os.path.exists(repository_dir):
+        if shell(f"git clone --no-checkout {repository_url} {repository_dir}") != 0:
+            return True
+
+        return git_clone_shallow(repository_url, repository_dir, ref)
+
+    if not os.path.isdir(os.path.join(repository_dir, ".git")):
+        print(f"{repository_dir} exists but is not a git repository")
+        return True
+
+    if shell(f"git -C {repository_dir} fetch --depth 1 origin {ref}") != 0:
+        return True
+
+    return shell(f"git -C {repository_dir} checkout --detach FETCH_HEAD") != 0
 
 
 def build_ls1(mamico_repo_dir, with_mpi=False, jobs=8, force_gcc=False):
@@ -108,33 +119,48 @@ def download_open_foam():
     OPEN_FOAM_BASE_DIR.mkdir(exist_ok=True)
 
     def download_and_extract(url, archive_filename):
-        return 0 != shell(
-            f"wget -q -nc -O {archive_filename} {url} && tar -xzf {archive_filename} && rm {archive_filename}"
-        )
+        had_error = False
+        had_error |= 0 != shell(f"wget -q -nc -O {archive_filename} {url}")
+        if not had_error:
+            had_error |= 0 != shell(f"tar -xzf {archive_filename}")
+            if not had_error:
+                Path(archive_filename).unlink()
+        if had_error:
+            print(f"Error downloading {archive_filename} from {url}")
+        return had_error
 
     with ChangeDir(OPEN_FOAM_BASE_DIR):
         had_error |= download_and_extract(
             OPEN_FOAM_URL, f"OpenFOAM-v{OPEN_FOAM_VERSION}.tgz"
         )
     if not had_error:
-        with ChangeDir(OPEN_FOAM_SRC_DIR):
-            print(f"Downloading OpenFOAM-v{OPEN_FOAM_VERSION} third party files...")
-            had_error |= download_and_extract(
-                OPEN_FOAM_THIRD_PARTY_URL, f"ThirdParty-v{OPEN_FOAM_VERSION}.tgz"
-            )
-            if not had_error:
-                had_error = 0 != shell(f"mv ThirdParty-v{OPEN_FOAM_VERSION} ThirdParty")
+        if OPEN_FOAM_SRC_DIR.is_dir():
+            with ChangeDir(OPEN_FOAM_SRC_DIR):
+                print(f"Downloading OpenFOAM-v{OPEN_FOAM_VERSION} third party files...")
+                had_error |= download_and_extract(
+                    OPEN_FOAM_THIRD_PARTY_URL, f"ThirdParty-v{OPEN_FOAM_VERSION}.tgz"
+                )
+                if not had_error:
+                    had_error = 0 != shell(
+                        f"mv ThirdParty-v{OPEN_FOAM_VERSION} ThirdParty"
+                    )
+        else:
+            had_error = True
+    if had_error:
+        shutil.rmtree(OPEN_FOAM_SRC_DIR, ignore_errors=True)
     return had_error
 
 
 def build_open_foam(jobs=8):
     print("Building OpenFOAM from source...")
     had_error = False
-    if not OPEN_FOAM_BASE_DIR.exists():
+    if not OPEN_FOAM_SRC_DIR.exists():
         had_error |= download_open_foam()
         if had_error:
-            shutil.rmtree(OPEN_FOAM_BASE_DIR)
+            shutil.rmtree(OPEN_FOAM_SRC_DIR, ignore_errors=True)
             return had_error
+    else:
+        print(f"Found {OPEN_FOAM_SRC_DIR} (Skipping download.)")
     with ChangeDir(OPEN_FOAM_SRC_DIR):
         cmd_build = ""
         cmd_build += f"source {OPEN_FOAM_SRC_DIR / 'etc' / 'bashrc'};"
@@ -144,7 +170,9 @@ def build_open_foam(jobs=8):
         )  # Building OpenFOAM has some irrelevant errors (non-zero exit code)
     if not had_error:
         # Rename unused logging macro to avoid issue when compiling MaMiCo with both OpenFOAM and ls1
-        had_error = 0 != shell(f"sed -i 's/^#define Log/#define FoamLog/g' {OPEN_FOAM_SRC_DIR}/src/OpenFOAM/lnInclude/messageStream.H")
+        had_error = 0 != shell(
+            f"sed -i 's/^#define Log/#define FoamLog/g' {OPEN_FOAM_SRC_DIR}/src/OpenFOAM/lnInclude/messageStream.H"
+        )
     return had_error
 
 
@@ -152,9 +180,7 @@ def build_lammps(with_mpi, jobs=8):
     print("Building LAMMPS from source...")
     had_error = False
     if not LAMMPS_REPO_DIR.exists():
-        had_error = git_clone_shallow(
-            LAMMPS_REPO_URL, LAMMPS_REPO_DIR, LAMMPS_REPO_BRANCH
-        )
+        had_error = git_clone_shallow(LAMMPS_REPO_URL, LAMMPS_REPO_DIR, LAMMPS_REPO_REF)
     build_dir = LAMMPS_REPO_DIR / "build"
     install_dir = LAMMPS_REPO_DIR / "install"
     build_dir.mkdir(exist_ok=True)
@@ -196,8 +222,15 @@ md_solvers = dict(
 
 
 # FIXME: LAMMPS is not found during linking
-def build_mamico_couette(
-    md_solver="md", with_openfoam=False, with_mpi=False, with_tests=False, is_debug=False, jobs=8, clean=False, force_gcc=False
+def build_mamico_couette_md(
+    md_solver="md",
+    with_openfoam=False,
+    with_mpi=False,
+    with_tests=False,
+    is_debug=False,
+    jobs=8,
+    clean=False,
+    force_gcc=False,
 ):
     run_info = f"Started {time.strftime('%Y-%m-%d %H:%M:%S %Z')}"
     print(run_info)
@@ -271,7 +304,11 @@ if __name__ == "__main__":
     arg_parser.add_argument("-c", "--clean", action="store_true")
     args = arg_parser.parse_args()
 
-    exec_path = build_mamico_couette(
+    assert shell("cmake --version >/dev/null") == 0, "CMake not installed or loaded!"
+    if args.with_mpi:
+        assert shell("mpicxx --version >/dev/null") == 0, "MPI not installed or loaded!"
+
+    exec_path = build_mamico_couette_md(
         md_solver=args.md_solver,
         with_openfoam=args.with_foam,
         with_mpi=args.with_mpi,
@@ -279,7 +316,7 @@ if __name__ == "__main__":
         is_debug=args.debug,
         jobs=args.jobs,
         clean=args.clean,
-        force_gcc=args.force_gcc
+        force_gcc=args.force_gcc,
     )
     if exec_path is not None:
         print(exec_path)

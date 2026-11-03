@@ -150,7 +150,7 @@ public:
     bool found = false;
     while (_curIterator.isValid()) {
       ::Molecule* temp = &(*_curIterator);
-      if (temp->r(0) == molPosition[0] && temp->r(1) == molPosition[1] && temp->r(2) == molPosition[2]) {
+      if (std::abs(temp->r(0) - molPosition[0]) < 1e-6 && std::abs(temp->r(1) - molPosition[1]) < 1e-6 && std::abs(temp->r(2) - molPosition[2]) < 1e-6) {
         found = true;
         break;
       }

@@ -12,9 +12,22 @@ simplemd::MoleculeContainer::MoleculeContainer(simplemd::services::ParallelTopol
       _globalIndexOfFirstCell(parallelTopologyService.getGlobalIndexOfFirstCell()), _localIndexOfFirstCell(parallelTopologyService.getLocalIndexOfFirstCell()),
       _moleculeData("moleculeData", parallelTopologyService.getLocalNumberOfCellsLinear(true), cellCapacity),
       _linkedCellNumMolecules("linkedCellNumMolecules", parallelTopologyService.getLocalNumberOfCellsLinear(true)),
-      _linkedCellIsGhostCell("linkedCellIsGhostCell", _linkedCellNumMolecules.size()) {
+      _linkedCellIsGhostCell("linkedCellIsGhostCell", _linkedCellNumMolecules.size()), _neighborOffsets("neighborOffsets", 26) {
+
+  auto host_mirror1 = Kokkos::create_mirror_view(_linkedCellIsGhostCell);
   for (unsigned int i = 0; i < _linkedCellIsGhostCell.size(); i++)
-    _linkedCellIsGhostCell(i) = isGhostCell(i);
+    host_mirror1(i) = isGhostCell(i);
+  Kokkos::deep_copy(_linkedCellIsGhostCell, host_mirror1);
+
+  const int nc0 = (int)_numLocalCellsNoGhost[0] + 2;
+  const int nc01 = nc0 * ((int)_numLocalCellsNoGhost[1] + 2);
+  const std::vector<int> buff{1,        -1,        nc0,        -nc0,        nc0 + 1,        nc0 - 1,        -nc0 + 1,        -nc0 - 1,        nc01,
+                              1 + nc01, -1 + nc01, nc0 + nc01, -nc0 + nc01, nc0 + 1 + nc01, nc0 - 1 + nc01, -nc0 + 1 + nc01, -nc0 - 1 + nc01, -nc01,
+                              1 - nc01, -1 - nc01, nc0 - nc01, -nc0 - nc01, nc0 + 1 - nc01, nc0 - 1 - nc01, -nc0 + 1 - nc01, -nc0 - 1 - nc01};
+  auto host_mirror = Kokkos::create_mirror_view(_neighborOffsets);
+  for (unsigned int i = 0; i < 26; i++)
+    host_mirror(i) = buff[i];
+  Kokkos::deep_copy(_neighborOffsets, host_mirror);
 }
 
 void simplemd::MoleculeContainer::insert(unsigned int cellIdx, const simplemd::Molecule& molecule) {
@@ -37,7 +50,7 @@ void simplemd::MoleculeContainer::remove(unsigned int cellIdx, unsigned int mole
                    _linkedCellNumMolecules(cellIdx));
     Kokkos::abort("ERROR simplemd::MoleculeContainer::remove\n");
   }
-  if (cellIdx >= _linkedCellNumMolecules(cellIdx)) {
+  if (cellIdx >= _linkedCellNumMolecules.size()) {
     Kokkos::printf("Deleting particle from cell that does not exist! moleculeIdx: %d, cellIdx: %d, num molecules: %d\n", moleculeIdx, cellIdx,
                    _linkedCellNumMolecules(cellIdx));
     Kokkos::abort("ERROR simplemd::MoleculeContainer::remove\n");
@@ -113,7 +126,7 @@ void simplemd::MoleculeContainer::sort() {
         // parallelise loop for all cells that are to be traversed in this way
         printNonGhostCells(true, "host start sort");
         Kokkos::parallel_for(
-            Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int j) {
+            "simplemd::MoleculeContainer::sort", Kokkos::RangePolicy<MainExecSpace>(0, length), KOKKOS_CLASS_LAMBDA(const unsigned int j) {
               printNonGhostCells(j == 0, "device start sort");
               // compute index of the current cell
               unsigned int index = 0;
@@ -226,17 +239,18 @@ unsigned int simplemd::MoleculeContainer::positionToCellIndex(const tarch::la::V
     index += _localIndexOfFirstCell[d];
     index -= _globalIndexOfFirstCell[d];
 #if (MD_ERROR == MD_YES)
-    if (index < 0) {
-      Kokkos::printf("index < 0: index=%ld; "
+    if (index < 0 || index > _numCells[d]) {
+      Kokkos::printf("index %s: index=%ld; "
                      "Dimension : dim=%u, GIFC=%u, LIFC=%u, cell=%ld; "
                      "cellVectorIndex: %u %u %u; "
                      "Position: %lf %lf %lf; "
                      "offset: %lf %lf %lf; "
                      "meshwidth: %lf %lf %lf"
                      "\n",
-                     index, d, _globalIndexOfFirstCell[d], _localIndexOfFirstCell[d], (long int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])),
-                     cellVectorIndex[0], cellVectorIndex[1], MD_DIM3_OR0(cellVectorIndex[2]), position[0], position[1], MD_DIM3_OR0(position[2]),
-                     _domainOffset[0], _domainOffset[1], MD_DIM3_OR0(_domainOffset[2]), _meshWidth[0], _meshWidth[1], MD_DIM3_OR0(_meshWidth[2]));
+                     index < 0 ? "< 0" : "> _numCells[dim]", index, d, _globalIndexOfFirstCell[d], _localIndexOfFirstCell[d],
+                     (long int)(floor((position[d] - _domainOffset[d]) / _meshWidth[d])), cellVectorIndex[0], cellVectorIndex[1],
+                     MD_DIM3_OR0(cellVectorIndex[2]), position[0], position[1], MD_DIM3_OR0(position[2]), _domainOffset[0], _domainOffset[1],
+                     MD_DIM3_OR0(_domainOffset[2]), _meshWidth[0], _meshWidth[1], MD_DIM3_OR0(_meshWidth[2]));
       Kokkos::abort("ERROR simplemd::MoleculeContainer::positionToCellIndex\n");
     }
 #endif
@@ -318,11 +332,14 @@ void simplemd::MoleculeContainer::printNonGhostCells(bool shouldPrintCells, cons
   Kokkos::printf("cell\tpos_x\tpos_y\tpos_z\tvel_x\tvel_y\tvel_z\tforce_x\tforce_y\tforce_z\n");
   size_t linkedCellCount = _linkedCellNumMolecules.size();
   size_t cellsRemaining = MD_DUMP_CELLS == 0 ? linkedCellCount : std::min(MD_DUMP_CELLS, linkedCellCount);
+
+  KOKKOS_IF_ON_HOST((auto mirror = Kokkos::create_mirror_view(_linkedCellIsGhostCell); Kokkos::deep_copy(mirror, _linkedCellIsGhostCell);))
   for (size_t i = 0; i < linkedCellCount && cellsRemaining > 0; i++) {
-    if (_linkedCellIsGhostCell(i))
-      continue;
+    KOKKOS_IF_ON_HOST((if (mirror(i))))
+    KOKKOS_IF_ON_DEVICE((if (_linkedCellIsGhostCell(i))))
+    continue;
     cellsRemaining--;
-    printCell(i);
+    printCellMolecules(i);
   }
   Kokkos::printf("=== END DUMP MOLECULE CONTAINER ===\n");
 #endif
