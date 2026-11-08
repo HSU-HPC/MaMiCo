@@ -42,6 +42,9 @@ public:
    *  @param fraction the fraction of momentum to use */
   virtual void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 idx) const = 0;
 
+  /** Used to activate / deactivate momentum insertion also on inner cell layers */
+  virtual void setInnerImposition(bool enable) = 0;
+
 protected:
   /** interface to the md solver */
   coupling::interface::MDSolverInterface<LinkedCell, dim>* const _mdSolverInterface;

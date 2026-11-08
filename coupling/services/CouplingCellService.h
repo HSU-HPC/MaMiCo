@@ -25,6 +25,7 @@
 #include "coupling/indexing/IndexingService.h"
 #include "coupling/interface/MDSolverInterface.h"
 #include "coupling/interface/MacroscopicSolverInterface.h"
+#include "coupling/sendrecv/DataExchangeFromAllMacro2MD.h"
 #include "coupling/sendrecv/DataExchangeFromMD2Macro.h"
 #include "coupling/sendrecv/DataExchangeFromMacro2MD.h"
 #include "coupling/sendrecv/FromMD2Macro.h"
@@ -65,12 +66,14 @@ public:
   virtual void processInnerCouplingCellAfterMDTimestep() = 0;
   virtual void computeAndStoreTemperature(double temperature) = 0;
   virtual void applyTemperatureToMolecules(unsigned int t) = 0;
+  virtual bool checkIfDistributeMass(unsigned int t) const = 0;
   virtual void distributeMass(unsigned int t) = 0;
   virtual void distributeMomentum(unsigned int t) = 0;
   virtual void applyBoundaryForce(unsigned int t) = 0;
   virtual void perturbateVelocity() = 0;
   virtual void plotEveryMicroscopicTimestep(unsigned int t) = 0;
   virtual void plotEveryMacroscopicTimestep(unsigned int t) = 0;
+  virtual void setInnerMomentumImposition(bool enable) = 0;
 
   virtual void initFiltering() {
     throw std::runtime_error("CouplingCellService: Error: Called "
@@ -120,17 +123,17 @@ public:
    * routines may use those as well.
    */
   CouplingCellServiceImpl(
-      unsigned int ID, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface,       // interface to MD simulation
-      coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,                  // interface to macroscopic solver
-      tarch::la::Vector<dim, unsigned int> numberProcesses,                                              // number of processes in all directions
-      unsigned int rank,                                                                                 // current rank
-      const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,    // configuration for particle
-                                                                                                         // insertion
-      const coupling::configurations::MomentumInsertionConfiguration<dim>& momentumInsertionConfiguration,    // configuration for momentum
-                                                                                                         // insertion
-      const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,       // configuration for boundary forces
-      const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration, // configuration for transfer strategy
-      const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,      // configuration for parallel topology
+      unsigned int ID, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface,         // interface to MD simulation
+      coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,                    // interface to macroscopic solver
+      tarch::la::Vector<dim, unsigned int> numberProcesses,                                                // number of processes in all directions
+      unsigned int rank,                                                                                   // current rank
+      const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,      // configuration for particle
+                                                                                                           // insertion
+      const coupling::configurations::MomentumInsertionConfiguration<dim>& momentumInsertionConfiguration, // configuration for momentum
+                                                                                                           // insertion
+      const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,         // configuration for boundary forces
+      const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,   // configuration for transfer strategy
+      const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,        // configuration for parallel topology
       const coupling::configurations::ThermostatConfiguration& thermostatConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,                                            // number MD timesteps per coupling
                                                                                                  // cycle (required to initialise
@@ -140,17 +143,17 @@ public:
       const char* filterPipelineConfiguration, const tarch::utils::MultiMDService<dim>& multiMDService, unsigned int topologyOffset, int tws = 0);
 
   CouplingCellServiceImpl(
-      unsigned int ID, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface,       // interface to MD simulation
-      coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,                  // interface to macroscopic solver
-      tarch::la::Vector<dim, unsigned int> numberProcesses,                                              // number of processes in all directions
-      unsigned int rank,                                                                                 // current rank
-      const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,    // configuration for particle
-                                                                                                         // insertion
-      const coupling::configurations::MomentumInsertionConfiguration<dim>& momentumInsertionConfiguration,    // configuration for momentum
-                                                                                                         // insertion
-      const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,       // configuration for boundary forces
-      const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration, // configuration for transfer strategy
-      const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,      // configuration for parallel topology
+      unsigned int ID, coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface,         // interface to MD simulation
+      coupling::interface::MacroscopicSolverInterface<dim>* macroscopicSolverInterface,                    // interface to macroscopic solver
+      tarch::la::Vector<dim, unsigned int> numberProcesses,                                                // number of processes in all directions
+      unsigned int rank,                                                                                   // current rank
+      const coupling::configurations::ParticleInsertionConfiguration& particleInsertionConfiguration,      // configuration for particle
+                                                                                                           // insertion
+      const coupling::configurations::MomentumInsertionConfiguration<dim>& momentumInsertionConfiguration, // configuration for momentum
+                                                                                                           // insertion
+      const coupling::configurations::BoundaryForceConfiguration<dim>& boundaryForceConfiguration,         // configuration for boundary forces
+      const coupling::configurations::TransferStrategyConfiguration<dim>& transferStrategyConfiguration,   // configuration for transfer strategy
+      const coupling::configurations::ParallelTopologyConfiguration& parallelTopologyConfiguration,        // configuration for parallel topology
       const coupling::configurations::ThermostatConfiguration& thermostatConfiguration,
       unsigned int numberMDTimestepsPerCouplingCycle,                                            // number MD timesteps per coupling
                                                                                                  // cycle (required to initialise
@@ -219,6 +222,11 @@ public:
    */
   void applyBoundaryForce(unsigned int t) override;
 
+  /** returns true if distributeMass would occur in this timestep
+   * public because this is useful for MD simulations to call and check if particle container needs to be updated
+   */
+  bool checkIfDistributeMass(unsigned int t) const override;
+
   /** distributes mass in the system. */
   void distributeMass(unsigned int t) override;
 
@@ -237,6 +245,7 @@ public:
    */
   void plotEveryMicroscopicTimestep(unsigned int t) override;
   void plotEveryMacroscopicTimestep(unsigned int t) override;
+  void setInnerMomentumImposition(bool enable) override;
 
   /**
    * Initialises the _filterPipeline member. Called from _multiMDCellService's
@@ -309,6 +318,8 @@ private:
   /** for quantity transfer between solvers */
   coupling::sendrecv::FromMacro2MD<coupling::datastructures::CouplingCell<dim>, dim> _fromMacro2MD;
   coupling::sendrecv::DataExchangeFromMacro2MD<dim> _deFromMacro2MD;
+  coupling::sendrecv::DataExchangeFromAllMacro2MD<dim> _deFromAllMacro2MD;
+  bool _enableInnerImposition;
   coupling::sendrecv::FromMD2Macro<coupling::datastructures::CouplingCell<dim>, dim> _fromMD2Macro;
   coupling::sendrecv::DataExchangeFromMD2Macro<dim> _deFromMD2Macro;
 

@@ -196,6 +196,7 @@ public:
 
   void init() override { throw std::runtime_error("not supported yet"); }
   void runOneCouplingCycle(int cycle) override { throw std::runtime_error("not supported yet"); }
+  void equilibrateMicro() override { throw std::runtime_error("not supported yet"); }
   coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { throw std::runtime_error("not supported yet"); }
 
 private:

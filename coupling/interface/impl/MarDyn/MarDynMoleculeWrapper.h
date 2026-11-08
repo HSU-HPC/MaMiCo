@@ -38,7 +38,7 @@ public:
 
   // sets the MarDynMolecule and the cutoffRadius (needed in the
   // MoleculeIterator interface)
-  void setMolecule(MardynMolecule *molecule, double cutoffRadius) {
+  void setMolecule(MardynMolecule* molecule, double cutoffRadius) {
     _myMolecule = molecule;
     _cutoffRadius = cutoffRadius;
   }
@@ -48,7 +48,7 @@ public:
     tarch::la::Vector<3, double> myVelocity(_myMolecule->v(0), _myMolecule->v(1), _myMolecule->v(2));
     return myVelocity;
   }
-  virtual void setVelocity(const tarch::la::Vector<3, double> &velocity) {
+  virtual void setVelocity(const tarch::la::Vector<3, double>& velocity) {
     for (unsigned int d = 0; d < 3; d++)
       _myMolecule->setv(d, velocity[d]);
   }
@@ -58,7 +58,7 @@ public:
     tarch::la::Vector<3, double> myPosition(_myMolecule->r(0), _myMolecule->r(1), _myMolecule->r(2));
     return myPosition;
   }
-  virtual void setPosition(const tarch::la::Vector<3, double> &position) {
+  virtual void setPosition(const tarch::la::Vector<3, double>& position) {
     for (unsigned int d = 0; d < 3; d++)
       _myMolecule->setr(d, position[d]);
   }
@@ -68,7 +68,7 @@ public:
     tarch::la::Vector<3, double> myForce(_myMolecule->F(0), _myMolecule->F(1), _myMolecule->F(2));
     return myForce;
   }
-  virtual void setForce(const tarch::la::Vector<3, double> &force) {
+  virtual void setForce(const tarch::la::Vector<3, double>& force) {
     double Force[3] = {force[0], force[1], force[2]};
     _myMolecule->setF(Force);
   }
@@ -78,7 +78,7 @@ public:
     double potentialEnergy = 0.0;
 
     // pointer to the MarDyn simulation
-    MarDynCoupledSimulation *mdSim = (MarDynCoupledSimulation *)global_simulation;
+    MarDynCoupledSimulation* mdSim = (MarDynCoupledSimulation*)global_simulation;
     LegacyCellProcessor legacyCellProcessor(_cutoffRadius, mdSim->getLJCutoff(), mdSim->getTersoffCutoff(), mdSim->getParticlePairsHandler());
 
     // if myMolecule is not in the particle container yet (check id):
@@ -89,19 +89,19 @@ public:
     // pointer to the molecule in the simulation, no search needed
     if (_myMolecule->id() < 1 || _myMolecule->id() > global_simulation->getMaxID()) {
       int cellIndex;
-      MardynMolecule *temp = NULL;
+      MardynMolecule* temp = NULL;
       bool moleculeFound = false;
       const tarch::la::Vector<3, double> myPosition(_myMolecule->r(0), _myMolecule->r(1), _myMolecule->r(2));
 
       // get size of domain in number of cells
-      LinkedCells *lc = (LinkedCells *)mdSim->getMolecules();
-      int *boxWidthInNumCells = lc->boxWidthInNumCells();
+      LinkedCells* lc = (LinkedCells*)mdSim->getMolecules();
+      int* boxWidthInNumCells = lc->boxWidthInNumCells();
 
       // compute linked cell index vector
       tarch::la::Vector<3, double> cellLength(0.0);
       tarch::la::Vector<3, double> haloBoundingBoxMin(0.0);
       tarch::la::Vector<3, unsigned int> cellIndexVector(0.0);
-      LinkedCells *c = (LinkedCells *)mdSim->getMolecules();
+      LinkedCells* c = (LinkedCells*)mdSim->getMolecules();
       for (int d = 0; d < 3; d++) {
         cellLength[d] = (c->cellLength())[d];
         haloBoundingBoxMin[d] = c->getBoundingBoxMin(d) - c->getHaloWidthForDimension(d);
@@ -144,12 +144,12 @@ public:
 
     return potentialEnergy;
   }
-  virtual void setPotentialEnergy(const double &potentialEnergy) {
+  virtual void setPotentialEnergy(const double& potentialEnergy) {
     // currently not needed, therefore not implemented
   }
 
 private:
-  MardynMolecule *_myMolecule;
+  MardynMolecule* _myMolecule;
   double _cutoffRadius;
 };
 

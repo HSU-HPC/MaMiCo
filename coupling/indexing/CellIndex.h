@@ -190,7 +190,7 @@ public:
    * @param CellIndex index to compare this index to
    */
   bool operator==(const CellIndex& i) const { return _index == i.get(); }
-  bool operator!=(const CellIndex& i) const { return not(i == *this); }
+  bool operator!=(const CellIndex& i) const { return _index != i.get(); }
   bool operator<(const CellIndex& i) const { return convertToScalar<dim, traits...>(*this) < convertToScalar<dim, traits...>(i); };
   bool operator<=(const CellIndex& i) const { return convertToScalar<dim, traits...>(*this) <= convertToScalar<dim, traits...>(i); };
   bool operator>(const CellIndex& i) const { return convertToScalar<dim, traits...>(*this) > convertToScalar<dim, traits...>(i); };
@@ -332,6 +332,18 @@ private:
     return CellIndex<dim, other_traits...>(value);
   }
 };
+
+template <unsigned int dim, coupling::indexing::IndexTrait... lhs_traits, coupling::indexing::IndexTrait... rhs_traits>
+bool operator==(const coupling::indexing::CellIndex<dim, lhs_traits...>& lhs, const coupling::indexing::CellIndex<dim, rhs_traits...>& rhs) {
+  using Base = coupling::indexing::BaseIndex<dim>;
+
+  return Base(lhs).get() == Base(rhs).get();
+}
+
+template <unsigned int dim, coupling::indexing::IndexTrait... lhs_traits, coupling::indexing::IndexTrait... rhs_traits>
+bool operator!=(const coupling::indexing::CellIndex<dim, lhs_traits...>& lhs, const coupling::indexing::CellIndex<dim, rhs_traits...>& rhs) {
+  return not(lhs == rhs);
+}
 
 // Include implementation
 #include "CellIndex.cpph"

@@ -511,8 +511,8 @@ template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBu
       char* str = new char[MPI_MAX_ERROR_STRING];
       int len = -1;
       MPI_Error_string(err, str, &len);
-      std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::allocateBcastRequests(): Unable to create communicator "
-                << "on rank " << thisRank << " together with ranks [ ";
+      std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::allocateBcastRequests(): Unable to create communicator " << "on rank " << thisRank
+                << " together with ranks [ ";
       for (int& item : groupRanks) {
         std::cout << item << " ";
       }
@@ -599,8 +599,8 @@ template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBu
       char* str = new char[MPI_MAX_ERROR_STRING];
       int len = -1;
       MPI_Error_string(err, str, &len);
-      std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::allocateBcastRequests(): Unable to create communicator "
-                << "on rank " << thisRank << " together with ranks [ ";
+      std::cout << "ERROR coupling::sendrecv::SendRecvBuffer::allocateBcastRequests(): Unable to create communicator " << "on rank " << thisRank
+                << " together with ranks [ ";
       for (int& item : groupRanks) {
         std::cout << item << " ";
       }
@@ -609,8 +609,7 @@ template <class Cell_T, unsigned int dim> void coupling::sendrecv::SendReceiveBu
       exit(EXIT_FAILURE);
     }
 
-    std::cout << thisRank << " : "
-              << " allocated request for group " << groupRanks << " with tag " << buffer.first << std::endl;
+    std::cout << thisRank << " : " << " allocated request for group " << groupRanks << " with tag " << buffer.first << std::endl;
 
     counter += 1;
   }

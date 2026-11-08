@@ -53,6 +53,7 @@ public:
   const double& getCutoffRadius() const { return _cutoffRadius; }
   const tarch::la::Vector<MD_DIM, double>& getMeshWidth() const { return _meshWidth; }
   const double& getKB() const { return _kB; }
+  const double& getCapacityFactor() const { return _capacityFactor; }
   const unsigned int& getBlockSize() const { return _blockSize; }
   const tarch::la::Vector<MD_LINKED_CELL_NEIGHBOURS, simplemd::BoundaryType>& getBoundary() const { return _boundary; }
   const std::string& getCheckpointFilestem() const { return _checkpointFilestem; }
@@ -72,6 +73,7 @@ private:
   static const std::string CUTOFF_RADIUS;
   static const std::string LINKED_CELL_SIZE;
   static const std::string K_B;
+  static const std::string CAPACITY_FACTOR;
   static const std::string BLOCK_SIZE;
   static const std::string BOUNDARY[MD_LINKED_CELL_NEIGHBOURS];
   static const std::string PERIODIC_BOUNDARY;
@@ -103,6 +105,10 @@ private:
 
   /** dimensionless Boltzmann's constant */
   double _kB;
+
+  /** capacity factor, used to compute the maximum number of molecules that can be present in a linked cell by multiplication with the average number of
+   * molecules per cell*/
+  double _capacityFactor;
 
   /** blocksize to be used for molecule storage */
   unsigned int _blockSize;

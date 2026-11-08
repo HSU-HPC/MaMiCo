@@ -20,10 +20,9 @@ namespace LAMMPS_NS {
  */
 template <unsigned int dim> class MamicoLammpsMoleculeIterator : public coupling::interface::MoleculeIterator<MamicoCell, dim> {
 public:
-  MamicoLammpsMoleculeIterator(MoleculeInformation info, double cutoff, MamicoCell &cell)
-      : coupling::interface::MoleculeIterator<MamicoCell, dim>(cell), _info(info), _cutoff(cutoff) {
-  } virtual ~MamicoLammpsMoleculeIterator() {
-  }
+  MamicoLammpsMoleculeIterator(MoleculeInformation info, double cutoff, MamicoCell& cell)
+      : coupling::interface::MoleculeIterator<MamicoCell, dim>(cell), _info(info), _cutoff(cutoff) {}
+  virtual ~MamicoLammpsMoleculeIterator() {}
 
   virtual void begin() { coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.begin(); }
 
@@ -31,18 +30,18 @@ public:
 
   virtual bool continueIteration() const { return coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.continueIteration(); }
 
-  virtual coupling::interface::Molecule<dim> &get() {
+  virtual coupling::interface::Molecule<dim>& get() {
     _molecule = MamicoLammpsMolecule<dim>(_info._x, _info._v, _info._f, coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.get(), _cutoff);
     return _molecule;
   }
 
-  virtual const coupling::interface::Molecule<dim> &
-  getConst() {
+  virtual const coupling::interface::Molecule<dim>& getConst() {
     _molecule = MamicoLammpsMolecule<dim>(_info._x, _info._v, _info._f, coupling::interface::MoleculeIterator<MamicoCell, dim>::_cell.get(), _cutoff);
     return _molecule;
   }
 
-  private : MoleculeInformation _info;
+private:
+  MoleculeInformation _info;
   const double _cutoff;
   MamicoLammpsMolecule<dim> _molecule;
 };

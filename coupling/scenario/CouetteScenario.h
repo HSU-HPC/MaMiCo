@@ -16,7 +16,6 @@
 #include "tarch/utils/RandomNumberService.h"
 #include "tarch/utils/Utils.h"
 #if (BUILD_WITH_OPENFOAM)
-#include "coupling/solvers/IcoFoamBufferSetup.h"
 #include "coupling/solvers/IcoFoamInterface.h"
 #endif
 #include "coupling/configurations/CouetteConfiguration.h"
@@ -95,7 +94,6 @@ public:
     global_log->set_mpi_output_root(0);
 #endif
 #endif
-    getRootRank();
     parseConfigurations();
     initSolvers();
   }
@@ -124,18 +122,33 @@ public:
     }
   }
 
+  /** called to push the micro solver into a new macroscopic state (given from outside)
+   * */
+  void equilibrateMicro() override {
+    if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SYNTHETIC)
+      return;
+
+    coupling::datastructures::FlexibleCellContainer<3> buffer;
+    for (auto pair : _couplingBuffer.macro2MDBuffer)
+      buffer << pair;
+    for (auto pair : _couplingBuffer.md2macroBuffer)
+      buffer << pair;
+    fillSendBuffer(_cfg.density, *_couetteSolver, buffer);
+
+    _multiMDCellService->setInnerMomentumImposition(true);
+    const int EQUI_CYCLES = 3; // 2 cycles should be sufficient (10 cycles without inner imposition on MD30), 3 cycles is even safer
+    for (int i = 0; i < EQUI_CYCLES; i++) {
+      _multiMDCellService->sendFromMacro2MD(buffer);
+      _instanceHandling->simulateTimesteps(_simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps(), _mdStepCounter, *_multiMDCellService);
+    }
+    _mdStepCounter += EQUI_CYCLES * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps();
+
+    _multiMDCellService->setInnerMomentumImposition(false);
+  }
+
   coupling::solvers::AbstractCouetteSolver<3>* getSolver() override { return _couetteSolver; }
 
 protected:
-  /** @brief initialises all MPI variables  */
-  void getRootRank() {
-    int rank = 0;
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-#endif
-    _isRootRank = (rank == 0);
-  }
-
   /** @brief Executes the entire test several times for a range of time-window-size parameters */
   void twsLoop() {
     for (_tws = _cfg.twsLoopMin; _tws <= _cfg.twsLoopMax; _tws += _cfg.twsLoopStep) {
@@ -154,12 +167,16 @@ protected:
     tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(filename, "molecular-dynamics",
                                                                                                                            _simpleMDConfig);
     if (!_simpleMDConfig.isValid()) {
-      std::cout << "ERROR CouetteScenario: Invalid SimpleMD config!" << std::endl;
+      if (_isRootRank) {
+        std::cout << "ERROR CouetteScenario: Invalid SimpleMD config!" << std::endl;
+      }
       exit(EXIT_FAILURE);
     }
     tarch::configuration::ParseConfiguration::parseConfiguration<coupling::configurations::MaMiCoConfiguration<3>>(filename, "mamico", _mamicoConfig);
     if (!_mamicoConfig.isValid()) {
-      std::cout << "ERROR CouetteScenario: Invalid MaMiCo config!" << std::endl;
+      if (_isRootRank) {
+        std::cout << "ERROR CouetteScenario: Invalid MaMiCo config!" << std::endl;
+      }
       exit(EXIT_FAILURE);
     }
 
@@ -175,7 +192,7 @@ protected:
 
 #if defined(LS1_MARDYN)
     auto offset = _simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset();
-    coupling::interface::LS1StaticCommData::getInstance().setConfigFilename("ls1config.xml");
+    coupling::interface::LS1StaticCommData::getInstance().setConfigFilename(_cfg.ls1config);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offset[0]); // temporary till ls1 offset is natively supported
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offset[1]);
     coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offset[2]);
@@ -246,7 +263,9 @@ protected:
 
     _instanceHandling = new coupling::InstanceHandling<MY_LINKEDCELL, 3>(_simpleMDConfig, _mamicoConfig, *_multiMDService);
     if (_instanceHandling == nullptr) {
-      std::cout << "ERROR CouetteScenario::initSolvers() : _instanceHandling == NULL!" << std::endl;
+      if (_isRootRank) {
+        std::cout << "ERROR CouetteScenario::initSolvers() : _instanceHandling == NULL!" << std::endl;
+      }
       std::exit(EXIT_FAILURE);
     }
 
@@ -290,6 +309,7 @@ protected:
     _couetteSolver =
         getCouetteSolver(_mamicoConfig.getCouplingCellConfiguration().getCouplingCellSize()[0],
                          _simpleMDConfig.getSimulationConfiguration().getDt() * _simpleMDConfig.getSimulationConfiguration().getNumberOfTimesteps());
+    _MDBoundarySetupDone = false;
 
     if (_cfg.miSolverType == coupling::configurations::CouetteConfig::SIMPLEMD || _cfg.miSolverType == coupling::configurations::CouetteConfig::LS1) {
       // set couette solver interface in MamicoInterfaceProvider
@@ -470,7 +490,9 @@ protected:
     if (_isRootRank) {
       gettimeofday(&_tv.start_total, NULL);
     }
-    std::cout << "Finish CouetteScenario::initSolvers() " << std::endl;
+    if (_isRootRank) {
+      std::cout << "Finish CouetteScenario::initSolvers() " << std::endl;
+    }
   }
 
   /** @brief advances the continuum solver and collects data to send to md
@@ -504,7 +526,7 @@ protected:
       fillSendBuffer(_cfg.density, *_couetteSolver, _couplingBuffer.macro2MDBuffer);
     }
     if (_cfg.macro2Md) {
-#ifdef USE_COLLECTIVE_MPI
+#ifdef MAMICO_USE_COLLECTIVE_MPI
       _multiMDCellService->bcastFromMacro2MD(_couplingBuffer.macro2MDBuffer);
 #else
       _multiMDCellService->sendFromMacro2MD(_couplingBuffer.macro2MDBuffer);
@@ -597,7 +619,7 @@ protected:
 
       // send back data from MD instances and merge it
       if (_cfg.md2Macro) {
-#ifdef USE_COLLECTIVE_MPI
+#ifdef MAMICO_USE_COLLECTIVE_MPI
         _tv.filter += _multiMDCellService->reduceFromMD2Macro(_couplingBuffer.md2macroBuffer);
 #else
         _tv.filter += _multiMDCellService->sendFromMD2Macro(_couplingBuffer.md2macroBuffer);
@@ -612,7 +634,7 @@ protected:
         //_couplingBuffer does not get used here: Instead, the synthetic MD in the
         // SYNTHETICMD_SEQUENCE generates values. To prevent segfaults, it has
         // to be nonempty, though.
-#ifdef USE_COLLECTIVE_MPI
+#ifdef MAMICO_USE_COLLECTIVE_MPI
         _tv.filter += _multiMDCellService->reduceFromMD2Macro(_couplingBuffer.md2macroBuffer);
 #else
         _tv.filter += _multiMDCellService->sendFromMD2Macro(_couplingBuffer.md2macroBuffer);
@@ -653,19 +675,18 @@ protected:
   void twoWayCoupling(int cycle) {
     using coupling::configurations::CouetteConfig;
     if (_cfg.twoWayCoupling) {
-      if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle == _cfg.filterInitCycles) {
-        static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
-            ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
-      }
 #if (BUILD_WITH_OPENFOAM)
-      else if ((_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
-        static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)
-            ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
-                            _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+      if ((_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) && cycle == _cfg.filterInitCycles && _couetteSolver != NULL) {
+        static_cast<coupling::solvers::IcoFoamInterface*>(_couetteSolver)->setupMDBoundary();
       }
 #endif
       if ((_cfg.maSolverType == CouetteConfig::COUETTE_LB || _cfg.maSolverType == CouetteConfig::COUETTE_FD) && cycle >= _cfg.filterInitCycles) {
+        if (!_MDBoundarySetupDone) {
+          static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)
+              ->setMDBoundary(_simpleMDConfig.getDomainConfiguration().getGlobalDomainOffset(), _simpleMDConfig.getDomainConfiguration().getGlobalDomainSize(),
+                              _mamicoConfig.getMomentumInsertionConfiguration().getInnerOverlap());
+          _MDBoundarySetupDone = true;
+        }
         static_cast<coupling::solvers::LBCouetteSolver*>(_couetteSolver)->setMDBoundaryValues(_couplingBuffer.md2macroBuffer);
       }
 #if (BUILD_WITH_OPENFOAM)
@@ -725,7 +746,9 @@ protected:
       _multiMDMediator = nullptr;
     }
 
-    std::cout << "Finish CouetteScenario::shutdown() " << std::endl;
+    if (_isRootRank) {
+      std::cout << "Finish CouetteScenario::shutdown() " << std::endl;
+    }
   }
 
   /** computes global number of coupling cells from configs. Required by couette solver interface before CouplingCellService is initialised! */
@@ -781,7 +804,10 @@ protected:
       return;
     // form file name and open file
     std::stringstream ss;
-    ss << "CouetteAvgMultiMDCells_" << _timeIntegrationService->getPintDomain() << "_" << _rank << "_" << couplingCycle << ".csv";
+    ss << "CouetteAvgMultiMDCells_d" << _timeIntegrationService->getPintDomain() << "_r" << _rank << "_c" << couplingCycle;
+    if (_timeIntegrationService->isPintEnabled())
+      ss << "_i" << _timeIntegrationService->getIteration();
+    ss << ".csv";
     std::ofstream file(ss.str().c_str());
     if (!file.is_open()) {
       std::cout << "ERROR CouetteScenario::write2CSV(): Could not open file " << ss.str() << "!" << std::endl;
@@ -861,15 +887,15 @@ protected:
 #endif
     // LB solver: active on lbNumberProcesses
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
-      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "LBCouette",
-                                                      _cfg.lbNumberProcesses, 1, this);
+      solver = new coupling::solvers::LBCouetteSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, _cfg.plotAverageVelocity,
+                                                      "LBCouette", _cfg.lbNumberProcesses, 1, this);
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): LB solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
       }
     } else if (_cfg.maSolverType == CouetteConfig::COUETTE_FD) {
       solver = new coupling::solvers::FiniteDifferenceSolver(_cfg.channelheight, vel, _cfg.kinVisc, dx, dt, _cfg.plotEveryTimestep, "FDCouette",
-                                                             _cfg.lbNumberProcesses, 1);
+                                                             _cfg.lbNumberProcesses);
       if (solver == NULL) {
         std::cout << "ERROR CouetteScenario::getCouetteSolver(): FD solver==NULL!" << std::endl;
         exit(EXIT_FAILURE);
@@ -899,12 +925,8 @@ protected:
       interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberCouplingCells, outerRegion);
     } else if (_cfg.maSolverType == CouetteConfig::COUETTE_LB) {
       // compute number of cells of MD offset; detect any mismatches!
-      tarch::la::Vector<3, unsigned int> offsetMDDomain(0);
+      tarch::la::Vector<3, int> offsetMDDomain(0);
       for (unsigned int d = 0; d < 3; d++) {
-        if (mdOffset[d] < 0.0) {
-          std::cout << "ERROR CouetteScenario::getCouetteSolverInterface(...): mdOffset[" << d << "]<0.0!" << std::endl;
-          exit(EXIT_FAILURE);
-        }
         offsetMDDomain[d] = floor(mdOffset[d] / mamicoMeshsize[d] + 0.5);
         if (fabs((offsetMDDomain[d] * mamicoMeshsize[d] - mdOffset[d]) / mamicoMeshsize[d]) > 1.0e-8) {
           std::cout << "ERROR CouetteScenario::getCouetteSolverInterface: MD offset and mesh size mismatch!" << std::endl;
@@ -920,17 +942,13 @@ protected:
     }
 #if (BUILD_WITH_OPENFOAM)
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FOAM) {
-      interface = new coupling::solvers::FoamSolverInterface<3>(globalNumberCouplingCells, outerRegion);
+      interface = new coupling::solvers::CouetteSolverInterface<3>(globalNumberCouplingCells, outerRegion);
     }
 #endif
     else if (_cfg.maSolverType == CouetteConfig::COUETTE_FD) {
       // compute number of cells of MD offset; detect any mismatches!
-      tarch::la::Vector<3, unsigned int> offsetMDDomain(0);
+      tarch::la::Vector<3, int> offsetMDDomain(0);
       for (unsigned int d = 0; d < 3; d++) {
-        if (mdOffset[d] < 0.0) {
-          std::cout << "ERROR CouetteScenario::getCouetteSolverInterface(...): mdOffset[" << d << "]<0.0!" << std::endl;
-          exit(EXIT_FAILURE);
-        }
         offsetMDDomain[d] = floor(mdOffset[d] / mamicoMeshsize[d] + 0.5);
         if (fabs((offsetMDDomain[d] * mamicoMeshsize[d] - mdOffset[d]) / mamicoMeshsize[d]) > 1.0e-8) {
           std::cout << "ERROR CouetteScenario::getCouetteSolverInterface: MD offset and mesh size mismatch!" << std::endl;
@@ -982,8 +1000,6 @@ protected:
 
   /** @brief the rank of the current MPI process in the local time domain*/
   int _rank;
-  /** @brief if this is the world global root process */
-  bool _isRootRank;
   /** @todo Piet */
   int _tws;
   /** @brief the config data and information for SimpleMD */
@@ -1014,6 +1030,7 @@ protected:
   /** @brief a instance of the timingValues */
   TimingValues _tv;
   coupling::MultiMDMediator<MY_LINKEDCELL, 3>* _multiMDMediator;
+  bool _MDBoundarySetupDone;
 };
 
 #endif // _COUPLING_SCENARIO_COUETTESCENARIO_H_

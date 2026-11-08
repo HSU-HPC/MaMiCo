@@ -46,7 +46,7 @@ public:
   };
 
   /** Constructor, initializes the class  */
-  MomentumInsertionConfiguration() : _insertionType(ADDITIVE_MOMENTUM_INSERTION), _boundaries(true), _isValid(true) {}
+  MomentumInsertionConfiguration() : _insertionType(ADDITIVE_MOMENTUM_INSERTION), _isValid(true) {}
 
   /** Destructor */
   virtual ~MomentumInsertionConfiguration() {}
@@ -117,10 +117,11 @@ public:
         exit(EXIT_FAILURE);
       }
       _outerOverlap = (unsigned int)buf;
-    }
-    const std::string boundaries[6] = {"west", "east", "south", "north", "bottom", "top"};
-    for (unsigned int d = 0; d < 2 * dim; d++) {
-      tarch::configuration::ParseConfiguration::readBoolOptional(_boundaries[d], node, boundaries[d]);
+      const std::string boundaries[6] = {"west", "east", "south", "north", "bottom", "top"}; // TODO change to +-xyz
+      for (unsigned int d = 0; d < 2 * dim; d++) {
+        _impositionEnabled[d] = true;
+        tarch::configuration::ParseConfiguration::readBoolOptional(_impositionEnabled[d], node, boundaries[d]);
+      }
     }
   }
 
@@ -158,9 +159,10 @@ public:
    * 	@return momentum insertion config
    */
   template <class LinkedCell>
-  MomentumInsertion<LinkedCell, dim>* interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
-                                                              const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells,
-                                                              unsigned int numberMDTimestepsPerCouplingCycle) const {
+  coupling::MomentumInsertion<LinkedCell, dim>*
+  interpreteConfiguration(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface,
+                          const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const couplingCells,
+                          unsigned int numberMDTimestepsPerCouplingCycle) const {
     if (_insertionType == ADDITIVE_MOMENTUM_INSERTION) {
       return new coupling::AdditiveMomentumInsertion<LinkedCell, dim>(mdSolverInterface, numberMDTimestepsPerCouplingCycle);
     } else if (_insertionType == DIRECT_VELOCITY_INSERTION) {
@@ -172,24 +174,20 @@ public:
     } else if (_insertionType == VELOCITY_GRADIENT_RELAXATION_TOPONLY) {
       return new coupling::VelocityGradientRelaxationTopOnly<LinkedCell, dim>(_velocityRelaxationFactor, mdSolverInterface, couplingCells);
     } else if (_insertionType == NIE_VELOCITY_IMPOSITION) {
-      return new coupling::NieVelocityImposition<LinkedCell, dim>(mdSolverInterface, _outerOverlap, _innerOverlap, _boundaries);
+      return new coupling::NieVelocityImposition<LinkedCell, dim>(mdSolverInterface, _outerOverlap, _innerOverlap, _impositionEnabled);
     }
     return NULL;
   }
 
 private:
   MomentumInsertionType _insertionType;
-  // required by velocity relaxation schemes
-  double _velocityRelaxationFactor;
-  // innermost layer of overlap cells (required by
-  // nie velocity imposition)
-  unsigned int _innerOverlap;
-  // outermost layer of overlap cells (required by
-  // nie velocity imposition)
-  unsigned int _outerOverlap;
-  // specify on which boundary the velocity
-  // will be imposed to the layer of cells
-  tarch::la::Vector<2*dim, bool> _boundaries; 
+  double _velocityRelaxationFactor;                    // required by velocity relaxation schemes
+  unsigned int _innerOverlap;                          // innermost layer of overlap cells (required by
+                                                       // nie velocity imposition)
+  unsigned int _outerOverlap;                          // outermost layer of overlap cells (required by
+                                                       // nie velocity imposition)
+  tarch::la::Vector<2 * dim, bool> _impositionEnabled; // true in each component, if one of the 2*dim
+                                                       // boundaries allows for velocity imposition (currently only used for nie)
   bool _isValid;
 };
 

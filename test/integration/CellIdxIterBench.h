@@ -44,6 +44,7 @@ private:
       exit(EXIT_FAILURE);
     }
     file << R"mdconf(
+  <scenario-configuration>
   <molecular-dynamics>
   <molecule-configuration
     mass="1.0"
@@ -56,7 +57,6 @@ private:
   <simulation-configuration
     dt="0.005"
     number-of-timesteps="50"
-    reorganise-memory-every-timestep="20"
     compute-macroscopic-quantities-every-timestep="0"
     fix-seed="no"
    />
@@ -80,7 +80,9 @@ private:
     top-south-west="reflecting"    top-south="reflecting"    top-south-east="reflecting"
     top-west="reflecting"          top="reflecting"          top-east="reflecting"
     top-north-west="reflecting"    top-north="reflecting"    top-north-east="reflecting"
-  /> </molecular-dynamics>)mdconf"
+  />
+  </molecular-dynamics>
+  </scenario-configuration>)mdconf"
          << std::endl;
     file.close();
     tarch::configuration::ParseConfiguration::parseConfiguration<simplemd::configurations::MolecularDynamicsConfiguration>(fname, "molecular-dynamics",
@@ -98,6 +100,7 @@ private:
       exit(EXIT_FAILURE);
     }
     file << R"mamicoconf(
+    <scenario-configuration>
     <mamico>
       <coupling-cell-configuration
         cell-size="2.5 ; 2.5 ; 2.5"
@@ -114,6 +117,7 @@ private:
       <parallel-topology type="xyz" />
       <thermostat type='outerLayers' number-layers='1' />
     </mamico>
+    </scenario-configuration>
     )mamicoconf"
          << std::endl;
     file.close();
@@ -216,49 +220,3 @@ private:
   simplemd::configurations::MolecularDynamicsConfiguration _simpleMDConfig;
   coupling::configurations::MaMiCoConfiguration<3> _mamicoConfig;
 };
-
-void runTest(Test* test) {
-  if (test == NULL) {
-    std::cout << "ERROR executeTest: test==NULL!" << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  test->run();
-  delete test;
-}
-
-int main(int argc, char* argv[]) {
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-  MPI_Init(&argc, &argv);
-#endif
-
-  // run tests
-  runTest(new CellIdxIterBench());
-
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-  MPI_Finalize();
-#endif
-
-  return 0;
-};
-
-/* Sampe Output:
-
-Run CellIdxIterBench...
-Number cells in test domain: 74088
-lowerBoundary = 4 , 4 , 4
-upperBoundary = 45 , 45 , 45
-
-Scalar benchmark -------------
-Useless result: 27444788280000
-Raw loop: 191ms
-Useless result: 27444788280000
-Index range iterator: 119ms
-
-Vector benchmark -------------
-Useless result: 15188040000 , 15188040000 , 15188040000
-Raw loop: 147ms
-Useless result: 15188040000 , 15188040000 , 15188040000
-Index range iterator: 152ms
-Shut down CellIdxIterBench
-
-*/

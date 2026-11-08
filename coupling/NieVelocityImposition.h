@@ -27,10 +27,12 @@ public:
   /** @brief a simple constructor
    *  @param mdSolverInterface interface to the md solver
    *  @param outermostLayer the index of the outermost cell layer
-   *  @param innermostLayer the index of the innermost cell layer */
+   *  @param innermostLayer the index of the innermost cell layer
+   *  @param impositionEnabled whether imposition is allowed at the specified domain face */
   NieVelocityImposition(coupling::interface::MDSolverInterface<LinkedCell, dim>* const mdSolverInterface, const unsigned int& outermostLayer,
-                        const unsigned int& innermostLayer, const tarch::la::Vector<2*dim, bool>& boundaries)
-      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _outermostLayer(outermostLayer), _innermostLayer(innermostLayer), _boundaries(boundaries) {}
+                        const unsigned int& innermostLayer, const tarch::la::Vector<2 * dim, bool> impositionEnabled)
+      : coupling::MomentumInsertion<LinkedCell, dim>(mdSolverInterface), _outermostLayer(outermostLayer), _innermostLayer(innermostLayer),
+        _impositionEnabled(impositionEnabled), _enableInnerImposition(false) {}
 
   /** @brief a simple destructor */
   virtual ~NieVelocityImposition() {}
@@ -62,6 +64,8 @@ public:
     cell.iterateCells(velocityImposition);
   }
 
+  void setInnerImposition(bool enable) override { _enableInnerImposition = enable; }
+
 private:
   /** returns true if the local cell at index currentLocalCouplingCellIndex is
    * inside the layer of imposition cells, given by outermostLayer and
@@ -69,6 +73,7 @@ private:
    * layers for imposition are located in the 3rd and 4th strip of cells (we
    * start counting from cell layer=0 which corresponds to the outermost,
    * actually ghost-layer of cells which surrounds the MD domain).
+   * Also checks if imposition is enabled in that direction.
    *  @brief based on the cell index, the function tells if the cell is inside
    * the imposition layer
    *  @param globalCellIndex global linearised index of a coupling
@@ -78,24 +83,26 @@ private:
   bool isInsideImpositionLayer(I01 globalCellIndex) const { 
     bool inner = true;
     bool outer = false;
-    bool boundary = false;
     tarch::la::Vector<dim, unsigned int> globalIndexUnsigned{globalCellIndex.get()};
     for (unsigned int d = 0; d < dim; d++) {
-      inner = inner && (globalIndexUnsigned[d] > _innermostLayer && globalIndexUnsigned[d] < 1 + I09::numberCellsInDomain[d] - _innermostLayer);
-      outer = outer || (globalIndexUnsigned[d] < _outermostLayer || globalIndexUnsigned[d] > 1 + I09::numberCellsInDomain[d] - _outermostLayer);
-      boundary = boundary || (globalCellIndex.get()[d] == 1 && !_boundaries[2 * d]) 
-        || (globalCellIndex.get()[d] == (int)I09::numberCellsInDomain[d] && !_boundaries[2 * d + 1]);
-
+      if (_impositionEnabled[d * 2]) { // negative direction
+        inner = inner && (globalIndexUnsigned[d] > _innermostLayer);
+        outer = outer || (globalIndexUnsigned[d] < _outermostLayer);
+      }
+      if (_impositionEnabled[d * 2 + 1]) { // positive direction
+        inner = inner && (globalIndexUnsigned[d] < 1 + I09::numberCellsInDomain[d] - _innermostLayer);
+        outer = outer || (globalIndexUnsigned[d] > 1 + I09::numberCellsInDomain[d] - _outermostLayer);
+      }
     }
-    return !inner && !outer && !boundary;
+    return (_enableInnerImposition || !inner) && !outer;
   }
 
   /** @brief the index of the outermost cell layer*/
   const unsigned int _outermostLayer;
   /** @brief the index of the innermost cell layer*/
   const unsigned int _innermostLayer;
-  /** @brief boundaries to consider for velocity impostion*/
-  const tarch::la::Vector<2*dim, bool> _boundaries;
+  const tarch::la::Vector<2 * dim, bool> _impositionEnabled;
+  bool _enableInnerImposition;
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_VELOCITYGRADIENTRELAXATION_H_

@@ -7,6 +7,8 @@
 
 #include "coupling/interface/MoleculeIterator.h"
 #include "coupling/interface/impl/SimpleMD/SimpleMDMolecule.h"
+#include "coupling/interface/impl/SimpleMD/SimpleMDLinkedCellWrapper.h"
+#include "simplemd/services/MoleculeService.h"
 #include "simplemd/LinkedCell.h"
 #include "simplemd/Molecule.h"
 
@@ -16,36 +18,41 @@ namespace interface {
 /** iterates over molecules in a SimpleMD linked cell.
  *  @author Philipp Neumann
  */
-class SimpleMDMoleculeIterator : public MoleculeIterator<simplemd::LinkedCell, MD_DIM> {
+class SimpleMDMoleculeIterator : public MoleculeIterator<SimpleMDLinkedCellWrapper, MD_DIM> {
 public:
-  SimpleMDMoleculeIterator(simplemd::LinkedCell& cell) : coupling::interface::MoleculeIterator<simplemd::LinkedCell, MD_DIM>(cell), _buffer(NULL) {}
+  SimpleMDMoleculeIterator(SimpleMDLinkedCellWrapper& cellWrapper, simplemd::services::MoleculeService& moleculeService)
+      : coupling::interface::MoleculeIterator<SimpleMDLinkedCellWrapper, MD_DIM>(cellWrapper), _moleculeService(moleculeService), _moleculeIndex(0),
+        _buffer(NULL) {}
   virtual ~SimpleMDMoleculeIterator() {}
 
   /** sets the iterator to the first element */
-  void begin() { _it = _cell.begin(); }
+  void begin() { _moleculeIndex = 0; }
 
   /** returns false, if the iterator reached the end of the molecule list */
-  bool continueIteration() const { return (_it != _cell.end()); }
+  bool continueIteration() const {
+    auto cell = _moleculeService.getContainer()[_cell.getCellIndex()];
+    return (_moleculeIndex < cell.numMolecules());
+  }
 
   /** sets the iterator to the next molecule */
   void next() {
     // check if we need to update molecule information and reset flag in this case
-    _it++;
+    _moleculeIndex++;
   }
 
   /** returns a reference to the molecule that this iterator currently points to */
   coupling::interface::Molecule<MD_DIM>& get() {
-    _buffer.setMolecule(*_it);
+    auto cell = _moleculeService.getContainer()[_cell.getCellIndex()];
+    auto molecule = &_moleculeService.getContainer().getMoleculeAt(cell.getIndex(), _moleculeIndex);
+    _buffer.setMolecule(molecule);
     return _buffer;
   }
 
-  const coupling::interface::Molecule<MD_DIM>& getConst() {
-    _buffer.setMolecule(*_it);
-    return _buffer;
-  }
+  const coupling::interface::Molecule<MD_DIM>& getConst() { return get(); }
 
 private:
-  std::list<simplemd::Molecule*>::iterator _it;
+  simplemd::services::MoleculeService& _moleculeService;
+  size_t _moleculeIndex;
   coupling::interface::SimpleMDMolecule _buffer;
 };
 

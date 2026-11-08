@@ -10,7 +10,7 @@ def validate(get_config_value) -> str:
     A pre-computed checkpoint is (currently) only available for Simple MD with a 30x30x30 domain.
     """
     key = __name__.split(".")[-1]
-    use_checkpoint = get_config_value(key)
+    use_checkpoint = get_config_value(key) == "use_checkpoint"
     domain_size = get_domain_size(get_config_value)
     solver_md = get_config_value("solver_md")
     if use_checkpoint and (domain_size > 1 or solver_md != "md"):
@@ -20,7 +20,18 @@ def validate(get_config_value) -> str:
 
 def apply(partial_xml, get_config_value) -> None:
     key = __name__.split(".")[-1]
-    use_checkpoint = get_config_value(key)
+    equilibration_steps = 10000
+    equilibration_steps_max = 20000
+    size = get_domain_size(get_config_value)
+    equilibrate = get_config_value(key)
+    use_checkpoint = equilibrate == "use_checkpoint"
+    if use_checkpoint:
+        equilibrate = False  # Just to make sure ;)
+    partial_xml.substitute(
+        "equilibration-steps",
+        min(equilibration_steps_max, equilibration_steps * size)
+        * (1 if equilibrate == True else 0),
+    )
     checkpoint_key = 'init-from-sequential-checkpoint="CheckpointSimpleMD"'
     partial_xml.substitute("checkpoint", checkpoint_key if use_checkpoint else "")
     print("Substituted loading checkpoint")

@@ -36,6 +36,8 @@ public:
   /** @brief a dummy function, which doesn't do anything
    * @param cell the coupling cell to not change */
   void insertMomentum(coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>& cell, I02 idx) const override {}
+
+  void setInnerImposition(bool enable) override {}
 };
 
 #endif // _MOLECULARDYNAMICS_COUPLING_NOMOMENTUMINSERTION_H_

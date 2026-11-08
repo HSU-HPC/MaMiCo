@@ -8,6 +8,22 @@
 #define MD_YES 1
 #define MD_NO 0
 
+// KOKKOS
+#include <Kokkos_Core.hpp>
+using MainExecSpace =
+#if defined(KOKKOS_TARGET_SERIAL)
+    Kokkos::Serial
+#elif defined(KOKKOS_TARGET_OPENMP)
+    Kokkos::OpenMP
+#elif defined(KOKKOS_TARGET_CUDA)
+    Kokkos::Cuda
+#else
+#error "No KOKKOS_TARGET_* macro defined!"
+    /* use the default execution space */
+    Kokkos::DefaultExecutionSpace
+#endif
+    ;
+
 // USER INPUT --------------------------
 // Dimension of simulation (1D=1,2D=2, 3D=3)
 #if defined(MDDim2)
@@ -16,6 +32,14 @@
 #define MD_DIM 3
 #else
 #error "MDDim2 or MDDim3"
+#endif
+
+// Do not evaluate and fall back on zero when using 2D
+// (for accessing values in third dimension)
+#if (MD_DIM > 2)
+#define MD_DIM3_OR0(x) x
+#else
+#define MD_DIM3_OR0(x) 0
 #endif
 
 // MPI-Parallelisation (MD_YES/ MD_NO)
@@ -39,9 +63,6 @@
 // error mode (MD_YES/MD_NO). Performs error checks during the computation.
 #define MD_ERROR MD_NO
 #endif
-
-// OpenMP-Parallelisation (MD_YES/MD_NO)
-#define MD_OPENMP MD_NO
 
 // TEST_TCHIPEV (MD_YES/MD_NO). If no - two communication stages, if yes - one
 // communication stage.

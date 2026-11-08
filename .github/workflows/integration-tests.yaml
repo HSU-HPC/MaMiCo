@@ -1,0 +1,156 @@
+name: Integration Testing
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  OPEN_FOAM_VERSION: "2606"
+  LAMMPS_REPO_REF: "release"
+  TEST_TIMEOUT_MINUTES: 330 # Must be less than 6 hours
+
+# Abort running jobs if a new one is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  extract-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.get-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: get-matrix
+        name: Extract all test configurations from a text file
+        run: |
+          test/gh-act/integration/get-test-cases-matrix.py >> $GITHUB_OUTPUT
+
+  build-executable:
+    runs-on: minicluster
+    defaults:
+      run:
+        shell: bash -leo pipefail {0}
+    strategy:
+      fail-fast: false # If some versions fail to build, still build all the others
+      matrix:
+        md-solver: [md, ls1] # lammps (LAMMPS integration is currently broken -> issue #86)
+    steps:
+      - name: Clean up any old files
+        run: rm -rf build
+      - uses: actions/checkout@v4
+      - name: Use cached LAMMPS
+        if: matrix.md-solver == 'lammps'
+        uses: actions/cache/restore@v4
+        with:
+          path: build/LAMMPS
+          key: LAMMPS-${{ env.LAMMPS_REPO_REF }}
+      - name: Use cached OpenFOAM
+        uses: actions/cache/restore@v4
+        with:
+          path: build/openfoam
+          key: OpenFOAM-${{ env.OPEN_FOAM_VERSION }}
+      - name: Build couette executable
+        run: |
+          ./tools/build-couette.py \
+            --force-gcc \
+            --jobs $(($(nproc --all) / 2)) \
+            --with-mpi \
+            --with-foam \
+            --md-solver ${{ matrix.md-solver }}
+      - name: Cache LAMMPS
+        uses: actions/cache/save@v4
+        if: matrix.md-solver == 'lammps'
+        with:
+          path: build/LAMMPS
+          key: LAMMPS-${{ env.LAMMPS_REPO_REF }}
+      - name: Cache OpenFOAM
+        uses: actions/cache/save@v4
+        with:
+          path: build/openfoam
+          key: OpenFOAM-${{ env.OPEN_FOAM_VERSION }}
+      - name: Delete OpenFOAM files (too large)
+        run: rm -rf build/openfoam
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.md-solver }}
+          path: build
+
+  run-test:
+    needs: [extract-tests, build-executable]
+    if: "success() || failure()" # Only SOME couette binaries might have failed to build (unless canceled)
+    runs-on: minicluster
+    timeout-minutes: 360 # Also the default value (https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idtimeout-minutes)
+    defaults:
+      run:
+        shell: bash -leo pipefail {0}
+    strategy:
+      fail-fast: false # If some test cases fail, still run all the others
+      matrix: ${{ fromJson(needs.extract-tests.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use cached OpenFOAM
+        uses: actions/cache/restore@v4
+        with:
+          path: build/openfoam
+          key: OpenFOAM-${{ env.OPEN_FOAM_VERSION }}
+          fail-on-cache-miss: true
+        env:
+          SEGMENT_DOWNLOAD_TIMEOUT_MINS: 5 # Average cache transfer speed should be over 3 MB/s
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-${{ runner.os }}-${{ runner.arch }}-${{ matrix.solver_md }}
+          path: build
+      - name: Generate the test configuration for ${{ matrix.case }}
+        run: |
+          MAMICO_CFG=$(pwd)/tools/mamico-cfg
+          rm -rf build/test_cases # Clean up any old test
+          mkdir -p build/test_cases/${{ matrix.case }} && cd $_
+          O="domain_size=${{ matrix.domain_size }}"
+          O="$O,equilibrate=${{ matrix.equilibrate }}"
+          O="$O,solver_md=${{ matrix.solver_md }}"
+          O="$O,solver_cfd=${{ matrix.solver_cfd }}"
+          O="$O,mpi_ranks=${{ matrix.mpi_ranks_per_md }}"
+          O="$O,cell_size=${{ matrix.cell_size }}"
+          O="$O,boundary=${{ matrix.boundary }}"
+          O="$O,coupling_2way=${{ matrix.coupling_2way }}"
+          O="$O,filtering=${{ matrix.filtering }}"
+          O="$O,simulation=${{ matrix.simulation }}"
+          O="$O,multi_md=${{ matrix.multi_md }}"
+          $MAMICO_CFG -O $O
+      - name: Run the couette executable with the generated configuration
+        run: |
+          source build/openfoam/OpenFOAM-v*/etc/bashrc || :
+          cd build/test_cases/${{ matrix.case }}
+          chmod +x ../../couette
+          srun \
+            --job-name="couette-${{ matrix.case }}" \
+            --time="${TEST_TIMEOUT_MINUTES}" \
+            mpirun -n $(( ${{ matrix.mpi_ranks_per_md }} * ${{ matrix.parallel_MD_instances }} )) \
+            ../../couette
+      - name: Assess couette profile
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install matplotlib
+          cd build/test_cases/${{ matrix.case }}
+          ../../../tools/assess-couette-flow-profile.py . > assess-couette-flow-profile.log
+          cat assess-couette-flow-profile.log
+          cat assess-couette-flow-profile.log >> "$GITHUB_STEP_SUMMARY"
+          echo '```mermaid' >> "$GITHUB_STEP_SUMMARY"
+          cat couette-flow-profile.mmd >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        id: artifact-upload-test-results
+        with:
+          name: test-results-${{ matrix.case }}
+          path: build/test_cases/${{ matrix.case }}      
+      - name: Append test result download link to summary
+        run: |
+          echo '[:arrow_down: test results](${{ steps.artifact-upload-test-results.outputs.artifact-url }})' >> "$GITHUB_STEP_SUMMARY"
+      - name: Report "no test results" in summary
+        if: "!success()"
+        run: |
+          echo ':x: no test results' >> "$GITHUB_STEP_SUMMARY"

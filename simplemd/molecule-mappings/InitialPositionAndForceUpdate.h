@@ -30,6 +30,7 @@ public:
     molecule.setForceOld(molecule.getConstForce());
     molecule.setForce(_zero);
   }
+  static const bool IsParallel = false;
 
 private:
   const double _dt;

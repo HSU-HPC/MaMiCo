@@ -41,7 +41,7 @@ public:
     coupling::indexing::IndexingService<3>::getInstance().initWithCells({12}, {1}, coupling::paralleltopology::XYZ, 3, (unsigned int)_rank);
 
     // Temporal fine solver
-    F = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5, 0, 0}, 2.14, 2.5, 0.25, 0, "LBCouette",
+    F = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5, 0, 0}, 2.14, 2.5, 0.25, 0, false, "LBCouette",
                                           tarch::la::Vector<3, unsigned int>{1, 1, 1});
     int num_cycles = 5;
     double visc_multiplier = 2;
@@ -60,7 +60,7 @@ public:
   }
 
   void testSetUp() {
-    std::unique_ptr<LBCouetteSolver> F2 = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5, 0, 0}, 2.14, 2.5, 0.25, 0, "LBCouette",
+    std::unique_ptr<LBCouetteSolver> F2 = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5, 0, 0}, 2.14, 2.5, 0.25, 0, false, "LBCouette",
                                                                             tarch::la::Vector<3, unsigned int>{1, 1, 1});
 
     CPPUNIT_ASSERT_EQUAL(F->getNumberProcesses(), G1->getNumberProcesses());
@@ -131,7 +131,7 @@ public:
     F->advance(0.5);
     std::unique_ptr<State> u0 = F->getState();
 
-    std::unique_ptr<LBCouetteSolver> F2 = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5, 0, 0}, 2.14, 2.5, 0.25, 0, "LBCouette",
+    std::unique_ptr<LBCouetteSolver> F2 = std::make_unique<LBCouetteSolver>(50, tarch::la::Vector<3, double>{1.5, 0, 0}, 2.14, 2.5, 0.25, 0, false, "LBCouette",
                                                                             tarch::la::Vector<3, unsigned int>{1, 1, 1});
     F2->setState(u0, 0);
 

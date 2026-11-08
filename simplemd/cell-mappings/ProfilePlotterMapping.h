@@ -6,7 +6,6 @@
 #define _MOLECULARDYNAMICS_CELLMAPPINGS_PROFILEPLOTTERMAPPING_H_
 
 #include "simplemd/LinkedCell.h"
-#include "simplemd/services/LinkedCellService.h"
 #include "simplemd/services/ParallelTopologyService.h"
 #include <fstream>
 #include <sstream>
@@ -24,11 +23,10 @@ class ProfilePlotterMapping;
  */
 class simplemd::cellmappings::ProfilePlotterMapping {
 public:
-  ProfilePlotterMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService,
-                        const simplemd::services::LinkedCellService& linkedCellService, const unsigned int& plotEveryTimestep,
-                        const unsigned int& sampleEveryTimestep, const unsigned int& startAtTimestep, const double& linkedCellVolume,
-                        const unsigned int& localMDSimulation)
-      : _parallelTopologyService(parallelTopologyService), _linkedCellService(linkedCellService), _plotEveryTimestep(plotEveryTimestep),
+  ProfilePlotterMapping(const simplemd::services::ParallelTopologyService& parallelTopologyService, const simplemd::MoleculeContainer& moleculeContainer,
+                        const unsigned int& plotEveryTimestep, const unsigned int& sampleEveryTimestep, const unsigned int& startAtTimestep,
+                        const double& linkedCellVolume, const unsigned int& localMDSimulation)
+      : _parallelTopologyService(parallelTopologyService), _moleculeContainer(moleculeContainer), _plotEveryTimestep(plotEveryTimestep),
         _sampleEveryTimestep(sampleEveryTimestep), _startAtTimestep(startAtTimestep), _linkedCellVolume(linkedCellVolume),
         _localMDSimulation(localMDSimulation), _currentTimestep(0), _cellCounter(0) {
     _velocityAndDensity.clear();
@@ -52,7 +50,7 @@ public:
     _cellCounter = 0;
   }
 
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
+  void handleCell(LinkedCell& cell) {
     if (_currentTimestep < _startAtTimestep) {
       return;
     }
@@ -60,7 +58,7 @@ public:
     // if this is the first timestep in the sampling interval, create vector entry for this cell and store the cell index in vector form
     if ((_currentTimestep - _startAtTimestep) % _plotEveryTimestep == 0) {
       _velocityAndDensity.push_back(tarch::la::Vector<2 * MD_DIM + 1, double>(0.0));
-      const tarch::la::Vector<MD_DIM, unsigned int> localCellIndexVector = _linkedCellService.getLocalCellIndexVector(cellIndex);
+      const tarch::la::Vector<MD_DIM, unsigned int> localCellIndexVector = _moleculeContainer.getLocalCellIndexVector(cell.getIndex());
       const tarch::la::Vector<MD_DIM, unsigned int> globalCellIndexVector = _parallelTopologyService.localToGlobalCellIndexVector(localCellIndexVector);
       for (unsigned int d = 0; d < MD_DIM; d++) {
         _velocityAndDensity[_cellCounter][d] = (double)globalCellIndexVector[d];
@@ -71,8 +69,8 @@ public:
     if ((_currentTimestep - _startAtTimestep) % _sampleEveryTimestep == 0) {
       tarch::la::Vector<MD_DIM, double> vel(0.0);
       double mass = 0.0;
-      for (std::list<Molecule*>::const_iterator m1 = cell.begin(); m1 != cell.end(); m1++) {
-        vel += (*m1)->getConstVelocity();
+      for (auto m1 = cell.begin(); m1 != cell.end(); m1++) {
+        vel += m1->getConstVelocity();
         mass += 1.0;
       }
       // add mean velocity
@@ -136,9 +134,11 @@ public:
     }
   }
 
+  static const bool IsParallel = false;
+
 private:
   const simplemd::services::ParallelTopologyService& _parallelTopologyService;
-  const simplemd::services::LinkedCellService& _linkedCellService;
+  const simplemd::MoleculeContainer& _moleculeContainer;
   const unsigned int _plotEveryTimestep;
   const unsigned int _sampleEveryTimestep;
   const unsigned int _startAtTimestep;

@@ -16,6 +16,7 @@ send-from-md-to-macro = yes
 send-from-macro-to-md = yes
 csv-every-timestep = 100
 png-every-timestep = 100
+adios2-every-timestep = 0
 
 [macroscopic-solver]
 type = lbmpy

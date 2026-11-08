@@ -74,6 +74,10 @@ public:
     cell.iterateCells(velocityGradientRelaxation);
   }
 
+  void setInnerImposition(bool enable) override {
+    throw std::runtime_error(std::string("coupling::AdditiveMomentumInsertion::setInnerImposition not implemented"));
+  }
+
 protected:
   /** the coupling cells to apply the velocity gradient relaxation */
   const coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>* const _couplingCells;

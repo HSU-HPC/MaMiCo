@@ -1,4 +1,5 @@
 import shutil
+import sys
 from pathlib import Path
 
 from generators.cell_size import get_timesteps_per_coupling_cycle
@@ -48,7 +49,13 @@ def _create_foam_setup(get_config_value) -> Path:
     src_path = Path(__file__).parent.parent / "assets" / f"FoamSetup.template"
     dst_path = Path(get_config_value("output_dir")) / "FoamSetup"
     check_if_replacing(dst_path, get_config_value)
-    shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
+    if sys.version_info >= (3, 8):
+        shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
+    else:
+        try:
+            shutil.copytree(src_path, dst_path)
+        except FileExistsError:
+            pass
     return dst_path
 
 
@@ -252,6 +259,7 @@ def validate(get_config_value) -> str:
     key = __name__.split(".")[-1]
     solver = get_config_value(key)
     use_2way_coupling = get_config_value("coupling_2way")
+    cell_size = get_config_value("cell_size")
     if solver == "foam" and get_domain_size(get_config_value) != 2:
         return f"OpenFOAM can only be used with the medium domain size."
     # FoamSetup.template is a fixed mesh built for medium + cell size 5

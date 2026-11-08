@@ -17,15 +17,14 @@ template <class LinkedCell, unsigned int dim> class LinkedCellContainer;
  *CouplingCellWithLinkedCells
  *	@tparam dim Number of dimensions; it can be 1, 2 or 3
  */
-template <class LinkedCell, unsigned int dim>
-class coupling::datastructures::LinkedCellContainer : public coupling::datastructures::CellContainer<I02, dim> {
+template <class LinkedCell, unsigned int dim> class coupling::datastructures::LinkedCellContainer : public coupling::datastructures::CellContainer<I02, dim> {
 public:
   /** Constructor: initialises the coupling cell with linked cells
    *	@param numberLinkedCellsPerCouplingCell
    * 	@param mdSolverInterface
    */
   LinkedCellContainer(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
-                               coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface);
+                      coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface);
   /** Destructor */
   ~LinkedCellContainer();
 
@@ -76,7 +75,7 @@ private:
    */
   coupling::datastructures::CouplingCellWithLinkedCells<LinkedCell, dim>*
   initLinkedCellContainer(tarch::la::Vector<dim, unsigned int> numberLinkedCellsPerCouplingCell,
-                                   coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const;
+                          coupling::interface::MDSolverInterface<LinkedCell, dim>* mdSolverInterface) const;
 
   /** initialises the coupling cells (without linked cells).
    */

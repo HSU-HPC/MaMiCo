@@ -71,6 +71,10 @@ public:
     }
   }
 
+  void setInnerImposition(bool enable) override {
+    throw std::runtime_error(std::string("coupling::AdditiveMomentumInsertion::setInnerImposition not implemented"));
+  }
+
 private:
   const unsigned int _numberMDTimestepsPerCouplingCycle; ///< The number of molecular dynamics
                                                          ///< timesteps within one coupling

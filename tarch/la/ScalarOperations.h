@@ -5,6 +5,7 @@
 #ifndef _TARCH_LA_SCALAROPERATIONS_H_
 #define _TARCH_LA_SCALAROPERATIONS_H_
 #include <cmath>
+#include <Kokkos_Core.hpp>
 /**	namespace tarch */
 namespace tarch {
 /** namespace la */
@@ -20,7 +21,7 @@ namespace la {
  *  @author Philipp Neumann
  */
 
-template <class T> inline bool equals(const T& l, const T& r, const T& tolerance) { return std::abs(l - r) <= tolerance; }
+template <class T> KOKKOS_INLINE_FUNCTION bool equals(const T& l, const T& r, const T& tolerance) { return std::abs(l - r) <= tolerance; }
 
 } // namespace la
 } // namespace tarch

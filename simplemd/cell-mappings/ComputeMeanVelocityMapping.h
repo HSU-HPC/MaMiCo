@@ -60,9 +60,9 @@ public:
     }
   }
 
-  void handleCell(LinkedCell& cell, const unsigned int& cellIndex) {
-    for (std::list<Molecule*>::const_iterator m1 = cell.begin(); m1 != cell.end(); m1++) {
-      _meanVelocity += (*m1)->getConstVelocity();
+  void handleCell(LinkedCell& cell) {
+    for (auto m1 = cell.begin(); m1 != cell.end(); m1++) {
+      _meanVelocity += m1->getConstVelocity();
       _particleCounter++;
     }
   }
@@ -71,8 +71,10 @@ public:
 
   const tarch::la::Vector<MD_DIM, double>& getMeanVelocity() const { return _meanVelocity; }
 
-  /** returns the global number of particles. The local number can be retrieved from MoleculeService.getNumberMolecules(). */
+  /** returns the global number of particles. */
   const unsigned int& getGlobalNumberMolecules() const { return _particleCounter; }
+
+  static const bool IsParallel = false;
 
 private:
   simplemd::services::ParallelTopologyService& _parallelTopologyService;

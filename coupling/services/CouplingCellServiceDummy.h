@@ -69,12 +69,14 @@ public:
   void processInnerCouplingCellAfterMDTimestep() override {}
   void computeAndStoreTemperature(double temperature) override {}
   void applyTemperatureToMolecules(unsigned int t) override {}
+  bool checkIfDistributeMass(unsigned int t) const override { return false; }
   void distributeMass(unsigned int t) override {}
   void distributeMomentum(unsigned int t) override {}
   void perturbateVelocity() override {}
   void applyBoundaryForce(unsigned int t) override {}
   void plotEveryMicroscopicTimestep(unsigned int t) override {}
   void plotEveryMacroscopicTimestep(unsigned int t) override {}
+  void setInnerMomentumImposition(bool enable) override {}
 
 private:
   /** interface for macroscopic solver */
