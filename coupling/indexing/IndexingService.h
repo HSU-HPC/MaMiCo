@@ -147,7 +147,7 @@ public:
 
   /**
    * Determines all ranks that contain a certain global BaseIndex.
-   * Ripped from deprecated IndexConversion.
+   * Ripped from deprecated IndexConversion (git tag: legacyIndexing).
    *
    * @param globalCellIndex index to be looked up
    * @param globalNumberCouplingCells global number of cells in BaseIndex
@@ -157,6 +157,17 @@ public:
   std::vector<unsigned int> getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex, unsigned int topologyOffset) const;
 
   unsigned int getUniqueRankForCouplingCell(const BaseIndex<dim>& globalCellIndex, unsigned int topologyOffset) const;
+
+  /** @returns the coordinates of the calling rank in the process grid. */
+  tarch::la::Vector<dim, unsigned int> getThisProcess() const;
+
+  /** @returns the number of coupling cells (excl. ghost layer) owned by the calling rank,
+   * per dimension. Used e.g. by the LAMMPS coupling to size its rank-local domain. */
+  tarch::la::Vector<dim, unsigned int> getLocalNumberCouplingCells() const;
+
+  /** @returns the 0-indexed offset (excl. ghost layer) of the calling rank's first owned
+   * coupling cell within the global domain, per dimension. */
+  tarch::la::Vector<dim, unsigned int> getLocalCellOffset() const;
 
 #if (COUPLING_MD_PARALLEL == COUPLING_MD_YES) // parallel scenario
   MPI_Comm getComm() const {
@@ -247,10 +258,31 @@ public:
     }
 #endif
 
+    // Fix: This function serves two different callers with opposite needs, so the
+    // clamp below must be narrow:
+
     tarch::la::Vector<dim, int> res_raw;
+    tarch::la::Vector<dim, double> frac;
     for (unsigned int d = 0; d < dim; d++) {
       const double buf = position[d] - (_globalMDDomainOffset[d] - _couplingCellSize[d]);
-      res_raw[d] = buf / _couplingCellSize[d];
+      frac[d] = buf / _couplingCellSize[d];
+      res_raw[d] = (int)floor(frac[d]);
+    }
+    constexpr double residueTolerance = 1e-6; // cell-fraction units: far
+                                               // above fp noise (~1e-13), far
+                                               // below one full cell (1.0)
+    const auto realLower = CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::lowerBoundary.get();
+    const auto realUpper = CellIndex<dim, IndexTrait::vector, IndexTrait::noGhost>::upperBoundary.get();
+    for (unsigned int d = 0; d < dim; d++) {
+      if (res_raw[d] < realLower[d]) {
+        const double undershoot = (double)realLower[d] - frac[d];
+        if (undershoot < residueTolerance)
+          res_raw[d] = realLower[d];
+      } else if (res_raw[d] > realUpper[d]) {
+        const double overshoot = frac[d] - ((double)realUpper[d] + 1.0);
+        if (overshoot < residueTolerance)
+          res_raw[d] = realUpper[d];
+      }
     }
 
     BaseIndex<dim> res{res_raw};
@@ -265,6 +297,11 @@ public:
 private:
   unsigned int getUniqueRankForCouplingCell(tarch::la::Vector<dim, unsigned int> globalCellIndex,
                                             const tarch::la::Vector<dim, unsigned int>& globalNumberCouplingCells, unsigned int topologyOffset) const;
+
+  tarch::la::Vector<dim, unsigned int> getProcessCoordinates(unsigned int rank) const;
+  // Owned-cell range of the calling rank (excl. ghost layer), cached in initWithCells();
+  tarch::la::Vector<dim, unsigned int> _localNumberCouplingCells;
+  tarch::la::Vector<dim, unsigned int> _localCellOffset;
 
   /*const*/ tarch::la::Vector<dim, unsigned int> _numberProcesses; // TODO: make const
   unsigned int _scalarNumberProcesses;

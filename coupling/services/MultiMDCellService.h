@@ -380,7 +380,7 @@ public:
     unsigned int totalNumberEquilibratedMDSimulations = 0;
     for (unsigned int l = 0; l < _totalNumberMDSimulations; l++) {
       // std::cout << "Rank " <<
-      //_couplingCellServices[l]->getIndexConversion().getThisRank() << ":
+      // IDXS.getRank() << ":
       // Send from MD to Macro for Simulation no. " << l << std::endl;
       if (_couplingCellServices[l] != nullptr && _warmupPhase[l] == 0) {
         res += _couplingCellServices[l]->sendFromMD2Macro(md2macroCouplingCells);

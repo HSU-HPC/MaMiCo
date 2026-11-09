@@ -23,6 +23,7 @@ Plots several PinT iterations in a single plot, can be used to show convergence.
 ## Build Couette Scenario
 
 + __build-couette.py__ Utility script for building the coutte scenario using different solvers.
++ __cluster-build/__ Two-stage couette build for clusters whose compute nodes have no outbound network: `build-couette-login.py` fetches LAMMPS and Kokkos on a login node, `build-couette-compute.py` builds offline on a compute node. Alternative to `build-couette.py`; see `cluster-build/README.md`.
 
 ## Config Generator
 

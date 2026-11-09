@@ -26,6 +26,17 @@ def _create_ls1_config(get_config_value) -> Path:
     return path
 
 
+def warn(get_config_value) -> str:
+    """LAMMPS instances in one process share the MamicoInterfaceProvider singleton and
+    drift apart, so a LAMMPS run needs exactly one instance per process: launch with the
+    rank count printed below, never fewer."""
+    key = __name__.split(".")[-1]
+    if get_config_value(key) != "lammps-md":
+        return None
+    ranks = get_config_value("mpi_ranks") * get_config_value("multi_md")
+    return f"LAMMPS: launch with exactly mpirun -n {ranks} (mpi_ranks x multi_md); fewer ranks put several instances in one process, which share one interface singleton and drift."
+
+
 def apply(partial_xml, get_config_value) -> None:
     key = __name__.split(".")[-1]
     solver = get_config_value(key)

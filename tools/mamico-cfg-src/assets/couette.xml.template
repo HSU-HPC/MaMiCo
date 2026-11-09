@@ -75,7 +75,7 @@
       domain-size="{md-size} ; {md-size} ; {md-size}"
       domain-offset="{domain-offset-x} ; {domain-offset-x} ; {domain-offset-z}"
       cutoff-radius="2.2"
-      linked-cell-size="2.5 ; 2.5 ; 2.5"
+      linked-cell-size="{linked-cell-size} ; {linked-cell-size} ; {linked-cell-size}"
       k_B="1.0"
       block-size="100"
 

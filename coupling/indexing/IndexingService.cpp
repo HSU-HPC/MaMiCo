@@ -458,16 +458,22 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
       // calculate box bounds from cell ownership
       // find the first occurence of owned rank
       boxMin[i] = std::distance(_subdomainOwnership[i].begin(), std::find(_subdomainOwnership[i].begin(), _subdomainOwnership[i].end(), coords[i]));
-      // find the last occurence, add one to convert reverse iterator to forward
+      //Now storing one past the last occurence: reverse_iterator::base()
+      // already yields the forward iterator (one element further right).
       boxMax[i] =
-          std::distance(_subdomainOwnership[i].begin(), (std::find(_subdomainOwnership[i].rbegin(), _subdomainOwnership[i].rend(), coords[i]) + 1).base());
+          std::distance(_subdomainOwnership[i].begin(), std::find(_subdomainOwnership[i].rbegin(), _subdomainOwnership[i].rend(), coords[i]).base());
+
+      // cache this rank's owned-cell range (noGhost, 0-indexed) for getLocalCellOffset() /
+      // getLocalNumberCouplingCells(), so callers outside this class need not duplicate the lookup above
+      _localCellOffset[i] = boxMin[i];
+      _localNumberCouplingCells[i] = boxMax[i] - boxMin[i];
     }
     // _subdomainOwnership does not include ghost, so when we take the first occurence value, it is noGhost
-    // however directly casting it into baseIndex shifts everything left by 1, since baseIndex expects ghost
-    // thus we directly use the BaseIndex cast, and consequently boxMax requires +2 for two ghost layers
-    // the "safer" way to write this would be I08{boxMin} -1 and I08{boxMax} + 1, but the result is the same
+    // however directly casting it into baseIndex would everything left by 1, since baseIndex expects ghost
+    // thus boxMin doubles as the lower 'ghost' cell, and boxMax (now one past the last owned cell)
+    // needs only +1 to point to the upper 'ghost' cell
     CellIndex<dim, IndexTrait::local>::lowerBoundary = BaseIndex<dim>{boxMin};
-    CellIndex<dim, IndexTrait::local>::upperBoundary = BaseIndex<dim>{boxMax + tarch::la::Vector<dim, int>{2}};
+    CellIndex<dim, IndexTrait::local>::upperBoundary = BaseIndex<dim>{boxMax + tarch::la::Vector<dim, int>{1}};
     CellIndex<dim, IndexTrait::local>::setDomainParameters();
   }
 
@@ -526,7 +532,7 @@ void coupling::indexing::IndexingService<dim>::initWithCells(const tarch::la::Ve
 }
 
 /*
- * This was in large parts stolen from IndexConversion.
+ * This was in large parts stolen from IndexConversion (git tag: legacyIndexing).
  */
 template <unsigned int dim>
 std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForGlobalIndex(const BaseIndex<dim>& globalCellIndex,
@@ -540,7 +546,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 
   std::vector<unsigned int> ranks;
   // using the old meaning of 'globalNumberCouplingCells' from
-  // IndexConversion
+  // IndexConversion (git tag: legacyIndexing)
   const auto globalNumberCouplingCells = I08::numberCellsInDomain;
 
   // start and end coordinates of neighbouring cells.
@@ -596,7 +602,7 @@ std::vector<unsigned int> coupling::indexing::IndexingService<dim>::getRanksForG
 }
 
 /*
- * This was in large parts stolen from IndexConversion.
+ * This was in large parts stolen from IndexConversion (git tag: legacyIndexing).
  * Note that this uses the globalNumberCouplingCells definition excl. the
  * ghost layer.
  */
@@ -646,6 +652,23 @@ unsigned int coupling::indexing::IndexingService<dim>::getUniqueRankForCouplingC
 
   return getUniqueRankForCouplingCell((tarch::la::Vector<dim, unsigned int>)(globalCellIndex.get()), I09::numberCellsInDomain, topologyOffset);
 }
+
+template <unsigned int dim>
+tarch::la::Vector<dim, unsigned int> coupling::indexing::IndexingService<dim>::getProcessCoordinates(unsigned int rank) const {
+  const unsigned int topologyOffset = (rank / _scalarNumberProcesses) * _scalarNumberProcesses;
+  return _parallelTopology->getProcessCoordinates(rank, topologyOffset);
+}
+
+template <unsigned int dim>
+tarch::la::Vector<dim, unsigned int> coupling::indexing::IndexingService<dim>::getThisProcess() const {
+  return getProcessCoordinates(_rank);
+}
+
+template <unsigned int dim>
+tarch::la::Vector<dim, unsigned int> coupling::indexing::IndexingService<dim>::getLocalNumberCouplingCells() const { return _localNumberCouplingCells; }
+
+template <unsigned int dim>
+tarch::la::Vector<dim, unsigned int> coupling::indexing::IndexingService<dim>::getLocalCellOffset() const { return _localCellOffset; }
 
 // declare specialisation of IndexingService
 #ifdef INDEXING_ENABLE_DIM2
