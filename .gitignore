@@ -35,5 +35,3 @@ docs/
 /lammps
 # mamico-cfg cache
 .mamico-cfg.cache
-allib/
-ls1-originrepo/
