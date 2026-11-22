@@ -114,7 +114,7 @@ public:
     double endRegion[] = {molecule.r(0) + _cutoff, molecule.r(1) + _cutoff, molecule.r(2) + _cutoff};
     auto iterator = _particleContainer->regionIterator(startRegion, endRegion, ParticleIterator::ALL_CELLS);
     tarch::la::Vector<3, double> tempMoleculePosition;
-    // calculate lennard jones energy
+    // find distances to all nearby particles
     while (iterator.isValid()) {
       ::Molecule temp = *iterator;
       tempMoleculePosition = {temp.r(0), temp.r(1), temp.r(2)};
@@ -194,6 +194,14 @@ public:
     deleteMolecule(_curIterator);
   }
 
+  /**
+   * @brief calculate potential at point within simulation, excluding molecule at the point itself
+   * A lot of duplicate code with calculateForceAndPotentialAtPoint, but this duplication make execution faster
+   * 
+   * @param position Point in 3D space whose potential needs to be calculated
+   * @param ignoreOffset Whether the MaMiCo offset should be subtracted or not
+   * @return std::tuple<tarch::la::Vector<3, double>, double> 
+   */
   double calculatePotentialAtMolecule(const tarch::la::Vector<3, double> position, const bool ignoreOffset) const {
     double potentialEnergy = 0.0;
     tarch::la::Vector<3, double> moleculePosition = position;
@@ -230,6 +238,14 @@ public:
     return potentialEnergy;
   }
 
+  /**
+   * @brief calculate force and potential at point within simulation, including any molecules at the point itself
+   * A lot of duplicate code with calculatePotentialAtMolecule, but this duplication make execution faster
+   * 
+   * @param position Point in 3D space whose potential and force needs to be calculated
+   * @param ignoreOffset Whether the MaMiCo offset should be subtracted or not
+   * @return std::tuple<tarch::la::Vector<3, double>, double> 
+   */
   std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position,
                                                                                      const bool ignoreOffset) const {
     tarch::la::Vector<3, double> force(0.0);
