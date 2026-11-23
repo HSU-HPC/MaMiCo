@@ -40,9 +40,6 @@ public:
     global_simulation = _testSimulation;
     _testSimulation->disableFinalCheckpoint();
     _testSimulation->readConfigFile(_ls1ConfigFileName);
-    //_testSimulation->getDomain()->thermostatOff();
-    //_testSimulation->getDomain()->setExplosionHeuristics(false);
-    // after this point the mamico plugin exists and is accessible
     _testSimulation->prepare_start();
     _testSimulation->preSimLoopSteps();
   }
@@ -126,15 +123,15 @@ public:
           // ensure there isn't a molecule already at that position
           double startRegion[] = {position[0] - 0.01, position[1] - 0.01, position[2] - 0.01};
           double endRegion[] = {position[0] + 0.01, position[1] + 0.01, position[2] + 0.01};
-          RegionParticleIterator _curIterator = _testSimulation->getMoleculeContainer()->regionIterator(startRegion, endRegion, ParticleIterator::ALL_CELLS);
+          RegionParticleIterator curIterator = _testSimulation->getMoleculeContainer()->regionIterator(startRegion, endRegion, ParticleIterator::ALL_CELLS);
           bool found = false;
-          while (_curIterator.isValid()) {
-            ::Molecule temp = *_curIterator;
-            if (std::abs(temp.r(0) - position[0]) < 1e-6 && std::abs(temp.r(1) - position[1]) < 1e-6 && std::abs(temp.r(2) - position[2]) < 1e-6) {
+          while (curIterator.isValid()) {
+            if (std::abs(curIterator->r(0) - position[0]) < 1e-6 && std::abs(curIterator->r(1) - position[1]) < 1e-6 &&
+                std::abs(curIterator->r(2) - position[2]) < 1e-6) {
               found = true;
               break;
             }
-            ++_curIterator;
+            ++curIterator;
           }
           const double potFromMolecule = mamicoMolecule.getPotentialEnergy();
           const auto [force, potFromIterator] = region.calculateForceAndPotentialAtPoint(position, false);

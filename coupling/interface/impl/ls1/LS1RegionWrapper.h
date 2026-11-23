@@ -8,6 +8,7 @@
 #include "ls1/src/Simulation.h"
 #include "ls1/src/Domain.h"
 #include "ls1/src/ensemble/EnsembleBase.h"
+#include "ls1/src/parallel/DomainDecompBase.h"
 #include "ls1/src/molecules/Molecule.h"
 #include "ls1/src/particleContainer/ParticleContainer.h"
 #include "ls1/src/particleContainer/RegionParticleIterator.h"
@@ -24,8 +25,11 @@
 #include "tarch/la/Vector.h"
 
 namespace ls1 {
+class LS1RegionWrapper;
+}
+class LS1RegionWrapperTest;
 
-class LS1RegionWrapper {
+class ls1::LS1RegionWrapper {
 public:
   LS1RegionWrapper(tarch::la::Vector<3, double> startRegion, tarch::la::Vector<3, double> endRegion, Simulation* simulation)
       : _locSimulation(simulation), _particleContainer(simulation->getMoleculeContainer()), _cutoff(simulation->getcutoffRadius()), _cutoff2(_cutoff * _cutoff),
@@ -81,6 +85,7 @@ public:
   bool isInRegion(const tarch::la::Vector<3, double> point) const { return isInRegion(new double[3]{point[0], point[1], point[2]}); }
 
   bool isInRegion(const double startBox[3], const double endBox[3]) const { return isInRegion(startBox) && isInRegion(endBox); }
+
   /**
    * @brief Initialises a region iterator so that it can insert particles with correct IDs into ls1.
    *
@@ -143,9 +148,10 @@ public:
     auto velocity = molecule.getVelocity();
     auto force = molecule.getForce();
 
-    temp.setr(0, position[0] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(0)); // temporary till ls1 offset is natively supported
-    temp.setr(1, position[1] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(1));
-    temp.setr(2, position[2] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(2));
+    position = applyLS1Offset(position);
+    temp.setr(0, position[0]);
+    temp.setr(1, position[1]);
+    temp.setr(2, position[2]);
 
     temp.setv(0, velocity[0]);
     temp.setv(1, velocity[1]);
@@ -167,9 +173,7 @@ public:
   void deleteMolecule(const coupling::interface::Molecule<3>& molecule) {
     // check if coords in region
     auto molPosition = molecule.getPosition();
-    for (int i = 0; i < 3; i++) {
-      molPosition[i] = molPosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i);
-    } // temporary till ls1 offset is natively supported;
+    molPosition = applyLS1Offset(molPosition);
     if (!isInRegion(molPosition))
       return;
     // check if molecule at location specified
@@ -177,39 +181,36 @@ public:
     double startBox[] = {molPosition[0] - margin, molPosition[1] - margin, molPosition[2] - margin};
     double endBox[] = {molPosition[0] + margin, molPosition[1] + margin, molPosition[2] + margin};
 
-    RegionParticleIterator _curIterator = _particleContainer->regionIterator(startBox, endBox, ParticleIterator::ALL_CELLS);
+    RegionParticleIterator curIterator = _particleContainer->regionIterator(startBox, endBox, ParticleIterator::ALL_CELLS);
     bool found = false;
-    while (_curIterator.isValid()) {
-      ::Molecule temp = *_curIterator;
-      if (std::abs(temp.r(0) - molPosition[0]) < 1e-6 && std::abs(temp.r(1) - molPosition[1]) < 1e-6 && std::abs(temp.r(2) - molPosition[2]) < 1e-6) {
+    while (curIterator.isValid()) {
+      if (std::abs(curIterator->r(0) - molPosition[0]) < 1e-6 && std::abs(curIterator->r(1) - molPosition[1]) < 1e-6 &&
+          std::abs(curIterator->r(2) - molPosition[2]) < 1e-6) {
         found = true;
         break;
       }
-      ++_curIterator;
+      ++curIterator;
     }
     // delete molecule
     if (!found)
       return;
 
-    deleteMolecule(_curIterator);
+    deleteMolecule(curIterator);
   }
 
   /**
    * @brief calculate potential at point within simulation, excluding molecule at the point itself
    * A lot of duplicate code with calculateForceAndPotentialAtPoint, but this duplication make execution faster
-   * 
+   *
    * @param position Point in 3D space whose potential needs to be calculated
    * @param ignoreOffset Whether the MaMiCo offset should be subtracted or not
-   * @return std::tuple<tarch::la::Vector<3, double>, double> 
+   * @return std::tuple<tarch::la::Vector<3, double>, double>
    */
   double calculatePotentialAtMolecule(const tarch::la::Vector<3, double> position, const bool ignoreOffset) const {
     double potentialEnergy = 0.0;
     tarch::la::Vector<3, double> moleculePosition = position;
     if (!ignoreOffset) {
-      for (int i = 0; i < 3; i++) {
-        moleculePosition[i] =
-            moleculePosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i); // temporary till ls1 offset is natively supported
-      }
+      moleculePosition = applyLS1Offset(moleculePosition);
     }
 
     tarch::la::Vector<3, double> tempMoleculePosition;
@@ -241,10 +242,10 @@ public:
   /**
    * @brief calculate force and potential at point within simulation, including any molecules at the point itself
    * A lot of duplicate code with calculatePotentialAtMolecule, but this duplication make execution faster
-   * 
+   *
    * @param position Point in 3D space whose potential and force needs to be calculated
    * @param ignoreOffset Whether the MaMiCo offset should be subtracted or not
-   * @return std::tuple<tarch::la::Vector<3, double>, double> 
+   * @return std::tuple<tarch::la::Vector<3, double>, double>
    */
   std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position,
                                                                                      const bool ignoreOffset) const {
@@ -254,10 +255,7 @@ public:
     // molecule position
     tarch::la::Vector<3, double> moleculePosition = position;
     if (!ignoreOffset) {
-      for (int i = 0; i < 3; i++) {
-        moleculePosition[i] =
-            moleculePosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i); // temporary till ls1 offset is natively supported
-      }
+      moleculePosition = applyLS1Offset(moleculePosition);
     }
 
     tarch::la::Vector<3, double> tempMoleculePosition;
@@ -289,6 +287,13 @@ public:
   }
 
 private:
+  inline tarch::la::Vector<3, double> applyLS1Offset(tarch::la::Vector<3, double> position) const {
+    tarch::la::Vector<3, double> toRet;
+    for (int i = 0; i < 3; i++) {
+      toRet[i] = position[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i); // temporary till ls1 offset is natively supported
+    }
+    return toRet;
+  }
   Simulation* _locSimulation;
   ParticleContainer* _particleContainer;
   const double _cutoff, _cutoff2;
@@ -300,7 +305,7 @@ private:
   unsigned int _IDIncrementor;
   bool _IDinited;
   RegionParticleIterator _iterator;
+  friend LS1RegionWrapperTest;
 };
-} // namespace ls1
 
 #endif

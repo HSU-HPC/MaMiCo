@@ -25,6 +25,7 @@ class LS1RegionWrapperTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testAddAndDeleteParticle);
   CPPUNIT_TEST(testResetIterator);
   CPPUNIT_TEST(testIteration);
+  CPPUNIT_TEST(testOffsetRemoval);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -46,9 +47,6 @@ public:
     global_simulation = _testSimulation;
     _testSimulation->disableFinalCheckpoint();
     _testSimulation->readConfigFile(_ls1ConfigFileName);
-    //_testSimulation->getDomain()->thermostatOff();
-    //_testSimulation->getDomain()->setExplosionHeuristics(false);
-    // after this point the mamico plugin exists and is accessible
     _testSimulation->prepare_start();
     _testSimulation->preSimLoopSteps();
   }
@@ -339,6 +337,39 @@ public:
     countInfo.clear();
     countInfo << "counted particles: " << particleCount << " actual number: " << _testSimulation->getDomain()->getglobalNumMolecules() << std::endl;
     CPPUNIT_ASSERT_MESSAGE(countInfo.str(), particleCount == _testSimulation->getDomain()->getglobalNumMolecules());
+  }
+  void testOffsetRemoval() {
+    ls1::LS1RegionWrapper fullRegion(_testSimulation->getEnsemble()->domain()->rmin(), _testSimulation->getEnsemble()->domain()->rmax(), _testSimulation);
+    // set up random seed
+    srand(time(NULL));
+
+    // test 20 times
+    for (int i = 0; i < 20; i++) {
+      // get values < 250
+      double posx = static_cast<double>(rand() % 250);
+      double posy = static_cast<double>(rand() % 250);
+      double posz = static_cast<double>(rand() % 250);
+      double offx = static_cast<double>(rand() % 250);
+      double offy = static_cast<double>(rand() % 250);
+      double offz = static_cast<double>(rand() % 250);
+
+      // set up
+      tarch::la::Vector<3, double> position{posx, posy, posz};
+      coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, offx);
+      coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, offy);
+      coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, offz);
+
+      // test
+      position = fullRegion.applyLS1Offset(position);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(position[0], posx - offx, 1e-6);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(position[1], posy - offy, 1e-6);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(position[2], posz - offz, 1e-6);
+    }
+
+    // reset offset for other tests
+    coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(0, 0);
+    coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(1, 0);
+    coupling::interface::LS1StaticCommData::getInstance().setBoxOffsetAtDim(2, 0);
   }
 
 private:

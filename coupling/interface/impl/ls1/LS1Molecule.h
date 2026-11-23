@@ -77,11 +77,11 @@ public:
 
   /** returns/ sets the potential energy of the molecule */
   virtual double getPotentialEnergy() const {
-    tarch::la::Vector<3, double> location;
+    tarch::la::Vector<3, double> position;
     // if(_myMolecule == NULL) return 0.0;
-    location = {_myMolecule->r(0), _myMolecule->r(1), _myMolecule->r(2)};
+    position = {_myMolecule->r(0), _myMolecule->r(1), _myMolecule->r(2)};
     ls1::LS1RegionWrapper region;
-    return region.calculatePotentialAtMolecule(location, true /*ignoreOffset*/);
+    return region.calculatePotentialAtMolecule(position, true /*ignoreOffset*/);
   }
   virtual void setPotentialEnergy(const double& potentialEnergy) { throw std::runtime_error("LS1Molecule:setPotentialEnergy should never be called!"); }
 
