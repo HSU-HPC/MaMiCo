@@ -147,8 +147,11 @@ public:
 #elif defined(LAMMPS_DPD)
     mdSolverInterface = coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().getMDSolverInterface();
 #elif defined(LS1_MARDYN)
+    const auto particleInsertionType = mamicoConfiguration.getParticleInsertionConfiguration().getParticleInsertionType();
+    const bool particleInsertionNeeded = !(particleInsertionType == mamicoConfiguration.getParticleInsertionConfiguration().NO_INSERTION);
     mdSolverInterface = new coupling::interface::LS1MDSolverInterface(mamicoConfiguration.getCouplingCellConfiguration().getCouplingCellSize(),
-                                                                      mamicoConfiguration.getCouplingCellConfiguration().getNumberLinkedCellsPerCouplingCell());
+                                                                      mamicoConfiguration.getCouplingCellConfiguration().getNumberLinkedCellsPerCouplingCell(),
+                                                                      particleInsertionNeeded);
     coupling::interface::MamicoInterfaceProvider<MY_LINKEDCELL, MDSIMULATIONFACTORY_DIMENSION>::getInstance().setMDSolverInterface(mdSolverInterface);
 #endif
 

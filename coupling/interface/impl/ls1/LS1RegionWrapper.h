@@ -6,10 +6,13 @@
 #include <tuple>
 
 #include "ls1/src/Simulation.h"
+#include "ls1/src/Domain.h"
 #include "ls1/src/ensemble/EnsembleBase.h"
+#include "ls1/src/parallel/DomainDecompBase.h"
 #include "ls1/src/molecules/Molecule.h"
 #include "ls1/src/particleContainer/ParticleContainer.h"
 #include "ls1/src/particleContainer/RegionParticleIterator.h"
+#include "ls1/src/utils/CommVar.h"
 
 #include "coupling/CouplingMDDefinitions.h"
 #include "coupling/interface/Molecule.h"
@@ -22,8 +25,10 @@
 #include "tarch/la/Vector.h"
 
 namespace ls1 {
+class LS1RegionWrapper;
+}
 
-class LS1RegionWrapper {
+class ls1::LS1RegionWrapper {
 public:
   LS1RegionWrapper(tarch::la::Vector<3, double> startRegion, tarch::la::Vector<3, double> endRegion, Simulation* simulation)
       : _locSimulation(simulation), _particleContainer(simulation->getMoleculeContainer()), _cutoff(simulation->getcutoffRadius()), _cutoff2(_cutoff * _cutoff),
@@ -43,7 +48,10 @@ public:
       : LS1RegionWrapper(tarch::la::Vector<3, double>(startRegion[0], startRegion[1], startRegion[2]),
                          tarch::la::Vector<3, double>(endRegion[0], endRegion[1], endRegion[2]), simulation) {}
 
-  void setRegion(double startRegion[3], double endRegion[3]) {
+  LS1RegionWrapper()
+      : LS1RegionWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation) {}
+
+  void setRegion(const double startRegion[3], const double endRegion[3]) {
     for (int i = 0; i < 3; i++) {
       _startRegion[i] = startRegion[i];
       _endRegion[i] = endRegion[i];
@@ -51,51 +59,78 @@ public:
     _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS);
   }
 
-  double getStartRegionAtDim(int dim) { return _startRegion[dim]; }
+  double getStartRegionAtDim(const int dim) const { return _startRegion[dim]; }
 
-  double getEndRegionAtDim(int dim) { return _endRegion[dim]; }
+  double getEndRegionAtDim(const int dim) const { return _endRegion[dim]; }
 
   void iteratorReset() { _iterator = _particleContainer->regionIterator(_startRegion, _endRegion, ParticleIterator::ALL_CELLS); }
 
   void iteratorNext() { ++_iterator; }
 
-  bool iteratorValid() { return _iterator.isValid(); }
+  bool iteratorValid() const { return _iterator.isValid(); }
 
   ::Molecule* getParticleAtIterator() {
     ::Molecule* temp = &(*_iterator);
     return temp;
   }
 
-  bool isInRegion(const double point[3]) {
+  bool isInRegion(const double point[3]) const {
     bool isInRegion = true;
     for (int i = 0; i < 3; i++) {
       isInRegion &= ((point[i] >= _startRegion[i]) & (point[i] < _endRegion[i]));
     }
     return isInRegion;
   }
-  bool isInRegion(const tarch::la::Vector<3, double> point) { return isInRegion(new double[3]{point[0], point[1], point[2]}); }
+  bool isInRegion(const tarch::la::Vector<3, double> point) const { return isInRegion(new double[3]{point[0], point[1], point[2]}); }
 
-  bool isInRegion(const double startBox[3], const double endBox[3]) { return isInRegion(startBox) && isInRegion(endBox); }
+  bool isInRegion(const double startBox[3], const double endBox[3]) const { return isInRegion(startBox) && isInRegion(endBox); }
 
+  /**
+   * @brief Initialises a region iterator so that it can insert particles with correct IDs into ls1.
+   *
+   * If IDs are not unique, crashes occur with AutoPas, since it uses IDs to update halo moleules, and if they are skipped, explosions can occur.
+   * ls1 inits its molecules in two ways: either it gives every molecule in the whole simulation consecutive IDs (old system, check CubicGridGeneratorInternal),
+   * or it divides the whole unsigned int space into ID pools per rank (check MoleculeIDPool.h). Regardless of which method it chooses, the system below (taking
+   * the biggest ID, and interweaving molecules by incrementing by rank number) should make sure that no clashes occur, while maintaining unique IDs.
+   *
+   */
   void setupIDcounterForParticleAddition() {
-    if (!_IDinited) {
-      _curParticleID = _locSimulation->getTotalNumberOfMolecules() + 1;
-      _IDIncrementor = 1;
-
-#if (COUPLING_MD_PARALLEL == COUPLING_MD_YES)
-      int curRank = _locSimulation->domainDecomposition().getRank();
-      _curParticleID += curRank + 1;
-      _IDIncrementor = _locSimulation->domainDecomposition().getNumProcs();
-#endif
-
-      _IDinited = true;
-    }
+    _locSimulation->getDomain()->updateMaxMoleculeID(_locSimulation->getMoleculeContainer(), &(_locSimulation->domainDecomposition()));
+    auto maxIDs = _locSimulation->getDomain()->getMaxMoleculeID();
+    _curParticleID = maxIDs.global + 1 + _locSimulation->domainDecomposition().getRank(); // returns 0 in serial case
+    _IDIncrementor = _locSimulation->domainDecomposition().getNumProcs();                 // returns 1 in serial case
+    _IDinited = true;
   }
 
   void addMolecule(::Molecule& molecule) {
     if (!_IDinited) {
       throw std::runtime_error("addMolecule used with a wrapper that did not have particle ID initalized");
     }
+#ifdef USHER_DEBUG
+    std::stringstream ss;
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    ss << "RANK " << rank << " adding ID " << molecule.getID() << " location " << molecule.r(0) << ", " << molecule.r(1) << ", " << molecule.r(2)
+       << " Nearby: ";
+    int i = 0;
+    tarch::la::Vector<3, double> moleculePosition = {molecule.r(0), molecule.r(1), molecule.r(2)};
+    double startRegion[] = {molecule.r(0) - _cutoff, molecule.r(1) - _cutoff, molecule.r(2) - _cutoff};
+    double endRegion[] = {molecule.r(0) + _cutoff, molecule.r(1) + _cutoff, molecule.r(2) + _cutoff};
+    auto iterator = _particleContainer->regionIterator(startRegion, endRegion, ParticleIterator::ALL_CELLS);
+    tarch::la::Vector<3, double> tempMoleculePosition;
+    // find distances to all nearby particles
+    while (iterator.isValid()) {
+      ::Molecule temp = *iterator;
+      tempMoleculePosition = {temp.r(0), temp.r(1), temp.r(2)};
+      const auto r = tempMoleculePosition - moleculePosition;
+      const double r2 = tarch::la::dot(r, r);
+      ss << "[" << temp.getID() << ", " << r2 << "] ";
+      ++iterator;
+      i++;
+    }
+    ss << " Total " << i << std::endl;
+    std::cout << ss.str();
+#endif
     _particleContainer->addParticle(molecule);
   }
 
@@ -112,9 +147,10 @@ public:
     auto velocity = molecule.getVelocity();
     auto force = molecule.getForce();
 
-    temp.setr(0, position[0] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(0)); // temporary till ls1 offset is natively supported
-    temp.setr(1, position[1] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(1));
-    temp.setr(2, position[2] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(2));
+    position = applyLS1Offset(position);
+    temp.setr(0, position[0]);
+    temp.setr(1, position[1]);
+    temp.setr(2, position[2]);
 
     temp.setv(0, velocity[0]);
     temp.setv(1, velocity[1]);
@@ -136,43 +172,44 @@ public:
   void deleteMolecule(const coupling::interface::Molecule<3>& molecule) {
     // check if coords in region
     auto molPosition = molecule.getPosition();
-    for (int i = 0; i < 3; i++) {
-      molPosition[i] = molPosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i);
-    } // temporary till ls1 offset is natively supported;
+    molPosition = applyLS1Offset(molPosition);
     if (!isInRegion(molPosition))
       return;
     // check if molecule at location specified
-    double margin = _cutoff / 10;
+    double margin = _locSimulation->getEnsemble()->getComponent(0)->getSigma(0) / 10;
     double startBox[] = {molPosition[0] - margin, molPosition[1] - margin, molPosition[2] - margin};
     double endBox[] = {molPosition[0] + margin, molPosition[1] + margin, molPosition[2] + margin};
 
-    RegionParticleIterator _curIterator = _particleContainer->regionIterator(startBox, endBox, ParticleIterator::ALL_CELLS);
+    RegionParticleIterator curIterator = _particleContainer->regionIterator(startBox, endBox, ParticleIterator::ALL_CELLS);
     bool found = false;
-    while (_curIterator.isValid()) {
-      ::Molecule* temp = &(*_curIterator);
-      if (std::abs(temp->r(0) - molPosition[0]) < 1e-6 && std::abs(temp->r(1) - molPosition[1]) < 1e-6 && std::abs(temp->r(2) - molPosition[2]) < 1e-6) {
+    while (curIterator.isValid()) {
+      if (std::abs(curIterator->r(0) - molPosition[0]) < 1e-6 && std::abs(curIterator->r(1) - molPosition[1]) < 1e-6 &&
+          std::abs(curIterator->r(2) - molPosition[2]) < 1e-6) {
         found = true;
         break;
       }
-      ++_curIterator;
+      ++curIterator;
     }
     // delete molecule
     if (!found)
       return;
 
-    deleteMolecule(_curIterator);
-    //_particleContainer->deleteMolecule(temp, false);
+    deleteMolecule(curIterator);
   }
 
-  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position, double adjustCutoff) {
-    tarch::la::Vector<3, double> force(0.0);
+  /**
+   * @brief calculate potential at point within simulation, excluding molecule at the point itself
+   * A lot of duplicate code with calculateForceAndPotentialAtPoint, but this duplication make execution faster
+   *
+   * @param position Point in 3D space whose potential needs to be calculated
+   * @param ignoreOffset Whether the MaMiCo offset should be subtracted or not
+   * @return std::tuple<tarch::la::Vector<3, double>, double>
+   */
+  double calculatePotentialAtMolecule(const tarch::la::Vector<3, double> position, const bool ignoreOffset) const {
     double potentialEnergy = 0.0;
-
-    // molecule position
     tarch::la::Vector<3, double> moleculePosition = position;
-    for (int i = 0; i < 3; i++) {
-      moleculePosition[i] =
-          moleculePosition[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i); // temporary till ls1 offset is natively supported
+    if (!ignoreOffset) {
+      moleculePosition = applyLS1Offset(moleculePosition);
     }
 
     tarch::la::Vector<3, double> tempMoleculePosition;
@@ -183,28 +220,79 @@ public:
     double startRegion[] = {moleculePosition[0] - _cutoff, moleculePosition[1] - _cutoff, moleculePosition[2] - _cutoff};
     double endRegion[] = {moleculePosition[0] + _cutoff, moleculePosition[1] + _cutoff, moleculePosition[2] + _cutoff};
 
-    ls1::LS1RegionWrapper region(startRegion, endRegion, _locSimulation);
+    auto iterator = _particleContainer->regionIterator(startRegion, endRegion, ParticleIterator::ALL_CELLS);
 
     // calculate lennard jones energy
-    while (region.iteratorValid()) {
-      ::Molecule* temp = region.getParticleAtIterator();
-      tempMoleculePosition = {temp->r(0), temp->r(1), temp->r(2)};
+    while (iterator.isValid()) {
+      ::Molecule temp = *iterator;
+      tempMoleculePosition = {temp.r(0), temp.r(1), temp.r(2)};
+      const auto r = tempMoleculePosition - moleculePosition;
+      const double r2 = tarch::la::dot(r, r);
+      if (r2 <= _cutoff2 && r2 != 0) {
+        const double r6 = r2 * r2 * r2;
+        const double uContrib = 4.0 * _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - _cutoffEnergy;
+        potentialEnergy += 0.5 * uContrib;
+      }
+      ++iterator;
+    }
+    return potentialEnergy;
+  }
+
+  /**
+   * @brief calculate force and potential at point within simulation, including any molecules at the point itself
+   * A lot of duplicate code with calculatePotentialAtMolecule, but this duplication make execution faster
+   *
+   * @param position Point in 3D space whose potential and force needs to be calculated
+   * @param ignoreOffset Whether the MaMiCo offset should be subtracted or not
+   * @return std::tuple<tarch::la::Vector<3, double>, double>
+   */
+  std::tuple<tarch::la::Vector<3, double>, double> calculateForceAndPotentialAtPoint(const tarch::la::Vector<3, double> position,
+                                                                                     const bool ignoreOffset) const {
+    tarch::la::Vector<3, double> force(0.0);
+    double potentialEnergy = 0.0;
+
+    // molecule position
+    tarch::la::Vector<3, double> moleculePosition = position;
+    if (!ignoreOffset) {
+      moleculePosition = applyLS1Offset(moleculePosition);
+    }
+
+    tarch::la::Vector<3, double> tempMoleculePosition;
+
+    // calculate force
+    // find all molecules within cutoff
+
+    double startRegion[] = {moleculePosition[0] - _cutoff, moleculePosition[1] - _cutoff, moleculePosition[2] - _cutoff};
+    double endRegion[] = {moleculePosition[0] + _cutoff, moleculePosition[1] + _cutoff, moleculePosition[2] + _cutoff};
+
+    auto iterator = _particleContainer->regionIterator(startRegion, endRegion, ParticleIterator::ALL_CELLS);
+
+    // calculate lennard jones energy
+    while (iterator.isValid()) {
+      ::Molecule temp = *iterator;
+      tempMoleculePosition = {temp.r(0), temp.r(1), temp.r(2)};
       const auto r = tempMoleculePosition - moleculePosition;
       const double r2 = tarch::la::dot(r, r);
       if (r2 <= _cutoff2) {
         const double r6 = r2 * r2 * r2;
         const auto forceContrib = (24.0 * _epsilon / r2 * (_sigma6 / r6)) * (1.0 - 2.0 * (_sigma6 / r6)) * r;
-        const double uContrib = 4.0 * _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - (adjustCutoff ? _cutoffEnergy : 0);
+        const double uContrib = 4.0 * _epsilon * (_sigma6 / r6) * ((_sigma6 / r6) - 1.0) - _cutoffEnergy;
         potentialEnergy += 0.5 * uContrib;
         force += forceContrib;
       }
-
-      region.iteratorNext();
+      ++iterator;
     }
     return std::make_tuple(force, potentialEnergy);
   }
 
 private:
+  inline tarch::la::Vector<3, double> applyLS1Offset(tarch::la::Vector<3, double> position) const {
+    tarch::la::Vector<3, double> toRet;
+    for (int i = 0; i < 3; i++) {
+      toRet[i] = position[i] - coupling::interface::LS1StaticCommData::getInstance().getBoxOffsetAtDim(i); // temporary till ls1 offset is natively supported
+    }
+    return toRet;
+  }
   Simulation* _locSimulation;
   ParticleContainer* _particleContainer;
   const double _cutoff, _cutoff2;
@@ -213,10 +301,9 @@ private:
   const double _cutoffEnergy;
   double _startRegion[3], _endRegion[3];
   unsigned long int _curParticleID;
-  int _IDIncrementor;
+  unsigned int _IDIncrementor;
   bool _IDinited;
   RegionParticleIterator _iterator;
 };
-} // namespace ls1
 
 #endif

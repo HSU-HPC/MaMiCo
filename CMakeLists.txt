@@ -112,7 +112,7 @@ option(BUILD_WITH_ADIOS2 "Enable output in the Adios2 format." OFF)
 message(STATUS ">> Build with Adios2: " ${BUILD_WITH_ADIOS2})
 
 # Optimize compile times for release builds
-if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT BUILD_TESTING)
+if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT BUILD_TESTING AND NOT "${MD_SIM}" STREQUAL "LS1_MARDYN")
   set(CMAKE_UNITY_BUILD ON)
 endif()
 
@@ -244,6 +244,7 @@ if("${MD_SIM}" STREQUAL "LS1_MARDYN")
   set(ENABLE_ADIOS2 ${BUILD_WITH_ADIOS2}) # ls1 will fetch adios2, it will be available for mamico
   set(ENABLE_MPI ${BUILD_WITH_MPI})
   set(ADIOS2_HAVE_MPI ${BUILD_WITH_MPI})
+  set(MAMICO_ENABLE_FPIC ${BUILD_WITH_PYBIND11})
   set(MAMICO_COUPLING ON)
   set(MAMICO_SRC_DIR ../..)
   if(${KOKKOS_TARGET} STREQUAL "OPENMP")

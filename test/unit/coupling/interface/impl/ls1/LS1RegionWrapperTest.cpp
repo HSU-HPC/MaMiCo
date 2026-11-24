@@ -46,9 +46,6 @@ public:
     global_simulation = _testSimulation;
     _testSimulation->disableFinalCheckpoint();
     _testSimulation->readConfigFile(_ls1ConfigFileName);
-    //_testSimulation->getDomain()->thermostatOff();
-    //_testSimulation->getDomain()->setExplosionHeuristics(false);
-    // after this point the mamico plugin exists and is accessible
     _testSimulation->prepare_start();
     _testSimulation->preSimLoopSteps();
   }
@@ -269,7 +266,7 @@ public:
                                                   _testSimulation);
           tarch::la::Vector<3, double> force(0.0);
           double pseudoPotential = 0.0;
-          std::tie(force, pseudoPotential) = fullDomainWrapper.calculateForceAndPotentialAtPoint(position, true);
+          std::tie(force, pseudoPotential) = fullDomainWrapper.calculateForceAndPotentialAtPoint(position, false);
 
           ::Molecule ls1Molecule;
           coupling::interface::LS1Molecule mamicoMolecule(&ls1Molecule);

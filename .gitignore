@@ -1,4 +1,4 @@
-build/
+build*/
 .sconsign.dblite
 *.csv
 *.vtk

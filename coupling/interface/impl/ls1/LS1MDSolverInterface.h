@@ -24,10 +24,15 @@ class LS1MDSolverInterface;
 
 class coupling::interface::LS1MDSolverInterface : public coupling::interface::MDSolverInterface<ls1::LS1RegionWrapper, 3> {
 public:
-  LS1MDSolverInterface(tarch::la::Vector<3, double> couplingCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell)
+  LS1MDSolverInterface(tarch::la::Vector<3, double> couplingCellSize, tarch::la::Vector<3, unsigned int> linkedCellsPerCouplingCell,
+                       bool enableInsertion = true)
       : _fullDomainWrapper(global_simulation->getEnsemble()->domain()->rmin(), global_simulation->getEnsemble()->domain()->rmax(), global_simulation),
         _locSimulation(global_simulation) {
-    _fullDomainWrapper.setupIDcounterForParticleAddition();
+    if (enableInsertion)
+      _fullDomainWrapper.setupIDcounterForParticleAddition();
+    const auto totalNumPossibleCells =
+        I10::linearNumberCellsInDomain * linkedCellsPerCouplingCell[0] * linkedCellsPerCouplingCell[1] * linkedCellsPerCouplingCell[2];
+    _linkedCellPointers.reserve(totalNumPossibleCells);
     for (int i = 0; i < 3; i++)
       _linkedCellSize[i] = couplingCellSize[i] / linkedCellsPerCouplingCell[i];
   }
@@ -181,7 +186,7 @@ public:
     tarch::la::Vector<3, double> force(0.0);
     double potentialEnergy = 0.0;
     // calculate energy (copied from coupling::interface, assuming that the molecule used here is a coupling::datastructures)
-    std::tie(force, potentialEnergy) = _fullDomainWrapper.calculateForceAndPotentialAtPoint(molecule.getPosition(), true);
+    std::tie(force, potentialEnergy) = _fullDomainWrapper.calculateForceAndPotentialAtPoint(molecule.getPosition(), false /*ignoreOffset*/);
     molecule.setForce(force);
     molecule.setPotentialEnergy(potentialEnergy);
   }
@@ -197,8 +202,8 @@ public:
   virtual void synchronizeMoleculesAfterMassModification() {
     // delete halo particles in ls1 linked cells
     // this should technically delete leaving particles too, since this is occuring after position update
-    // however at this point positions are only updates within molecules, and as long as moleculecontainer->update()
-    // is not called, the particles are not actually marked to be outside the bounding box, hence this is safe
+    // however before this, in the MamicoCoupling plugin, updateParticleContainer... has already been called
+    // so leaving particles are already communicated
 #ifndef MARDYN_AUTOPAS
     _locSimulation->getMoleculeContainer()->deleteOuterParticles();
 #endif
