@@ -90,6 +90,7 @@ def download_ls1(mamico_repo_dir):
     had_error = 0 != shell("git submodule init && git submodule update")
     return had_error
 
+
 def download_open_foam():
     had_error = False
     print(f"Downloading OpenFOAM-v{OPEN_FOAM_VERSION}...")
