@@ -27,7 +27,6 @@
 namespace ls1 {
 class LS1RegionWrapper;
 }
-class LS1RegionWrapperTest;
 
 class ls1::LS1RegionWrapper {
 public:
@@ -305,7 +304,6 @@ private:
   unsigned int _IDIncrementor;
   bool _IDinited;
   RegionParticleIterator _iterator;
-  friend LS1RegionWrapperTest;
 };
 
 #endif
